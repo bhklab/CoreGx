@@ -1,5 +1,6 @@
 .fitCurve <- function (x,
                        y,
+                       f,
                        density,
                        step,
                        precision,
@@ -9,21 +10,14 @@
                        family,
                        median_n,
                        trunc,
-                       verbose) {
-  match.arg(family)
-  
-  if (!SF_as_log) {
-    SF <- log(SF)
-  }
-  
-  if (trunc) {
-    SF[which(SF > 0)] <- 0
-  }
+                       verbose,
+                       gritty_guess,
+                       span) {
   
   guess <- tryCatch(optim(par = gritty_guess,
-                          fn = function(x) {.residual(D,
+                          fn = function(t) {.residual(D,
                                                       SF,
-                                                      pars = x,
+                                                      pars = t,
                                                       n = median_n,
                                                       scale = scale,
                                                       family = family,
@@ -51,32 +45,30 @@
                                      trunc = trunc)
   
   if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
-    sieve_guess <- .meshEval(D,
-                             SF,
-                             lower_bounds = lower_bounds, 
-                             upper_bounds = upper_bounds,
-                             density = density, 
-                             n = median_n,
-                             scale = scale,
-                             family = family,
-                             trunc = trunc)
-    sieve_guess_residual <- .residual(D,
-                                      SF, 
-                                      pars = sieve_guess,
-                                      n = median_n,
-                                      scale = scale, 
-                                      family = family,
-                                      trunc = trunc)
-    guess <- sieve_guess
-    guess_residual <- sieve_guess_residual
+    guess <- .meshEval(D,
+                       SF,
+                       lower_bounds = lower_bounds, 
+                       upper_bounds = upper_bounds,
+                       density = density, 
+                       n = median_n,
+                       scale = scale,
+                       family = family,
+                       trunc = trunc)
+    guess_residual <- .residual(D,
+                                SF, 
+                                pars = sieve_guess,
+                                n = median_n,
+                                scale = scale, 
+                                family = family,
+                                trunc = trunc)
     
-    guess <- .patternSearch(guess = sieve_guess,
-                            guess_residual = sieve_guess_residual,
-                            span = 0.1,
+    guess <- .patternSearch(guess = guess,
+                            guess_residual = guess_residual,
+                            span = span,
                             precision = precision,
                             step = step,
                             f = f)
   }
   
-  return(list(alpha = guess[1], beta = guess[2]))
+  return(guess)
 }
