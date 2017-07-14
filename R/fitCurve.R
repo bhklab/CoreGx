@@ -15,10 +15,11 @@
                        span) {
   
   guess <- tryCatch(optim(par = gritty_guess,
-                          fn = function(t) {.residual(D,
-                                                      SF,
-                                                      pars = t,
+                          fn = function(t) {.residual(x = x,
+                                                      y = y,
                                                       n = median_n,
+                                                      pars = guess,
+                                                      f = f,
                                                       scale = scale,
                                                       family = family,
                                                       trunc = trunc)},
@@ -29,35 +30,39 @@
   failed = guess[["convergence"]] != 0
   guess <- guess[["par"]]
   
-  guess_residual <- .residual(D,
-                              SF,
-                              pars = guess, 
+  guess_residual <- .residual(x = x,
+                              y = y,
                               n = median_n,
+                              pars = guess,
+                              f = f,
                               scale = scale,
                               family = family,
                               trunc = trunc)
-  gritty_guess_residual <- .residual(log_conc,
-                                     viability,
-                                     pars = gritty_guess, 
+  gritty_guess_residual <- .residual(x = x,
+                                     y = y,
                                      n = median_n,
+                                     pars = gritty_guess,
+                                     f = f,
                                      scale = scale,
                                      family = family,
                                      trunc = trunc)
   
   if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
-    guess <- .meshEval(D,
-                       SF,
+    guess <- .meshEval(x = x,
+                       y = y,
+                       f = f,
+                       guess = gritty_guess,
                        lower_bounds = lower_bounds, 
                        upper_bounds = upper_bounds,
                        density = density, 
                        n = median_n,
-                       scale = scale,
                        family = family,
                        trunc = trunc)
-    guess_residual <- .residual(D,
-                                SF, 
-                                pars = sieve_guess,
+    guess_residual <- .residual(x = x,
+                                y = y,
                                 n = median_n,
+                                pars = sieve_guess,
+                                f = f,
                                 scale = scale, 
                                 family = family,
                                 trunc = trunc)
