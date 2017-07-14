@@ -30,7 +30,7 @@ distancePointSegment <- function(x, #x-coordinate of point
   bestEndpointDistance <- min(c(.magnitude(c(x, y), c(x1, y1)),
                                 .magnitude(c(x, y), c(x2, y2))))
   
-  if (.magnitude(c(x, y), c((x1 + x2) / 2, (y1 + y2) / 2)) < bestEndpointDistance) {
+  if (.magnitude(c(x, y), c((x1 + x2) / 2, (y1 + y2) / 2)) < bestEndpointDistance) { # length to point has only one local minimum which is the global minimum; iff this condition is true then the shortest distance is to a point on the line segment
     if (x1 == x2) { #vertical line segment
       a <- 1
       b <- 0
