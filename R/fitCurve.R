@@ -56,23 +56,32 @@
                        upper_bounds = upper_bounds,
                        density = density, 
                        n = median_n,
+                       scale = scale,
                        family = family,
                        trunc = trunc)
     guess_residual <- .residual(x = x,
                                 y = y,
                                 n = median_n,
-                                pars = sieve_guess,
+                                pars = guess,
                                 f = f,
                                 scale = scale, 
                                 family = family,
                                 trunc = trunc)
     
-    guess <- .patternSearch(guess = guess,
+    guess <- .patternSearch(x = x,
+                            y = y,
+                            f = f,
+                            guess = guess,
+                            n = median_n,
                             guess_residual = guess_residual,
+                            lower_bounds = lower_bounds,
+                            upper_bounds = upper_bounds,
                             span = span,
                             precision = precision,
                             step = step,
-                            f = f)
+                            scale = scale,
+                            family = family,
+                            trunc = trunc)
   }
   
   return(guess)

@@ -1,6 +1,6 @@
-.patternSearch <- function(guess, guess_residual, span, precision, step, f) {
-  neighbours <- matrix(nrow = 2 ^ length(guess), ncol = length(guess))
-  neighbour_residuals <- matrix(NA, nrow = 1, ncol = length(neighbours))
+.patternSearch <- function(x, y, f, guess, n, guess_residual, lower_bounds, upper_bounds, span, precision, step, scale, family, trunc) {
+  neighbours <- matrix(nrow = 2 * length(guess), ncol = length(guess))
+  neighbour_residuals <- matrix(NA, nrow = 1, ncol = nrow(neighbours))
   
   while (span > precision) {
     for (neighbour in 1:nrow(neighbours)) {
@@ -16,7 +16,7 @@
                                                   y = y,
                                                   f = f,
                                                   pars = neighbours[neighbour, ],
-                                                  n = median_n, 
+                                                  n = n, 
                                                   scale = scale,
                                                   family = family,
                                                   trunc = trunc)
