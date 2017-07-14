@@ -1,8 +1,8 @@
-linePtDist <- function(x, #x-coordinate of point
-                       y, #y-coordinate of point
-                       a, #coefficient in line equation ax + by + c = 0
-                       b, #coefficient in line equation ax + by + c = 0
-                       c) { #coefficient in line equation ax + by + c = 0
+distancePointLine <- function(x, #x-coordinate of point
+                              y, #y-coordinate of point
+                              a, #coefficient in line equation ax + by + c = 0
+                              b, #coefficient in line equation ax + by + c = 0
+                              c) { #coefficient in line equation ax + by + c = 0
   
   #Function calculates shortest distance between point and line in R^2.
   
