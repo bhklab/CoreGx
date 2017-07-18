@@ -1,21 +1,17 @@
 #' Calculate shortest distance between point and line
 #'
+#'
+#' @examples distancePointLine(0, 0, 1, -1, 1)
+#'
 #' @description This function calculates the shortest distance between a point and a line in 2D space.
 #' @param x x-coordinate of point
 #' @param y y-coordinate of point
 #' @param a coefficient in line equation a * x + b * y + c = 0
 #' @param b coefficient in line equation a * x + b * y + c = 0
 #' @param c coefficient in line equation a * x + b * y + c = 0
-#' @example distancePointLine(0, 0, 1, -1, 1)
 #' @export
 
-distancePointLine <- function(x, #x-coordinate of point
-                              y, #y-coordinate of point
-                              a, #coefficient in line equation ax + by + c = 0
-                              b, #coefficient in line equation ax + by + c = 0
-                              c) { #coefficient in line equation ax + by + c = 0
-  
-  #Function calculates shortest distance between point and line in R^2.
+distancePointLine <- function(x, y, a, b, c) {
   
   if (!(all(is.finite(c(x, y, a, b, c))))) {
     stop("All inputs to linePtDist must be real numbers.")
@@ -37,7 +33,7 @@ distancePointLine <- function(x, #x-coordinate of point
 #' @param y1 y-coordinate of line segment endpoint with x-coordinate x1
 #' @param x2 x-coordinate of other endpoint of line segment
 #' @param y2 y-coordinate of line segment endpoint with x-coordinate x2
-#' @example distancePointSegment(0, 0, -1, 1, 1, -1)
+#' @examples distancePointSegment(0, 0, -1, 1, 1, -1)
 #' @export
 
 distancePointSegment <- function(x, #x-coordinate of point
