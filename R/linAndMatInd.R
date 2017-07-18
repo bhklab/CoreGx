@@ -1,4 +1,3 @@
-#returns linear indices of ROW-MAJOR array
 .linInd <- function(matInd, #array indices
                     dimsizes) { #array containing size of array of interest in each dimension
   y <- matInd[1]
@@ -10,7 +9,6 @@
   return(y)
 }
 
-#returns array indices of ROW-MAJOR array
 .matInd <- function(linInd, #linear index
                     dimsizes) { #array containing size of array of interest in each dimension
   y <- matrix(0, nrow = length(dimsizes), ncol = 1)

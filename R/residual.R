@@ -1,9 +1,8 @@
 .residual <- function (x, y, n, pars, f, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
   family <- match.arg(family)
-  Cauchy_flag = (family == "Cauchy")
   diffs <- do.call(f, list(x, pars)) - y
   
-  if (Cauchy_flag == FALSE) {
+  if (family == "Cauchy") {
     if (trunc == FALSE) {
       return(sum(-log(.dmednnormals(diffs, n, scale))))
     }
