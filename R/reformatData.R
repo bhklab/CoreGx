@@ -59,4 +59,8 @@
   if (y_to_log) {
     log_y <- log10(y)
   }
+  
+  return(list("x" = x,
+              "y" = y,
+              "pars" = pars))
 }

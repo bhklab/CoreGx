@@ -1,15 +1,11 @@
 .sanitizeInput <- function(x,
                            y,
                            pars,
-                           x_as_log = FALSE,
-                           y_as_log = FALSE,
-                           y_as_pct = TRUE,
-                           trunc = TRUE,
-                           verbose = TRUE) { # Set to 2 to see debug printouts
-
-  if (missing(x)) {
-    stop("Please provide x-values.")
-  }
+                           x_as_log,
+                           y_as_log,
+                           y_as_pct,
+                           trunc,
+                           verbose = FALSE) { # Set to 2 to see debug printouts
 
   if (!is.logical(x_as_log)) {
     if (verbose == 2) {
@@ -58,23 +54,25 @@
     print(verbose)
     stop("'verbose' flag is not set correctly.")
   }
-
-  if (!all(is.finite(x) || is.na(x) || (x_as_log && x == -Inf))) {
-    if (verbose == 2) {
-      print("x:")
-      print(x)
+  
+  if (!missing(x)) {
+    if (!all(is.finite(x) || is.na(x) || (x_as_log && x == -Inf))) {
+      if (verbose == 2) {
+        print("x:")
+        print(x)
+      }
+      stop("x must contain only real numbers, NA-values, and/or -Inf (if x_as_log flag is set to TRUE).")
     }
-    stop("x must contain only real numbers, NA-values, and/or -Inf (if x_as_log flag is set to TRUE).")
-  }
-
-  if (x_as_log == FALSE && min(x) < 0) {
-    if (verbose == 2) {
-      print("x:")
-      print(x)
-      print("x_as_log:")
-      print(x_as_log)
+    
+    if (x_as_log == FALSE && min(x) < 0) {
+      if (verbose == 2) {
+        print("x:")
+        print(x)
+        print("x_as_log:")
+        print(x_as_log)
+      }
+      stop("Negative x-values encountered. Data may be inappropriate, or 'x_as_log' flag may be set incorrectly.")
     }
-    stop("Negative x-values encountered. Data may be inappropriate, or 'x_as_log' flag may be set incorrectly.")
   }
 
   if (missing(y)) {
@@ -193,7 +191,7 @@
         }
       }
 
-      if (length(x) != length(y)) {
+      if (!missing(x) && length(x) != length(y)) {
         if (verbose == 2) {
           print("x:")
           print(x)
