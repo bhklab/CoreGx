@@ -1,5 +1,7 @@
 .sanitizeInput <- function(x,
                            y,
+                           lower,
+                           upper,
                            pars,
                            x_as_log,
                            y_as_log,
@@ -203,6 +205,50 @@
 
     } else {
       stop("Please pass in only one of 'pars' and 'y', as it is unclear which to use in the computation.")
+    }
+  }
+  
+  if (!missing(lower) && !missing(upper)) {
+    if (!(is.double(lower))) {
+      if (verbose == 2) {
+        print("lower:")
+        print(lower)
+      }
+      stop("The lower bound must be a positive real number.")
+    }
+    
+    if (!(is.double(lower))) {
+      if (verbose == 2) {
+        print("upper:")
+        print(upper)
+      }
+      stop("The upper bound must be a positive real number.")
+    }
+    
+    if (lower >= upper) {
+      if (verbose == 2) {
+        print("lower:")
+        print(lower)
+        print("upper:")
+        print(upper)
+      }
+      stop("The lower bound of the range of allowed x-values must be less than the upper bound.")
+    }
+    
+    if (lower < 0) {
+      if (verbose == 2) {
+        print("lower:")
+        print(lower)
+      }
+      stop("The lower bound of the range of allowed x-values must be nonnegative.")
+    }
+    
+    if (upper < 0) {
+      if (verbose == 2) {
+        print("upper:")
+        print(upper)
+      }
+      stop("The upper bound of the range of allowed x-values must be nonnegative.")
     }
   }
 }
