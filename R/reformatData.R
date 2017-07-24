@@ -39,14 +39,14 @@
       y <- y[-ii]
     }
     log_x <- log10(x)
-    if (length(pars) == 3) {
+    if (!missing(pars) && length(pars) == 3) {
       pars[[3]] <- log10(pars[[3]])
     }
   }
 
   if (y_to_frac) {
     y <- y / 100
-    if (length(pars) == 3) {
+    if (!missing(pars) && length(pars) == 3) {
       pars[[2]] <- pars[[2]] / 100
     }
   }
@@ -60,7 +60,13 @@
     log_y <- log10(y)
   }
   
-  return(list("x" = x,
-              "y" = y,
-              "pars" = pars))
+  if (missing(pars)) {
+    return(list("x" = x,
+                "y" = y))
+  } else if (missing(y)) {
+    return(list("x" = x,
+                "pars" = pars))
+  } else {
+    stop("y and pars should not both be missing!")
+  }
 }
