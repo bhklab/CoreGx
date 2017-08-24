@@ -26,8 +26,6 @@
 #'   containing the row and column metadata
 #' @slot cell A \code{data.frame} containg the annotations for all the cell 
 #'   lines profiled in the data set, across all data types
-#' @slot drug A \code{data.frame} containg the annotations for all the drugs 
-#'   profiled in the data set, across all data types
 #' @slot sensitivity A \code{list} containing all the data for the sensitivity 
 #'   experiments, including \code{$info}, a \code{data.frame} containing the 
 #'   experimental info,\code{$raw} a 3D \code{array} containing raw data, 
@@ -43,11 +41,11 @@
 #'   'perturbation', or both detailing what type of data can be found in the 
 #'   CoreSet, for proper processing of the data
 #' @return An object of the CoreSet class
+#' @export
 .CoreSet <- setClass("CoreSet", slots = list(
                                             annotation = "list",
                                             molecularProfiles = "list",
                                             cell="data.frame", 
-                                            drug="data.frame", 
                                             datasetType="character", 
                                             sensitivity="list",
                                             perturbation="list",
@@ -90,7 +88,7 @@
 #'   statistics such as IC50 and AUC
 #' @param sensitivityN,perturbationN A \code{data.frame} summarizing the
 #'   available sensitivity/perturbation data
-#' @param curationDrug,curationCell,curationTissue A \code{data.frame} mapping
+#' @param curationCell,curationTissue A \code{data.frame} mapping
 #'   the names for drugs, cells and tissues used in the data set to universal
 #'   identifiers used between different CoreSet objects
 #' @param datasetType A \code{character} string of 'sensitivity',
@@ -106,13 +104,11 @@
 CoreSet <-  function(name, 
                           molecularProfiles=list(), 
                           cell=data.frame(), 
-                          drug=data.frame(), 
                           sensitivityInfo=data.frame(),
                           sensitivityRaw=array(dim=c(0,0,0)), 
                           sensitivityProfiles=matrix(), 
                           sensitivityN=matrix(nrow=0, ncol=0), 
                           perturbationN=array(NA, dim=c(0,0,0)), 
-                          curationDrug=data.frame(), 
                           curationCell = data.frame(), 
                           curationTissue = data.frame(), 
                           datasetType=c("sensitivity", "perturbation", "both"),
@@ -139,9 +135,6 @@ CoreSet <-  function(name,
     #if (class(cell)!="data.frame"){
     #    stop("Please provide the cell line annotations as a data frame.")
     #}
-    #if (class(drug)!="data.frame"){
-    #    stop("Please provide the drug annotations as a data frame.")
-    #}
     
     sensitivity <- list()
     
@@ -155,7 +148,6 @@ CoreSet <-  function(name,
     sensitivity$n <- sensitivityN
     
     curation <- list()
-    curation$drug <- as.data.frame(curationDrug, stringsAsFactors = FALSE)
     curation$cell <- as.data.frame(curationCell, stringsAsFactors = FALSE)
     curation$tissue <- as.data.frame(curationTissue, stringsAsFactors = FALSE)
     ### TODO:: Make sure to fix the curation to check for matching row names to the drug and cell line matrices!!!!!!
@@ -169,7 +161,7 @@ CoreSet <-  function(name,
         perturbation$info <- "Not a perturbation dataset."
     }
     
-    cSet  <- .CoreSet(annotation=annotation, molecularProfiles=molecularProfiles, cell=as.data.frame(cell), drug=as.data.frame(drug), datasetType=datasetType, sensitivity=sensitivity, perturbation=perturbation, curation=curation)
+    cSet  <- .CoreSet(annotation=annotation, molecularProfiles=molecularProfiles, cell=as.data.frame(cell), datasetType=datasetType, sensitivity=sensitivity, perturbation=perturbation, curation=curation)
     if (verify) { checkCSetStructure(cSet)}
   if(length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
     cSet@sensitivity$n <- .summarizeSensitivityNumbers(cSet)
@@ -227,7 +219,6 @@ setReplaceMethod("cellInfo", signature = signature(object="CoreSet",value="data.
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' drugInfo(CCLEsmall)
 #' 
 #' @param cSet The \code{CoreSet} to retrieve drug info from
 #' @return a \code{data.frame} with the drug annotations
