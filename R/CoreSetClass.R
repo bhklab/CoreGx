@@ -31,10 +31,10 @@
 #'   experimental info,\code{$raw} a 3D \code{array} containing raw data, 
 #'   \code{$profiles}, a \code{data.frame} containing sensitivity profiles 
 #'   statistics, and \code{$n}, a \code{data.frame} detailing the number of 
-#'   experiments for each cell-drug pair
+#'   experiments for each cell-drug/radiationInfo pair
 #' @slot perturbation A \code{list} containting \code{$n}, a \code{data.frame} 
 #'   summarizing the available perturbation data,
-#' @slot curation A \code{list} containing mappings for \code{$drug}, 
+#' @slot curation A \code{list} containing mappings for
 #'   \code{cell}, \code{tissue} names  used in the data set to universal 
 #'   identifiers used between different CoreSet objects
 #' @slot datasetType A \code{character} string of 'sensitivity', 
@@ -78,8 +78,6 @@
 #'   molecular profiles 
 #' @param cell A \code{data.frame} containg the annotations for all the cell
 #'   lines profiled in the data set, across all data types
-#' @param drug A \code{data.frame} containg the annotations for all the drugs
-#'   profiled in the data set, across all data types
 #' @param sensitivityInfo A \code{data.frame} containing the information for the
 #'   sensitivity experiments
 #' @param sensitivityRaw A 3 Dimensional \code{array} contaning the raw drug
@@ -89,7 +87,7 @@
 #' @param sensitivityN,perturbationN A \code{data.frame} summarizing the
 #'   available sensitivity/perturbation data
 #' @param curationCell,curationTissue A \code{data.frame} mapping
-#'   the names for drugs, cells and tissues used in the data set to universal
+#'   the names for cells and tissues used in the data set to universal
 #'   identifiers used between different CoreSet objects
 #' @param datasetType A \code{character} string of 'sensitivity',
 #'   'preturbation', or both detailing what type of data can be found in the
@@ -211,41 +209,6 @@ setReplaceMethod("cellInfo", signature = signature(object="CoreSet",value="data.
   }
   
   object@cell <- value
-  object
-})
-#' drugInfo Generic
-#' 
-#' Generic for drugInfo method 
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' 
-#' @param cSet The \code{CoreSet} to retrieve drug info from
-#' @return a \code{data.frame} with the drug annotations
-setGeneric("drugInfo", function(cSet) standardGeneric("drugInfo"))
-
-#' drugInfo<- Generic
-#' 
-#' Generic for drugInfo replace method
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' drugInfo(CCLEsmall) <- drugInfo(CCLEsmall)
-#' 
-#' @param object The \code{CoreSet} to replace drug info in
-#' @param value A \code{data.frame} with the new drug annotations
-#' @return Updated \code{CoreSet}
-setGeneric("drugInfo<-", function(object, value) standardGeneric("drugInfo<-"))
-#' @describeIn CoreSet Returns the annotations for all the drugs tested in the CoreSet
-#' @export
-setMethod(drugInfo, "CoreSet", function(cSet){
-
-  cSet@drug
-})
-#' @describeIn CoreSet Update the drug annotations
-#' @export
-setReplaceMethod("drugInfo", signature = signature(object="CoreSet",value="data.frame"), function(object, value){
-  object@drug <- value
   object
 })
 
@@ -492,54 +455,6 @@ setMethod(sensitivityMeasures, "CoreSet", function(cSet){
     
 })
 
-#' drugNames Generic
-#' 
-#' A generic for the drugNames method
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' drugNames(CCLEsmall)
-#' 
-#' @param cSet The \code{CoreSet} to return drug names from
-#' @return A vector of the drug names used in the CoreSet
-setGeneric("drugNames", function(cSet) standardGeneric("drugNames"))
-#' @describeIn CoreSet Return the names of the drugs used in the CoreSet
-#' @export
-setMethod(drugNames, "CoreSet", function(cSet){
-  
-  # if (unique){
-#     unique(pData(cSet)[["drugid"]])
-#   } else {
-#     pData(cSet)[["drugid"]]
-#   
-#  }
-  rownames(drugInfo(cSet))
-
-})
-
-#' drugNames<- Generic
-#' 
-#' A generic for the drugNames replacement method
-#' 
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' drugNames(CCLEsmall) <- drugNames(CCLEsmall)
-#' 
-#' @param object The \code{CoreSet} to update
-#' @param value A \code{character} vector of the new drug names
-#' @return Updated \code{CoreSet} 
-setGeneric("drugNames<-", function(object, value) standardGeneric("drugNames<-"))
-#' @describeIn CoreSet Update the drug names used in the dataset
-#' @export
-setReplaceMethod("drugNames", signature = signature(object="CoreSet",value="character"), function(object, value){
-    
-    object <- updateDrugId(object, value)
-    return(object)
-    })
-
-
-
 #' cellNames Generic
 #' 
 #' A generic for the cellNames method
@@ -740,7 +655,6 @@ setMethod("show", signature=signature(object="CoreSet"),
         cat("Name: ", cSetName(object), "\n")
         cat("Date Created: ", dateCreated(object), "\n")
     cat("Number of cell lines: ", nrow(cellInfo(object)), "\n")
-    cat("Number of drug compounds: ", nrow(drugInfo(object)), "\n")
         if("dna" %in% names(object@molecularProfiles)){cat("DNA: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="dna")), "\n")}
       if("rna" %in% names(object@molecularProfiles)){cat("RNA: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="rna")), "\n")}
       if("rnaseq" %in% names(object@molecularProfiles)){cat("RNASeq: \n");cat("\tDim: ", dim(molecularProfiles(object, mDataType="rnaseq")), "\n")}
@@ -771,235 +685,9 @@ mDataNames <- function(cSet){
 
 }
 
-#'`[`
-#'
-#'@param x CSet
-#'@param i Cell lines to keep in CSet
-#'@param j Drugs to keep in CSet
-#'@param ... further arguments
-#'@param drop A boolean flag of whether to drop single dimensions or not
-#'@return Returns the subsetted CSet
-#'@export
-setMethod(`[`, "CoreSet", function(x, i, j, ..., drop = FALSE){
-  if(is.character(i)&&is.character(j)){
-    return(subsetTo(x, cells=i, drugs=j,  molecular.data.cells=i))
-  } 
-  else if(is.numeric(i) && is.numeric(j) && (as.integer(i)==i) && (as.integer(j)==j)){
-    return(subsetTo(x, cells=cellNames(x)[i], drugs=drugNames(x)[j],  molecular.data.cells=cellNames(x)[i]))
-  }
-})
-
-#' Get the dimensions of a CoreSet
-#' 
-#' @param x CoreSet
-#' @return A named vector with the number of Cells and Drugs in the CoreSet
-#' @export
-setMethod("dim", signature=signature(x="CoreSet"), function(x){
-
-  return(c(Cells=length(cellNames(x)), Drugs=length(drugNames(x))))
-
-})
 
 
-## FIXED? TODO:: Subset function breaks if it doesnt find cell line in sensitivity info
-#' A function to subset a CoreSet to data containing only specified drugs, cells and genes
-#' 
-#' This is the prefered method of subsetting a CoreSet. This function allows
-#' abstraction of the data to the level of biologically relevant objects: drugs
-#' and cells. The function will automatically go through all of the
-#' combined data in the CoreSet and ensure only the requested drugs
-#' and cell lines are found in any of the slots. This allows quickly picking out
-#' all the experiments for a drug or cell of interest, as well removes the need
-#' to keep track of all the metadata conventions between different datasets.
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' CCLEdrugs  <- drugNames(CCLEsmall)
-#' CCLEcells <- cellNames(CCLEsmall)
-#' CSet <- subsetTo(CCLEsmall,drugs = CCLEdrugs[1], cells = CCLEcells[1])
-#' CSet
-#' 
-#' @param cSet A \code{CoreSet} to be subsetted
-#' @param cells A list or vector of cell names as used in the dataset to which
-#'   the object will be subsetted. If left blank, then all cells will be left in
-#'   the dataset.
-#' @param drugs A list or vector of drug names as used in the dataset to which
-#'   the object will be subsetted. If left blank, then all drugs will be left in
-#'   the dataset.
-#' @param molecular.data.cells A list or vector of cell names to keep in the
-#'   molecular data
-#' @param keep.controls If the dataset has perturbation type experiments, should
-#'   the controls be kept in the dataset? Defaults to true.
-#' @param ... Other arguments passed by other function within the package
-#' @return A CoreSet with only the selected drugs and cells
-#' @export
-# subsetTo <- function(cSet, cells=NULL, drugs=NULL, exps=NULL, molecular.data.cells=NULL, keep.controls=TRUE) {
-subsetTo <- function(cSet, cells=NULL, drugs=NULL, molecular.data.cells=NULL, keep.controls=TRUE, ...) {
-  drop=FALSE
-  
-  adArgs = list(...)
-  if ("exps" %in% names(adArgs)) {
-  	exps <- adArgs[["exps"]]
-  	if(class(exps)=="data.frame"){
-  		exps2 <- exps[[cSetName(cSet)]]
-  		names(exps2) <- rownames(exps)
-  		exps <- exps2
-  	} else{
-  		exps <- exps[[cSetName(cSet)]]
-  	}
-  }else {
-    exps <- NULL
-  }
-  if(!missing(cells)){
-    cells <- unique(cells)
-  }
-  
-  if(!missing(drugs)){
-    drugs <- unique(drugs)
-  }
-  
-  if(!missing(molecular.data.cells)){
-    molecular.data.cells <- unique(molecular.data.cells)
-  }
-  
-    ### TODO:: implement strict subsetting at this level!!!!
-  
-    ### the function missing does not work as expected in the context below, because the arguments are passed to the anonymous
-    ### function in lapply, so it does not recognize them as missing
-  
-  cSet@molecularProfiles <- lapply(cSet@molecularProfiles, function(eset, cells, drugs, molecular.data.cells){
-    
-    molecular.data.type <- ifelse(length(grep("rna", Biobase::annotation(eset)) > 0), "rna", Biobase::annotation(eset))
-    if (length(grep(molecular.data.type, names(molecular.data.cells))) > 0) {
-      cells <- molecular.data.cells[[molecular.data.type]]
-    }
-      column_indices <- NULL
-  
-      if (length(cells)==0 && length(drugs)==0) {
-          column_indices <- 0:ncol(eset)
-      }
-      if(length(cells)==0 && cSet@datasetType=="sensitivity") {
-        column_indices <- 0:ncol(eset)
-      }
-  
-      cell_line_index <- NULL
-      if(length(cells)!=0) {
-        if (!all(cells %in% cellNames(cSet))) {
-              stop("Some of the cell names passed to function did not match to names in the CoreSet. Please ensure you are using cell names as returned by the cellNames function")
-        }
-          cell_line_index <- which(Biobase::pData(eset)[["cellid"]] %in% cells)
-        # if (length(na.omit(cell_line_index))==0){
-    #       stop("No cell lines matched")
-    #     }
-      }
-      drugs_index <- NULL
-      if(cSet@datasetType=="perturbation" || cSet@datasetType=="both"){
-        if(length(drugs) != 0) {
-            if (!all(drugs %in% drugNames(cSet))){
-                  stop("Some of the drug names passed to function did not match to names in the CoreSet. Please ensure you are using drug names as returned by the drugNames function")
-            }
-          drugs_index <- which(Biobase::pData(eset)[["drugid"]] %in% drugs)
-          # if (length(drugs_index)==0){
-    #         stop("No drugs matched")
-    #       }
-          if(keep.controls) {
-            control_indices <- which(Biobase::pData(eset)[["xptype"]]=="control")
-            drugs_index <- c(drugs_index, control_indices)
-          }
-        }
-      }
-  
-      if(length(drugs_index) != 0 && length(cell_line_index) != 0) {
-        if(length(intersect(drugs_index, cell_line_index)) == 0) {
-          stop("This Drug - Cell Line combination was not tested together.")
-        }
-        column_indices <- intersect(drugs_index, cell_line_index)
-      } else {
-        if(length(drugs_index) !=0) {
-        column_indices <- drugs_index
-      }
-        if(length(cell_line_index) !=0) {
-        column_indices <- cell_line_index
-      }
-      }
-  
-      row_indices <- 0:nrow(Biobase::exprs(eset))
-  
-      eset <- eset[row_indices,column_indices]
-      return(eset)
 
-  }, cells=cells, drugs=drugs, molecular.data.cells=molecular.data.cells)  
-  
-  if ((cSet@datasetType == "sensitivity" | cSet@datasetType == "both") & length(exps) != 0) {
-      cSet@sensitivity$info <- cSet@sensitivity$info[exps, , drop=drop]
-      rownames(cSet@sensitivity$info) <- names(exps)
-      if(length(cSet@sensitivity$raw) > 0) {
-        cSet@sensitivity$raw <- cSet@sensitivity$raw[exps, , , drop=drop]
-        dimnames(cSet@sensitivity$raw)[[1]] <- names(exps)
-      }
-      cSet@sensitivity$profiles <- cSet@sensitivity$profiles[exps, , drop=drop]
-      rownames(cSet@sensitivity$profiles) <- names(exps)
-      
-      cSet@sensitivity$n <- .summarizeSensitivityNumbers(cSet)
-  }
-  else if ((cSet@datasetType == "sensitivity" | cSet@datasetType == "both") & (length(drugs) != 0 | length(cells) != 0)) {
-    
-        drugs_index <- which (sensitivityInfo(cSet)[, "drugid"] %in% drugs)
-        cell_line_index <- which (sensitivityInfo(cSet)[,"cellid"] %in% cells)
-        if (length(drugs_index) !=0 & length(cell_line_index) !=0 ) {
-          if (length(intersect(drugs_index, cell_line_index)) == 0) {
-            stop("This Drug - Cell Line combination was not tested together.")
-          }
-          row_indices <- intersect(drugs_index, cell_line_index)
-        } else {
-          if(length(drugs_index)!=0 & length(cells)==0) {
-                row_indices <- drugs_index
-          } else {
-              if(length(cell_line_index)!=0 & length(drugs)==0){
-                  row_indices <- cell_line_index
-              } else {
-              row_indices <- vector()
-              }
-          }
-       }
-        cSet@sensitivity[names(cSet@sensitivity)[names(cSet@sensitivity)!="n"]] <- lapply(cSet@sensitivity[names(cSet@sensitivity)[names(cSet@sensitivity)!="n"]], function(x,i, drop){
-            #browser()
-          if (length(dim(x))==2){
-            return(x[i,,drop=drop])
-          }
-          if (length(dim(x))==3){
-            return(x[i,,,drop=drop])
-          }
-          }, i=row_indices, drop=drop)
-  }
-  
-	if (length(drugs)==0) {
-		if(cSet@datasetType == "sensitivity" | cSet@datasetType == "both"){
-			drugs <- unique(sensitivityInfo(cSet)[["drugid"]])
-		}
-		if(cSet@datasetType == "perturbation" | cSet@datasetType == "both"){
-			drugs <- union(drugs, na.omit(unionList(lapply(cSet@molecularProfiles, function(eSet){unique(Biobase::pData(eSet)[["drugid"]])}))))
-		}
-	}
-	if (length(cells)==0) {
-		cells <- union(cells, na.omit(unionList(lapply(cSet@molecularProfiles, function(eSet){unique(Biobase::pData(eSet)[["cellid"]])}))))
-        if (cSet@datasetType =="sensitivity" | cSet@datasetType == "both"){
-            cells <- union(cells, sensitivityInfo(cSet)[["cellid"]])
-        }
-	}
-	drugInfo(cSet) <- drugInfo(cSet)[drugs , , drop=drop]
-	cellInfo(cSet) <- cellInfo(cSet)[cells , , drop=drop]
-	cSet@curation$drug <- cSet@curation$drug[drugs , , drop=drop]
-	cSet@curation$cell <- cSet@curation$cell[cells , , drop=drop]
-	cSet@curation$tissue <- cSet@curation$tissue[cells , , drop=drop]
-	if (cSet@datasetType == "sensitivity" | cSet@datasetType == "both"  & length(exps) == 0) {
-	  cSet@sensitivity$n <- cSet@sensitivity$n[cells, drugs , drop=drop]
-	}
-	if (cSet@datasetType == "perturbation" | cSet@datasetType == "both") {
-	    cSet@perturbation$n <- cSet@perturbation$n[cells,drugs, , drop=drop]
-    }
-      return(cSet)
-}
 ### TODO:: Add updating of sensitivity Number tables
 updateCellId <- function(cSet, new.ids = vector("character")){
   
@@ -1145,94 +833,6 @@ updateCellId <- function(cSet, new.ids = vector("character")){
 #
 # }
 
-### TODO:: Add updating of sensitivity Number tables
-updateDrugId <- function(cSet, new.ids = vector("character")){
-
-  if (length(new.ids)!=nrow(drugInfo(cSet))){
-    stop("Wrong number of drug identifiers")
-  }
-
-  if(cSet@datasetType=="sensitivity"|cSet@datasetType=="both"){
-    myx <- match(sensitivityInfo(cSet)[,"drugid"],rownames(drugInfo(cSet)))
-    sensitivityInfo(cSet)[,"drugid"] <- new.ids[myx]
-
-  }
-  if(cSet@datasetType=="perturbation"|cSet@datasetType=="both"){
-    cSet@molecularProfiles <- lapply(cSet@molecularProfiles, function(eset){
-
-      myx <- match(Biobase::pData(eset)[["drugid"]],rownames(drugInfo(cSet)))
-      Biobase::pData(eset)[["drugid"]]  <- new.ids[myx]
-      return(eset)
-    })
-  }
-  
-
-  if(any(duplicated(new.ids))){
-    warning("Duplicated ids passed to updateDrugId. Merging old ids into the same identifier")
-    
-    if(ncol(sensNumber(cSet))>0){
-      sensMatch <- match(colnames(sensNumber(cSet)), rownames(drugInfo(cSet)))
-    }
-    if(dim(pertNumber(cSet))[[2]]>0){
-      pertMatch <- match(dimnames(pertNumber(cSet))[[2]], rownames(drugInfo(cSet)))
-    }
-    curMatch <- match(rownames(cSet@curation$drug),rownames(drugInfo(cSet)))
-
-    duplId <- unique(new.ids[duplicated(new.ids)])
-    for(id in duplId){
-
-      if (ncol(sensNumber(cSet))>0){
-        myx <- which(new.ids[sensMatch] == id)
-        sensNumber(cSet)[,myx[1]] <- apply(sensNumber(cSet)[,myx], 2, sum)
-        sensNumber(cSet) <- sensNumber(cSet)[,-myx[-1]]
-        # sensMatch <- sensMatch[-myx[-1]]
-      }
-      if (dim(pertNumber(cSet))[[2]]>0){
-        myx <- which(new.ids[pertMatch] == id)
-        pertNumber(cSet)[,myx[1],] <- apply(pertNumber(cSet)[,myx,], c(1,3), sum)
-        pertNumber(cSet) <- pertNumber(cSet)[,-myx[-1],]
-        # pertMatch <- pertMatch[-myx[-1]]
-      }
-
-      myx <- which(new.ids[curMatch] == id)
-      cSet@curation$drug[myx[1],] <- apply(cSet@curation$drug[myx,], 2, paste, collapse="///")
-      cSet@curation$drug <- cSet@curation$drug[-myx[-1],]
-      # curMatch <- curMatch[-myx[-1]]
-
-      myx <- which(new.ids == id)
-      drugInfo(cSet)[myx[1],] <- apply(drugInfo(cSet)[myx,], 2, paste, collapse="///")
-      drugInfo(cSet) <- drugInfo(cSet)[-myx[-1],]
-      new.ids <- new.ids[-myx[-1]]
-      if(ncol(sensNumber(cSet))>0){
-        sensMatch <- match(colnames(sensNumber(cSet)), rownames(drugInfo(cSet)))
-      }
-      if(dim(pertNumber(cSet))[[2]]>0){
-        pertMatch <- match(dimnames(pertNumber(cSet))[[2]], rownames(drugInfo(cSet)))
-      }
-      curMatch <- match(rownames(cSet@curation$drug),rownames(drugInfo(cSet)))
-    }
-  } else {
-    if (dim(pertNumber(cSet))[[2]]>0){
-      pertMatch <- match(dimnames(pertNumber(cSet))[[2]], rownames(drugInfo(cSet)))
-    }
-    if (ncol(sensNumber(cSet))>0){
-      sensMatch <- match(colnames(sensNumber(cSet)), rownames(drugInfo(cSet)))
-    }
-    curMatch <- match(rownames(cSet@curation$drug),rownames(drugInfo(cSet)))
-  }
-
-  if (dim(pertNumber(cSet))[[2]]>0){
-    dimnames(pertNumber(cSet))[[2]] <- new.ids[pertMatch]
-  }
-  if (ncol(sensNumber(cSet))>0){
-    colnames(sensNumber(cSet)) <- new.ids[sensMatch]
-  }
-  rownames(cSet@curation$drug) <- new.ids[curMatch]
-  rownames(drugInfo(cSet)) <- new.ids
-
-
-  return(cSet)
-}
 
 .summarizeSensitivityNumbers <- function(cSet) {
 
@@ -1395,31 +995,8 @@ checkPSetStructure <-
       print("rownames of curation cell slot should be the same as cell slot (curated cell ids)")
     }
     
-    if("unique.drugid" %in% colnames(cSet@curation$drug)) {
-      if(length(intersect(cSet@curation$drug$unique.drugid, rownames(cSet@drug))) != nrow(cSet@drug)) {
-        print("rownames of drug slot should be curated drug ids")
-      }
-    } else {
-      print("unique.drugid which is curated drug id across data set should be a column of drug curation slot")
-    }
-    
-#     if("drugid" %in% colnames(cSet@drug)) {
-#       if(length(intersect(cSet@curation$drug$drugid, rownames(cSet@drug))) != nrow(cSet@drug)) {
-#         print("values of drugid column should be curated drug ids")
-#       }
-#     } else {
-#       print("drugid which is curated drug id across data set should be a column of drug slot")
-#     }
-    
-    if(length(intersect(rownames(cSet@curation$cell), rownames(cSet@cell))) != nrow(cSet@cell)) {
-      print("rownames of curation drug slot should be the same as drug slot (curated drug ids)")
-    }
-    
     if(class(cSet@cell) != "data.frame") {
       warning("cell slot class type should be dataframe")
-    }
-    if(class(cSet@drug) != "data.frame") {
-      warning("drug slot class type should be dataframe")
     }
     if(cSet@datasetType %in% c("sensitivity", "both"))
     {
@@ -1433,15 +1010,7 @@ checkPSetStructure <-
       }else {
         warning("cellid does not exist in sensitivity info")
       }
-      if("drugid" %in% colnames(cSet@sensitivity$info)) {
-        drug.ids <- unique(cSet@sensitivity$info[,"drugid"])
-        drug.ids <- drug.ids[grep("///",drug.ids, invert=TRUE)]
-        if(!all(drug.ids %in% rownames(cSet@drug))) {
-          print("not all the drugs in sensitivity data are in drug slot")
-        }
-      }else {
-        warning("drugid does not exist in sensitivity info")
-      }
+    
       
       if(any(!is.na(cSet@sensitivity$raw))) {
         if(!all(dimnames(cSet@sensitivity$raw)[[1]] %in% rownames(cSet@sensitivity$info))) {
