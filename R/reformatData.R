@@ -54,10 +54,13 @@
     }
     
     if (y_to_log) {
-      if(any(y < 0)){
-        warning("Transforming y to log with negative y values present, therefore removing.")
-        x <- x[y >= 0]
-        y <- y[y >= 0]
+      if(any(y <= 0)){
+        warning("Transforming y to log with non-positive y values present, therefore removing.")
+        x <- x[y > 0]
+        y <- y[y > 0]
+        if(!length(x)){
+          stop("No valid positive y values encountered, please pass in some data.")
+        }
       }
       y <- log(y)
     }
