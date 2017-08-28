@@ -6,8 +6,6 @@
 \alias{.CoreSet}
 \alias{cellInfo,CoreSet-method}
 \alias{cellInfo<-,CoreSet,data.frame-method}
-\alias{drugInfo,CoreSet-method}
-\alias{drugInfo<-,CoreSet,data.frame-method}
 \alias{phenoInfo,CoreSet-method}
 \alias{phenoInfo<-,CoreSet,character,data.frame-method}
 \alias{molecularProfiles,CoreSet-method}
@@ -20,8 +18,6 @@
 \alias{sensitivityProfiles<-,CoreSet,data.frame-method}
 \alias{sensitivityProfiles<-,CoreSet,matrix-method}
 \alias{sensitivityMeasures,CoreSet-method}
-\alias{drugNames,CoreSet-method}
-\alias{drugNames<-,CoreSet,character-method}
 \alias{cellNames,CoreSet-method}
 \alias{cellNames<-,CoreSet,character-method}
 \alias{fNames,CoreSet-method}
@@ -36,10 +32,6 @@
 \S4method{cellInfo}{CoreSet}(cSet)
 
 \S4method{cellInfo}{CoreSet,data.frame}(object) <- value
-
-\S4method{drugInfo}{CoreSet}(cSet)
-
-\S4method{drugInfo}{CoreSet,data.frame}(object) <- value
 
 \S4method{phenoInfo}{CoreSet}(cSet, mDataType)
 
@@ -66,10 +58,6 @@
 \S4method{sensitivityProfiles}{CoreSet,matrix}(object) <- value
 
 \S4method{sensitivityMeasures}{CoreSet}(cSet)
-
-\S4method{drugNames}{CoreSet}(cSet)
-
-\S4method{drugNames}{CoreSet,character}(object) <- value
 
 \S4method{cellNames}{CoreSet}(cSet)
 
@@ -120,10 +108,6 @@ packages to applu the correct model for the given data.
 
 \item \code{cellInfo<-}: Update the cell line annotations
 
-\item \code{drugInfo}: Returns the annotations for all the drugs tested in the CoreSet
-
-\item \code{drugInfo<-}: Update the drug annotations
-
 \item \code{phenoInfo}: Return the experiment info from the given type of molecular data in CoreSet
 
 \item \code{phenoInfo<-}: Update the the given type of molecular data experiment info in the CoreSet
@@ -150,10 +134,6 @@ sensitivity
 
 \item \code{sensitivityMeasures}: Returns the available sensitivity profile
 summaries, for example, whether there are IC50 values available
-
-\item \code{drugNames}: Return the names of the drugs used in the CoreSet
-
-\item \code{drugNames<-}: Update the drug names used in the dataset
 
 \item \code{cellNames}: Return the cell names used in the dataset
 
@@ -198,12 +178,12 @@ experiments, including \code{$info}, a \code{data.frame} containing the
 experimental info,\code{$raw} a 3D \code{array} containing raw data, 
 \code{$profiles}, a \code{data.frame} containing sensitivity profiles 
 statistics, and \code{$n}, a \code{data.frame} detailing the number of 
-experiments for each cell-drug pair}
+experiments for each cell-drug/radiationInfo pair}
 
 \item{\code{perturbation}}{A \code{list} containting \code{$n}, a \code{data.frame} 
 summarizing the available perturbation data,}
 
-\item{\code{curation}}{A \code{list} containing mappings for \code{$drug}, 
+\item{\code{curation}}{A \code{list} containing mappings for
 \code{cell}, \code{tissue} names  used in the data set to universal 
 identifiers used between different CoreSet objects}
 

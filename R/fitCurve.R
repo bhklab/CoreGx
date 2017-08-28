@@ -18,13 +18,14 @@
                           fn = function(t) {.residual(x = x,
                                                       y = y,
                                                       n = median_n,
-                                                      pars = guess,
+                                                      pars = t,
                                                       f = f,
                                                       scale = scale,
                                                       family = family,
                                                       trunc = trunc)},
                           lower = lower_bounds,
                           upper = upper_bounds,
+                          control = list(factr = 1e-4),
                           method = "L-BFGS-B"),
                     error = function(e) {list(par = gritty_guess, convergence = -1)})
   failed = guess[["convergence"]] != 0

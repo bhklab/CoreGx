@@ -2,7 +2,7 @@
   family <- match.arg(family)
   diffs <- do.call(f, list(x, pars)) - y
   
-  if (family == "Cauchy") {
+  if (family != "Cauchy") {
     if (trunc == FALSE) {
       return(sum(-log(.dmednnormals(diffs, n, scale))))
     }

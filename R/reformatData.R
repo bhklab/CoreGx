@@ -14,7 +14,7 @@
   if (x_to_log) {
     x <- log10(x)
   }
-  
+  ### Shouldnt we sort y in same order?????
   if (is.unsorted(x)) {
     warning("x-values passed in unsorted. Sorting x-values and corresponding y-values (if passed in).")
     xOrder <- order(x)
@@ -54,7 +54,7 @@
     }
     
     if (y_to_log) {
-      y <- log10(y)
+      y <- log(y)
     }
     
     if (y_to_frac) {

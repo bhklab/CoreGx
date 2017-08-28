@@ -33,7 +33,7 @@ statistics such as IC50 and AUC}
 available sensitivity/perturbation data}
 
 \item{curationCell, curationTissue}{A \code{data.frame} mapping
-the names for drugs, cells and tissues used in the data set to universal
+the names for cells and tissues used in the data set to universal
 identifiers used between different CoreSet objects}
 
 \item{datasetType}{A \code{character} string of 'sensitivity',
@@ -42,9 +42,6 @@ CoreSet, for proper processing of the data}
 
 \item{verify}{\code{boolean} Should the function verify the CoreSet and
 print out any errors it finds after construction?}
-
-\item{drug}{A \code{data.frame} containg the annotations for all the drugs
-profiled in the data set, across all data types}
 }
 \value{
 An object of class CoreSet
