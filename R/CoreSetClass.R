@@ -271,7 +271,7 @@ setReplaceMethod("phenoInfo", signature = signature(object="CoreSet", mDataType 
 setGeneric("molecularProfiles", function(cSet, mDataType) standardGeneric("molecularProfiles"))
 #' @describeIn CoreSet Return the given type of molecular data from the CoreSet 
 #' @export
-setMethod(molecularProfiles, "CoreSet", function(cSet, mDataType){
+setMethod(molecularProfiles, signature("CoreSet", "character"), function(cSet, mDataType){
     
   if(mDataType %in% names(cSet@molecularProfiles)){
     return(Biobase::exprs(cSet@molecularProfiles[[mDataType]]))}else{
@@ -667,6 +667,20 @@ setMethod("show", signature=signature(object="CoreSet"),
         cat("\tPlease look at sensNumber(cSet) to determine number of experiments for each drug-cell combination.\n")
     })
 
+#' mDataNames Generic
+#' 
+#' A generic for the mDataNames method
+#' 
+#' 
+#' @examples
+#' data(CCLEsmall)
+#' mDataNames(CCLEsmall)
+#' 
+#' @param cSet PharamcoSet object
+#' @return Vector of names of the molecular data types
+#' @export
+setGeneric("mDataNames", function(cSet) standardGeneric("mDataNames"))
+
 
 #' mDataNames
 #' 
@@ -679,11 +693,11 @@ setMethod("show", signature=signature(object="CoreSet"),
 #' @param cSet PharamcoSet object
 #' @return Vector of names of the molecular data types
 #' @export
-mDataNames <- function(cSet){
+setMethod("mDataNames", "CoreSet", function(cSet){
 
   return(names(cSet@molecularProfiles))
 
-}
+})
 
 
 

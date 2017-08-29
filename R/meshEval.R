@@ -22,7 +22,7 @@
   for (point in 1:prod((upper_bounds - lower_bounds) * density)) {
     for (par in seq_along(guess)) {
       if (point %% periods[par] == 0) {
-        if (currentPars[par] == upper_bounds[par]) {
+        if (currentPars[par] >= upper_bounds[par]) {
           currentPars[par] <- lower_bounds[par]
         } else {
           currentPars[par] <- currentPars[par] + 1 / density[par]

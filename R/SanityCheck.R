@@ -75,6 +75,9 @@
       }
       stop("Negative x-values encountered. Data may be inappropriate, or 'x_as_log' flag may be set incorrectly.")
     }
+    if(length(unique(x)) < 3){
+      stop("Please pass in at least 3 unique dose points.")
+    }
   }
 
   if (missing(y)) {
