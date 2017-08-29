@@ -69,6 +69,11 @@
       y <- y / 100
     }
     
+    if(length(unique(x)) < 3){
+      stop("Less than 3 unique dose points left after cleaning data, please pass in enough valid measurements.")
+
+    }
+
     return(list("x" = x, "y" = y))
   }
   
