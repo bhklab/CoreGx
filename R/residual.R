@@ -4,6 +4,15 @@
   
   if (family != "Cauchy") {
     if (trunc == FALSE) {
+
+      if (n == 1){
+        return(sum(diffs^2))
+      }
+
+      # if(!all(is.finite(sum(-log(.dmednnormals(diffs, n, scale)))))){
+      #   browser()
+      # }
+
       return(sum(-log(.dmednnormals(diffs, n, scale))))
     }
     else {

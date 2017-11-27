@@ -25,7 +25,7 @@
                                                       trunc = trunc)},
                           lower = lower_bounds,
                           upper = upper_bounds,
-                          control = list(factr = 1e-4),
+                          control = list(factr = 1e-8, trace=0),
                           method = "L-BFGS-B"),
                     error = function(e) {list(par = gritty_guess, convergence = -1)})
   failed = guess[["convergence"]] != 0
@@ -85,5 +85,10 @@
                             trunc = trunc)
   }
   
+  y_hat <- do.call(f, list(x, guess))
+
+  Rsqr <- 1 - var(y - y_hat)/var(y)
+  attr(guess, "Rsquare") <- Rsqr
+
   return(guess)
 }

@@ -879,6 +879,26 @@ updateCellId <- function(cSet, new.ids = vector("character")){
     return(sensitivity.info)
 }
 
+
+.summarizeMolecularNumbers <- function(cSet) {
+  
+  ## consider all molecular types
+  mDT <- mDataNames(cSet)
+  
+  ## consider all cell lines
+  celln <- rownames(cSet@cell)
+  
+  molecular.info <- matrix(0, nrow=length(celln), ncol=length(mDT), dimnames=list(celln, mDT))
+  
+  for(mDataType in mDT) {
+    tt <- table(phenoInfo(cSet, mDataType)$cellid)
+    molecular.info[names(tt), mDataType] <- tt
+
+  }
+  return(molecular.info)
+}
+
+
 .summarizePerturbationNumbers <- function(cSet) {
 
   if (cSet@datasetType != "perturbation" && cSet@datasetType != "both") {
