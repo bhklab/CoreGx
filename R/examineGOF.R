@@ -1,3 +1,4 @@
+#' @export
 examineGOF <- function(pars) {
 	return(c("Rsquare" = attr(pars, "Rsquare")))
 }

@@ -8,4 +8,5 @@ Maintainer: Who to complain to <marky.freeman@gmail.com>
 Description: Core Gx Functions
 Suggests: PharmacoGx, RadioGx
 License: All Rights Reserved.
+Imports: MultiAssayExperiment, longArray
 RoxygenNote: 6.0.1
