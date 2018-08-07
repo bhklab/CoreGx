@@ -1,5 +1,5 @@
 setClassUnion("df_or_DF", c("data.frame", "DataFrame"))
-
+setClassUnion("la_or_la.DT_or_NULL", c("longArray", "longArray.DT", "NULL"))
 
 
 
@@ -17,7 +17,7 @@ setClassUnion("df_or_DF", c("data.frame", "DataFrame"))
 #' different, and two seperate implementations of the CSet class allows the
 #' packages to applu the correct model for the given data. 
 #' 
-#' @param cSet A \code{PhenoGenoExperiment} object
+#' @param x A \code{PhenoGenoExperiment} object
 #' @param mDataType A \code{character} with the type of molecular data to return/update
 #' @param object A \code{PhenoGenoExperiment} object
 #' @param value A replacement value
@@ -48,11 +48,11 @@ setClassUnion("df_or_DF", c("data.frame", "DataFrame"))
 #' @return An object of the PhenoGenoExperiment class
 #' @export
 # setClass("PGExperimentList", contains = "ExperimentList")
-.PhenoGenoExperiment <- setClass("PhenoGenoExperiment", slots = list(
-                                            sensitivity = "longArray.DT", 
-                                            treatmentData = "DataFrame"
-                                            ),
-                                contains = "MultiAssayExperiment")
+setClass("PhenoGenoExperiment", slots = list(
+                                sensitivity = "la_or_la.DT_or_NULL", 
+                                treatmentData = "DataFrame"
+                                ),
+                    contains = "MultiAssayExperiment")
 
 
 # The default constructor above does a poor job of explaining the required structure of a PhenoGenoExperiment. 
@@ -65,7 +65,7 @@ setClassUnion("df_or_DF", c("data.frame", "DataFrame"))
 PhenoGenoExperiment <- function(molecularProfiles = MultiAssayExperiment::ExperimentList(),
              colData = S4Vectors::DataFrame(),
              treatmentData = S4Vectors::DataFrame(),
-             sensitivity,
+             sensitivity = NULL,
              sampleMap =
                 S4Vectors::DataFrame(
                     assay = factor(),
@@ -76,6 +76,7 @@ PhenoGenoExperiment <- function(molecularProfiles = MultiAssayExperiment::Experi
 
 
         if(!missing(sensitivity)){
+          if(!is(sensitivity, "longArray")) { stop("Only longArray sensitivity is implemented ATM.")}
           sensitivity.columns <- colnames(sensitivity)
           fakeSensAssay <- new("PlaceHolderAssay", .Data=matrix(NA_real_, ncol=length(sensitivity.columns)))
           colnames(fakeSensAssay) <- sensitivity.columns
@@ -91,7 +92,6 @@ PhenoGenoExperiment <- function(molecularProfiles = MultiAssayExperiment::Experi
         else
             experiments <- ExperimentList(molecularProfiles)
 
-        if(!is(sensitivity, "longArray")) { stop("Only longArray sensitivity is implemented ATM.")}
         
         if (missing(colData)){
           stop("Please provide explicit colData.")
@@ -130,6 +130,125 @@ PhenoGenoExperiment <- function(molecularProfiles = MultiAssayExperiment::Experi
                              metadata = metadata)
         return(newMultiAssay)
     }
+
+
+#' A function to verify the structure of a PhenoGenoExperiment
+#' 
+#' This function checks the structure of a PhenoGenoExperiment, ensuring that the
+#' correct annotations are in place and all the required slots are filled so
+#' that matching of cells and drugs can be properly done across different types
+#' of data and with other studies.
+#' 
+#' @examples
+#' data(CCLEsmall)
+#' 
+#' checkPGEStructure(CCLEsmall)
+#' 
+#' @param x A \code{PhenoGenoExperiment} to be verified
+#' @param plotDist Should the function also plot the distribution of molecular data?
+#' @param result.dir The path to the directory for saving the plots as a string
+#' @return Prints out messages whenever describing the errors found in the structure of the pset object passed in. 
+#' @export
+#' @importFrom graphics hist
+#' @importFrom grDevices dev.off pdf
+
+checkPGEStructure <-
+  function(x, plotDist=FALSE, result.dir=".") {
+    if(!file.exists(result.dir) & plotDist) { dir.create(result.dir, showWarnings=FALSE, recursive=TRUE) }
+    for( i in 1:length(x@molecularProfiles)) {
+      profile <- x@molecularProfiles[[i]]
+      nn <- names(x@molecularProfiles)[i]
+      if((Biobase::annotation(profile) == "rna" | Biobase::annotation(profile) == "rnaseq") & plotDist)
+      {
+        pdf(file=file.path(result.dir, sprintf("%s.pdf", nn)))
+        hist(Biobase::exprs(profile), breaks = 100)
+        dev.off()
+      }
+      warning(ifelse(nrow(Biobase::fData(profile)) != nrow(Biobase::exprs(profile)), sprintf("%s: number of features in fData is different from expression slots", nn), sprintf("%s: fData dimension is OK", nn)))
+      warning(ifelse(nrow(Biobase::pData(profile)) != ncol(Biobase::exprs(profile)), sprintf("%s: number of cell lines in pData is different from expression slots", nn), sprintf("%s: pData dimension is OK", nn)))
+      warning(ifelse("cellid" %in% colnames(Biobase::pData(profile)), "", sprintf("%s: cellid does not exist in pData columns", nn)))
+      warning(ifelse("batchid" %in% colnames(Biobase::pData(profile)), "", sprintf("%s: batchid does not exist in pData columns", nn)))
+      if(Biobase::annotation(profile) == "rna" | Biobase::annotation(profile) == "rnaseq")
+      {
+        warning(ifelse("BEST" %in% colnames(Biobase::fData(profile)), "BEST is OK", sprintf("%s: BEST does not exist in fData columns", nn)))
+        warning(ifelse("Symbol" %in% colnames(Biobase::fData(profile)), "Symbol is OK", sprintf("%s: Symbol does not exist in fData columns", nn)))
+      }
+      if("cellid" %in% colnames(Biobase::pData(profile))) {
+        if(!all(Biobase::pData(profile)[,"cellid"] %in% rownames(x@cell))) {
+          warning(sprintf("%s: not all the cell lines in this profile are in cell lines slot", nn))
+        }
+      }else {
+        warning(sprintf("%s: cellid does not exist in pData", nn))
+      }
+    }
+    if("tissueid" %in% colnames(x@cell)) {
+      if("unique.tissueid" %in% colnames(x@curation$tissue))
+      {
+        if(length(intersect(rownames(x@curation$tissue), rownames(x@cell))) != nrow(x@cell)) {
+          message("rownames of curation tissue slot should be the same as cell slot (curated cell ids)")
+        } else{
+          if(length(intersect(x@cell$tissueid, x@curation$tissue$unique.tissueid)) != length(table(x@cell$tissueid))){
+            message("tissueid should be the same as unique tissue id from tissue curation slot")
+          }
+        }
+      } else {
+        message("unique.tissueid which is curated tissue id across data set should be a column of tissue curation slot")
+      }
+      if(any(is.na(x@cell[,"tissueid"]) | x@cell[,"tissueid"]=="", na.rm=TRUE)){
+        message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(x@cell)[which(is.na(x@cell[,"tissueid"]) | x@cell[,"tissueid"]=="")], collapse=" ")))
+      }
+    } else {
+      warning("tissueid does not exist in cell slot")
+    }
+    
+    if("unique.cellid" %in% colnames(x@curation$cell)) {
+      if(length(intersect(x@curation$cell$unique.cellid, rownames(x@cell))) != nrow(x@cell)) {
+        print("rownames of cell slot should be curated cell ids")
+      }
+    } else {
+      print("unique.cellid which is curated cell id across data set should be a column of cell curation slot")
+    }
+#     if("cellid" %in% colnames(x@cell)) {
+#       if(length(intersect(x@curation$cell$cellid, rownames(x@cell))) != nrow(x@cell)) {
+#         print("values of cellid column should be curated cell line ids")
+#       }
+#     } else {
+#       print("cellid which is curated cell id across data set should be a column of cell slot")
+#     }
+    
+    if(length(intersect(rownames(x@curation$cell), rownames(x@cell))) != nrow(x@cell)) {
+      print("rownames of curation cell slot should be the same as cell slot (curated cell ids)")
+    }
+    
+    if(class(x@cell) != "data.frame") {
+      warning("cell slot class type should be dataframe")
+    }
+    if(x@datasetType %in% c("sensitivity", "both"))
+    {
+      if(class(x@sensitivity$info) != "data.frame") {
+        warning("sensitivity info slot class type should be dataframe")
+      }
+      if("cellid" %in% colnames(x@sensitivity$info)) {
+        if(!all(x@sensitivity$info[,"cellid"] %in% rownames(x@cell))) {
+          warning("not all the cell lines in sensitivity data are in cell slot")
+        }
+      }else {
+        warning("cellid does not exist in sensitivity info")
+      }
+    
+      
+      if(any(!is.na(x@sensitivity$raw))) {
+        if(!all(dimnames(x@sensitivity$raw)[[1]] %in% rownames(x@sensitivity$info))) {
+          warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
+        }
+      }
+      if(!all(rownames(x@sensitivity$profiles) %in% rownames(x@sensitivity$info))) {
+        warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
+      }
+    }
+  }
+
+
 
 
 #' Show a PhenoGenoExpriment
@@ -183,7 +302,7 @@ longFormat <- function(object, colDataCols = NULL, i = 1L) {
 #' data(CCLEsmall)
 #' cellInfo(CCLEsmall)
 #' 
-#' @param cSet The \code{PhenoGenoExperiment} to retrieve cell info from
+#' @param x The \code{PhenoGenoExperiment} to retrieve cell info from
 #' 
 #' @return a \code{data.frame} with the cell annotations
 setGeneric("cellInfo", function(x) standardGeneric("cellInfo"))
@@ -296,7 +415,7 @@ setGeneric("molecularProfiles", function(x, mDataType) standardGeneric("molecula
 setMethod(molecularProfiles, signature("PhenoGenoExperiment", "character"), function(x, mDataType){
     
   if(mDataType %in% names(x)){
-    return(assay(PGE, mDataType))}else{
+    return(assay(x, mDataType))} else {
       return(NULL)
     }
     
@@ -318,11 +437,8 @@ setGeneric("molecularProfiles<-", function(object, mDataType, value) standardGen
 #' @describeIn PhenoGenoExperiment Update the given type of molecular data from the PhenoGenoExperiment 
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="PhenoGenoExperiment", mDataType ="character",value="matrix"), function(object, mDataType, value){
-
-  if (mDataType %in% names(object@molecularProfiles)) {
-    Biobase::exprs(object@molecularProfiles[[mDataType]]) <- value
-  }
-    object
+  assay(object, mDataType) <- value
+  object
 })
 
 #' featureInfo Generic
@@ -333,18 +449,18 @@ setReplaceMethod("molecularProfiles", signature = signature(object="PhenoGenoExp
 #' data(CCLEsmall)
 #' featureInfo(CCLEsmall, "rna")
 #' 
-#' @param cSet The \code{PhenoGenoExperiment} to retrieve feature annotations from
+#' @param x The \code{PhenoGenoExperiment} to retrieve feature annotations from
 #' @param mDataType the type of molecular data 
 #' @return a \code{data.frame} with the experiment info
-setGeneric("featureInfo", function(cSet, mDataType) standardGeneric("featureInfo"))
+setGeneric("featureInfo", function(x, mDataType) standardGeneric("featureInfo"))
 #' @describeIn PhenoGenoExperiment Return the feature info for the given molecular data 
 #' @export
-setMethod(featureInfo, "PhenoGenoExperiment", function(cSet, mDataType){
-  if(mDataType %in% names(cSet@molecularProfiles)){
-    return(Biobase::fData(cSet@molecularProfiles[[mDataType]]))}else{
-      return(NULL)
-    }
-  
+setMethod(featureInfo, "PhenoGenoExperiment", function(x, mDataType){
+  if(is(x[[mDataType]], "ExpressionSet"))
+    return(Biobase::fData(x[[mDataType]]))
+  if(is(x[[mDataType]], "SummarizedExperiment"))
+    return(SummarizedExperiment::rowData(x[[mDataType]]))
+  return(NULL)
 })
 
 #' featureInfo<- Generic
@@ -362,120 +478,19 @@ setMethod(featureInfo, "PhenoGenoExperiment", function(cSet, mDataType){
 setGeneric("featureInfo<-", function(object, mDataType, value) standardGeneric("featureInfo<-"))
 #' @describeIn PhenoGenoExperiment Replace the gene info for the molecular data
 #' @export
-setReplaceMethod("featureInfo", signature = signature(object="PhenoGenoExperiment", mDataType ="character",value="data.frame"), function(object, mDataType, value){
+setReplaceMethod("featureInfo", signature = signature(object="PhenoGenoExperiment", mDataType ="character",value="ANY"), function(object, mDataType, value){
   
-  if(mDataType %in% names(object@molecularProfiles)){Biobase::fData(object@molecularProfiles[[mDataType]]) <- value}
-  
-  object
-})
-
-#' sensitivityInfo Generic
-#' 
-#' Generic for sensitivityInfo method 
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' sensitivityInfo(CCLEsmall)
-#' 
-#' @param cSet The \code{PhenoGenoExperiment} to retrieve sensitivity experiment annotations from
-#' @return a \code{data.frame} with the experiment info
-setGeneric("sensitivityInfo", function(cSet) standardGeneric("sensitivityInfo"))
-#' @describeIn PhenoGenoExperiment Return the drug dose sensitivity experiment info
-#' @export
-setMethod(sensitivityInfo, "PhenoGenoExperiment", function(cSet){
-    
-    return(cSet@sensitivity$info)
-    
-})
-
-#' sensitivityInfo<- Generic
-#' 
-#' A generic for the sensitivityInfo replacement method
-#' 
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' sensitivityInfo(CCLEsmall) <- sensitivityInfo(CCLEsmall)
-#' 
-#' @param object The \code{PhenoGenoExperiment} to update
-#' @param value A \code{data.frame} with the new sensitivity annotations
-#' @return Updated \code{PhenoGenoExperiment} 
-setGeneric("sensitivityInfo<-", function(object, value) standardGeneric("sensitivityInfo<-"))
-#' @describeIn PhenoGenoExperiment Update the sensitivity experiment info
-#' @export
-setReplaceMethod("sensitivityInfo", signature = signature(object="PhenoGenoExperiment",value="data.frame"), function(object, value){
-
-    object@sensitivity$info <- value
+  if(is(object[[mDataType]], "ExpressionSet")){
+    Biobase::fData(object[[mDataType]]) <- value
     object
-})
-
-
-#' sensitivityProfiles Generic
-#' 
-#' Generic for sensitivityProfiles method 
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' sensitivityProfiles(CCLEsmall)
-#' 
-#' @param cSet The \code{PhenoGenoExperiment} to retrieve sensitivity experiment data from
-#' @return a \code{data.frame} with the experiment info
-setGeneric("sensitivityProfiles", function(cSet) standardGeneric("sensitivityProfiles"))
-#' @describeIn PhenoGenoExperiment Return the phenotypic data for the drug dose sensitivity
-#' @export
-setMethod(sensitivityProfiles, "PhenoGenoExperiment", function(cSet){
-    
-    return(cSet@sensitivity$profiles)
-    
-})
-
-#' sensitivityProfiles<- Generic
-#' 
-#' A generic for the sensitivityProfiles replacement method
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' sensitivityProfiles(CCLEsmall) <- sensitivityProfiles(CCLEsmall)
-#' 
-#' @param object The \code{PhenoGenoExperiment} to update
-#' @param value A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment
-#' @return Updated \code{PhenoGenoExperiment} 
-setGeneric("sensitivityProfiles<-", function(object, value) standardGeneric("sensitivityProfiles<-"))
-#' @describeIn PhenoGenoExperiment Update the phenotypic data for the drug dose
-#'   sensitivity
-#' @export
-setReplaceMethod("sensitivityProfiles", signature = signature(object="PhenoGenoExperiment",value="data.frame"), function(object, value){
-
-    object@sensitivity$profiles <- value
+  }
+  if(is(object[[mDataType]], "SummarizedExperiment")){
+    SummarizedExperiment::rowData(object[[mDataType]]) <- value
     object
+  }
+  stop("Trying to set the feature info to an mDataType that does not support it. \n Check that the mDataType exists and that it is stored in an object that has row data.")
 })
-#' @describeIn PhenoGenoExperiment Update the phenotypic data for the drug dose
-#'   sensitivity
-#' @export
-setReplaceMethod("sensitivityProfiles", signature = signature(object="PhenoGenoExperiment",value="matrix"), function(object, value){
 
-    object@sensitivity$profiles <- as.data.frame(value)
-    object
-})
-#' sensitivityMeasures Generic
-#' 
-#' A generic for the sensitivityMeasures  method
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' sensitivityMeasures(CCLEsmall)
-#' 
-#' @param cSet The \code{PhenoGenoExperiment} 
-#' @return A \code{character} vector of all the available sensitivity measures
-setGeneric("sensitivityMeasures", function(cSet) standardGeneric("sensitivityMeasures"))
-#' @describeIn PhenoGenoExperiment Returns the available sensitivity profile
-#'   summaries, for example, whether there are IC50 values available
-#' @export
-setMethod(sensitivityMeasures, "PhenoGenoExperiment", function(cSet){
-    
-    return(colnames(sensitivityProfiles(cSet)))
-    
-})
 
 #' cellNames Generic
 #' 
@@ -485,14 +500,14 @@ setMethod(sensitivityMeasures, "PhenoGenoExperiment", function(cSet){
 #' data(CCLEsmall)
 #' cellNames(CCLEsmall)
 #' 
-#' @param cSet The \code{PhenoGenoExperiment} to return cell names from
+#' @param x The \code{PhenoGenoExperiment} to return cell names from
 #' @return A vector of the cell names used in the PhenoGenoExperiment
-setGeneric("cellNames", function(cSet) standardGeneric("cellNames"))
+setGeneric("cellNames", function(x) standardGeneric("cellNames"))
 #' @describeIn PhenoGenoExperiment Return the cell names used in the dataset
 #' @export
-setMethod(cellNames, "PhenoGenoExperiment", function(cSet){
+setMethod(cellNames, "PhenoGenoExperiment", function(x){
   
-  rownames(cellInfo(cSet))
+  rownames(cellInfo(x))
   
 })
 
@@ -526,19 +541,21 @@ setReplaceMethod("cellNames", signature = signature(object="PhenoGenoExperiment"
 #' data(CCLEsmall)
 #' fNames(CCLEsmall, "rna")
 #' 
-#' @param cSet The \code{PhenoGenoExperiment} 
+#' @param x The \code{PhenoGenoExperiment} 
 #' @param mDataType The molecular data type to return feature names for
 #' @return A \code{character} vector of the feature names
-setGeneric("fNames", function(cSet, mDataType) standardGeneric("fNames"))
+setGeneric("fNames", function(x, mDataType) standardGeneric("fNames"))
 #' @describeIn PhenoGenoExperiment Return the feature names used in the dataset
 #' @export
-setMethod(fNames, "PhenoGenoExperiment", function(cSet, mDataType){
-  if (mDataType %in% names(cSet@molecularProfiles)) {
-    rownames(featureInfo(cSet, mDataType))
+setMethod(fNames, "PhenoGenoExperiment", function(x, mDataType){
+  if (mDataType %in% names(x)) {
+    rownames(x[[mDataType]])
   } else {
     stop("Molecular data type name specified is not part of this PhenoGenoExperiment")
   }
 })
+
+## TODO:: FIX the broken annotations!!!
 
 #' dateCreated Generic
 #' 
@@ -548,119 +565,119 @@ setMethod(fNames, "PhenoGenoExperiment", function(cSet, mDataType){
 #' data(CCLEsmall)
 #' dateCreated(CCLEsmall)
 #' 
-#' @param cSet A \code{PhenoGenoExperiment} 
+#' @param x A \code{PhenoGenoExperiment} 
 #' @return The date the PhenoGenoExperiment was created
-setGeneric("dateCreated", function(cSet) standardGeneric("dateCreated"))
+setGeneric("dateCreated", function(x) standardGeneric("dateCreated"))
 #' @describeIn PhenoGenoExperiment Return the date the PhenoGenoExperiment was created
 #' @export
-setMethod(dateCreated, "PhenoGenoExperiment", function(cSet) {
-  cSet@annotation$dateCreated
+setMethod(dateCreated, "PhenoGenoExperiment", function(x) {
+  x@annotation$dateCreated
 })
 
-#' cSetName Generic
+#' PGEName Generic
 #' 
-#' A generic for the cSetName method
+#' A generic for the PGEName method
 #' 
 #' @examples
 #' data(CCLEsmall)
-#' cSetName(CCLEsmall)
+#' PGEName(CCLEsmall)
 #' 
-#' @param cSet A \code{PhenoGenoExperiment} 
+#' @param x A \code{PhenoGenoExperiment} 
 #' @return The name of the PhenoGenoExperiment
-setGeneric("cSetName", function(cSet) standardGeneric("cSetName"))
+setGeneric("PGEName", function(x) standardGeneric("PGEName"))
 #' @describeIn PhenoGenoExperiment Return the name of the PhenoGenoExperiment 
 #' @export
-setMethod(cSetName, "PhenoGenoExperiment", function(cSet){
+setMethod(PGEName, "PhenoGenoExperiment", function(x){
     
-    return(cSet@annotation$name)
-    
-})
-
-#' pertNumber Generic
-#' 
-#' A generic for the pertNumber method
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' pertNumber(CCLEsmall)
-#' 
-#' @param cSet A \code{PhenoGenoExperiment} 
-#' @return A 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
-setGeneric("pertNumber", function(cSet) standardGeneric("pertNumber"))
-#' @describeIn PhenoGenoExperiment Return the summary of available perturbation
-#'   experiments
-#' @export
-setMethod(pertNumber, "PhenoGenoExperiment", function(cSet){
-    
-    return(cSet@perturbation$n)
+    return(x@annotation$name)
     
 })
 
+# #' pertNumber Generic
+# #' 
+# #' A generic for the pertNumber method
+# #' 
+# #' @examples
+# #' data(CCLEsmall)
+# #' pertNumber(CCLEsmall)
+# #' 
+# #' @param x A \code{PhenoGenoExperiment} 
+# #' @return A 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
+# setGeneric("pertNumber", function(x) standardGeneric("pertNumber"))
+# #' @describeIn PhenoGenoExperiment Return the summary of available perturbation
+# #'   experiments
+# #' @export
+# setMethod(pertNumber, "PhenoGenoExperiment", function(x){
+    
+#     return(x@perturbation$n)
+    
+# })
 
-#' sensNumber Generic
-#' 
-#' A generic for the sensNumber method
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' sensNumber(CCLEsmall)
-#' 
-#' @param cSet A \code{PhenoGenoExperiment} 
-#' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
-setGeneric("sensNumber", function(cSet) standardGeneric("sensNumber"))
-#' @describeIn PhenoGenoExperiment Return the summary of available sensitivity
-#'   experiments
-#' @export
-setMethod(sensNumber, "PhenoGenoExperiment", function(cSet){
-  
-  return(cSet@sensitivity$n)
-  
-})
 
-#' pertNumber<- Generic
-#' 
-#' A generic for the pertNumber method
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' pertNumber(CCLEsmall) <- pertNumber(CCLEsmall)
-#' 
-#' @param object A \code{PhenoGenoExperiment} 
-#' @param value A new 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
-#' @return The updated \code{PhenoGenoExperiment} 
-setGeneric("pertNumber<-", function(object, value) standardGeneric("pertNumber<-"))
-#' @describeIn PhenoGenoExperiment Update the summary of available perturbation
-#'   experiments
-#' @export
-setReplaceMethod('pertNumber', signature = signature(object="PhenoGenoExperiment",value="array"), function(object, value){
+# #' sensNumber Generic
+# #' 
+# #' A generic for the sensNumber method
+# #' 
+# #' @examples
+# #' data(CCLEsmall)
+# #' sensNumber(CCLEsmall)
+# #' 
+# #' @param x A \code{PhenoGenoExperiment} 
+# #' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
+# setGeneric("sensNumber", function(x) standardGeneric("sensNumber"))
+# #' @describeIn PhenoGenoExperiment Return the summary of available sensitivity
+# #'   experiments
+# #' @export
+# setMethod(sensNumber, "PhenoGenoExperiment", function(x){
   
-  object@perturbation$n <- value
-  object
+#   return(x@sensitivity$n)
   
-})
+# })
 
-#' sensNumber<- Generic
-#' 
-#' A generic for the sensNumber method
-#' 
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' sensNumber(CCLEsmall) <- sensNumber(CCLEsmall)
-#' 
-#' @param object A \code{PhenoGenoExperiment} 
-#' @param value A new \code{data.frame} with the number of sensitivity experiments per drug and cell line
-#' @return The updated \code{PhenoGenoExperiment} 
-setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-"))
-#' @describeIn PhenoGenoExperiment Update the summary of available sensitivity
-#'   experiments
-#' @export
-setReplaceMethod('sensNumber', signature = signature(object="PhenoGenoExperiment",value="matrix"), function(object, value){
+# #' pertNumber<- Generic
+# #' 
+# #' A generic for the pertNumber method
+# #' 
+# #' @examples
+# #' data(CCLEsmall)
+# #' pertNumber(CCLEsmall) <- pertNumber(CCLEsmall)
+# #' 
+# #' @param object A \code{PhenoGenoExperiment} 
+# #' @param value A new 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
+# #' @return The updated \code{PhenoGenoExperiment} 
+# setGeneric("pertNumber<-", function(object, value) standardGeneric("pertNumber<-"))
+# #' @describeIn PhenoGenoExperiment Update the summary of available perturbation
+# #'   experiments
+# #' @export
+# setReplaceMethod('pertNumber', signature = signature(object="PhenoGenoExperiment",value="array"), function(object, value){
   
-  object@sensitivity$n <- value
-  object
+#   object@perturbation$n <- value
+#   object
   
-})
+# })
+
+# #' sensNumber<- Generic
+# #' 
+# #' A generic for the sensNumber method
+# #' 
+# #' 
+# #' @examples
+# #' data(CCLEsmall)
+# #' sensNumber(CCLEsmall) <- sensNumber(CCLEsmall)
+# #' 
+# #' @param object A \code{PhenoGenoExperiment} 
+# #' @param value A new \code{data.frame} with the number of sensitivity experiments per drug and cell line
+# #' @return The updated \code{PhenoGenoExperiment} 
+# setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-"))
+# #' @describeIn PhenoGenoExperiment Update the summary of available sensitivity
+# #'   experiments
+# #' @export
+# setReplaceMethod('sensNumber', signature = signature(object="PhenoGenoExperiment",value="matrix"), function(object, value){
+  
+#   object@sensitivity$n <- value
+#   object
+  
+# })
 
 #' mDataNames Generic
 #' 
@@ -671,10 +688,10 @@ setReplaceMethod('sensNumber', signature = signature(object="PhenoGenoExperiment
 #' data(CCLEsmall)
 #' mDataNames(CCLEsmall)
 #' 
-#' @param cSet PharamcoSet object
+#' @param x PharamcoSet object
 #' @return Vector of names of the molecular data types
 #' @export
-setGeneric("mDataNames", function(cSet) standardGeneric("mDataNames"))
+setGeneric("mDataNames", function(x) standardGeneric("mDataNames"))
 
 
 #' mDataNames
@@ -685,35 +702,34 @@ setGeneric("mDataNames", function(cSet) standardGeneric("mDataNames"))
 #' data(CCLEsmall)
 #' mDataNames(CCLEsmall)
 #' 
-#' @param cSet PharamcoSet object
+#' @param x PharamcoSet object
 #' @return Vector of names of the molecular data types
 #' @export
-setMethod("mDataNames", "PhenoGenoExperiment", function(cSet){
+setMethod("mDataNames", "PhenoGenoExperiment", function(x){
 
-  return(names(cSet@molecularProfiles))
+  return(names(x))
 
 })
 
 
 
 
-### TODO:: Add updating of sensitivity Number tables
-updateCellId <- function(cSet, new.ids = vector("character")){
+updateCellId <- function(x, new.ids = vector("character")){
   
-  if (length(new.ids)!=nrow(cellInfo(cSet))){
+  if (length(new.ids)!=nrow(cellInfo(x))){
     stop("Wrong number of cell identifiers")
   }
 
-  if(cSet@datasetType=="sensitivity"|cSet@datasetType=="both"){
-    myx <- match(sensitivityInfo(cSet)[,"cellid"],rownames(cellInfo(cSet)))
-    sensitivityInfo(cSet)[,"cellid"] <- new.ids[myx]
+  if(x@datasetType=="sensitivity"|x@datasetType=="both"){
+    myx <- match(sensitivityInfo(x)[,"cellid"],rownames(cellInfo(x)))
+    sensitivityInfo(x)[,"cellid"] <- new.ids[myx]
 
   }
   
   
-  cSet@molecularProfiles <- lapply(cSet@molecularProfiles, function(eset){
+  x@molecularProfiles <- lapply(x@molecularProfiles, function(eset){
           
-      myx <- match(Biobase::pData(eset)[["cellid"]],rownames(cellInfo(cSet)))
+      myx <- match(Biobase::pData(eset)[["cellid"]],rownames(cellInfo(x)))
       Biobase::pData(eset)[["cellid"]]  <- new.ids[myx]
       return(eset)
         })
@@ -725,330 +741,213 @@ updateCellId <- function(cSet, new.ids = vector("character")){
   if(any(duplicated(new.ids))){
     warning("Duplicated ids passed to updateCellId. Merging old ids into the same identifier")
     
-    if(ncol(sensNumber(cSet))>0){
-      sensMatch <- match(rownames(sensNumber(cSet)), rownames(cellInfo(cSet)))
+    if(ncol(sensNumber(x))>0){
+      sensMatch <- match(rownames(sensNumber(x)), rownames(cellInfo(x)))
     }
-    if(dim(pertNumber(cSet))[[2]]>0){
-      pertMatch <- match(dimnames(pertNumber(cSet))[[1]], rownames(cellInfo(cSet)))
+    if(dim(pertNumber(x))[[2]]>0){
+      pertMatch <- match(dimnames(pertNumber(x))[[1]], rownames(cellInfo(x)))
     }
-    curMatch <- match(rownames(cSet@curation$cell),rownames(cellInfo(cSet)))
+    curMatch <- match(rownames(x@curation$cell),rownames(cellInfo(x)))
 
     duplId <- unique(new.ids[duplicated(new.ids)])
     for(id in duplId){
 
-      if (ncol(sensNumber(cSet))>0){
+      if (ncol(sensNumber(x))>0){
         myx <- which(new.ids[sensMatch] == id)
-        sensNumber(cSet)[myx[1],] <- apply(sensNumber(cSet)[myx,], 2, sum)
-        sensNumber(cSet) <- sensNumber(cSet)[-myx[-1],]
+        sensNumber(x)[myx[1],] <- apply(sensNumber(x)[myx,], 2, sum)
+        sensNumber(x) <- sensNumber(x)[-myx[-1],]
         # sensMatch <- sensMatch[-myx[-1]]
       }
-      if (dim(pertNumber(cSet))[[1]]>0){
+      if (dim(pertNumber(x))[[1]]>0){
         myx <- which(new.ids[pertMatch] == id)
-        pertNumber(cSet)[myx[1],,] <- apply(pertNumber(cSet)[myx,,], c(1,3), sum)
-        pertNumber(cSet) <- pertNumber(cSet)[-myx[-1],,]
+        pertNumber(x)[myx[1],,] <- apply(pertNumber(x)[myx,,], c(1,3), sum)
+        pertNumber(x) <- pertNumber(x)[-myx[-1],,]
         # pertMatch <- pertMatch[-myx[-1]]
       }
 
       myx <- which(new.ids[curMatch] == id)
-      cSet@curation$cell[myx[1],] <- apply(cSet@curation$cell[myx,], 2, paste, collapse="///")
-      cSet@curation$cell <- cSet@curation$cell[-myx[-1],]
-      cSet@curation$tissue[myx[1],] <- apply(cSet@curation$tissue[myx,], 2, paste, collapse="///")
-      cSet@curation$tissue <- cSet@curation$tissue[-myx[-1],]
+      x@curation$cell[myx[1],] <- apply(x@curation$cell[myx,], 2, paste, collapse="///")
+      x@curation$cell <- x@curation$cell[-myx[-1],]
+      x@curation$tissue[myx[1],] <- apply(x@curation$tissue[myx,], 2, paste, collapse="///")
+      x@curation$tissue <- x@curation$tissue[-myx[-1],]
       # curMatch <- curMatch[-myx[-1]]
 
       myx <- which(new.ids == id)
-      cellInfo(cSet)[myx[1],] <- apply(cellInfo(cSet)[myx,], 2, paste, collapse="///")
-      cellInfo(cSet) <- cellInfo(cSet)[-myx[-1],]
+      cellInfo(x)[myx[1],] <- apply(cellInfo(x)[myx,], 2, paste, collapse="///")
+      cellInfo(x) <- cellInfo(x)[-myx[-1],]
       new.ids <- new.ids[-myx[-1]]
-      if(ncol(sensNumber(cSet))>0){
-        sensMatch <- match(rownames(sensNumber(cSet)), rownames(cellInfo(cSet)))
+      if(ncol(sensNumber(x))>0){
+        sensMatch <- match(rownames(sensNumber(x)), rownames(cellInfo(x)))
       }
-      if(dim(pertNumber(cSet))[[1]]>0){
-        pertMatch <- match(dimnames(pertNumber(cSet))[[1]], rownames(cellInfo(cSet)))
+      if(dim(pertNumber(x))[[1]]>0){
+        pertMatch <- match(dimnames(pertNumber(x))[[1]], rownames(cellInfo(x)))
       }
-      curMatch <- match(rownames(cSet@curation$cell),rownames(cellInfo(cSet)))
+      curMatch <- match(rownames(x@curation$cell),rownames(cellInfo(x)))
     }
   } else {
-    if (dim(pertNumber(cSet))[[1]]>0){
-      pertMatch <- match(dimnames(pertNumber(cSet))[[1]], rownames(cellInfo(cSet)))
+    if (dim(pertNumber(x))[[1]]>0){
+      pertMatch <- match(dimnames(pertNumber(x))[[1]], rownames(cellInfo(x)))
     }
-    if (ncol(sensNumber(cSet))>0){
-      sensMatch <- match(rownames(sensNumber(cSet)), rownames(cellInfo(cSet)))
+    if (ncol(sensNumber(x))>0){
+      sensMatch <- match(rownames(sensNumber(x)), rownames(cellInfo(x)))
     }
-    curMatch <- match(rownames(cSet@curation$cell),rownames(cellInfo(cSet)))
+    curMatch <- match(rownames(x@curation$cell),rownames(cellInfo(x)))
   }
 
-  if (dim(pertNumber(cSet))[[1]]>0){
-    dimnames(pertNumber(cSet))[[1]] <- new.ids[pertMatch]
+  if (dim(pertNumber(x))[[1]]>0){
+    dimnames(pertNumber(x))[[1]] <- new.ids[pertMatch]
   }
-  if (ncol(sensNumber(cSet))>0){
-    rownames(sensNumber(cSet)) <- new.ids[sensMatch]
+  if (ncol(sensNumber(x))>0){
+    rownames(sensNumber(x)) <- new.ids[sensMatch]
   }
-  rownames(cSet@curation$cell) <- new.ids[curMatch]
-  rownames(cSet@curation$tissue) <- new.ids[curMatch]
-  rownames(cellInfo(cSet)) <- new.ids
+  rownames(x@curation$cell) <- new.ids[curMatch]
+  rownames(x@curation$tissue) <- new.ids[curMatch]
+  rownames(cellInfo(x)) <- new.ids
 
 
 
 
 
-  # myx <- match(rownames(cSet@curation$cell),rownames(cellInfo(cSet)))
-  # rownames(cSet@curation$cell) <- new.ids[myx]
-  # rownames(cSet@curation$tissue) <- new.ids[myx]
-  # if (dim(pertNumber(cSet))[[1]]>0){
-  #   myx <- match(dimnames(pertNumber(cSet))[[1]], rownames(cellInfo(cSet)))
-  #   dimnames(pertNumber(cSet))[[1]] <- new.ids[myx]
+  # myx <- match(rownames(x@curation$cell),rownames(cellInfo(x)))
+  # rownames(x@curation$cell) <- new.ids[myx]
+  # rownames(x@curation$tissue) <- new.ids[myx]
+  # if (dim(pertNumber(x))[[1]]>0){
+  #   myx <- match(dimnames(pertNumber(x))[[1]], rownames(cellInfo(x)))
+  #   dimnames(pertNumber(x))[[1]] <- new.ids[myx]
   # }
-  # if (nrow(sensNumber(cSet))>0){
-  #   myx <- match(rownames(sensNumber(cSet)), rownames(cellInfo(cSet)))
-  #   rownames(sensNumber(cSet)) <- new.ids[myx]
+  # if (nrow(sensNumber(x))>0){
+  #   myx <- match(rownames(sensNumber(x)), rownames(cellInfo(x)))
+  #   rownames(sensNumber(x)) <- new.ids[myx]
   # }
-  # rownames(cellInfo(cSet)) <- new.ids
-  return(cSet)
+  # rownames(cellInfo(x)) <- new.ids
+  return(x)
 
 }
 
-# updateFeatureNames <- function(cSet, new.ids = vector("character")){
+# updateFeatureNames <- function(x, new.ids = vector("character")){
 #
-#   if (length(new.ids)!=nrow(cellInfo(cSet))){
+#   if (length(new.ids)!=nrow(cellInfo(x))){
 #     stop("Wrong number of cell identifiers")
 #   }
 #
-#   if(cSet@datasetType=="sensitivity"|cSet@datasetType=="both"){
-#     myx <- match(sensitivityInfo(cSet)[,"cellid"],rownames(cellInfo(cSet)))
-#     sensitivityInfo(cSet)[,"cellid"] <- new.ids[myx]
+#   if(x@datasetType=="sensitivity"|x@datasetType=="both"){
+#     myx <- match(sensitivityInfo(x)[,"cellid"],rownames(cellInfo(x)))
+#     sensitivityInfo(x)[,"cellid"] <- new.ids[myx]
 #
 #   }
 #
-#   cSet@molecularProfiles <- lapply(cSet@molecularProfiles, function(eset){
+#   x@molecularProfiles <- lapply(x@molecularProfiles, function(eset){
 #
-#     myx <- match(pData(eset)[["cellid"]],rownames(cellInfo(cSet)))
+#     myx <- match(pData(eset)[["cellid"]],rownames(cellInfo(x)))
 #     pData(eset)[["cellid"]]  <- new.ids[myx]
 #     return(eset)
 #       })
-#   myx <- match(rownames(cSet@curation$cell),rownames(cellInfo(cSet)))
-#   rownames(cSet@curation$cell) <- new.ids[myx]
-#   rownames(cSet@curation$tissue) <- new.ids[myx]
-#   if (dim(pertNumber(cSet))[[1]]>0){
-#     myx <- match(dimnames(pertNumber(cSet))[[1]], rownames(cellInfo(cSet)))
-#     dimnames(pertNumber(cSet))[[1]] <- new.ids[myx]
+#   myx <- match(rownames(x@curation$cell),rownames(cellInfo(x)))
+#   rownames(x@curation$cell) <- new.ids[myx]
+#   rownames(x@curation$tissue) <- new.ids[myx]
+#   if (dim(pertNumber(x))[[1]]>0){
+#     myx <- match(dimnames(pertNumber(x))[[1]], rownames(cellInfo(x)))
+#     dimnames(pertNumber(x))[[1]] <- new.ids[myx]
 #   }
-#   if (nrow(sensNumber(cSet))>0){
-#     myx <- match(rownames(sensNumber(cSet)), rownames(cellInfo(cSet)))
-#     rownames(sensNumber(cSet)) <- new.ids[myx]
+#   if (nrow(sensNumber(x))>0){
+#     myx <- match(rownames(sensNumber(x)), rownames(cellInfo(x)))
+#     rownames(sensNumber(x)) <- new.ids[myx]
 #   }
-#   rownames(cellInfo(cSet)) <- new.ids
-#   return(cSet)
+#   rownames(cellInfo(x)) <- new.ids
+#   return(x)
 #
 # }
 
 
-.summarizeSensitivityNumbers <- function(cSet) {
+# .summarizeSensitivityNumbers <- function(x) {
 
-  if (cSet@datasetType != "sensitivity" && cSet@datasetType != "both") {
-    stop ("Data type must be either sensitivity or both")
-  }
+#   if (x@datasetType != "sensitivity" && x@datasetType != "both") {
+#     stop ("Data type must be either sensitivity or both")
+#   }
   
-  ## unique drug identifiers
-  # drugn <- sort(unique(cSet@sensitivity$info[ , "drugid"]))
+#   ## unique drug identifiers
+#   # drugn <- sort(unique(x@sensitivity$info[ , "drugid"]))
   
-  ## consider all drugs
-  drugn <- rownames(cSet@drug)
+#   ## consider all drugs
+#   drugn <- rownames(x@drug)
   
-  ## unique drug identifiers
-  # celln <- sort(unique(cSet@sensitivity$info[ , "cellid"]))
+#   ## unique drug identifiers
+#   # celln <- sort(unique(x@sensitivity$info[ , "cellid"]))
   
-  ## consider all cell lines
-  celln <- rownames(cSet@cell)
+#   ## consider all cell lines
+#   celln <- rownames(x@cell)
   
-  sensitivity.info <- matrix(0, nrow=length(celln), ncol=length(drugn), dimnames=list(celln, drugn))
-  drugids <- cSet@sensitivity$info[ , "drugid"]
-  cellids <- cSet@sensitivity$info[ , "cellid"]
-  cellids <- cellids[grep("///", drugids, invert=TRUE)]
-  drugids <- drugids[grep("///", drugids, invert=TRUE)]
+#   sensitivity.info <- matrix(0, nrow=length(celln), ncol=length(drugn), dimnames=list(celln, drugn))
+#   drugids <- x@sensitivity$info[ , "drugid"]
+#   cellids <- x@sensitivity$info[ , "cellid"]
+#   cellids <- cellids[grep("///", drugids, invert=TRUE)]
+#   drugids <- drugids[grep("///", drugids, invert=TRUE)]
   
   
-  tt <- table(cellids, drugids)
-  sensitivity.info[rownames(tt), colnames(tt)] <- tt
+#   tt <- table(cellids, drugids)
+#   sensitivity.info[rownames(tt), colnames(tt)] <- tt
   
-    return(sensitivity.info)
-}
-
-
-.summarizeMolecularNumbers <- function(cSet) {
-  
-  ## consider all molecular types
-  mDT <- mDataNames(cSet)
-  
-  ## consider all cell lines
-  celln <- rownames(cSet@cell)
-  
-  molecular.info <- matrix(0, nrow=length(celln), ncol=length(mDT), dimnames=list(celln, mDT))
-  
-  for(mDataType in mDT) {
-    tt <- table(phenoInfo(cSet, mDataType)$cellid)
-    molecular.info[names(tt), mDataType] <- tt
-
-  }
-  return(molecular.info)
-}
+#     return(sensitivity.info)
+# }
 
 
-.summarizePerturbationNumbers <- function(cSet) {
+# .summarizeMolecularNumbers <- function(x) {
+  
+#   ## consider all molecular types
+#   mDT <- mDataNames(x)
+  
+#   ## consider all cell lines
+#   celln <- rownames(x@cell)
+  
+#   molecular.info <- matrix(0, nrow=length(celln), ncol=length(mDT), dimnames=list(celln, mDT))
+  
+#   for(mDataType in mDT) {
+#     tt <- table(phenoInfo(x, mDataType)$cellid)
+#     molecular.info[names(tt), mDataType] <- tt
 
-  if (cSet@datasetType != "perturbation" && cSet@datasetType != "both") {
-    stop ("Data type must be either perturbation or both")
-  }
-  
-  ## unique drug identifiers
-  # drugn <- sort(unique(unlist(lapply(cSet@molecularProfiles, function (x) {
-  #   res <- NULL
-  #   if (nrow(pData(x)) > 0 & "drugid" %in% colnames(pData(x))) {
-  #     res <- pData(x)[ , "drugid"]
-  #   }
-  #   return (res)
-  # }))))
-  
-  ## consider all drugs
-  drugn <- rownames(cSet@drug)
-  
-  ## unique cell line identifiers
-  # celln <- sort(unique(unlist(lapply(cSet@molecularProfiles, function (x) {
-  #   res <- NULL
-  #   if (nrow(pData(x)) > 0 & "cellid" %in% colnames(pData(x))) {
-  #     res <- pData(x)[ , "cellid"]
-  #   }
-  #   return (res)
-  # }))))
-  
-  ## consider all cell lines
-  celln <- rownames(cSet@cell)
-  
-  perturbation.info <- array(0, dim=c(length(celln), length(drugn), length(cSet@molecularProfiles)), dimnames=list(celln, drugn, names((cSet@molecularProfiles))))
+#   }
+#   return(molecular.info)
+# }
 
-    for (i in 1:length(cSet@molecularProfiles)) {
-      if (nrow(Biobase::pData(cSet@molecularProfiles[[i]])) > 0 && all(is.element(c("cellid", "drugid"), colnames(Biobase::pData(cSet@molecularProfiles[[i]]))))) {
-      tt <- table(Biobase::pData(cSet@molecularProfiles[[i]])[ , "cellid"], Biobase::pData(cSet@molecularProfiles[[i]])[ , "drugid"])
-        perturbation.info[rownames(tt), colnames(tt), names(cSet@molecularProfiles)[i]] <- tt
-      }
-    }
+
+# .summarizePerturbationNumbers <- function(x) {
+
+#   if (x@datasetType != "perturbation" && x@datasetType != "both") {
+#     stop ("Data type must be either perturbation or both")
+#   }
   
-    return(perturbation.info)
-}
+#   ## unique drug identifiers
+#   # drugn <- sort(unique(unlist(lapply(x@molecularProfiles, function (x) {
+#   #   res <- NULL
+#   #   if (nrow(pData(x)) > 0 & "drugid" %in% colnames(pData(x))) {
+#   #     res <- pData(x)[ , "drugid"]
+#   #   }
+#   #   return (res)
+#   # }))))
+  
+#   ## consider all drugs
+#   drugn <- rownames(x@drug)
+  
+#   ## unique cell line identifiers
+#   # celln <- sort(unique(unlist(lapply(x@molecularProfiles, function (x) {
+#   #   res <- NULL
+#   #   if (nrow(pData(x)) > 0 & "cellid" %in% colnames(pData(x))) {
+#   #     res <- pData(x)[ , "cellid"]
+#   #   }
+#   #   return (res)
+#   # }))))
+  
+#   ## consider all cell lines
+#   celln <- rownames(x@cell)
+  
+#   perturbation.info <- array(0, dim=c(length(celln), length(drugn), length(x@molecularProfiles)), dimnames=list(celln, drugn, names((x@molecularProfiles))))
 
-#' A function to verify the structure of a PhenoGenoExperiment
-#' 
-#' This function checks the structure of a PharamcoSet, ensuring that the
-#' correct annotations are in place and all the required slots are filled so
-#' that matching of cells and drugs can be properly done across different types
-#' of data and with other studies.
-#' 
-#' @examples
-#' data(CCLEsmall)
-#' 
-#' checkCSetStructure(CCLEsmall)
-#' 
-#' @param cSet A \code{PhenoGenoExperiment} to be verified
-#' @param plotDist Should the function also plot the distribution of molecular data?
-#' @param result.dir The path to the directory for saving the plots as a string
-#' @return Prints out messages whenever describing the errors found in the structure of the pset object passed in. 
-#' @export
-#' @importFrom graphics hist
-#' @importFrom grDevices dev.off pdf
-
-checkPSetStructure <-
-  function(cSet, plotDist=FALSE, result.dir=".") {
-    if(!file.exists(result.dir) & plotDist) { dir.create(result.dir, showWarnings=FALSE, recursive=TRUE) }
-    for( i in 1:length(cSet@molecularProfiles)) {
-      profile <- cSet@molecularProfiles[[i]]
-      nn <- names(cSet@molecularProfiles)[i]
-      if((Biobase::annotation(profile) == "rna" | Biobase::annotation(profile) == "rnaseq") & plotDist)
-      {
-        pdf(file=file.path(result.dir, sprintf("%s.pdf", nn)))
-        hist(Biobase::exprs(profile), breaks = 100)
-        dev.off()
-      }
-      warning(ifelse(nrow(Biobase::fData(profile)) != nrow(Biobase::exprs(profile)), sprintf("%s: number of features in fData is different from expression slots", nn), sprintf("%s: fData dimension is OK", nn)))
-      warning(ifelse(nrow(Biobase::pData(profile)) != ncol(Biobase::exprs(profile)), sprintf("%s: number of cell lines in pData is different from expression slots", nn), sprintf("%s: pData dimension is OK", nn)))
-      warning(ifelse("cellid" %in% colnames(Biobase::pData(profile)), "", sprintf("%s: cellid does not exist in pData columns", nn)))
-      warning(ifelse("batchid" %in% colnames(Biobase::pData(profile)), "", sprintf("%s: batchid does not exist in pData columns", nn)))
-      if(Biobase::annotation(profile) == "rna" | Biobase::annotation(profile) == "rnaseq")
-      {
-        warning(ifelse("BEST" %in% colnames(Biobase::fData(profile)), "BEST is OK", sprintf("%s: BEST does not exist in fData columns", nn)))
-        warning(ifelse("Symbol" %in% colnames(Biobase::fData(profile)), "Symbol is OK", sprintf("%s: Symbol does not exist in fData columns", nn)))
-      }
-      if("cellid" %in% colnames(Biobase::pData(profile))) {
-        if(!all(Biobase::pData(profile)[,"cellid"] %in% rownames(cSet@cell))) {
-          warning(sprintf("%s: not all the cell lines in this profile are in cell lines slot", nn))
-        }
-      }else {
-        warning(sprintf("%s: cellid does not exist in pData", nn))
-      }
-    }
-    if("tissueid" %in% colnames(cSet@cell)) {
-      if("unique.tissueid" %in% colnames(cSet@curation$tissue))
-      {
-        if(length(intersect(rownames(cSet@curation$tissue), rownames(cSet@cell))) != nrow(cSet@cell)) {
-          message("rownames of curation tissue slot should be the same as cell slot (curated cell ids)")
-        } else{
-          if(length(intersect(cSet@cell$tissueid, cSet@curation$tissue$unique.tissueid)) != length(table(cSet@cell$tissueid))){
-            message("tissueid should be the same as unique tissue id from tissue curation slot")
-          }
-        }
-      } else {
-        message("unique.tissueid which is curated tissue id across data set should be a column of tissue curation slot")
-      }
-      if(any(is.na(cSet@cell[,"tissueid"]) | cSet@cell[,"tissueid"]=="", na.rm=TRUE)){
-        message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(cSet@cell)[which(is.na(cSet@cell[,"tissueid"]) | cSet@cell[,"tissueid"]=="")], collapse=" ")))
-      }
-    } else {
-      warning("tissueid does not exist in cell slot")
-    }
-    
-    if("unique.cellid" %in% colnames(cSet@curation$cell)) {
-      if(length(intersect(cSet@curation$cell$unique.cellid, rownames(cSet@cell))) != nrow(cSet@cell)) {
-        print("rownames of cell slot should be curated cell ids")
-      }
-    } else {
-      print("unique.cellid which is curated cell id across data set should be a column of cell curation slot")
-    }
-#     if("cellid" %in% colnames(cSet@cell)) {
-#       if(length(intersect(cSet@curation$cell$cellid, rownames(cSet@cell))) != nrow(cSet@cell)) {
-#         print("values of cellid column should be curated cell line ids")
+#     for (i in 1:length(x@molecularProfiles)) {
+#       if (nrow(Biobase::pData(x@molecularProfiles[[i]])) > 0 && all(is.element(c("cellid", "drugid"), colnames(Biobase::pData(x@molecularProfiles[[i]]))))) {
+#       tt <- table(Biobase::pData(x@molecularProfiles[[i]])[ , "cellid"], Biobase::pData(x@molecularProfiles[[i]])[ , "drugid"])
+#         perturbation.info[rownames(tt), colnames(tt), names(x@molecularProfiles)[i]] <- tt
 #       }
-#     } else {
-#       print("cellid which is curated cell id across data set should be a column of cell slot")
 #     }
-    
-    if(length(intersect(rownames(cSet@curation$cell), rownames(cSet@cell))) != nrow(cSet@cell)) {
-      print("rownames of curation cell slot should be the same as cell slot (curated cell ids)")
-    }
-    
-    if(class(cSet@cell) != "data.frame") {
-      warning("cell slot class type should be dataframe")
-    }
-    if(cSet@datasetType %in% c("sensitivity", "both"))
-    {
-      if(class(cSet@sensitivity$info) != "data.frame") {
-        warning("sensitivity info slot class type should be dataframe")
-      }
-      if("cellid" %in% colnames(cSet@sensitivity$info)) {
-        if(!all(cSet@sensitivity$info[,"cellid"] %in% rownames(cSet@cell))) {
-          warning("not all the cell lines in sensitivity data are in cell slot")
-        }
-      }else {
-        warning("cellid does not exist in sensitivity info")
-      }
-    
-      
-      if(any(!is.na(cSet@sensitivity$raw))) {
-        if(!all(dimnames(cSet@sensitivity$raw)[[1]] %in% rownames(cSet@sensitivity$info))) {
-          warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
-        }
-      }
-      if(!all(rownames(cSet@sensitivity$profiles) %in% rownames(cSet@sensitivity$info))) {
-        warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
-      }
-    }
-  }
-
+  
+#     return(perturbation.info)
+# }
