@@ -139,30 +139,56 @@ Error in running tools::texi2pdf()
 ## 29.05.19
 
 4. Build 4
+   
 **Errors**
 
-**Warnings**
-5. Build 5
-**Errors**
+```
+Running examples in 'CoreGx-Ex.R' failed
+The error most likely occurred in:
+
+> ### Name: cSetName
+> ### Title: cSetName Generic
+> ### Aliases: cSetName
+> 
+> ### ** Examples
+> 
+> data(CCLEsmall)
+> cSetName(CCLEsmall)
+Loading required package: PharmacoGx
+
+Attaching package: 'PharmacoGx'
+
+The following objects are masked from 'package:CoreGx':
+
+    amcc, cellInfo, cellInfo<-, cellNames, cellNames<-,
+    checkPSetStructure, connectivityScore, cosinePerm, dateCreated,
+    fNames, featureInfo, featureInfo<-, gwc, intersectList, mDataNames,
+    mcc, molecularProfiles, molecularProfiles<-, pertNumber,
+    pertNumber<-, phenoInfo, phenoInfo<-, sensNumber, sensNumber<-,
+    sensitivityInfo, sensitivityInfo<-, sensitivityMeasures,
+    sensitivityProfiles, sensitivityProfiles<-, symSetDiffList,
+    unionList
+
+Error in (function (classes, fdef, mtable)  : 
+  unable to find an inherited method for function 'cSetName' for signature '"PharmacoSet"'
+Calls: cSetName -> <Anonymous>
+Execution halted
+```
+- Error appears to be due to PharmacoGx masking CoreGx function definitions
+- When it tries to call a function on a `cSet`, PharmacoGx doesn't accept that arguement type
+- Need to figure out how to set CoreGx package priority in all `@example` sections of Roxygen code for `CoreSetClass.R` and `GWC.R`
+
 
 **Warnings**
-6. Build 6
-**Errors**
-
-**Warnings**
-7. Build 7
-**Errors**
-
-**Warnings**
-8. Build 8
-**Errors**
-
-**Warnings**
-9.  Build 9
-**Errors**
-
-**Warnings**
-10.  Build 10
-**Errors**
-
-**Warnings**
+```
+* checking for missing documentation entries ... WARNING
+Undocumented code objects:
+  'CCLEsmall' 'CMAPsmall' 'GDSCsmall' 'HDAC_genes'
+Undocumented data sets:
+  'CCLEsmall' 'CMAPsmall' 'GDSCsmall' 'HDAC_genes'
+All user-level objects in a package should have documentation entries.
+See chapter 'Writing R documentation files' in the 'Writing R
+Extensions' manual.
+```
+- Need to write documentation for the four datasets copied from PharmacoGx
+  - This was done to fix error with `data(CCLE)` in `@example` of `CoreSetClass.R`
