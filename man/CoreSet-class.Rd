@@ -101,7 +101,7 @@ both data PSets and RSets, allowing much of the code to be abstracted into
 the CoreSet super-class. However, the models involved with quantifying 
 cellular response to Pharmacological and Radiation therapy are widely 
 different, and two seperate implementations of the CSet class allows the
-packages to applu the correct model for the given data.
+packages to apply the correct model for the given data.
 }
 \section{Methods (by generic)}{
 \itemize{

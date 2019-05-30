@@ -177,7 +177,10 @@ Execution halted
 - Error appears to be due to PharmacoGx masking CoreGx function definitions
 - When it tries to call a function on a `cSet`, PharmacoGx doesn't accept that arguement type
 - Need to figure out how to set CoreGx package priority in all `@example` sections of Roxygen code for `CoreSetClass.R` and `GWC.R`
-
+  - Apparently `CoreSet` and `PharmacoSet` are currently unrelated (don't inherit each other)
+  - Thus problem is due to passing wrong type ("PharmacoSet") from `data(CCLEsmall)`
+    - Fix: Get a CoreSet data set for examples
+    - Long-term fix: Define relationship between `CoreSet` and `PharmacoSet`
 
 **Warnings**
 

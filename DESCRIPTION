@@ -9,6 +9,6 @@ Description: Core Gx Functions
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.0.0)
-Imports: lsa, methods, piano, Biobase
+Imports: lsa, methods, piano, Biobase, PharmacoGx
 License: All Rights Reserved.
 RoxygenNote: 6.1.1
