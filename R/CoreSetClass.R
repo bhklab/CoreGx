@@ -10,7 +10,7 @@
 #' the CoreSet super-class. However, the models involved with quantifying 
 #' cellular response to Pharmacological and Radiation therapy are widely 
 #' different, and two seperate implementations of the CSet class allows the
-#' packages to applu the correct model for the given data. 
+#' packages to apply the correct model for the given data. 
 #' 
 #' @param cSet A \code{CoreSet} object
 #' @param mDataType A \code{character} with the type of molecular data to return/update
@@ -535,6 +535,7 @@ setMethod(dateCreated, "CoreSet", function(cSet) {
   cSet@annotation$dateCreated
 })
 
+###TODO:: Fix error accepting "Pharmacoset" objects
 #' cSetName Generic
 #' 
 #' A generic for the cSetName method
