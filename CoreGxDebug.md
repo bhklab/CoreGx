@@ -180,6 +180,7 @@ Execution halted
 
 
 **Warnings**
+
 ```[RESOLVED]
 * checking for missing documentation entries ... WARNING
 Undocumented code objects:
