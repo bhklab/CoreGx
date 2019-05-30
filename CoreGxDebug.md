@@ -4,7 +4,7 @@ This is a record of development on the CoreGx package while it is being prepared
 
 ## 28.05.19 R CMD check
 
-1. Build 1
+1. **Build 1**
 
 **Errors**
 
@@ -16,7 +16,7 @@ ERROR Package suggested but not available for checking: 'RadioGx'
 ```
 Namespace dependencies not required: 'lsa', 'methods', 'piano'
 ```
-- Add `Imports: lsa, methods, piano` to `DESCRIPTION.md`
+- Add `Imports: lsa, methods, piano` to `DESCRIPTION`
 - Tools > Project Options > Build Tools: uncheck "Use devtools package functions if available"
   - For some reason this makes piano dependency work
 
@@ -25,11 +25,11 @@ Namespace dependencies not required: 'lsa', 'methods', 'piano'
 ```
 Warning: roxygen2 requires Encoding: UTF-8
 ```
-- Added `Encoding: UTF-8` to `DESCRIPTION.md`
+- Added `Encoding: UTF-8` to `DESCRIPTION`
 - Caused 40 warnings on package build
+  - Warnings due to incorrect format of DESCRIPTION; must end with a return, doesn't support commenting
 
-
-2. Build 2
+2. **Build 2**
 
 **Errors**
 
@@ -65,7 +65,7 @@ Error in cSetName(CCLEsmall) : object 'CCLEsmall' not found
 Found the following significant warnings:
   Note: possible error in 'distancePointLine(x = x[1], ': unused arguments (slope = slope, intercept = intercept) 
 ```
-- Fixed in errors section
+- Fixed in above errors section
 
 ```
 * checking dependencies in R code ... WARNING
@@ -90,14 +90,55 @@ This typically indicates Rd problems.
 - Ran `install.package("latexpdf")`
 
 1. Build 3
-- Now 36 warnings on build
 
 **Errors**
 
+```
+* checking examples ... ERROR
+Running examples in 'CoreGx-Ex.R' failed
+The error most likely occurred in:
+
+> ### Name: cSetName
+> ### Title: cSetName Generic
+> ### Aliases: cSetName
+> 
+> ### ** Examples
+> 
+> data(CCLEsmall)
+Warning in data(CCLEsmall) : data set 'CCLEsmall' not found
+> cSetName(CCLEsmall)
+Error in cSetName(CCLEsmall) : object 'CCLEsmall' not found
+Execution halted
+```
+- Assigned `data(CCLEsmall)` to `CCLEsmall` variable in `@example` of `cSetName Generic` in `CoreSetClass.R`
+  - Didn't work
+- Added `PharmacoGx` to `Imports` in `DESCRIPTION`
+  - Didn't work
+- Create `data` directory and downloaded example files from `PharamcoGx` git repo
+
+```
+* checking PDF version of manual without hyperrefs or index ... ERROR
+Re-running with no redirection of stdout/stderr.
+Hmm ... looks like a package
+Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
+  pdflatex is not available
+Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  : 
+  pdflatex is not available
+You may want to clean up by 'rm -Rf C:/Users/CHRISE~1/AppData/Local/Temp/RtmpqarKT7/Rd2pdf20a4288b2048'
+Error in running tools::texi2pdf()
+```
+- Added MikTex directory to path in R with `Sys.setenv`
+  - Didn't work
+- Ran `install.packages("tinytex")`
+- Ran `tinytex::install_tinytex()`
+  - Restarted RStudio
+  - Note: UHN Wi-fi blocks download of TinyTex for some reason
 
 **Warnings**
 
-1. Build 4
+## 29.05.19
+
+4. Build 4
 **Errors**
 
 **Warnings**
