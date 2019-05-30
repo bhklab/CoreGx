@@ -26,7 +26,7 @@ Namespace dependencies not required: 'lsa', 'methods', 'piano'
 Warning: roxygen2 requires Encoding: UTF-8
 ```
 - Added `Encoding: UTF-8` to `DESCRIPTION.md`
-- There are now 40 warnings on package build?
+- Caused 40 warnings on package build
 
 
 2. Build 2
@@ -90,12 +90,14 @@ This typically indicates Rd problems.
 - Ran `install.package("latexpdf")`
 
 1. Build 3
+- Now 36 warnings on build
 
 **Errors**
 
+
 **Warnings**
 
-4. Build 4
+1. Build 4
 **Errors**
 
 **Warnings**
