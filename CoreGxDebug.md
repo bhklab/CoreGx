@@ -4,7 +4,7 @@ This is a record of development on the CoreGx package while it is being prepared
 
 ## 28.05.19 R CMD check
 
-1. **Build 1**
+### **Build 1**
 
 **Errors**
 
@@ -29,7 +29,7 @@ Warning: roxygen2 requires Encoding: UTF-8
 - Caused 40 warnings on package build
   - Warnings due to incorrect format of DESCRIPTION; must end with a return, doesn't support commenting
 
-2. **Build 2**
+### **Build 2**
 
 **Errors**
 
@@ -89,7 +89,7 @@ This typically indicates Rd problems.
 - Installed MikTex in Windows
 - Ran `install.package("latexpdf")`
 
-1. Build 3
+### Build 3
 
 **Errors**
 
@@ -138,7 +138,7 @@ Error in running tools::texi2pdf()
 
 ## 29.05.19
 
-4. Build 4
+### Build 4
    
 **Errors**
 
