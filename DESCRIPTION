@@ -6,6 +6,8 @@ Date: 2017-07-07
 Author: BHKLab
 Maintainer: Who to complain to <marky.freeman@gmail.com>
 Description: Core Gx Functions
-Suggests: PharmacoGx, RadioGx
+Encoding: UTF-8
+Imports: lsa, methods, piano, Biobase
+Suggests: PharmacoGx
 License: All Rights Reserved.
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

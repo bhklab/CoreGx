@@ -8,7 +8,7 @@
 \alias{cellInfo<-,CoreSet,data.frame-method}
 \alias{phenoInfo,CoreSet-method}
 \alias{phenoInfo<-,CoreSet,character,data.frame-method}
-\alias{molecularProfiles,CoreSet-method}
+\alias{molecularProfiles,CoreSet,character-method}
 \alias{molecularProfiles<-,CoreSet,character,matrix-method}
 \alias{featureInfo,CoreSet-method}
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
@@ -35,9 +35,10 @@
 
 \S4method{phenoInfo}{CoreSet}(cSet, mDataType)
 
-\S4method{phenoInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
+\S4method{phenoInfo}{CoreSet,character,data.frame}(object,
+  mDataType) <- value
 
-\S4method{molecularProfiles}{CoreSet}(cSet, mDataType)
+\S4method{molecularProfiles}{CoreSet,character}(cSet, mDataType)
 
 \S4method{molecularProfiles}{CoreSet,character,matrix}(object,
   mDataType) <- value
