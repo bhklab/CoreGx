@@ -8,21 +8,21 @@ This is a record of development on the CoreGx package while it is being prepared
 
 **Errors**
 
-```
+```[RESOLVED]
 ERROR Package suggested but not available for checking: 'RadioGx'
 ```
 - Remove RadioGx from suggestions until it is release on CRAN
 
 ```
 Namespace dependencies not required: 'lsa', 'methods', 'piano'
-```
+``` [RESOLVED]
 - Add `Imports: lsa, methods, piano` to `DESCRIPTION`
 - Tools > Project Options > Build Tools: uncheck "Use devtools package functions if available"
   - For some reason this makes piano dependency work
 
 **Warnings**
 
-```
+``` [RESOLVED]
 Warning: roxygen2 requires Encoding: UTF-8
 ```
 - Added `Encoding: UTF-8` to `DESCRIPTION`
@@ -33,7 +33,7 @@ Warning: roxygen2 requires Encoding: UTF-8
 
 **Errors**
 
-```
+```[RESOLVED]
 callingWaterfall : <anonymous>: possible error in distancePointLine(x =
   x[1], y = x[2], slope = slope, intercept = intercept): unused
   arguments (slope = slope, intercept = intercept)
@@ -67,13 +67,13 @@ Found the following significant warnings:
 ```
 - Fixed in above errors section
 
-```
+```[RESOLVED]
 * checking dependencies in R code ... WARNING
 '::' or ':::' import not declared from: 'Biobase'
 ```
 - Added `Biobase` to end of `Imports` in `DESCRIPTION`
 
-```
+```[RESOLVED]
 * checking for missing documentation entries ... WARNING
 Undocumented code objects:
   'examineGOF'
@@ -88,6 +88,7 @@ This typically indicates Rd problems.
 ```
 - Installed MikTex in Windows
 - Ran `install.package("latexpdf")`
+  - Didn't work
 
 ### Build 3
 
@@ -116,7 +117,7 @@ Execution halted
   - Didn't work
 - Create `data` directory and downloaded example files from `PharamcoGx` git repo
 
-```
+```[RESOLVED]
 * checking PDF version of manual without hyperrefs or index ... ERROR
 Re-running with no redirection of stdout/stderr.
 Hmm ... looks like a package
@@ -136,10 +137,9 @@ Error in running tools::texi2pdf()
 
 **Warnings**
 
-## 29.05.19
+## 29.05.19 R CMD check continued
 
-### Build 4
-   
+
 **Errors**
 
 ```
@@ -180,7 +180,7 @@ Execution halted
 
 
 **Warnings**
-```
+```[RESOLVED]
 * checking for missing documentation entries ... WARNING
 Undocumented code objects:
   'CCLEsmall' 'CMAPsmall' 'GDSCsmall' 'HDAC_genes'
@@ -192,3 +192,6 @@ Extensions' manual.
 ```
 - Need to write documentation for the four datasets copied from PharmacoGx
   - This was done to fix error with `data(CCLE)` in `@example` of `CoreSetClass.R`
+- Added man files of datasets from PharmacoGx to man folder of CoreGx
+  - Didn't work
+- Added datasets.R file from PharamcoGx to `R` directory
