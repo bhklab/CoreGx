@@ -18,7 +18,5 @@ Updated \code{CoreSet}
 A generic for the cellNames replacement method
 }
 \examples{
-data(CCLEsmall)
-cellNames(CCLEsmall) <- cellNames(CCLEsmall)
 
 }

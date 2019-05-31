@@ -16,7 +16,6 @@ A \code{data.frame} with the number of sensitivity experiments per drug and cell
 A generic for the sensNumber method
 }
 \examples{
-data(CCLEsmall)
-sensNumber(CCLEsmall)
+sensNumber(Cleveland_small)
 
 }

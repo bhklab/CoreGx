@@ -8,21 +8,20 @@ This is a record of development on the CoreGx package while it is being prepared
 
 **Errors**
 
-```[RESOLVED]
+```R [RESOLVED]
 ERROR Package suggested but not available for checking: 'RadioGx'
 ```
 - Remove RadioGx from suggestions until it is release on CRAN
-
-```
+```R [RESOLVED]
 Namespace dependencies not required: 'lsa', 'methods', 'piano'
-``` [RESOLVED]
+``` 
 - Add `Imports: lsa, methods, piano` to `DESCRIPTION`
 - Tools > Project Options > Build Tools: uncheck "Use devtools package functions if available"
   - For some reason this makes piano dependency work
 
 **Warnings**
 
-``` [RESOLVED]
+```R [RESOLVED]
 Warning: roxygen2 requires Encoding: UTF-8
 ```
 - Added `Encoding: UTF-8` to `DESCRIPTION`
@@ -33,7 +32,7 @@ Warning: roxygen2 requires Encoding: UTF-8
 
 **Errors**
 
-```[RESOLVED]
+```R [RESOLVED]
 callingWaterfall : <anonymous>: possible error in distancePointLine(x =
   x[1], y = x[2], slope = slope, intercept = intercept): unused
   arguments (slope = slope, intercept = intercept)
@@ -41,7 +40,7 @@ callingWaterfall : <anonymous>: possible error in distancePointLine(x =
 - Changed `slope` to `a` and `intercept` to `b` in function call; this matches the parameters in function definition
 
 
-```
+``` R
 * checking examples ... ERROR
 Running examples in 'CoreGx-Ex.R' failed
 The error most likely occurred in:
@@ -60,20 +59,20 @@ Error in cSetName(CCLEsmall) : object 'CCLEsmall' not found
 - Added `PharmacoGx` to end of `Imports` in `DESCRIPTION`
 
 **Warnings**
-```
+```R 
 * checking whether package 'CoreGx' can be installed ... WARNING
 Found the following significant warnings:
   Note: possible error in 'distancePointLine(x = x[1], ': unused arguments (slope = slope, intercept = intercept) 
 ```
 - Fixed in above errors section
 
-```[RESOLVED]
+```R [RESOLVED]
 * checking dependencies in R code ... WARNING
 '::' or ':::' import not declared from: 'Biobase'
 ```
 - Added `Biobase` to end of `Imports` in `DESCRIPTION`
 
-```[RESOLVED]
+```R [RESOLVED]
 * checking for missing documentation entries ... WARNING
 Undocumented code objects:
   'examineGOF'
@@ -81,7 +80,7 @@ All user-level objects in a package should have documentation entries.
 ```
 - Defined preliminary documentation for `examineGOF` function in `examineGOF.R`
 
-```
+```R
 * checking PDF version of manual ... WARNING
 LaTeX errors when creating PDF version.
 This typically indicates Rd problems.
@@ -94,7 +93,7 @@ This typically indicates Rd problems.
 
 **Errors**
 
-```
+```R
 * checking examples ... ERROR
 Running examples in 'CoreGx-Ex.R' failed
 The error most likely occurred in:
@@ -117,7 +116,7 @@ Execution halted
   - Didn't work
 - Create `data` directory and downloaded example files from `PharamcoGx` git repo
 
-```[RESOLVED]
+```R [RESOLVED]
 * checking PDF version of manual without hyperrefs or index ... ERROR
 Re-running with no redirection of stdout/stderr.
 Hmm ... looks like a package
@@ -139,10 +138,11 @@ Error in running tools::texi2pdf()
 
 ## 29.05.19 R CMD check continued
 
+### Build 4
 
 **Errors**
 
-```
+```R
 Running examples in 'CoreGx-Ex.R' failed
 The error most likely occurred in:
 
@@ -179,12 +179,16 @@ Execution halted
 - Need to figure out how to set CoreGx package priority in all `@example` sections of Roxygen code for `CoreSetClass.R` and `GWC.R`
   - Apparently `CoreSet` and `PharmacoSet` are currently unrelated (don't inherit each other)
   - Thus problem is due to passing wrong type ("PharmacoSet") from `data(CCLEsmall)`
-    - Fix: Get a CoreSet data set for examples
+    - Fix: Get a CoreSet dataset for examples
     - Long-term fix: Define relationship between `CoreSet` and `PharmacoSet`
+  - Received `RadioSet` from Ian, testing that in `@example` of `CoreSetClass.R`
+    - Didn't work
+  - Opened `Cleaveland_mut.RData` in `RadioGx` environment and used `coerce(Cleaveland_mut, "CoreSet")` function
+  - Exported as .RData and moved to `CoreGx/data`
 
 **Warnings**
 
-```[RESOLVED]
+```R [RESOLVED]
 * checking for missing documentation entries ... WARNING
 Undocumented code objects:
   'CCLEsmall' 'CMAPsmall' 'GDSCsmall' 'HDAC_genes'
@@ -199,3 +203,49 @@ Extensions' manual.
 - Added man files of datasets from PharmacoGx to man folder of CoreGx
   - Didn't work
 - Added datasets.R file from PharamcoGx to `R` directory
+
+### Build 5
+
+**Errors**
+
+```R
+* checking examples ... ERROR
+Running examples in 'CoreGx-Ex.R' failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: cellNames<-
+> ### Title: cellNames<- Generic
+> ### Aliases: cellNames<-
+> 
+> ### ** Examples
+> 
+> data(Cleaveland_cSet)
+> cellNames(Cleaveland_cSet) <- cellNames(Cleaveland_cSet)
+Error in `[[<-.data.frame`(`*tmp*`, "cellid", value = character(0)) : 
+  replacement has 0 rows, data has 540
+Calls: cellNames<- ... updateCellId -> lapply -> FUN -> [[<- -> [[<-.data.frame
+Execution halted
+```
+- Prohibitively long load times when running build and check with devtools
+- Exploring PharamcoGx docs for ability to subset eSet objects
+  - Data subsetted, recast and exported as `Cleveland_small.RData` to `data` directory
+
+**Warnings**
+
+```R [RESOLVED]
+* checking data for ASCII and uncompressed saves ... WARNING
+  
+  Note: significantly better compression could be obtained
+        by using R CMD build --resave-data
+                        old_size new_size compress
+  Cleaveland_cSet.RData  131.4Mb  105.7Mb       xz
+```
+- Running recommended command
+  - Data subset fixes this problem
+
+### Build 7
+
+**Errors**
+
+**Warnings**

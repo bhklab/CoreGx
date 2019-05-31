@@ -21,7 +21,6 @@ Generic for phenoInfo replace method
 }
 \examples{
 
-data(CCLEsmall)
-phenoInfo(CCLEsmall, mDataType="rna") <- phenoInfo(CCLEsmall, mDataType="rna")
+phenoInfo(Cleveland_small, mDataType="rna") <- phenoInfo(Cleveland_small, mDataType="rna")
 
 }

@@ -18,7 +18,6 @@ Updated \code{CoreSet}
 Generic for cellInfo replace method
 }
 \examples{
-data(CCLEsmall)
-cellInfo(CCLEsmall) <- cellInfo(CCLEsmall)
+cellInfo(Cleveland_small) <- cellInfo(Cleveland_small)
 
 }

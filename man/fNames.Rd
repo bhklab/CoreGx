@@ -18,7 +18,6 @@ A \code{character} vector of the feature names
 A generic for the fNames method
 }
 \examples{
-data(CCLEsmall)
-fNames(CCLEsmall, "rna")
+fNames(Cleveland_small, "rna")
 
 }

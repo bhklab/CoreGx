@@ -3,7 +3,7 @@
 \docType{methods}
 \name{show,CoreSet-method}
 \alias{show,CoreSet-method}
-\title{Show a PharamcoSet}
+\title{Show a CoreSet}
 \usage{
 \S4method{show}{CoreSet}(object)
 }
@@ -14,10 +14,9 @@
 Prints the CoreSet object to the output stream, and returns invisible NULL.
 }
 \description{
-Show a PharamcoSet
+Show a CoreSet
 }
 \examples{
-data(CCLEsmall)
-CCLEsmall
+show(Cleveland_small)
 
 }

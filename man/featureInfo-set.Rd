@@ -20,7 +20,6 @@ Updated \code{CoreSet}
 Generic for featureInfo replace method
 }
 \examples{
-data(CCLEsmall)
-featureInfo(CCLEsmall, "rna") <- featureInfo(CCLEsmall, "rna")
+featureInfo(Cleveland_small, "rna") <- featureInfo(Cleveland_small, "rna")
 
 }

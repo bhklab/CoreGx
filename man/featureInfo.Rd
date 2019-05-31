@@ -18,7 +18,6 @@ a \code{data.frame} with the experiment info
 Generic for featureInfo method
 }
 \examples{
-data(CCLEsmall)
-featureInfo(CCLEsmall, "rna")
+featureInfo(Cleveland_small, "rna")
 
 }

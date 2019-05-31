@@ -16,7 +16,6 @@ The name of the CoreSet
 A generic for the cSetName method
 }
 \examples{
-data(CCLEsmall)
-cSetName(CCLEsmall)
+cSetName(Cleveland_small)
 
 }

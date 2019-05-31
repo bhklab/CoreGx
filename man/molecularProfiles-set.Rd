@@ -20,7 +20,6 @@ Updated \code{CoreSet}
 Generic for molecularProfiles replace method
 }
 \examples{
-data(CCLEsmall)
-molecularProfiles(CCLEsmall, "rna") <- molecularProfiles(CCLEsmall, "rna")
+molecularProfiles(Cleveland_small, "rna") <- molecularProfiles(Cleveland_small, "rna")
 
 }

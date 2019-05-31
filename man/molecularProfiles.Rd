@@ -18,7 +18,6 @@ a \code{data.frame} with the experiment info
 Generic for molecularProfiles method
 }
 \examples{
-data(CCLEsmall)
-molecularProfiles(CCLEsmall, "rna")
+molecularProfiles(Cleveland_small, "rna")
 
 }

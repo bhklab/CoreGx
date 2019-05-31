@@ -8,16 +8,11 @@
 \S4method{mDataNames}{CoreSet}(cSet)
 }
 \arguments{
-\item{cSet}{PharamcoSet object}
+\item{cSet}{CoreSet object}
 }
 \value{
 Vector of names of the molecular data types
 }
 \description{
 Returns the molecular data names for the CoreSet.
-}
-\examples{
-data(CCLEsmall)
-mDataNames(CCLEsmall)
-
 }

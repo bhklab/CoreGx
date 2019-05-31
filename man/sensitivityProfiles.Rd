@@ -16,7 +16,6 @@ a \code{data.frame} with the experiment info
 Generic for sensitivityProfiles method
 }
 \examples{
-data(CCLEsmall)
-sensitivityProfiles(CCLEsmall)
+sensitivityProfiles(Cleveland_small)
 
 }
