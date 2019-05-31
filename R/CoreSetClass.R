@@ -432,7 +432,6 @@ setReplaceMethod("sensitivityProfiles", signature = signature(object="CoreSet",v
 #' A generic for the sensitivityMeasures  method
 #' 
 #' @examples
-
 #' sensitivityMeasures(Cleveland_small)
 #' 
 #' @param cSet The \code{CoreSet} 
@@ -452,7 +451,6 @@ setMethod(sensitivityMeasures, "CoreSet", function(cSet){
 #' A generic for the cellNames method
 #' 
 #' @examples
-
 #' cellNames(Cleveland_small)
 #' 
 #' @param cSet The \code{CoreSet} to return cell names from
@@ -471,8 +469,7 @@ setMethod(cellNames, "CoreSet", function(cSet){
 #' A generic for the cellNames replacement method
 #' 
 #' @examples
-
-# cellNames(Cleveland_small) <- cellNames(Cleveland_small)
+#' cellNames(Cleveland_small) <- cellNames(Cleveland_small)
 #' 
 #' @param object The \code{CoreSet} to update
 #' @param value A \code{character} vector of the new cell names
@@ -493,7 +490,6 @@ setReplaceMethod("cellNames", signature = signature(object="CoreSet",value="char
 #' A generic for the fNames method
 #' 
 #' @examples
-
 #' fNames(Cleveland_small, "rna")
 #' 
 #' @param cSet The \code{CoreSet} 
@@ -570,7 +566,6 @@ setMethod(pertNumber, "CoreSet", function(cSet){
 #' A generic for the sensNumber method
 #' 
 #' @examples
-
 #' sensNumber(Cleveland_small)
 #' 
 #' @param cSet A \code{CoreSet} 
@@ -590,7 +585,6 @@ setMethod(sensNumber, "CoreSet", function(cSet){
 #' A generic for the pertNumber method
 #' 
 #' @examples
-
 #' pertNumber(Cleveland_small) <- pertNumber(Cleveland_small)
 #' 
 #' @param object A \code{CoreSet} 
