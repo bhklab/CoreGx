@@ -688,7 +688,6 @@ setMethod("mDataNames", "CoreSet", function(cSet){
 
 
 ### TODO:: Add updating of sensitivity Number tables
-#'@export
 updateCellId <- function(cSet, new.ids = vector("character")){
   
   if (length(new.ids)!=nrow(cellInfo(cSet))){
@@ -945,7 +944,7 @@ updateCellId <- function(cSet, new.ids = vector("character")){
 #' @importFrom graphics hist
 #' @importFrom grDevices dev.off pdf
 
-checkPSetStructure <-
+checkCSetStructure <-
   function(cSet, plotDist=FALSE, result.dir=".") {
     if(!file.exists(result.dir) & plotDist) { dir.create(result.dir, showWarnings=FALSE, recursive=TRUE) }
     for( i in 1:length(cSet@molecularProfiles)) {
