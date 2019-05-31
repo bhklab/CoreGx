@@ -1,0 +1,15 @@
+Package: CoreGx
+Type: Package
+Title: CoreGx
+Version: 0.0.001
+Date: 2019-05-29
+Author: BHKLab
+Maintainer: Who to complain to <marky.freeman@gmail.com>
+Description: Core Gx Functions
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 3.5.0)
+Imports: lsa, methods, piano, Biobase
+Suggests: PharmacoGx
+License: All Rights Reserved.
+RoxygenNote: 6.1.1
