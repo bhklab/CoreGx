@@ -1,15 +1,21 @@
 Package: CoreGx
 Type: Package
-Title: CoreGx
-Version: 0.0.001
+Title: Classes and Functions to Serve as the Basis for Other Gx Packages
+Version: 0.0.0.1
 Date: 2019-05-29
 Author: BHKLab
 Maintainer: Who to complain to <marky.freeman@gmail.com>
-Description: Core Gx Functions
+Description: Supplies base classes and functions to other Gx packages.
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
-Imports: lsa, methods, piano, Biobase
+Imports: 
+  lsa, 
+  methods, 
+  piano, 
+  Biobase,
+  stats,
+  rlang
 Suggests: PharmacoGx
-License: All Rights Reserved.
+License: GPL-3
 RoxygenNote: 6.1.1
