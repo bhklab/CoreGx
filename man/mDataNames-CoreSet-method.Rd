@@ -16,3 +16,8 @@ Vector of names of the molecular data types
 \description{
 Returns the molecular data names for the CoreSet.
 }
+\examples{
+data(cleveland_small)
+mDataNames(Cleveland_small)
+
+}
