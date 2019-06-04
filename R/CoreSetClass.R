@@ -658,7 +658,7 @@ setMethod("show", signature=signature(object="CoreSet"),
 #' @examples
 #' mDataNames(Cleveland_small)
 #' 
-#' @param cSet PharamcoSet object
+#' @param cSet CoreSet object
 #' @return Vector of names of the molecular data types
 #' @export
 setGeneric("mDataNames", function(cSet) standardGeneric("mDataNames"))
