@@ -1,3 +1,5 @@
+#' @importFrom stats optim
+#' @importFrom stats var
 .fitCurve <- function (x,
                        y,
                        f,

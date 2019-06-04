@@ -668,7 +668,8 @@ setGeneric("mDataNames", function(cSet) standardGeneric("mDataNames"))
 #' 
 #' Returns the molecular data names for the CoreSet.
 #' 
-#' @example
+#' @examples
+#' data(cleveland_small)
 #' mDataNames(Cleveland_small)
 #' 
 #' @param cSet CoreSet object
