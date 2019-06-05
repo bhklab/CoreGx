@@ -1,7 +1,7 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other Gx Packages
-Version: 0.0.0.1
+Version: 0.1.0
 Date: 2019-05-29
 Author: Petr Smirnov, Ian Smith, Christopher Eeles, Benjamin Haibe Kains
 Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
