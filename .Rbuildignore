@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^.*\.git$
+^.*\.gitignore$
+^README.Rmd
+^CoreGx.Rproj
