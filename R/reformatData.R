@@ -1,3 +1,4 @@
+#' @export
 .reformatData <- function(x, y, pars, x_to_log, y_to_log, y_to_frac, trunc) {
   if (!(is.logical(x_to_log))) {
     stop("x_to_log must be a logical.")

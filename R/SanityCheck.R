@@ -1,3 +1,4 @@
+#' @export
 .sanitizeInput <- function(x,
                            y,
                            lower,

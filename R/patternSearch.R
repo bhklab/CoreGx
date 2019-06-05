@@ -1,3 +1,4 @@
+#' @export
 .patternSearch <- function(x, y, f, guess, n, guess_residual, lower_bounds, upper_bounds, span, precision, step, scale, family, trunc) {
   neighbours <- matrix(nrow = 2 * length(guess), ncol = length(guess))
   neighbour_residuals <- matrix(NA, nrow = 1, ncol = nrow(neighbours))
