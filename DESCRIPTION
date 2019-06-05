@@ -3,8 +3,12 @@ Type: Package
 Title: Classes and Functions to Serve as the Basis for Other Gx Packages
 Version: 0.0.0.1
 Date: 2019-05-29
-Author: BHKLab
-Maintainer: Who to complain to <marky.freeman@gmail.com>
+Authors@R: c(
+    person("Petr", "Smirnov", , email = "petr.smirnov@mail.utoronto.ca", role = c("aut")),
+    person("Ian", "Smith", , email = "ian.smith@mail.utoronto.ca", role = c("aut")),
+    person("Christopher", "Eeles", , email = "christopher.eeles@uhnresearch.ca", role = c("aut")),
+    person("Benjamin", "Haibe-Kains", , email = "benjamin.haibe.kains@utoronto.ca", role = c("aut", "cre"))
+    )
 Description: Supplies base classes and functions to other Gx packages.
 Encoding: UTF-8
 LazyData: true
