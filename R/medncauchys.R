@@ -1,3 +1,4 @@
+#' @importFrom stats rcauchy
 .rmedncauchys = function(N, n, scale) {
   x <- matrix(NA, nrow = 1, ncol = N)
   for (i in 1:N) {
@@ -6,6 +7,9 @@
   return(x)
 }
 
+#' @importFrom stats dcauchy
+#' @importFrom stats pcauchy
+#' @importFrom stats integrate
 .dmedncauchys = function(x, n, scale, divisions = 100) {
   n <- rep(n, times = length(x) / length(n))
   scale <- rep(scale, times = length(x) / length(scale))
@@ -46,6 +50,8 @@
   return(y)
 }
 
+#' @importFrom stats pcauchy
+#' @importFrom stats integrate
 .pmedncauchys = function(x, n, scale, divisions = 100) {
   n <- rep(n, times = length(x) / length(n))
   scale <- rep(scale, times = length(x) / length(scale))
@@ -72,6 +78,7 @@
   return(y)
 }
 
+#' @importFrom stats integrate
 .edmedncauchys = function(x, n, scale, divisions = 100) {
   n <- rep(n, times = length(x) / length(n))
   scale <- rep(scale, times = length(x) / length(scale))

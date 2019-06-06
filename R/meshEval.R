@@ -1,4 +1,5 @@
 .meshEval <- function (x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
+  pars <- NULL
   guess_residual <- .residual(x = x,
                               y = y,
                               n = n,

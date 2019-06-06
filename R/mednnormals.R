@@ -6,6 +6,8 @@
   return(x)
 }
 
+#' @importFrom stats rnorm
+#' @importFrom stats dnorm
 .dmednnormals = function(x, n, scale, divisions = 100) {
   n <- rep(n, times = length(x) / length(n))
   scale <- rep(scale, times = length(x) / length(scale))
@@ -46,6 +48,7 @@
   return(y)
 }
 
+#' @importFrom stats integrate
 .pmednnormals = function(x, n, scale, divisions = 100) {
   n <- rep(n, times = length(x) / length(n))
   scale <- rep(scale, times = length(x) / length(scale))
@@ -72,6 +75,7 @@
   return(y)
 }
 
+#' @importFrom stats integrate
 .edmednnormals = function(x, n, scale, divisions = 100) {
   n <- rep(n, times = length(x) / length(n))
   scale <- rep(scale, times = length(x) / length(scale))

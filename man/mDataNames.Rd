@@ -7,7 +7,7 @@
 mDataNames(cSet)
 }
 \arguments{
-\item{cSet}{PharamcoSet object}
+\item{cSet}{CoreSet object}
 }
 \value{
 Vector of names of the molecular data types

@@ -40,7 +40,11 @@ callingWaterfall : <anonymous>: possible error in distancePointLine(x =
 - Changed `slope` to `a` and `intercept` to `b` in function call; this matches the parameters in function definition
 
 
+<<<<<<< HEAD
 ``` R
+=======
+``` R [RESOLVED]
+>>>>>>> CRAN_Debug
 * checking examples ... ERROR
 Running examples in 'CoreGx-Ex.R' failed
 The error most likely occurred in:
@@ -59,7 +63,11 @@ Error in cSetName(CCLEsmall) : object 'CCLEsmall' not found
 - Added `PharmacoGx` to end of `Imports` in `DESCRIPTION`
 
 **Warnings**
+<<<<<<< HEAD
 ```R 
+=======
+```R  [RESOLVED]
+>>>>>>> CRAN_Debug
 * checking whether package 'CoreGx' can be installed ... WARNING
 Found the following significant warnings:
   Note: possible error in 'distancePointLine(x = x[1], ': unused arguments (slope = slope, intercept = intercept) 
@@ -80,7 +88,11 @@ All user-level objects in a package should have documentation entries.
 ```
 - Defined preliminary documentation for `examineGOF` function in `examineGOF.R`
 
+<<<<<<< HEAD
 ```R
+=======
+```R [Resolved]
+>>>>>>> CRAN_Debug
 * checking PDF version of manual ... WARNING
 LaTeX errors when creating PDF version.
 This typically indicates Rd problems.
@@ -88,12 +100,20 @@ This typically indicates Rd problems.
 - Installed MikTex in Windows
 - Ran `install.package("latexpdf")`
   - Didn't work
+<<<<<<< HEAD
+=======
+- Installed TinyTex after much troubleshooting; fixed issue
+>>>>>>> CRAN_Debug
 
 ### Build 3
 
 **Errors**
 
+<<<<<<< HEAD
 ```R
+=======
+```R [RESOLVED]
+>>>>>>> CRAN_Debug
 * checking examples ... ERROR
 Running examples in 'CoreGx-Ex.R' failed
 The error most likely occurred in:
@@ -115,6 +135,10 @@ Execution halted
 - Added `PharmacoGx` to `Imports` in `DESCRIPTION`
   - Didn't work
 - Create `data` directory and downloaded example files from `PharamcoGx` git repo
+<<<<<<< HEAD
+=======
+- These datasets were the wrong type: should be `CoreSet` not `PharmacoSet`
+>>>>>>> CRAN_Debug
 
 ```R [RESOLVED]
 * checking PDF version of manual without hyperrefs or index ... ERROR
@@ -142,7 +166,7 @@ Error in running tools::texi2pdf()
 
 **Errors**
 
-```R
+```R [RESOLVED]
 Running examples in 'CoreGx-Ex.R' failed
 The error most likely occurred in:
 
@@ -208,7 +232,7 @@ Extensions' manual.
 
 **Errors**
 
-```R
+```R [Resloved]
 * checking examples ... ERROR
 Running examples in 'CoreGx-Ex.R' failed
 The error most likely occurred in:
@@ -230,6 +254,8 @@ Execution halted
 - Prohibitively long load times when running build and check with devtools
 - Exploring PharamcoGx docs for ability to subset eSet objects
   - Data subsetted, recast and exported as `Cleveland_small.RData` to `data` directory
+  - Also exported RadioSet version into RadioGx `data` directory as `Cleveland_small.RData`
+    - May be good to disambiguate dataset names
 
 **Warnings**
 
@@ -247,6 +273,6 @@ Execution halted
 ### Build 7
 
 **Errors**
+- Corrected misnamed function `checkPSetStructure` to `checkCSetStructure`
 
-
-**Warnings**
+# [Complete] R CMD check --as-cran 
