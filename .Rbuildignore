@@ -2,6 +2,5 @@
 ^\.Rproj\.user$
 ^.*\.git$
 ^.*\.gitignore$
-^README.md
+^README.Rmd
 ^CoreGx.Rproj
-^CoreGxDebug.md
