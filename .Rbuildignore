@@ -4,3 +4,5 @@
 ^.*\.gitignore$
 ^README.Rmd
 ^CoreGx.Rproj
+^CoreGxDebug.md
+^ReadMe.md
