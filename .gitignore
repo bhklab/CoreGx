@@ -1,5 +1,7 @@
-
 .DS_Store
 .Rproj.user
 .Rhistory
 .RData
+..Rcheck
+CoreGx_0.1.0.tar.gz
+CoreGx.Rcheck

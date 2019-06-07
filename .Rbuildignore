@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^.*\.git$
 ^.*\.gitignore$
+^..Rcheck
 ^README.Rmd
 ^CoreGx.Rproj
 ^CoreGxDebug.md
