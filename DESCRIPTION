@@ -3,20 +3,28 @@ Type: Package
 Title: Classes and Functions to Serve as the Basis for Other Gx Packages
 Version: 0.1.0
 Date: 2019-05-29
-Author: Petr Smirnov, Ian Smith, Christopher Eeles, Benjamin Haibe Kains
-Maintainer: Benjamin Haibe-Kains <benjamin.haibe.kains@utoronto.ca>
+Authors@R: c(
+    person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca", role = c("aut")),
+    person("Ian","Smith", email = "ianc.smith@mail.utoronto.ca", role = c("aut")),
+    person("Christopher", "Eeles", , email = "christopher.eeles@uhnresearch.ca", role = c("aut")),
+    person("Benjamin", "Haibe-Kains",  email = "benjamin.haibe.kains@utoronto.ca", role = c("aut", "cre"))
+    )
 Description: A collection of functions and classes which serve as the foundation 
-    for the our labs suite of R packages, such as Pharmacogenomics and 
-    Radiogenomics. This package was created to abstract shared functionality 
-    from other lab package releases to increase ease of maintainability and 
-    reduce code repetition in current and future suite programs. Major features 
-    include a "core set" class, from which "radio set" and "pharmacology set" 
-    are derived, along with get and set methods for each respective slot. 
-    Additional functions related to fitting and plotting dose response curves, 
-    quantifying statistical correlation and calculating AUC or SF are included. 
-    For more details please see the included documentation, as well as: Smirnov,
-    P. and others (2015) <doi:10.1093/bioinformatics/btv723>, V.M. and others 
-    (2019) <doi:10.1101/449793>.
+    for our lab's suite of R packages, such as PharmacoGx and RadioGx. This 
+    package was created to abstract shared functionality from other lab package 
+    releases to increase ease of maintainability and reduce code repetition in 
+    current and future Gx suite programs. Major features include a CoreSet 
+    class, from which RadioSet and PharmaSet are derived, along with get and set
+    methods for each respective slot. Additional functions related to fitting 
+    and plotting dose response curves, quantifying statistical correlation and 
+    calculating area under the curve (AUC) or survival fraction (SF) are 
+    included. For more details please see the included documentation, as well 
+    as: 
+    Smirnov, P., Safikhani, Z., El-Hachem, N., Wang, D., She, A., Olsen, C., 
+      Freeman, M., Selby, H., Gendoo, D., Grossman, P., Beck, A., Aerts, H., 
+      Lupien, M., Goldenberg, A. (2015) <doi:10.1093/bioinformatics/btv723>.
+    Manem, V., Labie, M., Smirnov, P., Kofia, V., Freeman, M., Koritzinksy, M.,
+      Abazeed, M., Haibe-Kains, B., Bratman, S. (2018) <doi:10.1101/449793>.
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
