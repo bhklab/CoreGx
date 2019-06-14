@@ -1,8 +1,7 @@
 ########################
-## Benjamin Haibe-Kainser 9, 2014
+## Benjamin Haibe-Kains
+## September 9, 2014
 ########################
-
-
 
 #' Function computing connectivity scores between two signatures
 #' 
