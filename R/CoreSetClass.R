@@ -121,7 +121,7 @@ CoreSet <-  function(name,
     annotation$call <- match.call()
     
     #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
-    for (i in 1:length(molecularProfiles)){
+    for (i in seq_len(length(molecularProfiles))){
         if (class(molecularProfiles[[i]]) != "ExpressionSet"){
             stop(sprintf("Please provide the %s data as an ExpressionSet", names(molecularProfiles[i])))
         }else{
@@ -911,7 +911,7 @@ updateCellId <- function(cSet, new.ids = vector("character")){
   
   perturbation.info <- array(0, dim=c(length(celln), length(drugn), length(cSet@molecularProfiles)), dimnames=list(celln, drugn, names((cSet@molecularProfiles))))
 
-    for (i in 1:length(cSet@molecularProfiles)) {
+    for (i in seq_len(length(cSet@molecularProfiles))) {
       if (nrow(Biobase::pData(cSet@molecularProfiles[[i]])) > 0 && all(is.element(c("cellid", "drugid"), colnames(Biobase::pData(cSet@molecularProfiles[[i]]))))) {
       tt <- table(Biobase::pData(cSet@molecularProfiles[[i]])[ , "cellid"], Biobase::pData(cSet@molecularProfiles[[i]])[ , "drugid"])
         perturbation.info[rownames(tt), colnames(tt), names(cSet@molecularProfiles)[i]] <- tt
@@ -942,7 +942,7 @@ updateCellId <- function(cSet, new.ids = vector("character")){
 checkCSetStructure <-
   function(cSet, plotDist=FALSE, result.dir=".") {
     if(!file.exists(result.dir) & plotDist) { dir.create(result.dir, showWarnings=FALSE, recursive=TRUE) }
-    for( i in 1:length(cSet@molecularProfiles)) {
+    for( i in seq_len(length(cSet@molecularProfiles))) {
       profile <- cSet@molecularProfiles[[i]]
       nn <- names(cSet@molecularProfiles)[i]
       if((Biobase::annotation(profile) == "rna" | Biobase::annotation(profile) == "rnaseq") & plotDist)

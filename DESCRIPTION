@@ -25,11 +25,12 @@ Description: A collection of functions and classes which serve as the foundation
       Lupien, M., Goldenberg, A. (2015) <doi:10.1093/bioinformatics/btv723>.
     Manem, V., Labie, M., Smirnov, P., Kofia, V., Freeman, M., Koritzinksy, M.,
       Abazeed, M., Haibe-Kains, B., Bratman, S. (2018) <doi:10.1101/449793>.
+biocViews: Software, Pharmacogenomics
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.5.0)
+Depends: R (>= 3.6.0)
 Imports: 
-    lsa, 
+    lsa,
     methods, 
     piano, 
     Biobase,

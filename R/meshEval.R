@@ -20,7 +20,7 @@
   }
   
   currentPars <- lower_bounds
-  for (point in 1:prod((upper_bounds - lower_bounds) * density)) {
+  for (point in seq_len(prod((upper_bounds - lower_bounds) * density))) {
     for (par in seq_along(guess)) {
       if (point %% periods[par] == 0) {
         if (currentPars[par] >= upper_bounds[par]) {
