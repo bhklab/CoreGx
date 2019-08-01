@@ -1,7 +1,7 @@
 setClass("PlaceHolderAssay", contains="array")
 
 
-setMethod("[", "PlaceHolderAssay", function(x, i, j, ..., drop=TRUE){
+setMethod("[", c("PlaceHolderAssay", "ANY", "ANY"), function(x, i, j, ..., drop=TRUE){
 	mdrop <- missing(drop)
     Narg <- nargs() - !mdrop
     if(missing(j)){

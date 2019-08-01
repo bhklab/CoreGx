@@ -8,5 +8,38 @@ Maintainer: Who to complain to <marky.freeman@gmail.com>
 Description: Core Gx Functions
 Suggests: PharmacoGx, RadioGx
 License: All Rights Reserved.
-Imports: MultiAssayExperiment, longArray
-RoxygenNote: 6.0.1
+Imports: MultiAssayExperiment, SummarizedExperiment, S4Vectors, data.table, lsa, methods, piano
+RoxygenNote: 6.1.0
+Collate: 
+    'AdaptiveMatthewCor.R'
+    'FakeMartix.R'
+    'GWC.R'
+    'GetSupportVec.R'
+    'MatthewCor.R'
+    'PhenoGenoExperiment-phenotypeMethods.R'
+    'PhenoGenoExperiment-subsetMethods.R'
+    'longArray.R'
+    'PhenoGenoExperiment.R'
+    'SanityCheck.R'
+    'callingWaterfall.R'
+    'combineTest.R'
+    'connectivityScore.R'
+    'corWeighted.R'
+    'cosinePerm.R'
+    'examineGOF.R'
+    'fitCurve.R'
+    'intersectList.R'
+    'isserlis.R'
+    'linAndMatInd.R'
+    'linePtDist.R'
+    'medncauchys.R'
+    'mednnormals.R'
+    'meshEval.R'
+    'multinom.R'
+    'patternSearch.R'
+    'reformatData.R'
+    'rescale.R'
+    'residual.R'
+    'stripWhiteSpace.R'
+    'symSetDiffList.R'
+    'unionList.R'

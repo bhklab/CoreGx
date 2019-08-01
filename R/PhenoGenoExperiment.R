@@ -1,3 +1,5 @@
+#' @include longArray.R
+#' @importClassesFrom S4Vectors DataFrame
 setClassUnion("df_or_DF", c("data.frame", "DataFrame"))
 setClassUnion("la_or_la.DT_or_NULL", c("longArray", "longArray.DT", "NULL"))
 
@@ -125,7 +127,7 @@ PhenoGenoExperiment <- function(molecularProfiles = MultiAssayExperiment::Experi
                              ExperimentList = bliss[["experiments"]],
                              colData = bliss[["colData"]],
                              sampleMap = bliss[["sampleMap"]],
-                             treatmentData = treatmentData,
+                             treatmentData = S4Vectors::DataFrame(treatmentData),
                              phenotype = phenotype,
                              metadata = metadata)
         return(newMultiAssay)
@@ -285,14 +287,50 @@ setMethod("names", "PhenoGenoExperiment", function(x){
   return(setdiff(callNextMethod(x), "phenotype"))
 })
 
-longFormat <- function(object, colDataCols = NULL, i = 1L) {
-    if (is(object, "PhenoGenoExperiment"))
-        return(MultiAssayExperiment::longFormat(suppressMessages(object[,,names(object)]), colDataCols = colDataCols, i = i))
-    else
-      return(MultiAssayExperiment::longFormat(object, colDataCols = colDataCols, i = i))
-}
 
+#' treatmentData Generic
+#' 
+#' Generic for treatmentData method 
+#' 
+#' @examples
+#' data(CCLEsmall)
+#' treatmentData(CCLEsmall)
+#' 
+#' @param x The \code{PhenoGenoExperiment} to retrieve cell info from
+#' 
+#' @return a \code{data.frame} with the cell annotations
+setGeneric("treatmentData", function(x) standardGeneric("treatmentData"))
+NULL
 
+#' treatmentData<- Generic
+#' 
+#' Generic for treatmentData replace method
+#' 
+#' @examples
+#' data(CCLEsmall)
+#' treatmentData(CCLEsmall) <- treatmentData(CCLEsmall)
+#' 
+#' @param object The \code{PhenoGenoExperiment} to replace cell info in
+#' @param value A \code{data.frame} with the new cell annotations
+#' @return Updated \code{PhenoGenoExperiment}
+setGeneric("treatmentData<-", function(object, value) standardGeneric("treatmentData<-"))
+NULL
+
+#' @describeIn PhenoGenoExperiment Returns the annotations for all the cell lines tested on in the PhenoGenoExperiment
+#' @export
+setMethod("treatmentData", "PhenoGenoExperiment", function(x){
+  x@treatmentData
+})
+
+#' @describeIn PhenoGenoExperiment Update the cell line annotations
+#' @export
+setReplaceMethod("treatmentData", signature = signature(object="PhenoGenoExperiment",value="ANY"), function(object, value){
+  if(is.null(rownames(value))){
+    stop("Please provide the treatment_id as rownames for the treatment annotations")
+  }
+  BiocGenerics:::replaceSlots(object, treatment = S4Vectors::DataFrame(value))
+  object
+})
 
 #' cellInfo Generic
 #' 
