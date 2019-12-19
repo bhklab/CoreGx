@@ -60,10 +60,10 @@ connectivityScore <- function(x, y, method=c("gsea", "fgsea", "gwc"), nperm=1e4,
   
   method <- match.arg(method)
   gwc.method <- match.arg(gwc.method)
-  if (class(x) != "matrix") {
+  if (!is.matrix(x)) {
       x <- as.matrix(x)
   }
-  if (class(y) != "matrix") {
+  if (!is.matrix(y)) {
       y <- as.matrix(y)
   }
   if ((ncol(x) != 2 || ncol(y) != 2) && method=="gwc") {
