@@ -12,12 +12,12 @@ featureInfo(cSet, mDataType)
 \item{mDataType}{the type of molecular data}
 }
 \value{
-a \code{data.frame} with the experiment info
+a \code{data.frame} with the feature annotations
 }
 \description{
 Generic for featureInfo method
 }
 \examples{
-featureInfo(Cleveland_small, "rna")
+featureInfo(clevelandSmall, "rna")
 
 }

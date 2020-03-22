@@ -1,8 +1,8 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
-Version: 0.1.1
-Date: 2019-12-19
+Version: 0.2.0
+Date: 2020-03-22
 Authors@R: c(
     person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca", role = c("aut")),
     person("Ian","Smith", email = "ianc.smith@mail.utoronto.ca", role = c("aut")),
@@ -30,12 +30,25 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.6.0)
 Imports: 
-    lsa,
-    methods, 
-    piano, 
     Biobase,
-    stats,
-    rlang
-Suggests: PharmacoGx
+    S4Vectors,
+    SummarizedExperiment,
+    piano, 
+    magicaxis, 
+    RColorBrewer, 
+    parallel, 
+    caTools, 
+    methods, 
+    downloader, 
+    stats, 
+    utils, 
+    graphics, 
+    grDevices, 
+    lsa, 
+    reshape2,
+    testthat
+Suggests: pander, 
+  rmarkdown,
+  knitr
 License: GPL-3
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0

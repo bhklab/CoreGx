@@ -8,8 +8,9 @@
 \alias{cellInfo<-,CoreSet,data.frame-method}
 \alias{phenoInfo,CoreSet-method}
 \alias{phenoInfo<-,CoreSet,character,data.frame-method}
-\alias{molecularProfiles,CoreSet,character-method}
-\alias{molecularProfiles<-,CoreSet,character,matrix-method}
+\alias{phenoInfo<-,CoreSet,character,DataFrame-method}
+\alias{molecularProfiles,CoreSet-method}
+\alias{molecularProfiles<-,CoreSet,character,character,matrix-method}
 \alias{featureInfo,CoreSet-method}
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
 \alias{sensitivityInfo,CoreSet-method}
@@ -35,18 +36,17 @@
 
 \S4method{phenoInfo}{CoreSet}(cSet, mDataType)
 
-\S4method{phenoInfo}{CoreSet,character,data.frame}(object,
-  mDataType) <- value
+\S4method{phenoInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
 
-\S4method{molecularProfiles}{CoreSet,character}(cSet, mDataType)
+\S4method{phenoInfo}{CoreSet,character,DataFrame}(object, mDataType) <- value
 
-\S4method{molecularProfiles}{CoreSet,character,matrix}(object,
-  mDataType) <- value
+\S4method{molecularProfiles}{CoreSet}(cSet, mDataType, assay)
+
+\S4method{molecularProfiles}{CoreSet,character,character,matrix}(object, mDataType, assay) <- value
 
 \S4method{featureInfo}{CoreSet}(cSet, mDataType)
 
-\S4method{featureInfo}{CoreSet,character,data.frame}(object,
-  mDataType) <- value
+\S4method{featureInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
 
 \S4method{sensitivityInfo}{CoreSet}(cSet)
 
@@ -95,9 +95,9 @@ The CoreSet (CSet) class was developed as a superclass for objects in the
 PharmacoGx and RadioGx packages to contain the data generated in screens 
 of cancer cell lines for their genetic profile and sensitivities to therapy
 (Pharmacological or Radiation). This class is meant to be a superclass which 
-is contained within the PharmacoSet (PSet) and RadioSet (RSet) objects 
+is contained within the CoreSet (cSet) and RadioSet (RSet) objects 
 exported by PharmacoGx and RadioGx. The format of the data is similar for 
-both data PSets and RSets, allowing much of the code to be abstracted into 
+both data cSets and RSets, allowing much of the code to be abstracted into 
 the CoreSet super-class. However, the models involved with quantifying 
 cellular response to Pharmacological and Radiation therapy are widely 
 different, and two seperate implementations of the CSet class allows the
@@ -111,7 +111,9 @@ packages to apply the correct model for the given data.
 
 \item \code{phenoInfo}: Return the experiment info from the given type of molecular data in CoreSet
 
-\item \code{phenoInfo<-}: Update the the given type of molecular data experiment info in the CoreSet
+\item \code{phenoInfo<-}: Update the given type of molecular data experiment info in the CoreSet
+
+\item \code{phenoInfo<-}: Update the given type of molecular data experiment info in the CoreSet
 
 \item \code{molecularProfiles}: Return the given type of molecular data from the CoreSet
 
@@ -166,9 +168,9 @@ experiments
 including the \code{$name} and the session information for how the object
 was creating, detailing the exact versions of R and all the packages used}
 
-\item{\code{molecularProfiles}}{A \code{list} containing 4 \code{Biobase::ExpressionSet} 
+\item{\code{molecularProfiles}}{A \code{list} containing \code{SummarizedExperiment}s 
 type object for holding data for RNA, DNA, SNP and Copy Number Variation 
-measurements respectively, with associated \code{fData} and \code{pData} 
+measurements respectively, with associated \code{rowData} and \code{colData} 
 containing the row and column metadata}
 
 \item{\code{cell}}{A \code{data.frame} containg the annotations for all the cell 

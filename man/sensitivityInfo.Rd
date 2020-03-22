@@ -16,6 +16,6 @@ a \code{data.frame} with the experiment info
 Generic for sensitivityInfo method
 }
 \examples{
-sensitivityInfo(Cleveland_small)
+sensitivityInfo(clevelandSmall)
 
 }

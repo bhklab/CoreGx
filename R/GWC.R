@@ -7,9 +7,9 @@
 #'Calculate the gwc score between two vectors, using either a weighted spearman or pearson correlation
 #'
 #'@examples
-#'data(Cleveland_small)
-#'x <- molecularProfiles(Cleveland_small,"rna")[,1]
-#'y <- molecularProfiles(Cleveland_small,"rna")[,2]
+#'data(clevelandSmall)
+#'x <- molecularProfiles(clevelandSmall,"rna")[,1]
+#'y <- molecularProfiles(clevelandSmall,"rna")[,2]
 #'x_p <- rep(0.05, times=length(x))
 #'y_p <- rep(0.05, times=length(y))
 #'names(x_p) <- names(x)

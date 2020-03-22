@@ -14,7 +14,7 @@ checkCSetStructure(cSet, plotDist = FALSE, result.dir = ".")
 \item{result.dir}{The path to the directory for saving the plots as a string}
 }
 \value{
-Prints out messages whenever describing the errors found in the structure of the pset object passed in.
+Prints out messages whenever describing the errors found in the structure of the cSet object passed in.
 }
 \description{
 This function checks the structure of a PharamcoSet, ensuring that the
@@ -23,6 +23,6 @@ that matching of cells and drugs can be properly done across different types
 of data and with other studies.
 }
 \examples{
-checkCSetStructure(Cleveland_small)
+checkCSetStructure(clevelandSmall)
 
 }

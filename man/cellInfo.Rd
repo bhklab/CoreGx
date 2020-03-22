@@ -16,7 +16,7 @@ a \code{data.frame} with the cell annotations
 Generic for cellInfo method
 }
 \examples{
-data(Cleveland_small)
-cellInfo(Cleveland_small)
+data(clevelandSmall)
+cellInfo(clevelandSmall)
 
 }

@@ -4,8 +4,16 @@
 \alias{gwc}
 \title{Calculate the gwc score between two vectors, using either a weighted spearman or pearson correlation}
 \usage{
-gwc(x1, p1, x2, p2, method.cor = c("pearson", "spearman"),
-  nperm = 10000, truncate.p = 1e-16, ...)
+gwc(
+  x1,
+  p1,
+  x2,
+  p2,
+  method.cor = c("pearson", "spearman"),
+  nperm = 10000,
+  truncate.p = 1e-16,
+  ...
+)
 }
 \arguments{
 \item{x1}{\code{numeric} vector of effect sizes (e.g., fold change or t statitsics) for the first experiment}
@@ -32,9 +40,9 @@ gwc(x1, p1, x2, p2, method.cor = c("pearson", "spearman"),
 Calculate the gwc score between two vectors, using either a weighted spearman or pearson correlation
 }
 \examples{
-data(Cleveland_small)
-x <- molecularProfiles(Cleveland_small,"rna")[,1]
-y <- molecularProfiles(Cleveland_small,"rna")[,2]
+data(clevelandSmall)
+x <- molecularProfiles(clevelandSmall,"rna")[,1]
+y <- molecularProfiles(clevelandSmall,"rna")[,2]
 x_p <- rep(0.05, times=length(x))
 y_p <- rep(0.05, times=length(y))
 names(x_p) <- names(x)

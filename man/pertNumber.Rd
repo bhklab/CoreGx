@@ -16,6 +16,6 @@ A 3D \code{array} with the number of perturbation experiments per drug and cell 
 A generic for the pertNumber method
 }
 \examples{
-pertNumber(Cleveland_small)
+pertNumber(clevelandSmall)
 
 }

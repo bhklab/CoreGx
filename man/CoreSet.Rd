@@ -4,21 +4,28 @@
 \alias{CoreSet}
 \title{CoreSet constructor}
 \usage{
-CoreSet(name, molecularProfiles = list(), cell = data.frame(),
-  sensitivityInfo = data.frame(), sensitivityRaw = array(dim = c(0, 0,
-  0)), sensitivityProfiles = matrix(), sensitivityN = matrix(nrow = 0,
-  ncol = 0), perturbationN = array(NA, dim = c(0, 0, 0)),
-  curationCell = data.frame(), curationTissue = data.frame(),
+CoreSet(
+  name,
+  molecularProfiles = list(),
+  cell = data.frame(),
+  sensitivityInfo = data.frame(),
+  sensitivityRaw = array(dim = c(0, 0, 0)),
+  sensitivityProfiles = matrix(),
+  sensitivityN = matrix(nrow = 0, ncol = 0),
+  perturbationN = array(NA, dim = c(0, 0, 0)),
+  curationCell = data.frame(),
+  curationTissue = data.frame(),
   datasetType = c("sensitivity", "perturbation", "both"),
-  verify = TRUE)
+  verify = TRUE
+)
 }
 \arguments{
 \item{name}{A \code{character} string detailing the name of the dataset}
 
-\item{molecularProfiles}{A \code{list} of ExpressionSet objects containing
-molecular profiles}
+\item{molecularProfiles}{A \code{list} of SummarizedExperiment objects containing
+molecular profiles for each molecular data type.}
 
-\item{cell}{A \code{data.frame} containg the annotations for all the cell
+\item{cell}{A \code{data.frame} containing the annotations for all the cell
 lines profiled in the data set, across all data types}
 
 \item{sensitivityInfo}{A \code{data.frame} containing the information for the

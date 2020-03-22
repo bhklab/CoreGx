@@ -18,6 +18,6 @@ Updated \code{CoreSet}
 A generic for the cellNames replacement method
 }
 \examples{
-cellNames(Cleveland_small) <- cellNames(Cleveland_small)
+cellNames(clevelandSmall) <- cellNames(clevelandSmall)
 
 }

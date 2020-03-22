@@ -8,8 +8,8 @@
 #' Lamb et al. The Connectivity Map: using gene-expression signatures to connect small molecules, genes, and disease. Science, 2006.
 #' 
 #' @docType data
-#' @name Cleveland_small
-#' @usage data(Cleveland_small)
+#' @name clevelandSmall
+#' @usage data(clevelandSmall)
 #' @keywords datasets
 #' @format CoreSet object
 #'

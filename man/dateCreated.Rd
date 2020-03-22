@@ -16,6 +16,6 @@ The date the CoreSet was created
 A generic for the dateCreated method
 }
 \examples{
-dateCreated(Cleveland_small)
+dateCreated(clevelandSmall)
 
 }
