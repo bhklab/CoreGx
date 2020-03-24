@@ -21,7 +21,8 @@
 #' @import parallel
 #' @importFrom stats quantile
 #' @export
-amcc <- 
+##FIXME:: We need a more descriptive name for this function
+amcc <-
   function(x, y, step.prct=0, min.cat=3, nperm=1000, setseed=12345, nthread=1) {
     if(!min.cat>1){
 

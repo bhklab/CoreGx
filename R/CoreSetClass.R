@@ -180,7 +180,6 @@ CoreSet <-  function(name,
 # CELL SLOT GETTERS/SETTERS ----
 ###
 
-
 #' cellInfo Generic
 #' 
 #' Generic for cellInfo method 
@@ -190,9 +189,21 @@ CoreSet <-  function(name,
 #' cellInfo(clevelandSmall)
 #' 
 #' @param cSet The \code{CoreSet} to retrieve cell info from
+#' @param ... \code{list} Fall through arguments to allow generic 
+#'   to be defined with different parameters
 #' 
 #' @return a \code{data.frame} with the cell annotations
-setGeneric("cellInfo", function(cSet) standardGeneric("cellInfo"))
+#'
+#' @import methods
+#'
+#' @export
+setGeneric("cellInfo", function(cSet, ...) standardGeneric("cellInfo"))
+#' @describeIn CoreSet Returns the annotations for all the cell lines tested on in the CoreSet
+#' @export
+setMethod(cellInfo, "CoreSet", function(cSet){
+  cSet@cell
+})
+
 
 #' cellInfo<- Generic
 #' 
@@ -203,20 +214,17 @@ setGeneric("cellInfo", function(cSet) standardGeneric("cellInfo"))
 #' 
 #' @param object The \code{CoreSet} to replace cell info in
 #' @param value A \code{data.frame} with the new cell annotations
+#' 
 #' @return Updated \code{CoreSet}
-setGeneric("cellInfo<-", function(object, value) standardGeneric("cellInfo<-"))
-#' @describeIn CoreSet Returns the annotations for all the cell lines tested on in the CoreSet
+#' 
 #' @export
-setMethod(cellInfo, "CoreSet", function(cSet){
-  cSet@cell
-})
+setGeneric("cellInfo<-", function(object, value) standardGeneric("cellInfo<-"))
 #' @describeIn CoreSet Update the cell line annotations
 #' @export
-setReplaceMethod("cellInfo", signature = signature(object="CoreSet",value="data.frame"), function(object, value){
+setReplaceMethod("cellInfo", signature = signature(object="CoreSet", value="data.frame"), function(object, value){
   if(is.null(rownames(value))){
     stop("Please provide the cell_id as rownames for the cell line annotations")
   }
-  
   object@cell <- value
   object
 })
@@ -234,8 +242,11 @@ setReplaceMethod("cellInfo", signature = signature(object="CoreSet",value="data.
 #' 
 #' @param cSet The \code{CoreSet} to retrieve rna annotations from
 #' @param mDataType the type of molecular data 
+#' 
 #' @return a \code{data.frame} with the experiment info
+#' 
 setGeneric("phenoInfo", function(cSet, mDataType) standardGeneric("phenoInfo"))
+#'
 #' @describeIn CoreSet Return the experiment info from the given type of molecular data in CoreSet 
 #' @export
 setMethod(phenoInfo, "CoreSet", function(cSet, mDataType){
@@ -302,7 +313,7 @@ setGeneric("molecularProfiles", function(cSet, mDataType, assay, ...) standardGe
 #' @describeIn CoreSet Return the given type of molecular data from the CoreSet 
 #' @export
 setMethod(molecularProfiles, "CoreSet", function(cSet, mDataType, assay){
-  
+  ## TODO:: Add an all option that returns a list?
   if(mDataType %in% names(cSet@molecularProfiles)){
     if (!missing(assay)) {
       if (assay %in% assayNames(cSet@molecularProfiles[[mDataType]])) {
@@ -339,6 +350,14 @@ setGeneric("molecularProfiles<-", function(object, mDataType, assay, value, ...)
 setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mDataType ="character", assay="character", value="matrix"), function(object, mDataType, assay, value){
   if (mDataType %in% names(object@molecularProfiles)) {
     SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay) <- value
+  }
+  object
+})
+#'@describeIn CoreSet Update the given type of molecular data from the CoreSet 
+#' @export
+setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mDataType ="character", assay="missing", value="matrix"), function(object, mDataType, assay, value){
+  if (mDataType %in% names(object@molecularProfiles)) {
+    SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1) <- value
   }
   object
 })
@@ -383,6 +402,14 @@ setGeneric("featureInfo<-", function(object, mDataType, value) standardGeneric("
 #' @describeIn CoreSet Replace the gene info for the molecular data
 #' @export
 setReplaceMethod("featureInfo", signature = signature(object="CoreSet", mDataType ="character",value="data.frame"), function(object, mDataType, value){
+  
+  if(mDataType %in% names(object@molecularProfiles)){
+    rowData(object@molecularProfiles[[mDataType]]) <- 
+      S4Vectors::DataFrame(value, rownames = rownames(value))
+  }
+  object
+})
+setReplaceMethod("featureInfo", signature = signature(object="CoreSet", mDataType ="character",value="DataFrame"), function(object, mDataType, value){
   
   if(mDataType %in% names(object@molecularProfiles)){
     rowData(object@molecularProfiles[[mDataType]]) <- 
@@ -481,7 +508,7 @@ setReplaceMethod("sensitivityProfiles", signature = signature(object="CoreSet",v
     object@sensitivity$profiles <- as.data.frame(value)
     object
 })
-#' sensitivityMeasures Generic
+#' sensitivityMeasures Generi
 #' 
 #' A generic for the sensitivityMeasures  method
 #' 
@@ -538,7 +565,6 @@ setReplaceMethod("cellNames", signature = signature(object="CoreSet",value="char
     })
 
 
-    #### TODO:: set replace method for genenames
 #' fNames Generic
 #' 
 #' A generic for the fNames method
@@ -556,7 +582,32 @@ setMethod(fNames, "CoreSet", function(cSet, mDataType){
   if (mDataType %in% names(cSet@molecularProfiles)) {
     rownames(featureInfo(cSet, mDataType))
   } else {
-    stop("Molecular data type name specified is not part of this CoreSet")
+    stop(paste0("Molecular data type name specified is not part of this ", class(cSet)))
+  }
+})
+
+#' fNames<- Generic
+#' 
+#' A generic for the cellNames replacement method
+#' 
+#' @examples
+#' data(CCLEsmall)
+#' fNames(CCLEsmall) <- fNames(CCLEsmall)
+#' 
+#' @param object The \code{CoreSet} to update
+#' @param value A \code{character} vector of the new cell names
+#' 
+#' @return Updated \code{CoreSet}
+#' @export
+setGeneric("fNames<-", function(object, value) standardGeneric("fNames<-"))
+#' @describeIn CoreSet Update the cell names used in the dataset
+#' @export
+setReplaceMethod("fNames", signature = signature(object="CoreSet",value="character"), function(object, value){
+  if (mDataType %in% names(object@molecularProfiles)) {
+    rownames(featureInfo(object, mDataType)) <- as.character(value)
+    object
+  } else {
+    stop(paste0(mDataType, " is not in the object. Possible mDataTypes are: ", names(object@molecularProfiles)))
   }
 })
 
@@ -579,7 +630,7 @@ setMethod(dateCreated, "CoreSet", function(cSet) {
 
 #' cSetName Generic
 #' 
-#' A generic for the cSetName method
+#' A generic for the name method
 #' 
 #' @examples
 #' cSetName(clevelandSmall)
@@ -590,9 +641,7 @@ setGeneric("cSetName", function(cSet) standardGeneric("cSetName"))
 #' @describeIn CoreSet Return the name of the CoreSet 
 #' @export
 setMethod(cSetName, "CoreSet", function(cSet){
-    
     return(cSet@annotation$name)
-    
 })
 
 #' pertNumber Generic
@@ -609,11 +658,8 @@ setGeneric("pertNumber", function(cSet) standardGeneric("pertNumber"))
 #'   experiments
 #' @export
 setMethod(pertNumber, "CoreSet", function(cSet){
-    
     return(cSet@perturbation$n)
-    
 })
-
 
 #' sensNumber Generic
 #' 
@@ -622,16 +668,15 @@ setMethod(pertNumber, "CoreSet", function(cSet){
 #' @examples
 #' sensNumber(clevelandSmall)
 #' 
-#' @param cSet A \code{CoreSet} 
+#' @param cSet A \code{CoreSet}
+#' 
 #' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
 setGeneric("sensNumber", function(cSet) standardGeneric("sensNumber"))
 #' @describeIn CoreSet Return the summary of available sensitivity
 #'   experiments
 #' @export
 setMethod(sensNumber, "CoreSet", function(cSet){
-  
   return(cSet@sensitivity$n)
-  
 })
 
 #' pertNumber<- Generic
@@ -643,16 +688,15 @@ setMethod(sensNumber, "CoreSet", function(cSet){
 #' 
 #' @param object A \code{CoreSet} 
 #' @param value A new 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
+#' 
 #' @return The updated \code{CoreSet} 
 setGeneric("pertNumber<-", function(object, value) standardGeneric("pertNumber<-"))
 #' @describeIn CoreSet Update the summary of available perturbation
 #'   experiments
 #' @export
 setReplaceMethod('pertNumber', signature = signature(object="CoreSet",value="array"), function(object, value){
-  
   object@perturbation$n <- value
   object
-  
 })
 
 #' sensNumber<- Generic
@@ -661,7 +705,6 @@ setReplaceMethod('pertNumber', signature = signature(object="CoreSet",value="arr
 #' 
 #' 
 #' @examples
-
 #' sensNumber(clevelandSmall) <- sensNumber(clevelandSmall)
 #' 
 #' @param object A \code{CoreSet} 
@@ -672,10 +715,8 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
 #'   experiments
 #' @export
 setReplaceMethod('sensNumber', signature = signature(object="CoreSet",value="matrix"), function(object, value){
-  
   object@sensitivity$n <- value
   object
-  
 })
 
 #' Show a CoreSet
@@ -700,7 +741,7 @@ setMethod("show", signature=signature(object="CoreSet"),
         cat("Drug pertubation: \n")
         cat("\tPlease look at pertNumber(cSet) to determine number of experiments for each drug-cell combination.\n")
         cat("Drug sensitivity: \n")
-        cat("\tNumber of Experiments: ",nrow(sensitivityInfo(object)),"\n")
+        cat("\tNumber of Experiments: ", nrow(sensitivityInfo(object)),"\n")
         cat("\tPlease look at sensNumber(cSet) to determine number of experiments for each drug-cell combination.\n")
     })
 
@@ -730,9 +771,7 @@ setGeneric("mDataNames", function(cSet) standardGeneric("mDataNames"))
 #' @return Vector of names of the molecular data types
 #' @export
 setMethod("mDataNames", "CoreSet", function(cSet){
-
   return(names(cSet@molecularProfiles))
-
 })
 
 
@@ -881,7 +920,6 @@ updateCellId <- function(cSet, new.ids = vector("character")){
 #
 # }
 
-
 .summarizeSensitivityNumbers <- function(cSet) {
 
   if (cSet@datasetType != "sensitivity" && cSet@datasetType != "both") {
@@ -1009,7 +1047,7 @@ checkCSetStructure <-
       nn <- names(cSet@molecularProfiles)[i]
       
       # Testing plot rendering for rna and rnaseq
-      if( (SummarizedExperiment::metadata(profile)$annotation == "rna" | SummarizedExperiment::metadata(profile)$annotation == "rnaseq") & plotDist)
+      if( (S4Vectors::metadata(profile)$annotation == "rna" | S4Vectors::metadata(profile)$annotation == "rnaseq") & plotDist)
       {
         pdf(file=file.path(result.dir, sprintf("%s.pdf", nn)))
         hist(SummarizedExperiment::assay(profile, 'exprs'), breaks = 100)
@@ -1018,7 +1056,7 @@ checkCSetStructure <-
       
       ## Test if sample and feature annotations dimensions match the assay
       warning(ifelse(nrow(rowData(profile)) != nrow(assays(profile)$exprs),
-                     sprintf("%s: number of features in fData is different from SummarizedExperiment slots", nn),
+                     sprintf("%s: number of features in rowData is different from SummarizedExperiment slots", nn),
                      sprintf("%s: rowData dimension is OK", nn)
                     )
               )

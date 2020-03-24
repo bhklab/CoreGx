@@ -34,7 +34,7 @@
 ## http://www.mathworks.com/matlabcentral/fileexchange/20846-weighted-correlation-matrix
 ## F. Pozzi, T. Di Matteo, T. Aste, "Exponential smoothing weighted correlations", The European Physical Journal B, Vol. 85, No 6, 2012. DOI: 10.1140/epjb/e2012-20697-x
 #################################################
-
+##TODO:: Give this function a more descriptive name
 gwc <-
 function (x1, p1, x2, p2, method.cor=c("pearson", "spearman"), nperm=1e4, truncate.p=1e-16, ...) {
     

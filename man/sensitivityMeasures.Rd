@@ -2,7 +2,7 @@
 % Please edit documentation in R/CoreSetClass.R
 \name{sensitivityMeasures}
 \alias{sensitivityMeasures}
-\title{sensitivityMeasures Generic}
+\title{sensitivityMeasures Generi}
 \usage{
 sensitivityMeasures(cSet)
 }

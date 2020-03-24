@@ -11,6 +11,7 @@
 \alias{phenoInfo<-,CoreSet,character,DataFrame-method}
 \alias{molecularProfiles,CoreSet-method}
 \alias{molecularProfiles<-,CoreSet,character,character,matrix-method}
+\alias{molecularProfiles<-,CoreSet,character,missing,matrix-method}
 \alias{featureInfo,CoreSet-method}
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
 \alias{sensitivityInfo,CoreSet-method}
@@ -22,6 +23,7 @@
 \alias{cellNames,CoreSet-method}
 \alias{cellNames<-,CoreSet,character-method}
 \alias{fNames,CoreSet-method}
+\alias{fNames<-,CoreSet,character-method}
 \alias{dateCreated,CoreSet-method}
 \alias{cSetName,CoreSet-method}
 \alias{pertNumber,CoreSet-method}
@@ -44,6 +46,8 @@
 
 \S4method{molecularProfiles}{CoreSet,character,character,matrix}(object, mDataType, assay) <- value
 
+\S4method{molecularProfiles}{CoreSet,character,missing,matrix}(object, mDataType, assay) <- value
+
 \S4method{featureInfo}{CoreSet}(cSet, mDataType)
 
 \S4method{featureInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
@@ -65,6 +69,8 @@
 \S4method{cellNames}{CoreSet,character}(object) <- value
 
 \S4method{fNames}{CoreSet}(cSet, mDataType)
+
+\S4method{fNames}{CoreSet,character}(object) <- value
 
 \S4method{dateCreated}{CoreSet}(cSet)
 
@@ -119,6 +125,8 @@ packages to apply the correct model for the given data.
 
 \item \code{molecularProfiles<-}: Update the given type of molecular data from the CoreSet
 
+\item \code{molecularProfiles<-}: Update the given type of molecular data from the CoreSet
+
 \item \code{featureInfo}: Return the feature info for the given molecular data
 
 \item \code{featureInfo<-}: Replace the gene info for the molecular data
@@ -143,6 +151,8 @@ summaries, for example, whether there are IC50 values available
 \item \code{cellNames<-}: Update the cell names used in the dataset
 
 \item \code{fNames}: Return the feature names used in the dataset
+
+\item \code{fNames<-}: Update the cell names used in the dataset
 
 \item \code{dateCreated}: Return the date the CoreSet was created
 

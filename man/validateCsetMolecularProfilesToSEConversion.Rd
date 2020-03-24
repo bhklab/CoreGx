@@ -7,7 +7,7 @@
 validateCsetMolecularProfilesToSEConversion(cSet_old, cSet_new)
 }
 \arguments{
-\item{cSet}{\code{S4} a cSet containing molecularProfiles as ExpressionSets}
+\item{cSet}{\code{CoreSet} a cSet containing molecularProfiles as ExpressionSets}
 }
 \value{
 \code{message} Any slots which are not the same

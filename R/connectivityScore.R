@@ -53,9 +53,6 @@
 #' @importFrom piano runGSA
 #' @importFrom piano loadGSC
 #' @importFrom stats complete.cases
-
-
-
 connectivityScore <- function(x, y, method=c("gsea", "fgsea", "gwc"), nperm=1e4, nthread=1, gwc.method=c("spearman", "pearson"), ...) {
   
   method <- match.arg(method)

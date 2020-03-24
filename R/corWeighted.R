@@ -9,7 +9,7 @@
 ##            - 
 ##
 #################################################
-
+##TODO:: Write function documentation?
 #' @importFrom stats cov.wt complete.cases
 
 corWeighted <- 

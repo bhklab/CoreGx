@@ -1,5 +1,5 @@
 #### Copyright Benjamin Haibe Kains, adapted from the genefu package
-
+##TODO:: Add  function documentatio
 `rescale` <-
 function(x, na.rm=FALSE, q=0) {
 	if(q == 0) {

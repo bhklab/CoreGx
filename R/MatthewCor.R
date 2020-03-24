@@ -15,6 +15,7 @@
 #' @param nthread can parallelize permutation texting using parallel's mclapply 
 #' @return A list with the MCC as the $estimate, and p value as $p.value
 #' @export
+##TODO:: Give this function a more descriptive name
 mcc <- 
   function(x, y, nperm=1000, setseed=12345, nthread=1) {
     set.seed(setseed)

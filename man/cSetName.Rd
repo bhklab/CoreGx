@@ -13,7 +13,7 @@ cSetName(cSet)
 The name of the CoreSet
 }
 \description{
-A generic for the cSetName method
+A generic for the name method
 }
 \examples{
 cSetName(clevelandSmall)

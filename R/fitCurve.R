@@ -1,3 +1,4 @@
+##TODO:: Add function documentation
 #' @importFrom stats optim
 #' @importFrom stats var
 #' @export

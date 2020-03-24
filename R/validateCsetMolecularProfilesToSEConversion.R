@@ -3,8 +3,8 @@
 ##' Checks that all the information contained in an ExpressionSet molecularProfile 
 ##'   was successfully tranferred to the SummarizedExperiment molecularProfile
 ##'   
-##' @param cSet \code{S4} a cSet containing molecularProfiles as SummarizedExperiments
-##' @param cSet \code{S4} a cSet containing molecularProfiles as ExpressionSets
+##' @param cSet \code{CoreSet} a cSet containing molecularProfiles as SummarizedExperiments
+##' @param cSet \code{CoreSet} a cSet containing molecularProfiles as ExpressionSets
 ##' 
 ##' @return \code{message} Any slots which are not the same
 ##' 
@@ -135,6 +135,6 @@ resaveAllExampleDatasets <- function(datasets) {
     dataDir <- paste0(grep('data', list.dirs(), value=TRUE))
     load(paste0(dataDir, '/', dataset, '_old.rda'))
     assign(dataset, convertcSetMolecularProfilesToSE(get(dataset)))
-    save(get(dataset, pos=-2, inherits=TRUE), file=paste0(dataDir, '/', dataset, '.rda'))
+    save(list=dataset, file=paste0(dataDir, '/', dataset, '.rda'), compress='xz')
   }
 }
