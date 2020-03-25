@@ -4,10 +4,10 @@
 \alias{sensitivityProfiles}
 \title{sensitivityProfiles Generic}
 \usage{
-sensitivityProfiles(cSet)
+sensitivityProfiles(object)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve sensitivity experiment data from}
+\item{object}{The \code{CoreSet} to retrieve sensitivity experiment data from}
 }
 \value{
 a \code{data.frame} with the experiment info

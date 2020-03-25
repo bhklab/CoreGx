@@ -4,10 +4,10 @@
 \alias{mDataNames,CoreSet-method}
 \title{mDataNames}
 \usage{
-\S4method{mDataNames}{CoreSet}(cSet)
+\S4method{mDataNames}{CoreSet}(object)
 }
 \arguments{
-\item{cSet}{CoreSet object}
+\item{object}{CoreSet object}
 }
 \value{
 Vector of names of the molecular data types

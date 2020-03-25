@@ -4,10 +4,10 @@
 \alias{phenoInfo}
 \title{phenoInfo Generic}
 \usage{
-phenoInfo(cSet, mDataType)
+phenoInfo(object, mDataType)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve rna annotations from}
+\item{object}{The \code{CoreSet} to retrieve rna annotations from}
 
 \item{mDataType}{the type of molecular data}
 }

@@ -4,10 +4,10 @@
 \alias{cellInfo}
 \title{cellInfo Generic}
 \usage{
-cellInfo(cSet, ...)
+cellInfo(object, ...)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve cell info from}
+\item{object}{The \code{CoreSet} to retrieve cell info from}
 
 \item{...}{\code{list} Fall through arguments to allow generic 
 to be defined with different parameters}

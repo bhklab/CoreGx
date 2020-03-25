@@ -4,10 +4,10 @@
 \alias{fNames}
 \title{fNames Generic}
 \usage{
-fNames(cSet, mDataType)
+fNames(object, mDataType, ...)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet}}
+\item{object}{The \code{CoreSet}}
 
 \item{mDataType}{The molecular data type to return feature names for}
 }

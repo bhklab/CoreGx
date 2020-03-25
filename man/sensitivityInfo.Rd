@@ -4,10 +4,10 @@
 \alias{sensitivityInfo}
 \title{sensitivityInfo Generic}
 \usage{
-sensitivityInfo(cSet)
+sensitivityInfo(object)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve sensitivity experiment annotations from}
+\item{object}{The \code{CoreSet} to retrieve sensitivity experiment annotations from}
 }
 \value{
 a \code{data.frame} with the experiment info

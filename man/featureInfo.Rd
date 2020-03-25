@@ -4,10 +4,10 @@
 \alias{featureInfo}
 \title{featureInfo Generic}
 \usage{
-featureInfo(cSet, mDataType)
+featureInfo(object, mDataType)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve feature annotations from}
+\item{object}{The \code{CoreSet} to retrieve feature annotations from}
 
 \item{mDataType}{the type of molecular data}
 }

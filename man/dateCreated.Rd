@@ -4,10 +4,10 @@
 \alias{dateCreated}
 \title{dateCreated Generic}
 \usage{
-dateCreated(cSet)
+dateCreated(object)
 }
 \arguments{
-\item{cSet}{A \code{CoreSet}}
+\item{object}{A \code{CoreSet}}
 }
 \value{
 The date the CoreSet was created

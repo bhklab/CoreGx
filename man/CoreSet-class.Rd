@@ -25,68 +25,66 @@
 \alias{fNames,CoreSet-method}
 \alias{fNames<-,CoreSet,character-method}
 \alias{dateCreated,CoreSet-method}
-\alias{cSetName,CoreSet-method}
+\alias{name,CoreSet-method}
 \alias{pertNumber,CoreSet-method}
 \alias{sensNumber,CoreSet-method}
 \alias{pertNumber<-,CoreSet,array-method}
 \alias{sensNumber<-,CoreSet,matrix-method}
 \title{A Superclass to Contain Data for Genetic Profiling and Viability Screens of Cancer Cell Lines}
 \usage{
-\S4method{cellInfo}{CoreSet}(cSet)
+\S4method{cellInfo}{CoreSet}(object)
 
 \S4method{cellInfo}{CoreSet,data.frame}(object) <- value
 
-\S4method{phenoInfo}{CoreSet}(cSet, mDataType)
+\S4method{phenoInfo}{CoreSet}(object, mDataType)
 
 \S4method{phenoInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
 
 \S4method{phenoInfo}{CoreSet,character,DataFrame}(object, mDataType) <- value
 
-\S4method{molecularProfiles}{CoreSet}(cSet, mDataType, assay)
+\S4method{molecularProfiles}{CoreSet}(object, mDataType, assay)
 
 \S4method{molecularProfiles}{CoreSet,character,character,matrix}(object, mDataType, assay) <- value
 
 \S4method{molecularProfiles}{CoreSet,character,missing,matrix}(object, mDataType, assay) <- value
 
-\S4method{featureInfo}{CoreSet}(cSet, mDataType)
+\S4method{featureInfo}{CoreSet}(object, mDataType)
 
 \S4method{featureInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
 
-\S4method{sensitivityInfo}{CoreSet}(cSet)
+\S4method{sensitivityInfo}{CoreSet}(object)
 
 \S4method{sensitivityInfo}{CoreSet,data.frame}(object) <- value
 
-\S4method{sensitivityProfiles}{CoreSet}(cSet)
+\S4method{sensitivityProfiles}{CoreSet}(object)
 
 \S4method{sensitivityProfiles}{CoreSet,data.frame}(object) <- value
 
 \S4method{sensitivityProfiles}{CoreSet,matrix}(object) <- value
 
-\S4method{sensitivityMeasures}{CoreSet}(cSet)
+\S4method{sensitivityMeasures}{CoreSet}(object)
 
-\S4method{cellNames}{CoreSet}(cSet)
+\S4method{cellNames}{CoreSet}(object)
 
 \S4method{cellNames}{CoreSet,character}(object) <- value
 
-\S4method{fNames}{CoreSet}(cSet, mDataType)
+\S4method{fNames}{CoreSet}(object, mDataType)
 
 \S4method{fNames}{CoreSet,character}(object) <- value
 
-\S4method{dateCreated}{CoreSet}(cSet)
+\S4method{dateCreated}{CoreSet}(object)
 
-\S4method{cSetName}{CoreSet}(cSet)
+\S4method{name}{CoreSet}(object)
 
-\S4method{pertNumber}{CoreSet}(cSet)
+\S4method{pertNumber}{CoreSet}(object)
 
-\S4method{sensNumber}{CoreSet}(cSet)
+\S4method{sensNumber}{CoreSet}(object)
 
 \S4method{pertNumber}{CoreSet,array}(object) <- value
 
 \S4method{sensNumber}{CoreSet,matrix}(object) <- value
 }
 \arguments{
-\item{cSet}{A \code{CoreSet} object}
-
 \item{object}{A \code{CoreSet} object}
 
 \item{value}{A replacement value}
@@ -156,7 +154,7 @@ summaries, for example, whether there are IC50 values available
 
 \item \code{dateCreated}: Return the date the CoreSet was created
 
-\item \code{cSetName}: Return the name of the CoreSet
+\item \code{name}: Return the name of the CoreSet
 
 \item \code{pertNumber}: Return the summary of available perturbation
 experiments

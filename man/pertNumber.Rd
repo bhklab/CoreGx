@@ -4,10 +4,10 @@
 \alias{pertNumber}
 \title{pertNumber Generic}
 \usage{
-pertNumber(cSet)
+pertNumber(object)
 }
 \arguments{
-\item{cSet}{A \code{CoreSet}}
+\item{object}{A \code{CoreSet}}
 }
 \value{
 A 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
