@@ -14,6 +14,7 @@
 \alias{molecularProfiles<-,CoreSet,character,missing,matrix-method}
 \alias{featureInfo,CoreSet-method}
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
+\alias{featureInfo<-,CoreSet,character,DataFrame-method}
 \alias{sensitivityInfo,CoreSet-method}
 \alias{sensitivityInfo<-,CoreSet,data.frame-method}
 \alias{sensitivityProfiles,CoreSet-method}
@@ -23,7 +24,7 @@
 \alias{cellNames,CoreSet-method}
 \alias{cellNames<-,CoreSet,character-method}
 \alias{fNames,CoreSet-method}
-\alias{fNames<-,CoreSet,character-method}
+\alias{fNames<-,CoreSet,ANY,character-method}
 \alias{dateCreated,CoreSet-method}
 \alias{name,CoreSet-method}
 \alias{pertNumber,CoreSet-method}
@@ -52,6 +53,8 @@
 
 \S4method{featureInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
 
+\S4method{featureInfo}{CoreSet,character,DataFrame}(object, mDataType) <- value
+
 \S4method{sensitivityInfo}{CoreSet}(object)
 
 \S4method{sensitivityInfo}{CoreSet,data.frame}(object) <- value
@@ -64,13 +67,13 @@
 
 \S4method{sensitivityMeasures}{CoreSet}(object)
 
-\S4method{cellNames}{CoreSet}(object)
+\S4method{cellNames}{CoreSet}(object, ...)
 
 \S4method{cellNames}{CoreSet,character}(object) <- value
 
 \S4method{fNames}{CoreSet}(object, mDataType)
 
-\S4method{fNames}{CoreSet,character}(object) <- value
+\S4method{fNames}{CoreSet,ANY,character}(object, mDataType) <- value
 
 \S4method{dateCreated}{CoreSet}(object)
 
@@ -95,16 +98,16 @@
 An object of the CoreSet class
 }
 \description{
-The CoreSet (CSet) class was developed as a superclass for objects in the 
+The CoreSet (CSet) class was developed as a superclass for pSets in the 
 PharmacoGx and RadioGx packages to contain the data generated in screens 
 of cancer cell lines for their genetic profile and sensitivities to therapy
 (Pharmacological or Radiation). This class is meant to be a superclass which 
-is contained within the CoreSet (cSet) and RadioSet (RSet) objects 
+is contained within the PharmacoSet (pSet) and RadioSet (RSet) objects 
 exported by PharmacoGx and RadioGx. The format of the data is similar for 
-both data cSets and RSets, allowing much of the code to be abstracted into 
+both pSets and rSets, allowing much of the code to be abstracted into 
 the CoreSet super-class. However, the models involved with quantifying 
 cellular response to Pharmacological and Radiation therapy are widely 
-different, and two seperate implementations of the CSet class allows the
+different, and extension of the cSet class allows the
 packages to apply the correct model for the given data.
 }
 \section{Methods (by generic)}{
@@ -126,6 +129,8 @@ packages to apply the correct model for the given data.
 \item \code{molecularProfiles<-}: Update the given type of molecular data from the CoreSet
 
 \item \code{featureInfo}: Return the feature info for the given molecular data
+
+\item \code{featureInfo<-}: Replace the gene info for the molecular data
 
 \item \code{featureInfo<-}: Replace the gene info for the molecular data
 

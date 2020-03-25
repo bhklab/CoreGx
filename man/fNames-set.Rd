@@ -4,10 +4,12 @@
 \alias{fNames<-}
 \title{fNames<- Generic}
 \usage{
-fNames(object, ...) <- value
+fNames(object, mDataType) <- value
 }
 \arguments{
 \item{object}{The \code{CoreSet} to update}
+
+\item{mDataType}{The molecular data type to update}
 
 \item{value}{A \code{character} vector of the new cell names}
 }
@@ -18,7 +20,7 @@ Updated \code{CoreSet}
 A generic for the cellNames replacement method
 }
 \examples{
-data(CCLEsmall)
-fNames(CCLEsmall) <- fNames(CCLEsmall)
+data(clevelandSmall)
+fNames(clevelandSmall, 'rna') <- fNames(clevelandSmall, 'rna')
 
 }

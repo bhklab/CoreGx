@@ -4,10 +4,12 @@
 \alias{mDataNames}
 \title{mDataNames Generic}
 \usage{
-mDataNames(object)
+mDataNames(object, ...)
 }
 \arguments{
 \item{object}{CoreSet object}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 Vector of names of the molecular data types

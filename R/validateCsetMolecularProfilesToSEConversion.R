@@ -1,18 +1,18 @@
-##' Validate cSet molecularProfiles Conversion
-##' 
-##' Checks that all the information contained in an ExpressionSet molecularProfile 
-##'   was successfully tranferred to the SummarizedExperiment molecularProfile
-##'   
-##' @param cSet \code{CoreSet} a cSet containing molecularProfiles as SummarizedExperiments
-##' @param cSet \code{CoreSet} a cSet containing molecularProfiles as ExpressionSets
-##' 
-##' @return \code{message} Any slots which are not the same
-##' 
-##' @importFrom testthat expect_equal test_that
-##' 
-##' @export
-##'
-validateCsetMolecularProfilesToSEConversion <- function(cSet_old, cSet_new) {
+#' Validate cSet molecularProfiles Conversion
+#' 
+#' Checks that all the information contained in an ExpressionSet molecularProfile 
+#'   was successfully tranferred to the SummarizedExperiment molecularProfile
+#'   
+#' @param cSet_old \code{CoreSet} a cSet containing molecularProfiles as SummarizedExperiments
+#' @param cSet_new \code{CoreSet} a cSet containing molecularProfiles as ExpressionSets
+#' 
+#' @return \code{message} Any slots which are not the same
+#' 
+#' @importFrom testthat expect_equal test_that
+#' @importFrom SummarizedExperiment rowData colData assay assays assayNames assayNames<-
+#' @importFrom Biobase assayData assayData<-
+#' 
+.validateCsetMolecularProfilesToSEConversion <- function(cSet_old, cSet_new) {
   
   # Testing that cSets are in correct order
   print("Checking is cSet structures are correct")
@@ -129,12 +129,11 @@ validateCsetMolecularProfilesToSEConversion <- function(cSet_old, cSet_new) {
   message("Tests pass!")
 }
 
-## Doesn't work; issue with scoping of get() function
-resaveAllExampleDatasets <- function(datasets) {
+.resaveAllExampleDatasets <- function(datasets) {
   for (dataset in datasets) {
     dataDir <- paste0(grep('data', list.dirs(), value=TRUE))
     load(paste0(dataDir, '/', dataset, '_old.rda'))
-    assign(dataset, convertcSetMolecularProfilesToSE(get(dataset)))
+    assign(dataset, CoreGx::convertCSetMolecularProfilesToSE(get(dataset)))
     save(list=dataset, file=paste0(dataDir, '/', dataset, '.rda'), compress='xz')
   }
 }

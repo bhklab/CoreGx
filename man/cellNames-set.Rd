@@ -4,10 +4,12 @@
 \alias{cellNames<-}
 \title{cellNames<- Generic}
 \usage{
-cellNames(object) <- value
+cellNames(object, ...) <- value
 }
 \arguments{
 \item{object}{The \code{CoreSet} to update}
+
+\item{...}{Fallthrough arguements for defining new methods}
 
 \item{value}{A \code{character} vector of the new cell names}
 }

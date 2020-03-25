@@ -4,10 +4,12 @@
 \alias{sensNumber}
 \title{sensNumber Generic}
 \usage{
-sensNumber(object)
+sensNumber(object, ...)
 }
 \arguments{
 \item{object}{A \code{CoreSet}}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 A \code{data.frame} with the number of sensitivity experiments per drug and cell line

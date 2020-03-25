@@ -20,7 +20,7 @@ The updated \code{CoreSet}
 Generic for phenoInfo replace method
 }
 \examples{
-data(CCLEsmall)
-phenoInfo(CCLEsmall, mDataType="rna") <- phenoInfo(CCLEsmall, mDataType="rna")
+data(clevelandSmall)
+phenoInfo(clevelandSmall, mDataType="rna") <- phenoInfo(clevelandSmall, mDataType="rna")
 
 }

@@ -4,10 +4,12 @@
 \alias{sensitivityInfo<-}
 \title{sensitivityInfo<- Generic}
 \usage{
-sensitivityInfo(object) <- value
+sensitivityInfo(object, ...) <- value
 }
 \arguments{
 \item{object}{The \code{CoreSet} to update}
+
+\item{...}{Fallthrough arguements for defining new methods}
 
 \item{value}{A \code{data.frame} with the new sensitivity annotations}
 }
