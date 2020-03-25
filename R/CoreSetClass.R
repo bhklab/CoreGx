@@ -315,6 +315,7 @@ setReplaceMethod("phenoInfo", signature = signature(object="CoreSet", mDataType 
 #' @importFrom SummarizedExperiment colData assay assayNames
 setGeneric("molecularProfiles", function(object, mDataType, assay, ...) standardGeneric("molecularProfiles"))
 #' @describeIn CoreSet Return the given type of molecular data from the CoreSet 
+#' @inheritParams molecularProfiles
 #' @export
 setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
   ## TODO:: Add an all option that returns a list?
@@ -350,8 +351,8 @@ setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
 #' 
 setGeneric("molecularProfiles<-", function(object, mDataType, assay, value) standardGeneric("molecularProfiles<-"))
 #' @describeIn CoreSet Update the given type of molecular data from the CoreSet 
-#' 
 #' @importFrom SummarizedExperiment assay
+#' @inheritParams molecularProfiles<-
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mDataType ="character", assay="character", value="matrix"), function(object, mDataType, assay, value){
   if (mDataType %in% names(object@molecularProfiles)) {
@@ -360,6 +361,7 @@ setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mD
   object
 })
 #' @describeIn CoreSet Update the given type of molecular data from the CoreSet 
+#' @inheritParams molecularProfiles<-
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mDataType ="character", assay="missing", value="matrix"), function(object, mDataType, assay, value){
   if (mDataType %in% names(object@molecularProfiles)) {
@@ -566,7 +568,7 @@ setMethod(sensitivityMeasures, "CoreSet", function(object){
 setGeneric("cellNames", function(object, ...) standardGeneric("cellNames"))
 #' @describeIn CoreSet Return the cell names used in the dataset
 #' @export
-setMethod(cellNames, "CoreSet", function(object, ...){
+setMethod(cellNames, "CoreSet", function(object){
   rownames(cellInfo(object))
 })
 

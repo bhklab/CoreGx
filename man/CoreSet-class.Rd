@@ -67,7 +67,7 @@
 
 \S4method{sensitivityMeasures}{CoreSet}(object)
 
-\S4method{cellNames}{CoreSet}(object, ...)
+\S4method{cellNames}{CoreSet}(object)
 
 \S4method{cellNames}{CoreSet,character}(object) <- value
 
@@ -93,6 +93,10 @@
 \item{value}{A replacement value}
 
 \item{mDataType}{A \code{character} with the type of molecular data to return/update}
+
+\item{assay}{\code{character} Name of the desired assay; if excluded defaults to first assay
+in the SummarizedExperiment for the given mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
+to check which assays are available for a given molecular datatype.}
 }
 \value{
 An object of the CoreSet class
