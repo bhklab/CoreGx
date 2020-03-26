@@ -34,7 +34,7 @@ matrix:
       - R CMD build . --resave-data --compact-vignettes=gs+qpdf
       - travis_wait 30 xvfb-run R CMD check *.tar.gz # `xvfb-run` executes the command inside the xvfb virtual GUI to catch any renders
   ## OSX SETTINGS
-  - r: oldrel
+  - r: bioc-devel
     os: osx
     osx_image: xcode11
     ## OSX HOMEBREW PACKAGES
