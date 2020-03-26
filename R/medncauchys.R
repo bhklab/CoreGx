@@ -1,7 +1,7 @@
 #' @importFrom stats rcauchy
 .rmedncauchys = function(N, n, scale) {
   x <- matrix(NA, nrow = 1, ncol = N)
-  for (i in 1:N) {
+  for (i in seq_len(N)) {
     x[i] <- median(rcauchy(n, scale = scale))
   }
   return(x)

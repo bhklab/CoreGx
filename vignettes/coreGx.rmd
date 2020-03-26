@@ -1,0 +1,31 @@
+---
+title: "CoreGx Vignette"
+author: "Benjamin Haibe-Kains"
+date: "25/03/2020"
+output: html_document
+---
+# CoreGx
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This package provides a foundation for the PharmacoGx, RadioGx and ToxicoGx packages. It is not intended for standalone use, only as a dependency for the aforementioned software. Its existence allows abstracting generic definitions, method definitions and class structures common to all three of the Gx suite packages. Examples here are included as a demonstration only.
+
+```{r coregx_load}
+library(CoreGx)
+```
+
+
+```{r coregx_do_some_stuff}
+data(clevelandSmall)
+
+# Setter method for sample phenotype information
+phenoInfo(clevelandSmall, 'rna') <- phenoInfo(clevelandSmall, 'rna')
+
+# Setter method for molecular features available in the assay samples
+featureInfo(clevelandSmall, 'rna') <- featureInfo(clevelandSmall, 'rna')
+
+```
+
+For more information about this package and the possibility of collaborating on its extension please contacnt benjamin.haibe.kains@utoronto.ca.
