@@ -37,6 +37,8 @@ matrix:
   - r: bioc-release
     os: osx
     osx_image: xcode11
+    env:
+      - R_REMOTES_NO_ERRORS_FROM_WARNINGS="true"
     ## OSX HOMEBREW PACKAGES
     # - Dependencies for virtual GUI
     before_install:
