@@ -9,3 +9,6 @@
 ^ReadMe.md
 ^CoreGx_0.1.0.tar.gz
 .git
+.travis.yml
+^doc$
+^Meta$
