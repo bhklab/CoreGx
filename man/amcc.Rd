@@ -4,15 +4,7 @@
 \alias{amcc}
 \title{Calculate an Adaptive Matthews Correlation Coefficient}
 \usage{
-amcc(
-  x,
-  y,
-  step.prct = 0,
-  min.cat = 3,
-  nperm = 1000,
-  setseed = 12345,
-  nthread = 1
-)
+amcc(x, y, step.prct = 0, min.cat = 3, nperm = 1000, nthread = 1, ...)
 }
 \arguments{
 \item{x, y}{Two paired vectors of values. Could be replicates of observations for the same experiments for example.}
@@ -23,9 +15,9 @@ amcc(
 
 \item{nperm}{The number of perumatation to use for estimating significance. If 0, then no p-value is calculated.}
 
-\item{setseed}{Allows setting a consitent seed for reproducibility of permutation testing results. Defaults to 12345.}
-
 \item{nthread}{Number of threads to parallize over. Both the AMCC calculation and the permutation testing is done in parallel.}
+
+\item{...}{Additionaly arguments}
 }
 \value{
 Returns a list with two elements. $amcc contains the highest "mcc" value over all the splits, the p value, as well as the rank at which the split was done.

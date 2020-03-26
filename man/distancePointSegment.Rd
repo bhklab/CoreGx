@@ -19,9 +19,15 @@ distancePointSegment(x, y, x1, y1, x2, y2)
 
 \item{y2}{y-coordinate of line segment endpoint with x-coordinate x2}
 }
+\value{
+\code{numeric} The shortest distance between a point and a line
+  segment
+}
 \description{
-This function calculates the shortest distance between a point and a line segment in 2D space.
+This function calculates the shortest distance between a point 
+  and a line segment in 2D space.
 }
 \examples{
 distancePointSegment(0, 0, -1, 1, 1, -1)
+
 }

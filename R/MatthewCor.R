@@ -1,8 +1,13 @@
 ## Matthews correlatipon coefficient
 #' Compute a Mathews Correlation Coefficient 
 #' 
-#' The function computes a Matthews correlation coefficient for two factors provided to the function. It assumes each factor is a factor of class labels, 
-#' and the enteries are paired in order of the vectors.
+#' The function computes a Matthews correlation coefficient for two factors 
+#' provided to the function. It assumes each factor is a factor of class labels, 
+#' and the enteries are paired in order of the vectors. 
+#' 
+#' Please note: we recommend you call set.seed() before using this function to 
+#' ensure the reproducibility of your results. Write down the seed number or 
+#' save it in a script if you intend to use the results in a publication.
 #' 
 #' @examples
 #' x <- factor(c(1,2,1,2,3,1))
@@ -10,16 +15,17 @@
 #' mcc(x,y)
 #' 
 #' @param x,y factor of the same length with the same number of levels
-#' @param nperm number of permutations for significance estimation. If 0, no permutation testing is done
-#' @param setseed seed for permutation testing
-#' @param nthread can parallelize permutation texting using parallel's mclapply 
+#' @param nperm number of permutations for significance estimation. If 0, 
+#'   no permutation testing is done
+#' @param nthread can parallelize permutation texting using parallel's mclapply
 #' @return A list with the MCC as the $estimate, and p value as $p.value
 #' @export
 ##TODO:: Give this function a more descriptive name
 mcc <- 
-  function(x, y, nperm=1000, setseed=12345, nthread=1) {
-    set.seed(setseed)
-    if ((length(x) != length(y)) || (!is.factor(x) || length(levels(x)) < 2) || (!is.factor(y) || length(levels(y)) < 2)) { stop("x and y must be factors of the same length with at least two levels") }
+  function(x, y, nperm=1000, nthread=1) {
+    if ((length(x) != length(y)) || (!is.factor(x) || length(levels(x)) < 2) || 
+        (!is.factor(y) || length(levels(y)) < 2)) { 
+      stop("x and y must be factors of the same length with at least two levels") }
     if(length(levels(x))!= length(levels(y))){
 
       warning("The number of levels x and y was different. Taking the union of all class labels.")
@@ -33,13 +39,13 @@ mcc <-
     ## compute significance of MCC using a permutation test
     if (nperm > 0) {
       splitix <- parallel::splitIndices(nx=nperm, ncl=nthread)
-      splitix <- splitix[sapply(splitix, length) > 0]
+      splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
       mcres <- parallel::mclapply(splitix, function(x, xx, yy) {
-        res <- sapply(x, function(x, xx, yy) {
+        res <- vapply(x, function(x, xx, yy) {
           xx <- sample(xx)
           yy <- sample(yy)
           return (.mcc(ct=table(xx, yy)))
-        }, xx=xx, yy=yy)
+        }, xx=xx, yy=yy, FUN.VALUE=numeric(1))
         return (res)
       }, xx=x, yy=y)
       mcres <- unlist(mcres)
@@ -48,6 +54,9 @@ mcc <-
     }
     return (res)
   }
+
+## Helper functions
+
 .mcc <- 
   function(ct, nbcat=nrow(ct)) {
     if(nrow(ct) != ncol(ct)) { stop("the confusion table should be square!") }

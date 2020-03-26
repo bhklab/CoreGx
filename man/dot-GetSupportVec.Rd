@@ -11,6 +11,9 @@
 
 \item{output_length}{The length of the returned support vector}
 }
+\value{
+\code{numeric} A numeric vector of interpolated concentrations
+}
 \description{
 .GetSupportVec
 }

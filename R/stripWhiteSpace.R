@@ -16,7 +16,7 @@ stripWhiteSpace <- function (str, method=c("both", "head", "tail")) {
     )
     return (str2)
   } else {
-    str2 <- sapply(str, stripWhiteSpace, method=method)
+    str2 <- vapply(str, stripWhiteSpace, method=method, FUN.VALUE=character(1))
     return (str2)
   }
 }

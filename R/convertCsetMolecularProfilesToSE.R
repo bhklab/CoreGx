@@ -13,8 +13,7 @@
 #' @importFrom S4Vectors SimpleList DataFrame
 #' @importFrom stats setNames
 #' 
-#' @export
-convertCSetMolecularProfilesToSE <- function(cSet) {
+.convertCSetMolecularProfilesToSE <- function(cSet) {
   
   eSets <- cSet@molecularProfiles # Extract eSet data
   

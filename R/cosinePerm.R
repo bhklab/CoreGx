@@ -1,5 +1,10 @@
 #' Computes the cosine similarity and significance using permutation test
 #' 
+#' Please note: to ensure reproducibility of this functions results
+#'   remember to set.seed() in your script before running it. We 
+#'   recommend writing down the number you use as a set.seed() argument
+#'   to ensure you can reproduce your results in the future.
+#' 
 #' @examples
 #' x <- factor(c(1,2,1,2,1))
 #' y <- factor(c(2,2,1,1,1))
@@ -7,23 +12,30 @@
 #' 
 #' @param x [factor] is the factors for the first variable
 #' @param y [factor] is the factors for the second variable
-#' @param nperm [integer] is the number of permutations to comput ethe null distribution of MCC estimates
-#' @param alternative [string] indicates the alternative hypothesis and must be one of
-#' ‘"two.sided"’, ‘"greater"’ or ‘"less"’.  You can specify just
+#' @param nperm [integer] is the number of permutations to comput ethe null 
+#'   distribution of MCC estimates
+#' @param alternative [string] indicates the alternative hypothesis and must be 
+#'   one of ‘"two.sided"’, ‘"greater"’ or ‘"less"’.  You can specify just
 #' the initial letter.  ‘"greater"’ corresponds to positive
 #' association, ‘"less"’ to negative association.
 #' Options are "two.sided", "less", or "greater"
-#' @param include.perm [boolean] indicates whether the estimates for the null distribution should be returned.
-#' Default set to 'FALSE'
-#' @param setseed [integer] is the seed specified by the user. Defaults is '12345'
-#' @param nthread [integer] is the number of threads to be used to perform the permutations in parallel
-#' @return [list] estimate of the cosine similarity, p-value and estimates after random permutations (null distribution) in include.perm is set to 'TRUE'
+#' @param include.perm [boolean] indicates whether the estimates for the null 
+#'   distribution should be returned. Default set to 'FALSE'
+#' @param nthread [integer] is the number of threads to be used to perform the 
+#'   permutations in parallel
+#' @return [list] estimate of the cosine similarity, p-value and estimates after
+#'   random permutations (null distribution) in include.perm is set to 'TRUE'
 #' @importFrom lsa cosine
 #' @import parallel 
 #' @export
 
-cosinePerm <- function(x, y, nperm=1000, alternative=c("two.sided", "less", "greater"), include.perm=FALSE, setseed=12345, nthread=1) {
-  set.seed(setseed)
+cosinePerm <- function(x, y, 
+                       nperm=1000, 
+                       alternative=c("two.sided", "less", "greater"), 
+                       include.perm=FALSE, 
+                       nthread=1
+                       )
+{
   alternative <- match.arg(alternative)
   if ((length(x) != length(y))) { stop("x and y must be vectors of the same length") }
   res <- c("estimate"=NA, "p.value"=NA)
@@ -34,13 +46,13 @@ cosinePerm <- function(x, y, nperm=1000, alternative=c("two.sided", "less", "gre
   ## compute significance of cosine using a permutation test
   if (nperm > 0) {
     splitix <- parallel::splitIndices(nx=nperm, ncl=nthread)
-    splitix <- splitix[sapply(splitix, length) > 0]
+    splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
     mcres <- parallel::mclapply(splitix, function(x, xx, yy) {
-      res <- sapply(x, function(x, xx, yy) {
+      res <- vapply(x, function(x, xx, yy) {
         xx <- sample(xx)
         yy <- sample(yy)
         return (drop(lsa::cosine(x=xx, y=yy)))
-      }, xx=xx, yy=yy)
+      }, xx=xx, yy=yy, FUN.VALUE=numeric(1))
       return (res)
     }, xx=x, yy=y)
     mcres <- unlist(mcres)

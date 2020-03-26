@@ -5,7 +5,7 @@
 #' @return A named vector where index `Rsquare` contains the attributes of the object
 #' @export
 examineGOF <- function(pars) {
-	return(c("Rsquare" = attr(pars, "Rsquare")))
+    return(c("Rsquare" = attr(pars, "Rsquare")))
 }
 
 ### If more GOF stats are implemented, they can be added above

@@ -133,7 +133,7 @@
   for (dataset in datasets) {
     dataDir <- paste0(grep('data', list.dirs(), value=TRUE))
     load(paste0(dataDir, '/', dataset, '_old.rda'))
-    assign(dataset, CoreGx::convertCSetMolecularProfilesToSE(get(dataset)))
+    assign(dataset, .convertCSetMolecularProfilesToSE(get(dataset)))
     save(list=dataset, file=paste0(dataDir, '/', dataset, '.rda'), compress='xz')
   }
 }

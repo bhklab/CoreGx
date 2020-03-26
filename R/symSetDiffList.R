@@ -17,5 +17,5 @@
 #'   containing only the symmetric set difference
 #' @export
 symSetDiffList <- function(...){
-	return(setdiff(unionList(...), intersectList(...)))
+    return(setdiff(unionList(...), intersectList(...)))
 }

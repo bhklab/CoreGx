@@ -15,15 +15,25 @@
 #' @param step.prct Instead of testing all possible splits of the data, it is possible to test steps of a percentage size of the total number of ranks in x/y. If this variable is 0, function defaults to testing all possible splits.
 #' @param min.cat The minimum number of members per category. Classifications with less members fitting into both categories will not be considered. 
 #' @param nperm The number of perumatation to use for estimating significance. If 0, then no p-value is calculated. 
-#' @param setseed Allows setting a consitent seed for reproducibility of permutation testing results. Defaults to 12345.
 #' @param nthread Number of threads to parallize over. Both the AMCC calculation and the permutation testing is done in parallel. 
+#' @param ... Additionaly arguments
+#' 
 #' @return Returns a list with two elements. $amcc contains the highest "mcc" value over all the splits, the p value, as well as the rank at which the split was done. 
 #' @import parallel
 #' @importFrom stats quantile
 #' @export
 ##FIXME:: We need a more descriptive name for this function
 amcc <-
-  function(x, y, step.prct=0, min.cat=3, nperm=1000, setseed=12345, nthread=1) {
+  function(x, y, step.prct=0, min.cat=3, nperm=1000, nthread=1, ...) {
+    #PARAMETER CHANGE WARNING
+    if (!missing(...)) {
+      if ('setseed' %in% names(...)) {
+        warning('The setseed parmater has been removed in this release to conform
+              to Bioconductor coding standards. Please call set.seed in your
+              script before running this function.')
+      }
+    }  
+
     if(!min.cat>1){
 
       stop("Min.cat should be at least 2")
@@ -39,26 +49,32 @@ amcc <-
         iix <- round(quantile(iix, probs=seq(0, 1, by=step.prct)))
       }
       splitix <- parallel::splitIndices(nx=length(iix), ncl=nthread)
-      splitix <- splitix[sapply(splitix, length) > 0]
+      splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
       mcres <- parallel::mclapply(splitix, function(x, iix, x2, y2) {
-        res <- t(sapply(iix[x], function(x, x2, y2) {
+        res <- t(vapply(iix[x], function(x, x2, y2) {
           x3 <- factor(ifelse (x2 <= x, "1", "0"))
           y3 <- factor(ifelse (y2 <= x, "1", "0"))
           res <- mcc(x=x3, y=y3, nperm=0, nthread=1)
           return (res)
-        }, x2=x2, y2=y2))
+        }, x2=x2, y2=y2, 
+        ##TODO:: Why is return value a list of doubles when the class of res is 
+        # matrix in debug?
+        FUN.VALUE=list(1.0, 1.0))) 
         return (res)
       }, iix=iix, x2=x2, y2=y2)
       mm <- do.call(rbind, mcres)
       mode(mm) <- "numeric"
       ## remove extreme indices
       rmix <- c(seq_len(min.cat - 1), (nrow(mm) - min.cat + 2):nrow(mm))
-      mccix <- max(which(mm[-rmix, "estimate", drop=FALSE] == max(mm[-rmix, "estimate", drop=FALSE], na.rm=TRUE))) + (min.cat - 1)
+      mccix <- max(which(mm[-rmix, "estimate", drop=FALSE] == 
+                           max(mm[-rmix, "estimate", drop=FALSE], 
+                               na.rm=TRUE))) + (min.cat - 1)
       ## compute significance only for the AMCC
       x3 <- factor(ifelse (x2 <= mccix, "1", "0"))
       y3 <- factor(ifelse (y2 <= mccix, "1", "0"))
       if (nperm > 0) {
-        mm[mccix, "p.value"] <- mcc(x=x3, y=y3, nperm=nperm, nthread=nthread, setseed=setseed)[["p.value"]]
+        mm[mccix, "p.value"] <- 
+          mcc(x=x3, y=y3, nperm=nperm, nthread=nthread)[["p.value"]]
         ## bonferronni correction
         # mm[mccix, "p"] <- mm[mccix, "p"] * length(x3)
       }
