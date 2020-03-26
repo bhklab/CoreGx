@@ -19,7 +19,7 @@ matrix:
   ## LINUX SETTINGS
   - r: bioc-devel
     os: linux
-    dist: xenial
+    dist: bionic
     ## APT PACKAGE SETTINGS
     addons:
       apt:
