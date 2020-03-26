@@ -10,7 +10,6 @@
 #' @param b coefficient in line equation a * x + b * y + c = 0
 #' @param c coefficient in line equation a * x + b * y + c = 0
 #' @export
-
 distancePointLine <- function(x, y, a, b, c) {
   
   if (!(all(is.finite(c(x, y, a, b, c))))) {
@@ -35,7 +34,6 @@ distancePointLine <- function(x, y, a, b, c) {
 #' @param y2 y-coordinate of line segment endpoint with x-coordinate x2
 #' @examples distancePointSegment(0, 0, -1, 1, 1, -1)
 #' @export
-
 distancePointSegment <- function(x, #x-coordinate of point
                                  y, #y-coordinate of point
                                  x1, #x-coordinate of one endpoint of line segment

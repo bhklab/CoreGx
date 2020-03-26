@@ -4,12 +4,14 @@
 \alias{phenoInfo}
 \title{phenoInfo Generic}
 \usage{
-phenoInfo(object, mDataType)
+phenoInfo(object, mDataType, ...)
 }
 \arguments{
 \item{object}{The \code{CoreSet} to retrieve rna annotations from}
 
 \item{mDataType}{the type of molecular data}
+
+\item{...}{Fallthrough argument for defining new parameters in other S4 methods}
 }
 \value{
 a \code{data.frame} with the experiment info

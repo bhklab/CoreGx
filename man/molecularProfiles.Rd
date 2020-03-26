@@ -14,6 +14,8 @@ molecularProfiles(object, mDataType, assay, ...)
 \item{assay}{\code{character} Name of the desired assay; if excluded defaults to first assay
 in the SummarizedExperiment for the given mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
 to check which assays are available for a given molecular datatype.}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 a \code{matrix} of data for the given mDataType and assay

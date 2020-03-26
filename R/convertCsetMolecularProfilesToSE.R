@@ -8,9 +8,10 @@
 #' @return \code{S4} A CoreSet containing molecular data in a SummarizedExperiments
 #' 
 #' @importFrom parallel mclapply
-#' @importFrom SummarizedExperiment SummarizedExperiment Assays
-#' @importFrom Biobase exprs fData pData annotation protocolData
+#' @importFrom SummarizedExperiment SummarizedExperiment Assays assay assayNames assayNames<-
+#' @importFrom Biobase exprs fData pData annotation protocolData assayDataElementNames
 #' @importFrom S4Vectors SimpleList DataFrame
+#' @importFrom stats setNames
 #' 
 #' @export
 convertCSetMolecularProfilesToSE <- function(cSet) {

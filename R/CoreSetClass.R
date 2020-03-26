@@ -1,15 +1,15 @@
 #' A Superclass to Contain Data for Genetic Profiling and Viability Screens of Cancer Cell Lines
 #' 
-#' The CoreSet (CSet) class was developed as a superclass for objects in the 
+#' The CoreSet (CSet) class was developed as a superclass for pSets in the 
 #' PharmacoGx and RadioGx packages to contain the data generated in screens 
 #' of cancer cell lines for their genetic profile and sensitivities to therapy
 #' (Pharmacological or Radiation). This class is meant to be a superclass which 
-#' is contained within the CoreSet (cSet) and RadioSet (RSet) objects 
+#' is contained within the PharmacoSet (pSet) and RadioSet (RSet) objects 
 #' exported by PharmacoGx and RadioGx. The format of the data is similar for 
-#' both data cSets and RSets, allowing much of the code to be abstracted into 
+#' both pSets and rSets, allowing much of the code to be abstracted into 
 #' the CoreSet super-class. However, the models involved with quantifying 
 #' cellular response to Pharmacological and Radiation therapy are widely 
-#' different, and two seperate implementations of the CSet class allows the
+#' different, and extension of the cSet class allows the
 #' packages to apply the correct model for the given data.
 #' 
 # @param cSet A \code{CoreSet} object ##TODO:: Is this needed?
@@ -156,7 +156,6 @@ CoreSet <-  function(name,
     curation$tissue <- as.data.frame(curationTissue, stringsAsFactors = FALSE)
     ### TODO:: Make sure to fix the curation to check for matching row names to the drug and cell line matrices!!!!!!
     
-    
     perturbation <- list()
     perturbation$n <- perturbationN
     if (datasetType == "perturbation" || datasetType == "both") {
@@ -166,7 +165,7 @@ CoreSet <-  function(name,
     }
     
     object  <- .CoreSet(annotation=annotation, molecularProfiles=molecularProfiles, cell=as.data.frame(cell), datasetType=datasetType, sensitivity=sensitivity, perturbation=perturbation, curation=curation)
-    if (verify) { checkobjectStructure(object)}
+    if (verify) { checkCsetStructure(object)}
   if(length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
     object@sensitivity$n <- .summarizeSensitivityNumbers(object)
   }
@@ -180,13 +179,13 @@ CoreSet <-  function(name,
 # CELL SLOT GETTERS/SETTERS ----
 ###
 
-#' cellInfo Generic
+#' cellInfo Getter
 #' 
-#' Generic for cellInfo method 
+#' Get cell line information from a PharmacoSet object
 #' 
 #' @examples
 #' data(clevelandSmall)
-#' cellInfo(clevelandSmall)
+#' cellInf <- cellInfo(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to retrieve cell info from
 #' @param ... \code{list} Fall through arguments to allow generic 
@@ -241,12 +240,14 @@ setReplaceMethod("cellInfo", signature = signature(object="CoreSet", value="data
 #' phenoInfo(clevelandSmall, mDataType="rna")
 #' 
 #' @param object The \code{CoreSet} to retrieve rna annotations from
-#' @param mDataType the type of molecular data 
+#' @param mDataType the type of molecular data
+#' @param ... Fallthrough argument for defining new parameters in other S4 methods
 #' 
 #' @return a \code{data.frame} with the experiment info
 #' 
-setGeneric("phenoInfo", function(object, mDataType) standardGeneric("phenoInfo"))
+setGeneric("phenoInfo", function(object, mDataType, ...) standardGeneric("phenoInfo"))
 #'
+#' @importFrom SummarizedExperiment colData
 #' @describeIn CoreSet Return the experiment info from the given type of molecular data in CoreSet 
 #' @export
 setMethod(phenoInfo, "CoreSet", function(object, mDataType){
@@ -263,8 +264,8 @@ setMethod(phenoInfo, "CoreSet", function(object, mDataType){
 #' Generic for phenoInfo replace method
 #' 
 #' @examples
-#' data(CCLEsmall)
-#' phenoInfo(CCLEsmall, mDataType="rna") <- phenoInfo(CCLEsmall, mDataType="rna")
+#' data(clevelandSmall)
+#' phenoInfo(clevelandSmall, mDataType="rna") <- phenoInfo(clevelandSmall, mDataType="rna")
 #' 
 #' @param object The \code{CoreSet} to retrieve molecular experiment annotations from
 #' @param mDataType the type of molecular data 
@@ -274,6 +275,8 @@ setMethod(phenoInfo, "CoreSet", function(object, mDataType){
 #' 
 setGeneric("phenoInfo<-", function(object, mDataType, value) standardGeneric("phenoInfo<-"))
 #' @describeIn CoreSet Update the given type of molecular data experiment info in the CoreSet 
+#' @importFrom SummarizedExperiment colData colData<-
+#' @importFrom S4Vectors DataFrame
 #' @export
 setReplaceMethod("phenoInfo", signature = signature(object="CoreSet", mDataType ="character", value="data.frame"), function(object, mDataType, value){
   if(mDataType %in% names(object@molecularProfiles)){
@@ -303,14 +306,16 @@ setReplaceMethod("phenoInfo", signature = signature(object="CoreSet", mDataType 
 #' @param assay \code{character} Name of the desired assay; if excluded defaults to first assay
 #'   in the SummarizedExperiment for the given mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
 #'   to check which assays are available for a given molecular datatype.
+#' @param ... Fallthrough arguements for defining new methods
 #' 
 #' @return a \code{matrix} of data for the given mDataType and assay
 #' 
 #' @importClassesFrom S4Vectors DataFrame SimpleList
 #' @importFrom S4Vectors DataFrame
-#' @importFrom SummarizedExperiment colData
+#' @importFrom SummarizedExperiment colData assay assayNames
 setGeneric("molecularProfiles", function(object, mDataType, assay, ...) standardGeneric("molecularProfiles"))
 #' @describeIn CoreSet Return the given type of molecular data from the CoreSet 
+#' @inheritParams molecularProfiles
 #' @export
 setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
   ## TODO:: Add an all option that returns a list?
@@ -344,8 +349,10 @@ setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
 #' 
 #' @return Updated \code{CoreSet}
 #' 
-setGeneric("molecularProfiles<-", function(object, mDataType, assay, value, ...) standardGeneric("molecularProfiles<-"))
+setGeneric("molecularProfiles<-", function(object, mDataType, assay, value) standardGeneric("molecularProfiles<-"))
 #' @describeIn CoreSet Update the given type of molecular data from the CoreSet 
+#' @importFrom SummarizedExperiment assay
+#' @inheritParams molecularProfiles<-
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mDataType ="character", assay="character", value="matrix"), function(object, mDataType, assay, value){
   if (mDataType %in% names(object@molecularProfiles)) {
@@ -353,7 +360,8 @@ setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mD
   }
   object
 })
-#'@describeIn CoreSet Update the given type of molecular data from the CoreSet 
+#' @describeIn CoreSet Update the given type of molecular data from the CoreSet 
+#' @inheritParams molecularProfiles<-
 #' @export
 setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mDataType ="character", assay="missing", value="matrix"), function(object, mDataType, assay, value){
   if (mDataType %in% names(object@molecularProfiles)) {
@@ -370,12 +378,15 @@ setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mD
 #' featureInfo(clevelandSmall, "rna")
 #' 
 #' @param object The \code{CoreSet} to retrieve feature annotations from
-#' @param mDataType the type of molecular data 
+#' @param mDataType the type of molecular data
+#' @param ... Fallthrough arguements for defining new methods
 #' 
 #' @return a \code{data.frame} with the feature annotations
 #' 
-setGeneric("featureInfo", function(object, mDataType) standardGeneric("featureInfo"))
+setGeneric("featureInfo", function(object, mDataType, ...) standardGeneric("featureInfo"))
+#' 
 #' @describeIn CoreSet Return the feature info for the given molecular data 
+#' @importFrom SummarizedExperiment rowData rowData<-
 #' @export
 setMethod(featureInfo, "CoreSet", function(object, mDataType){
   
@@ -391,15 +402,20 @@ setMethod(featureInfo, "CoreSet", function(object, mDataType){
 #' Generic for featureInfo replace method
 #' 
 #' @examples
-
 #' featureInfo(clevelandSmall, "rna") <- featureInfo(clevelandSmall, "rna")
 #' 
 #' @param object The \code{CoreSet} to replace gene annotations in
 #' @param mDataType The type of molecular data to be updated
 #' @param value A \code{data.frame} with the new feature annotations
+#' 
 #' @return Updated \code{CoreSet}
+#' 
+#' @export
 setGeneric("featureInfo<-", function(object, mDataType, value) standardGeneric("featureInfo<-"))
 #' @describeIn CoreSet Replace the gene info for the molecular data
+#' @importFrom SummarizedExperiment rowData rowData<-
+#' @importFrom S4Vectors DataFrame
+#' 
 #' @export
 setReplaceMethod("featureInfo", signature = signature(object="CoreSet", mDataType ="character",value="data.frame"), function(object, mDataType, value){
   
@@ -409,6 +425,8 @@ setReplaceMethod("featureInfo", signature = signature(object="CoreSet", mDataTyp
   }
   object
 })
+#' @describeIn CoreSet Replace the gene info for the molecular data
+#'@export
 setReplaceMethod("featureInfo", signature = signature(object="CoreSet", mDataType ="character",value="DataFrame"), function(object, mDataType, value){
   
   if(mDataType %in% names(object@molecularProfiles)){
@@ -428,12 +446,13 @@ setReplaceMethod("featureInfo", signature = signature(object="CoreSet", mDataTyp
 #' Generic for sensitivityInfo method 
 #' 
 #' @examples
-
 #' sensitivityInfo(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to retrieve sensitivity experiment annotations from
+#' @param ... Fallthrough arguments for defining new methods
+#' 
 #' @return a \code{data.frame} with the experiment info
-setGeneric("sensitivityInfo", function(object) standardGeneric("sensitivityInfo"))
+setGeneric("sensitivityInfo", function(object, ...) standardGeneric("sensitivityInfo"))
 #' @describeIn CoreSet Return the drug dose sensitivity experiment info
 #' @export
 setMethod(sensitivityInfo, "CoreSet", function(object){
@@ -450,12 +469,14 @@ setMethod(sensitivityInfo, "CoreSet", function(object){
 #' sensitivityInfo(clevelandSmall) <- sensitivityInfo(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to update
+#' @param ... Fallthrough arguements for defining new methods
 #' @param value A \code{data.frame} with the new sensitivity annotations
 #' @return Updated \code{CoreSet} 
-setGeneric("sensitivityInfo<-", function(object, value) standardGeneric("sensitivityInfo<-"))
+#' 
+setGeneric("sensitivityInfo<-", function(object, ..., value) standardGeneric("sensitivityInfo<-"))
 #' @describeIn CoreSet Update the sensitivity experiment info
 #' @export
-setReplaceMethod("sensitivityInfo", signature = signature(object="CoreSet",value="data.frame"), function(object, value){
+setReplaceMethod("sensitivityInfo", signature = signature(object="CoreSet", value="data.frame"), function(object, value){
     object@sensitivity$info <- value
     object
 })
@@ -469,10 +490,11 @@ setReplaceMethod("sensitivityInfo", signature = signature(object="CoreSet",value
 #' sensitivityProfiles(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to retrieve sensitivity experiment data from
+#' @param ... Fallthrough arguements for defining new methods
 #' 
 #' @return a \code{data.frame} with the experiment info
 #' @export
-setGeneric("sensitivityProfiles", function(object) standardGeneric("sensitivityProfiles"))
+setGeneric("sensitivityProfiles", function(object, ...) standardGeneric("sensitivityProfiles"))
 #' @describeIn CoreSet Return the phenotypic data for the drug dose sensitivity
 #' @export
 setMethod(sensitivityProfiles, "CoreSet", function(object){
@@ -487,12 +509,13 @@ setMethod(sensitivityProfiles, "CoreSet", function(object){
 #' sensitivityProfiles(clevelandSmall) <- sensitivityProfiles(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to update
+#' @param ... Fallthrough arguements for defining new methods
 #' @param value A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment
 #' 
 #' @return Updated \code{CoreSet} 
 #' 
 #' @export
-setGeneric("sensitivityProfiles<-", function(object, value) standardGeneric("sensitivityProfiles<-"))
+setGeneric("sensitivityProfiles<-", function(object, ..., value) standardGeneric("sensitivityProfiles<-"))
 #' @describeIn CoreSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
@@ -518,9 +541,11 @@ setReplaceMethod("sensitivityProfiles", signature = signature(object="CoreSet",v
 #' @examples
 #' sensitivityMeasures(clevelandSmall)
 #' 
-#' @param object The \code{CoreSet} 
+#' @param object The \code{CoreSet}
+#' @param ... Fallthrough arguements for defining new methods
+#'  
 #' @return A \code{character} vector of all the available sensitivity measures
-setGeneric("sensitivityMeasures", function(object) standardGeneric("sensitivityMeasures"))
+setGeneric("sensitivityMeasures", function(object, ...) standardGeneric("sensitivityMeasures"))
 #' @describeIn CoreSet Returns the available sensitivity profile
 #'   summaries, for example, whether there are IC50 values available
 #' @export
@@ -537,8 +562,10 @@ setMethod(sensitivityMeasures, "CoreSet", function(object){
 #' cellNames(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to return cell names from
+#' @param ... Fallthrough arguements for defining new methods
+#'  
 #' @return A vector of the cell names used in the CoreSet
-setGeneric("cellNames", function(object) standardGeneric("cellNames"))
+setGeneric("cellNames", function(object, ...) standardGeneric("cellNames"))
 #' @describeIn CoreSet Return the cell names used in the dataset
 #' @export
 setMethod(cellNames, "CoreSet", function(object){
@@ -553,9 +580,12 @@ setMethod(cellNames, "CoreSet", function(object){
 #' cellNames(clevelandSmall) <- cellNames(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to update
+#' @param ... Fallthrough arguements for defining new methods
 #' @param value A \code{character} vector of the new cell names
+#' 
 #' @return Updated \code{CoreSet} 
-setGeneric("cellNames<-", function(object, value) standardGeneric("cellNames<-"))
+#' @export
+setGeneric("cellNames<-", function(object, ..., value) standardGeneric("cellNames<-"))
 #' @describeIn CoreSet Update the cell names used in the dataset
 #' @export
 setReplaceMethod("cellNames", signature = signature(object="CoreSet",value="character"), function(object, value){
@@ -574,6 +604,7 @@ setReplaceMethod("cellNames", signature = signature(object="CoreSet",value="char
 #' 
 #' @param object The \code{CoreSet} 
 #' @param mDataType The molecular data type to return feature names for
+#' @param ... Fallthrough arguements for defining new methods
 #' 
 #' @return A \code{character} vector of the feature names
 setGeneric("fNames", function(object, mDataType, ...) standardGeneric("fNames"))
@@ -592,18 +623,19 @@ setMethod(fNames, "CoreSet", function(object, mDataType){
 #' A generic for the cellNames replacement method
 #' 
 #' @examples
-#' data(CCLEsmall)
-#' fNames(CCLEsmall) <- fNames(CCLEsmall)
+#' data(clevelandSmall)
+#' fNames(clevelandSmall, 'rna') <- fNames(clevelandSmall, 'rna')
 #' 
 #' @param object The \code{CoreSet} to update
+#' @param mDataType The molecular data type to update
 #' @param value A \code{character} vector of the new cell names
 #' 
 #' @return Updated \code{CoreSet}
 #' @export
-setGeneric("fNames<-", function(object, value, ...) standardGeneric("fNames<-"))
+setGeneric("fNames<-", function(object, mDataType, value) standardGeneric("fNames<-"))
 #' @describeIn CoreSet Update the cell names used in the dataset
 #' @export
-setReplaceMethod("fNames", signature = signature(object="CoreSet",value="character"), function(object, value){
+setReplaceMethod("fNames", signature = signature(object="CoreSet", value="character"), function(object, mDataType, value){
   if (mDataType %in% names(object@molecularProfiles)) {
     rownames(featureInfo(object, mDataType)) <- as.character(value)
     object
@@ -617,12 +649,13 @@ setReplaceMethod("fNames", signature = signature(object="CoreSet",value="charact
 #' A generic for the dateCreated method
 #' 
 #' @examples
-
 #' dateCreated(clevelandSmall)
 #' 
 #' @param object A \code{CoreSet} 
+#' @param ... Fallthrough arguements for defining new methods
+#'  
 #' @return The date the CoreSet was created
-setGeneric("dateCreated", function(object) standardGeneric("dateCreated"))
+setGeneric("dateCreated", function(object, ...) standardGeneric("dateCreated"))
 #' @describeIn CoreSet Return the date the CoreSet was created
 #' @export
 setMethod(dateCreated, "CoreSet", function(object) {
@@ -637,9 +670,11 @@ setMethod(dateCreated, "CoreSet", function(object) {
 #' name(clevelandSmall)
 #' 
 #' @param object A \code{CoreSet} 
+#' @param ... Fallthrough arguements for defining new methods
+#' 
 #' @return The name of the CoreSet
 #' 
-setGeneric("name", function(object) standardGeneric("name"))
+setGeneric("name", function(object, ...) standardGeneric("name"))
 #' @describeIn CoreSet Return the name of the CoreSet 
 #' @export
 setMethod(name, "CoreSet", function(object){
@@ -653,12 +688,17 @@ setMethod(name, "CoreSet", function(object){
 #' @examples
 #' pertNumber(clevelandSmall)
 #' 
-#' @param object A \code{CoreSet} 
+#' @param object A \code{CoreSet}
+#' @param ... Fallthrough arguements for defining new methods
+#'
 #' @return A 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
-setGeneric("pertNumber", function(object) standardGeneric("pertNumber"))
+#' @export
+setGeneric("pertNumber", function(object, ...) standardGeneric("pertNumber"))
+#' 
 #' @describeIn CoreSet Return the summary of available perturbation
 #'   experiments
 #' @export
+#' 
 setMethod(pertNumber, "CoreSet", function(object){
     return(object@perturbation$n)
 })
@@ -671,9 +711,11 @@ setMethod(pertNumber, "CoreSet", function(object){
 #' sensNumber(clevelandSmall)
 #' 
 #' @param object A \code{CoreSet}
+#' @param ... Fallthrough arguements for defining new methods
 #' 
 #' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
-setGeneric("sensNumber", function(object) standardGeneric("sensNumber"))
+#' @export
+setGeneric("sensNumber", function(object, ...) standardGeneric("sensNumber"))
 #' @describeIn CoreSet Return the summary of available sensitivity
 #'   experiments
 #' @export
@@ -691,12 +733,14 @@ setMethod(sensNumber, "CoreSet", function(object){
 #' @param object A \code{CoreSet} 
 #' @param value A new 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
 #' 
-#' @return The updated \code{CoreSet} 
+#' @return The updated \code{CoreSet}
+#' 
+#' @export
 setGeneric("pertNumber<-", function(object, value) standardGeneric("pertNumber<-"))
 #' @describeIn CoreSet Update the summary of available perturbation
 #'   experiments
 #' @export
-setReplaceMethod('pertNumber', signature = signature(object="CoreSet",value="array"), function(object, value){
+setReplaceMethod('pertNumber', signature = signature(object="CoreSet", value="array"), function(object, value){
   object@perturbation$n <- value
   object
 })
@@ -705,13 +749,15 @@ setReplaceMethod('pertNumber', signature = signature(object="CoreSet",value="arr
 #' 
 #' A generic for the sensNumber method
 #' 
-#' 
 #' @examples
 #' sensNumber(clevelandSmall) <- sensNumber(clevelandSmall)
 #' 
 #' @param object A \code{CoreSet} 
 #' @param value A new \code{data.frame} with the number of sensitivity experiments per drug and cell line
+#' 
 #' @return The updated \code{CoreSet} 
+#' 
+#' @export
 setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-"))
 #' @describeIn CoreSet Update the summary of available sensitivity
 #'   experiments
@@ -756,9 +802,12 @@ setMethod("show", signature=signature(object="CoreSet"),
 #' mDataNames(clevelandSmall)
 #' 
 #' @param object CoreSet object
+#' @param ... Fallthrough arguements for defining new methods
+#'  
 #' @return Vector of names of the molecular data types
+#' 
 #' @export
-setGeneric("mDataNames", function(object) standardGeneric("mDataNames"))
+setGeneric("mDataNames", function(object, ...) standardGeneric("mDataNames"))
 
 
 #' mDataNames
@@ -770,7 +819,9 @@ setGeneric("mDataNames", function(object) standardGeneric("mDataNames"))
 #' mDataNames(clevelandSmall)
 #' 
 #' @param object CoreSet object
+#' 
 #' @return Vector of names of the molecular data types
+#' 
 #' @export
 setMethod("mDataNames", "CoreSet", function(object){
   return(names(object@molecularProfiles))
@@ -798,17 +849,13 @@ updateCellId <- function(object, new.ids = vector("character")){
     return(SE)
   })
 
-
-
-
-
   if(any(duplicated(new.ids))){
     warning("Duplicated ids passed to updateCellId. Merging old ids into the same identifier")
     
-    if(ncol(sensNumber(object))>0){
+    if(ncol(sensNumber(object))>0) {
       sensMatch <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
     }
-    if(dim(pertNumber(object))[[2]]>0){
+    if(dim(pertNumber(object))[[2]]>0) {
       pertMatch <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
     }
     curMatch <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
@@ -1023,20 +1070,20 @@ updateCellId <- function(object, new.ids = vector("character")){
 #' of data and with other studies.
 #' 
 #' @examples
-#' checkobjectStructure(clevelandSmall)
+#' checkCsetStructure(clevelandSmall)
 #' 
-#' @param object A \code{CoreSet} to be verified
+#' @param cSet A \code{CoreSet} to be verified
 #' @param plotDist Should the function also plot the distribution of molecular data?
 #' @param result.dir The path to the directory for saving the plots as a string
 #' 
-#' @return Prints out messages whenever describing the errors found in the structure of the object object passed in.
+#' @return Prints out messages whenever describing the errors found in the structure of the cSet object passed in.
 #' 
 #' @export
 #' 
 #' @importFrom graphics hist
 #' @importFrom grDevices dev.off pdf
-checkobjectStructure <-
-  function(object, plotDist=FALSE, result.dir=".") {
+checkCsetStructure <-
+  function(cSet, plotDist=FALSE, result.dir=".") {
     
     # Make directory to store results if it doesn't exist
     if(!file.exists(result.dir) & plotDist) { dir.create(result.dir, showWarnings=FALSE, recursive=TRUE) }
@@ -1044,9 +1091,9 @@ checkobjectStructure <-
     ####
     ## Checking molecularProfiles
     ####
-    for( i in seq_along(object@molecularProfiles)) {
-      profile <- object@molecularProfiles[[i]]
-      nn <- names(object@molecularProfiles)[i]
+    for( i in seq_along(cSet@molecularProfiles)) {
+      profile <- cSet@molecularProfiles[[i]]
+      nn <- names(cSet@molecularProfiles)[i]
       
       # Testing plot rendering for rna and rnaseq
       if( (S4Vectors::metadata(profile)$annotation == "rna" | S4Vectors::metadata(profile)$annotation == "rnaseq") & plotDist)
@@ -1079,9 +1126,9 @@ checkobjectStructure <-
         warning(ifelse("Symbol" %in% colnames(rowData(profile)), "Symbol is OK", sprintf("%s: Symbol does not exist in rowData (features) columns", nn)))
       }
 
-      # Check that all cellids from the object are included in molecularProfiles
+      # Check that all cellids from the cSet are included in molecularProfiles
       if("cellid" %in% colnames(rowData(profile))) {
-        if(!all(colData(profile)[,"cellid"] %in% rownames(object@cell))) {
+        if(!all(colData(profile)[,"cellid"] %in% rownames(cSet@cell))) {
           warning(sprintf("%s: not all the cell lines in this profile are in cell lines slot", nn))
         }
       }else {
@@ -1092,60 +1139,60 @@ checkobjectStructure <-
     #####
     # Checking cell
     #####
-    if("tissueid" %in% colnames(object@cell)) {
-      if("unique.tissueid" %in% colnames(object@curation$tissue))
+    if("tissueid" %in% colnames(cSet@cell)) {
+      if("unique.tissueid" %in% colnames(cSet@curation$tissue))
       {
-        if(length(intersect(rownames(object@curation$tissue), rownames(object@cell))) != nrow(object@cell)) {
+        if(length(intersect(rownames(cSet@curation$tissue), rownames(cSet@cell))) != nrow(cSet@cell)) {
           message("rownames of curation tissue slot should be the same as cell slot (curated cell ids)")
         } else{
-          if(length(intersect(object@cell$tissueid, object@curation$tissue$unique.tissueid)) != length(table(object@cell$tissueid))){
+          if(length(intersect(cSet@cell$tissueid, cSet@curation$tissue$unique.tissueid)) != length(table(cSet@cell$tissueid))){
             message("tissueid should be the same as unique tissue id from tissue curation slot")
           }
         }
       } else {
         message("unique.tissueid which is curated tissue id across data set should be a column of tissue curation slot")
       }
-      if(any(is.na(object@cell[,"tissueid"]) | object@cell[,"tissueid"]=="", na.rm=TRUE)){
-        message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(object@cell)[which(is.na(object@cell[,"tissueid"]) | object@cell[,"tissueid"]=="")], collapse=" ")))
+      if(any(is.na(cSet@cell[,"tissueid"]) | cSet@cell[,"tissueid"]=="", na.rm=TRUE)){
+        message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(cSet@cell)[which(is.na(cSet@cell[,"tissueid"]) | cSet@cell[,"tissueid"]=="")], collapse=" ")))
       }
     } else {
       warning("tissueid does not exist in cell slot")
     }
     
-    if("unique.cellid" %in% colnames(object@curation$cell)) {
-      if(length(intersect(object@curation$cell$unique.cellid, rownames(object@cell))) != nrow(object@cell)) {
+    if("unique.cellid" %in% colnames(cSet@curation$cell)) {
+      if(length(intersect(cSet@curation$cell$unique.cellid, rownames(cSet@cell))) != nrow(cSet@cell)) {
         print("rownames of cell slot should be curated cell ids")
       }
     } else {
       print("unique.cellid which is curated cell id across data set should be a column of cell curation slot")
     }
     
-    if(length(intersect(rownames(object@curation$cell), rownames(object@cell))) != nrow(object@cell)) {
+    if(length(intersect(rownames(cSet@curation$cell), rownames(cSet@cell))) != nrow(cSet@cell)) {
       print("rownames of curation cell slot should be the same as cell slot (curated cell ids)")
     }
     
-    if(!is(object@cell, "data.frame")) {
+    if(!is(cSet@cell, "data.frame")) {
       warning("cell slot class type should be dataframe")
     }
-    if(object@datasetType %in% c("sensitivity", "both"))
+    if(cSet@datasetType %in% c("sensitivity", "both"))
     {
-      if(!is(object@sensitivity$info, "data.frame")) {
+      if(!is(cSet@sensitivity$info, "data.frame")) {
         warning("sensitivity info slot class type should be dataframe")
       }
-      if("cellid" %in% colnames(object@sensitivity$info)) {
-        if(!all(object@sensitivity$info[,"cellid"] %in% rownames(object@cell))) {
+      if("cellid" %in% colnames(cSet@sensitivity$info)) {
+        if(!all(cSet@sensitivity$info[,"cellid"] %in% rownames(cSet@cell))) {
           warning("not all the cell lines in sensitivity data are in cell slot")
         }
       }else {
         warning("cellid does not exist in sensitivity info")
       }
     
-      if(any(!is.na(object@sensitivity$raw))) {
-        if(!all(dimnames(object@sensitivity$raw)[[1]] %in% rownames(object@sensitivity$info))) {
+      if(any(!is.na(cSet@sensitivity$raw))) {
+        if(!all(dimnames(cSet@sensitivity$raw)[[1]] %in% rownames(cSet@sensitivity$info))) {
           warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
         }
       }
-      if(!all(rownames(object@sensitivity$profiles) %in% rownames(object@sensitivity$info))) {
+      if(!all(rownames(cSet@sensitivity$profiles) %in% rownames(cSet@sensitivity$info))) {
         warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
       }
     }

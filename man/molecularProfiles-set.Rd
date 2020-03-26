@@ -4,7 +4,7 @@
 \alias{molecularProfiles<-}
 \title{molecularProfiles<- Generic}
 \usage{
-molecularProfiles(object, mDataType, assay, ...) <- value
+molecularProfiles(object, mDataType, assay) <- value
 }
 \arguments{
 \item{object}{The \code{CoreSet} to replace molecular profiles in}

@@ -29,7 +29,7 @@ function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), co
   
   type <- match.arg(type)
   if (any(!is.na(intermediate.fold) & intermediate.fold < 0)) { intermediate.fold <- intermediate.fold[!is.na(intermediate.fold) & intermediate.fold < 0] <- 0 }
-  if (is.null(names(x))) { names(x) <- paste("X", 1:length(x), sep=".") }
+  if (is.null(names(x))) { names(x) <- paste("X", seq_along(x), sep=".") }
   
   xx <- x[complete.cases(x)]
   switch (type,
@@ -70,12 +70,12 @@ function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), co
   
   oo <- order(xx, decreasing=TRUE)
   ## test linearity with Pearson correlation
-  cc <- stats::cor.test(-xx[oo], 1:length(oo), method="pearson")
+  cc <- stats::cor.test(-xx[oo], seq_along(oo), method="pearson")
   ## line between the two extreme sensitivity values
   dd <- cbind("y"=xx[oo][c(1, length(oo))], "x"=c(1, length(oo)))
   rr <- lm(y ~ x, data=data.frame(dd))
   ## compute distance from sensitivity values and the line between the two extreme sensitivity values
-  ddi <- apply(cbind(1:length(oo), xx[oo]), 1, function(x, slope, intercept) {
+  ddi <- apply(cbind(seq_along(oo), xx[oo]), 1, function(x, slope, intercept) {
     return(distancePointLine(x=x[1], y=x[2], a=slope, b=intercept))
   }, slope=rr$coefficients[2], intercept=rr$coefficients[1])
   if(cc$estimate > cor.min.linear){

@@ -4,10 +4,12 @@
 \alias{sensitivityMeasures}
 \title{sensitivityMeasures Generi}
 \usage{
-sensitivityMeasures(object)
+sensitivityMeasures(object, ...)
 }
 \arguments{
 \item{object}{The \code{CoreSet}}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 A \code{character} vector of all the available sensitivity measures

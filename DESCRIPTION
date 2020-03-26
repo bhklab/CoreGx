@@ -25,6 +25,7 @@ Description: A collection of functions and classes which serve as the foundation
       Lupien, M., Goldenberg, A. (2015) <doi:10.1093/bioinformatics/btv723>.
     Manem, V., Labie, M., Smirnov, P., Kofia, V., Freeman, M., Koritzinksy, M.,
       Abazeed, M., Haibe-Kains, B., Bratman, S. (2018) <doi:10.1101/449793>.
+VignetteBuilder: knitr
 biocViews: Software, Pharmacogenomics
 Encoding: UTF-8
 LazyData: true
@@ -34,18 +35,13 @@ Imports:
     S4Vectors,
     SummarizedExperiment,
     piano, 
-    magicaxis, 
-    RColorBrewer, 
     parallel, 
-    caTools, 
     methods, 
-    downloader, 
     stats, 
     utils, 
     graphics, 
     grDevices, 
     lsa, 
-    reshape2,
     testthat
 Suggests: pander, 
   rmarkdown,

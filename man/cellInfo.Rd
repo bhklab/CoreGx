@@ -2,7 +2,7 @@
 % Please edit documentation in R/CoreSetClass.R
 \name{cellInfo}
 \alias{cellInfo}
-\title{cellInfo Generic}
+\title{cellInfo Getter}
 \usage{
 cellInfo(object, ...)
 }
@@ -16,10 +16,10 @@ to be defined with different parameters}
 a \code{data.frame} with the cell annotations
 }
 \description{
-Generic for cellInfo method
+Get cell line information from a PharmacoSet object
 }
 \examples{
 data(clevelandSmall)
-cellInfo(clevelandSmall)
+cellInf <- cellInfo(clevelandSmall)
 
 }

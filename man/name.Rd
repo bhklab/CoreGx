@@ -4,10 +4,12 @@
 \alias{name}
 \title{name Generic}
 \usage{
-name(object)
+name(object, ...)
 }
 \arguments{
 \item{object}{A \code{CoreSet}}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 The name of the CoreSet

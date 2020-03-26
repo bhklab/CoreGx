@@ -4,7 +4,7 @@
   neighbour_residuals <- matrix(NA, nrow = 1, ncol = nrow(neighbours))
   
   while (span > precision) {
-    for (neighbour in 1:nrow(neighbours)) {
+    for (neighbour in seq_len(nrow(neighbours))) {
       neighbours[neighbour, ] <- guess
       dimension <- ceiling(neighbour / 2)
       if (neighbour %% 2 == 1) {

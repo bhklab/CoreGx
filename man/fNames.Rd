@@ -10,6 +10,8 @@ fNames(object, mDataType, ...)
 \item{object}{The \code{CoreSet}}
 
 \item{mDataType}{The molecular data type to return feature names for}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 A \code{character} vector of the feature names

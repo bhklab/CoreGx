@@ -4,10 +4,12 @@
 \alias{sensitivityInfo}
 \title{sensitivityInfo Generic}
 \usage{
-sensitivityInfo(object)
+sensitivityInfo(object, ...)
 }
 \arguments{
 \item{object}{The \code{CoreSet} to retrieve sensitivity experiment annotations from}
+
+\item{...}{Fallthrough arguments for defining new methods}
 }
 \value{
 a \code{data.frame} with the experiment info

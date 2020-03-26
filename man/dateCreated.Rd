@@ -4,10 +4,12 @@
 \alias{dateCreated}
 \title{dateCreated Generic}
 \usage{
-dateCreated(object)
+dateCreated(object, ...)
 }
 \arguments{
 \item{object}{A \code{CoreSet}}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 The date the CoreSet was created

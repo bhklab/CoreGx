@@ -4,10 +4,12 @@
 \alias{cellNames}
 \title{cellNames Generic}
 \usage{
-cellNames(object)
+cellNames(object, ...)
 }
 \arguments{
 \item{object}{The \code{CoreSet} to return cell names from}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 A vector of the cell names used in the CoreSet

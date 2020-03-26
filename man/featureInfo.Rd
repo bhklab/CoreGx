@@ -4,12 +4,14 @@
 \alias{featureInfo}
 \title{featureInfo Generic}
 \usage{
-featureInfo(object, mDataType)
+featureInfo(object, mDataType, ...)
 }
 \arguments{
 \item{object}{The \code{CoreSet} to retrieve feature annotations from}
 
 \item{mDataType}{the type of molecular data}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 a \code{data.frame} with the feature annotations
