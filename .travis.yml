@@ -36,7 +36,7 @@ matrix:
   ## OSX SETTINGS
   - r: bioc-release
     os: osx
-    osx_image: xcode11s
+    osx_image: xcode11
     ## OSX HOMEBREW PACKAGES
     # - Dependencies for virtual GUI
     before_install:
