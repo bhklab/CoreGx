@@ -40,7 +40,10 @@
 #' @slot datasetType A \code{character} string of 'sensitivity', 
 #'   'perturbation', or both detailing what type of data can be found in the 
 #'   CoreSet, for proper processing of the data
+#' 
 #' @return An object of the CoreSet class
+#' 
+#' @exportClass CoreSet
 #' @export
 .CoreSet <- setClass("CoreSet", slots = list(
                                             annotation = "list",
@@ -620,7 +623,7 @@ setMethod(fNames, "CoreSet", function(object, mDataType){
 
 #' fNames<- Generic
 #' 
-#' A generic for the cellNames replacement method
+#' A generic for the fNames replacement method
 #' 
 #' @examples
 #' data(clevelandSmall)
@@ -632,10 +635,15 @@ setMethod(fNames, "CoreSet", function(object, mDataType){
 #' 
 #' @return Updated \code{CoreSet}
 #' @export
-setGeneric("fNames<-", function(object, mDataType, value) standardGeneric("fNames<-"))
-#' @describeIn CoreSet Update the cell names used in the dataset
+setGeneric("fNames<-", function(object, mDataType, value)
+  standardGeneric("fNames<-"))
+#' @describeIn CoreSet Update the feature names used in a molecular profile
 #' @export
-setReplaceMethod("fNames", signature = signature(object="CoreSet", value="character"), function(object, mDataType, value){
+setReplaceMethod("fNames", 
+                 signature = signature(object="CoreSet", mDataType='character', 
+                                       value="character"), 
+                 function(object, mDataType, value)
+{
   if (mDataType %in% names(object@molecularProfiles)) {
     rownames(featureInfo(object, mDataType)) <- as.character(value)
     object

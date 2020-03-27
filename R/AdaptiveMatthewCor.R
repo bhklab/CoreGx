@@ -1,24 +1,37 @@
 ## adaptive Matthews correlation coefficient for binary classification
 #' Calculate an Adaptive Matthews Correlation Coefficient
 #' 
-#' This function calculates an Adaptive Matthews Correlation Coefficient (AMCC) for two vectors of values identical length. It assumes the entries in the two vectors are paired.
-#' The Adaptive Matthews Correlation Coefficient for two vectors of values is defined as the Maximum Matthews Coefficient over all possible 
-#' binary splits of the ranks of the two vectors. In this way, it calculates the best possible agreement of a binary 
-#' classifier on the two vectors of data. #If the AMCC is low, then it is impossible to find any binary classification of the two vectors with a high degree of concordance.   
+#' This function calculates an Adaptive Matthews Correlation Coefficient (AMCC) 
+#' for two vectors of values of the same length. It assumes the entries in the 
+#' two vectors are paired. The Adaptive Matthews Correlation Coefficient for two
+#' vectors of values is defined as the Maximum Matthews Coefficient over all 
+#' possible binary splits of the ranks of the two vectors. In this way, it 
+#' calculates the best possible agreement of a binary classifier on the two 
+#' vectors of data. If the AMCC is low, then it is impossible to find any binary 
+#' classification of the two vectors with a high degree of concordance.   
 #' 
 #' @examples 
 #' x <- c(1,2,3,4,5,6,7)
 #' y <- c(1,3,5,4,2,7,6)
 #' amcc(x,y, min.cat=2)
 #' 
-#' @param x,y Two paired vectors of values. Could be replicates of observations for the same experiments for example.  
-#' @param step.prct Instead of testing all possible splits of the data, it is possible to test steps of a percentage size of the total number of ranks in x/y. If this variable is 0, function defaults to testing all possible splits.
-#' @param min.cat The minimum number of members per category. Classifications with less members fitting into both categories will not be considered. 
-#' @param nperm The number of perumatation to use for estimating significance. If 0, then no p-value is calculated. 
-#' @param nthread Number of threads to parallize over. Both the AMCC calculation and the permutation testing is done in parallel. 
+#' @param x,y Two paired vectors of values. Could be replicates of observations 
+#'   for the same experiments for example.  
+#' @param step.prct Instead of testing all possible splits of the data, it is 
+#'   possible to test steps of a percentage size of the total number of ranks in 
+#'   x/y. If this variable is 0, function defaults to testing all possible 
+#'   splits.
+#' @param min.cat The minimum number of members per category. Classifications 
+#'   with less members fitting into both categories will not be considered. 
+#' @param nperm The number of perumatation to use for estimating significance. 
+#'   If 0, then no p-value is calculated. 
+#' @param nthread Number of threads to parallize over. Both the AMCC calculation 
+#'   and the permutation testing is done in parallel. 
 #' @param ... Additionaly arguments
 #' 
-#' @return Returns a list with two elements. $amcc contains the highest "mcc" value over all the splits, the p value, as well as the rank at which the split was done. 
+#' @return Returns a list with two elements. $amcc contains the highest "mcc" 
+#'   value over all the splits, the p value, as well as the rank at which the 
+#'   split was done. 
 #' @import parallel
 #' @importFrom stats quantile
 #' @export
@@ -28,11 +41,11 @@ amcc <-
     #PARAMETER CHANGE WARNING
     if (!missing(...)) {
       if ('setseed' %in% names(...)) {
-        warning('The setseed parmater has been removed in this release to conform
+        warning('The setseed parameter has been removed in this release to conform
               to Bioconductor coding standards. Please call set.seed in your
               script before running this function.')
       }
-    }  
+    }
 
     if(!min.cat>1){
 
@@ -58,7 +71,7 @@ amcc <-
           return (res)
         }, x2=x2, y2=y2, 
         ##TODO:: Why is return value a list of doubles when the class of res is 
-        # matrix in debug?
+        # matrix in debug ?
         FUN.VALUE=list(1.0, 1.0))) 
         return (res)
       }, iix=iix, x2=x2, y2=y2)

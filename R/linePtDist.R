@@ -25,7 +25,7 @@ distancePointLine <- function(x, y, a, b, c) {
 }
 
 .magnitude <- function(p1, p2) {
-  return (sqrt(sum((p2 - p1) ^ 2)))
+  return(sqrt(sum((p2 - p1) ^ 2)))
 }
 
 #' Calculate shortest distance between point and line segment

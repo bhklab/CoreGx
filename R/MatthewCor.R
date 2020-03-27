@@ -14,15 +14,26 @@
 #' y <- factor(c(2,1,1,1,2,2))
 #' mcc(x,y)
 #' 
-#' @param x,y factor of the same length with the same number of levels
-#' @param nperm number of permutations for significance estimation. If 0, 
-#'   no permutation testing is done
-#' @param nthread can parallelize permutation texting using parallel's mclapply
+#' @param x,y \code{factor} of the same length with the same number of levels
+#' @param nperm \code{numeric} number of permutations for significance 
+#' estimation. If 0, no permutation testing is done
+#' @param nthread \code{numeric} can parallelize permutation texting using 
+#'   parallel's mclapply
 #' @return A list with the MCC as the $estimate, and p value as $p.value
 #' @export
+#' 
 ##TODO:: Give this function a more descriptive name
 mcc <- 
   function(x, y, nperm=1000, nthread=1) {
+    #PARAMETER CHANGE WARNING
+    if (!missing(...)) {
+      if ('setseed' %in% names(...)) {
+        warning('The setseed parameter has been removed in this release to conform
+              to Bioconductor coding standards. Please call set.seed in your
+              script before running this function.')
+      }
+    }
+    
     if ((length(x) != length(y)) || (!is.factor(x) || length(levels(x)) < 2) || 
         (!is.factor(y) || length(levels(y)) < 2)) { 
       stop("x and y must be factors of the same length with at least two levels") }

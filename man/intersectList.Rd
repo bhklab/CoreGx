@@ -2,8 +2,7 @@
 % Please edit documentation in R/intersectList.R
 \name{intersectList}
 \alias{intersectList}
-\title{Utility to find the intersection between a list of more than two vectors or
-lists}
+\title{Intersect A List of More Than Two Vectors}
 \usage{
 intersectList(...)
 }
@@ -16,8 +15,9 @@ A vector like object of the same mode as the first argument,
   containing only the intersection common to all arguments to the function
 }
 \description{
-This function extends the native intersect function to work on two or more
-arguments.
+Utility to find the intersection between a list of more than two vectors or
+  lists This function extends the native intersect function to work on two 
+  or more arguments.
 }
 \examples{
 list1 <- list('a', 'b', 'c')

@@ -24,7 +24,7 @@
 \alias{cellNames,CoreSet-method}
 \alias{cellNames<-,CoreSet,character-method}
 \alias{fNames,CoreSet-method}
-\alias{fNames<-,CoreSet,ANY,character-method}
+\alias{fNames<-,CoreSet,character,character-method}
 \alias{dateCreated,CoreSet-method}
 \alias{name,CoreSet-method}
 \alias{pertNumber,CoreSet-method}
@@ -73,7 +73,7 @@
 
 \S4method{fNames}{CoreSet}(object, mDataType)
 
-\S4method{fNames}{CoreSet,ANY,character}(object, mDataType) <- value
+\S4method{fNames}{CoreSet,character,character}(object, mDataType) <- value
 
 \S4method{dateCreated}{CoreSet}(object)
 
@@ -159,7 +159,7 @@ summaries, for example, whether there are IC50 values available
 
 \item \code{fNames}: Return the feature names used in the dataset
 
-\item \code{fNames<-}: Update the cell names used in the dataset
+\item \code{fNames<-}: Update the feature names used in a molecular profile
 
 \item \code{dateCreated}: Return the date the CoreSet was created
 

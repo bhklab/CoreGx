@@ -1,31 +1,46 @@
-## Drug sensitivity calling using waterfall plots
-## Method:
-## 1. Sensitivity calls were made using one of IC50, ActArea or Amax
-## 2. Sort log IC50s (or ActArea or Amax) of the cell lines to generate a “waterfall distribution”
-## 3. Identify cutoff:
-##  3.1 If the waterfall distribution is non-linear (pearson cc to the linear fit <=0.95), estimate the major inflection point of the log IC50 curve as the point on the curve with the maximal distance to a line drawn between the start and end points of the distribution.
-##  3.2 If the waterfall distribution appears linear (pearson cc to the linear fit > 0.95), then use the median IC50 instead.
-## 4. Cell lines within a 4-fold IC50 (or within a 1.2-fold ActArea or 20% Amax difference) difference centered around this inflection point are classified as being “intermediate”,  cell lines with lower IC50s (or ActArea/Amax values) than this range are defined as sensitive, and those with IC50s (or ActArea/Amax) higher than this range are called “insensitive”.
-## 5. Require at least x sensitive and x insensitive cell lines after applying these criteria (x=5 in our case).
-
-## Input:
-##  ic50: IC50 values in micro molar (positive values)
-##  actarea: Activity Area, that is area under the drug activity curve (positive values)
-##  amax: Activity at max concentration (positive values)
-##  intermediate.fold: vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively
-#' @importFrom stats complete.cases
-#' @importFrom stats cor.test
-#' @importFrom stats lm
-#' @importFrom stats median
-#' @importFrom graphics par
-#' @importFrom grDevices rainbow
-#' @importFrom graphics points
-#' @importFrom graphics abline
-#' @importFrom graphics lines
-#' @importFrom graphics legend
+#' Drug sensitivity calling using waterfall plots
+#'
+#' 1. Sensitivity calls were made using one of IC50, ActArea or Amax
 #' 
+#' 2. Sort log IC50s (or ActArea or Amax) of the cell lines to generate a 
+#'   “waterfall distribution”
+#'   
+#' 3. Identify cutoff:
+#' 
+#'  3.1 If the waterfall distribution is non-linear (pearson cc to the linear 
+#'    fit <=0.95), estimate the major inflection point of the log IC50 curve as 
+#'    the point on the curve with the maximal distance to a line drawn between 
+#'    the start and end points of the distribution.
+#'    
+#'  3.2 If the waterfall distribution appears linear (pearson cc to the linear 
+#'    fit > 0.95), then use the median IC50 instead.
+#'    
+#' 4. Cell lines within a 4-fold IC50 (or within a 1.2-fold ActArea or 20% Amax 
+#'   difference) difference centered around this inflection point are classified 
+#'   as being “intermediate”,  cell lines with lower IC50s (or ActArea/Amax 
+#'   values) than this range are defined as sensitive, and those with IC50s (or 
+#'   ActArea/Amax) higher than this range are called “insensitive”.
+#'   
+#' 5. Require at least x sensitive and x insensitive cell lines after applying 
+#'   these criteria (x=5 in our case).
+#' 
+#' @param ic50: IC50 values in micro molar (positive values)
+#' @param actarea: Activity Area, that is area under the drug activity curve (positive values)
+#' @param amax: Activity at max concentration (positive values)
+#' @param intermediate.fold: vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively
+#' 
+#' @return \code{factor} Containing the status drug sensitivity status of each
+#'   cellline.
+#' 
+#' @importFrom stats complete.cases  cor.test lm median
+#' @importFrom graphics par points abline lines legend
+#' @importFrom grDevices rainbow
+#' 
+#' @export
 callingWaterfall <-
-function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), cor.min.linear=0.95, name="Drug", plot=FALSE) {
+  function(x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), 
+           cor.min.linear=0.95, name="Drug", plot=FALSE)
+{
   
   type <- match.arg(type)
   if (any(!is.na(intermediate.fold) & intermediate.fold < 0)) { intermediate.fold <- intermediate.fold[!is.na(intermediate.fold) & intermediate.fold < 0] <- 0 }

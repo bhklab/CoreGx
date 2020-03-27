@@ -1,7 +1,9 @@
 #### Copyright Benjamin Haibe Kains, adapted from the genefu package
-##TODO:: Add  function documentatio
-`rescale` <-
-function(x, na.rm=FALSE, q=0) {
+##TODO:: Add  function documentation
+#' @export
+#' @keywords internal
+.rescale <- function(x, na.rm=FALSE, q=0) 
+{
     if(q == 0) {
         ma <- max(x, na.rm=na.rm)
         mi <- min(x, na.rm=na.rm)

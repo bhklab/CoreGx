@@ -1,8 +1,10 @@
+##FIXME:: This should be implemented as an extension of the intersect generic
+##  provided in the BiocGenerics package!
+#' Intersect A List of More Than Two Vectors
+#'
 #' Utility to find the intersection between a list of more than two vectors or
-#' lists
-#' 
-#' This function extends the native intersect function to work on two or more
-#' arguments.
+#'   lists This function extends the native intersect function to work on two 
+#'   or more arguments.
 #' 
 #' @examples 
 #' list1 <- list('a', 'b', 'c')
@@ -13,11 +15,11 @@
 #' 
 #' @param ... A list of or any number of vector like objects of the same mode,
 #'   which could also be operated on by the native R set operations
+#'   
 #' @return A vector like object of the same mode as the first argument,
 #'   containing only the intersection common to all arguments to the function
+#'   
 #' @export
-
-
 intersectList <-
 function(...) {
    args <- list(...)
@@ -37,6 +39,4 @@ function(...) {
      return (intersect(args[[1]], intersectList(args[-1])))
    }
 }
-
-## End
 

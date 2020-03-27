@@ -17,7 +17,7 @@ fNames(object, mDataType) <- value
 Updated \code{CoreSet}
 }
 \description{
-A generic for the cellNames replacement method
+A generic for the fNames replacement method
 }
 \examples{
 data(clevelandSmall)
