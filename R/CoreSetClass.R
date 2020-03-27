@@ -587,7 +587,6 @@ setGeneric("cellNames<-", function(object, ..., value) standardGeneric("cellName
 #' @describeIn CoreSet Update the cell names used in the dataset
 #' @export
 setReplaceMethod("cellNames", signature = signature(object="CoreSet",value="character"), function(object, value){
-    
     object <- updateCellId(object, value)
     return(object)
     })
@@ -701,7 +700,6 @@ setGeneric("pertNumber", function(object, ...) standardGeneric("pertNumber"))
 #' @describeIn CoreSet Return the summary of available perturbation
 #'   experiments
 #' @export
-#' 
 setMethod(pertNumber, "CoreSet", function(object){
     return(object@perturbation$n)
 })
@@ -832,6 +830,15 @@ setMethod("mDataNames", "CoreSet", function(object){
 
 
 ### TODO:: Add updating of sensitivity Number tables
+##TODO:: Add documentation!
+
+#' Update the cell ids in a cSet object
+#'
+#' @param object The object for witch the cell ids will be updated
+#' @param new.ids The new ids to assign to the object
+#' 
+#' @export
+#' @keywords internal
 updateCellId <- function(object, new.ids = vector("character")){
   
   if (length(new.ids)!=nrow(cellInfo(object))){

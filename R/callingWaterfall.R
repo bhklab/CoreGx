@@ -24,10 +24,20 @@
 #' 5. Require at least x sensitive and x insensitive cell lines after applying 
 #'   these criteria (x=5 in our case).
 #' 
-#' @param ic50: IC50 values in micro molar (positive values)
-#' @param actarea: Activity Area, that is area under the drug activity curve (positive values)
-#' @param amax: Activity at max concentration (positive values)
+##FIXME:: Clarify the parameters of this function
+#' @param x What type of object does this take in?
+#' @param type  
+#'   ic50: IC50 values in micro molar (positive values)
+#' 
+#'   actarea: Activity Area, that is area under the drug activity curve (positive values)
+#'  
+#'   amax: Activity at max concentration (positive values)
+#'   
 #' @param intermediate.fold: vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively
+#' @param cor.min.linear \code{numeric} The minimum linear correlation to 
+#'   require?
+#' @param name \code{character} The name of the output to use in plot
+#' @param plot \code{boolean} Whether to plot the results
 #' 
 #' @return \code{factor} Containing the status drug sensitivity status of each
 #'   cellline.
@@ -37,6 +47,7 @@
 #' @importFrom grDevices rainbow
 #' 
 #' @export
+#' @keywords internal
 callingWaterfall <-
   function(x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), 
            cor.min.linear=0.95, name="Drug", plot=FALSE)
@@ -91,7 +102,7 @@ callingWaterfall <-
   rr <- lm(y ~ x, data=data.frame(dd))
   ## compute distance from sensitivity values and the line between the two extreme sensitivity values
   ddi <- apply(cbind(seq_along(oo), xx[oo]), 1, function(x, slope, intercept) {
-    return(distancePointLine(x=x[1], y=x[2], a=slope, b=intercept))
+    return(.distancePointLine(x=x[1], y=x[2], a=slope, b=intercept))
   }, slope=rr$coefficients[2], intercept=rr$coefficients[1])
   if(cc$estimate > cor.min.linear){
     ## approximately linear waterfall
@@ -185,4 +196,85 @@ callingWaterfall <-
   return(tt)  
 }
 
-## End
+
+# Helper Functions --------------------------------------------------------
+
+#' Calculate shortest distance between point and line
+#'
+#' @examples .distancePointLine(0, 0, 1, -1, 1)
+#'
+#' @description This function calculates the shortest distance between a point 
+#'   and a line in 2D space.
+#'
+#' @param x x-coordinate of point
+#' @param y y-coordinate of point
+#' @param a coefficient in line equation a * x + b * y + c = 0
+#' @param b coefficient in line equation a * x + b * y + c = 0
+#' @param c coefficient in line equation a * x + b * y + c = 0
+#' 
+#' @return \code{numeric} The shortest distance between a point and a line
+#' 
+#' @export
+#' @keywords internal
+.distancePointLine <- function(x, y, a, b, c) {
+  
+  if (!(all(is.finite(c(x, y, a, b, c))))) {
+    stop("All inputs to linePtDist must be real numbers.")
+  }
+  
+  return(abs(a * x + b * y + c) / sqrt(a ^ 2 + b ^ 2))
+}
+
+#' @export
+#' @keywords interal
+.magnitude <- function(p1, p2) {
+  return(sqrt(sum((p2 - p1) ^ 2)))
+}
+
+#' Calculate shortest distance between point and line segment
+#'
+#' @description This function calculates the shortest distance between a point 
+#'   and a line segment in 2D space.
+#' 
+#' @param x x-coordinate of point
+#' @param y y-coordinate of point
+#' @param x1 x-coordinate of one endpoint of the line segment
+#' @param y1 y-coordinate of line segment endpoint with x-coordinate x1
+#' @param x2 x-coordinate of other endpoint of line segment
+#' @param y2 y-coordinate of line segment endpoint with x-coordinate x2
+#' 
+#' @return \code{numeric} The shortest distance between a point and a line
+#'   segment
+#' 
+#' @examples .distancePointSegment(0, 0, -1, 1, 1, -1)
+#' 
+#' @export
+#' @keywords internal
+.distancePointSegment <- function(x, #x-coordinate of point
+                                 y, #y-coordinate of point
+                                 x1, #x-coordinate of one endpoint of line segment
+                                 y1, #y-coordinate of line segment endpoint with x-coordinate x1
+                                 x2, #x-coordinate of other endpoint of line segment,
+                                 y2) { #y-coordinate of line segment endpoint with x-coordinate x2
+  if (!(all(is.finite(c(x, y, x1, x2, y1, y2))))) {
+    stop("All inputs to linePtDist must be real numbers.")
+  }
+  
+  bestEndpointDistance <- min(c(.magnitude(c(x, y), c(x1, y1)),
+                                .magnitude(c(x, y), c(x2, y2))))
+  
+  if (.magnitude(c(x, y), c((x1 + x2) / 2, (y1 + y2) / 2)) < bestEndpointDistance) { # length to point has only one local minimum which is the global minimum; iff this condition is true then the shortest distance is to a point on the line segment
+    if (x1 == x2) { #vertical line segment
+      a <- 1
+      b <- 0
+      c <- -x1
+    } else {
+      a <- (y2 - y1) / (x2 - x1)
+      b <- -1
+      c <- y1 - a * x1
+    }
+    return(.distancePointLine(x, y, a, b, c))
+  } else {
+    return(bestEndpointDistance)
+  }
+}
