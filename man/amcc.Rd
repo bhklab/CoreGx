@@ -24,7 +24,7 @@ If 0, then no p-value is calculated.}
 \item{nthread}{Number of threads to parallize over. Both the AMCC calculation 
 and the permutation testing is done in parallel.}
 
-\item{...}{Additionaly arguments}
+\item{...}{Additional arguments}
 }
 \value{
 Returns a list with two elements. $amcc contains the highest "mcc" 

@@ -27,13 +27,15 @@
 #'   If 0, then no p-value is calculated. 
 #' @param nthread Number of threads to parallize over. Both the AMCC calculation 
 #'   and the permutation testing is done in parallel. 
-#' @param ... Additionaly arguments
+#' @param ... Additional arguments
 #' 
 #' @return Returns a list with two elements. $amcc contains the highest "mcc" 
 #'   value over all the splits, the p value, as well as the rank at which the 
-#'   split was done. 
+#'   split was done.
+#'
 #' @import parallel
 #' @importFrom stats quantile
+#' s
 #' @export
 ##FIXME:: We need a more descriptive name for this function
 amcc <-

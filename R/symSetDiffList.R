@@ -13,8 +13,10 @@
 #' 
 #' @param ... A list of or any number of vector like objects of the same mode,
 #'   which could also be operated on by the native R set operations
+#'
 #' @return A vector like object of the same mode as the first argument,
 #'   containing only the symmetric set difference
+#'
 #' @export
 symSetDiffList <- function(...){
     return(setdiff(unionList(...), intersectList(...)))

@@ -58,12 +58,5 @@ An object of class CoreSet
 A constructor that simplifies the process of creating CoreSets, as well 
 as creates empty objects for data not provided to the constructor. Only
 objects returned by this constructor are expected to work with the CoreSet
-methods. For a much more detailed instruction on creating CoreSets, please
-see the "CreatingCoreSet" vignette.
-}
-\examples{
- 
-## For help creating a CoreSet object, please see the following vignette:
-browseVignettes("PharmacoGx")
-
+methods.
 }
