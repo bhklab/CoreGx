@@ -4,7 +4,7 @@
 \alias{mcc}
 \title{Compute a Mathews Correlation Coefficient}
 \usage{
-mcc(x, y, nperm = 1000, nthread = 1)
+mcc(x, y, nperm = 1000, nthread = 1, ...)
 }
 \arguments{
 \item{x, y}{\code{factor} of the same length with the same number of levels}
@@ -14,6 +14,8 @@ estimation. If 0, no permutation testing is done}
 
 \item{nthread}{\code{numeric} can parallelize permutation texting using 
 parallel's mclapply}
+
+\item{...}{\code{list} Additional arguments}
 }
 \value{
 A list with the MCC as the $estimate, and p value as $p.value

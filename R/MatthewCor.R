@@ -19,12 +19,14 @@
 #' estimation. If 0, no permutation testing is done
 #' @param nthread \code{numeric} can parallelize permutation texting using 
 #'   parallel's mclapply
+#' @param ... \code{list} Additional arguments
+#'   
 #' @return A list with the MCC as the $estimate, and p value as $p.value
 #' @export
 #' 
 ##TODO:: Give this function a more descriptive name
 mcc <- 
-  function(x, y, nperm=1000, nthread=1) {
+  function(x, y, nperm=1000, nthread=1, ...) {
     #PARAMETER CHANGE WARNING
     if (!missing(...)) {
       if ('setseed' %in% names(...)) {

@@ -35,7 +35,7 @@
 #'
 #' @import parallel
 #' @importFrom stats quantile
-#' s
+#'
 #' @export
 ##FIXME:: We need a more descriptive name for this function
 amcc <-

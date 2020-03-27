@@ -1,6 +1,5 @@
 ##TODO:: Add function documentation
-#' @importFrom stats optim
-#' @importFrom stats var
+#' @importFrom stats optim var
 #' @export
 .fitCurve <- function (x,
                        y,
