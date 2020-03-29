@@ -22,14 +22,14 @@ callingWaterfall(
  
   amax: Activity at max concentration (positive values)}
 
+\item{intermediate.fold}{vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively}
+
 \item{cor.min.linear}{\code{numeric} The minimum linear correlation to 
 require?}
 
 \item{name}{\code{character} The name of the output to use in plot}
 
 \item{plot}{\code{boolean} Whether to plot the results}
-
-\item{intermediate.fold:}{vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively}
 }
 \value{
 \code{factor} Containing the status drug sensitivity status of each

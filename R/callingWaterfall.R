@@ -33,7 +33,7 @@
 #'  
 #'   amax: Activity at max concentration (positive values)
 #'   
-#' @param intermediate.fold: vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively
+#' @param intermediate.fold vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively
 #' @param cor.min.linear \code{numeric} The minimum linear correlation to 
 #'   require?
 #' @param name \code{character} The name of the output to use in plot

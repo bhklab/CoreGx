@@ -4,12 +4,10 @@
 \alias{sensitivityProfiles<-}
 \title{sensitivityProfiles<- Generic}
 \usage{
-sensitivityProfiles(object, ...) <- value
+sensitivityProfiles(object) <- value
 }
 \arguments{
 \item{object}{The \code{CoreSet} to update}
-
-\item{...}{Fallthrough arguements for defining new methods}
 
 \item{value}{A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment}
 }

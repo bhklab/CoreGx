@@ -807,7 +807,6 @@ setMethod("show", signature=signature(object="CoreSet"),
 #' @export
 setGeneric("mDataNames", function(object, ...) standardGeneric("mDataNames"))
 
-
 #' mDataNames
 #' 
 #' Returns the molecular data names for the CoreSet.
