@@ -467,11 +467,10 @@ setMethod(sensitivityInfo, "CoreSet", function(object){
 #' sensitivityInfo(clevelandSmall) <- sensitivityInfo(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to update
-#' @param ... Fallthrough arguements for defining new methods
 #' @param value A \code{data.frame} with the new sensitivity annotations
 #' @return Updated \code{CoreSet} 
 #' 
-setGeneric("sensitivityInfo<-", function(object, ..., value) standardGeneric("sensitivityInfo<-"))
+setGeneric("sensitivityInfo<-", function(object, value) standardGeneric("sensitivityInfo<-"))
 #' @describeIn CoreSet Update the sensitivity experiment info
 #' @export
 setReplaceMethod("sensitivityInfo", signature = signature(object="CoreSet", value="data.frame"), function(object, value){
@@ -507,13 +506,12 @@ setMethod(sensitivityProfiles, "CoreSet", function(object){
 #' sensitivityProfiles(clevelandSmall) <- sensitivityProfiles(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to update
-#' @param ... Fallthrough arguements for defining new methods
 #' @param value A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment
 #' 
 #' @return Updated \code{CoreSet} 
 #' 
 #' @export
-setGeneric("sensitivityProfiles<-", function(object, ..., value) standardGeneric("sensitivityProfiles<-"))
+setGeneric("sensitivityProfiles<-", function(object, value) standardGeneric("sensitivityProfiles<-"))
 #' @describeIn CoreSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
@@ -578,12 +576,11 @@ setMethod(cellNames, "CoreSet", function(object){
 #' cellNames(clevelandSmall) <- cellNames(clevelandSmall)
 #' 
 #' @param object The \code{CoreSet} to update
-#' @param ... Fallthrough arguements for defining new methods
 #' @param value A \code{character} vector of the new cell names
 #' 
 #' @return Updated \code{CoreSet} 
 #' @export
-setGeneric("cellNames<-", function(object, ..., value) standardGeneric("cellNames<-"))
+setGeneric("cellNames<-", function(object, value) standardGeneric("cellNames<-"))
 #' @describeIn CoreSet Update the cell names used in the dataset
 #' @export
 setReplaceMethod("cellNames", signature = signature(object="CoreSet",value="character"), function(object, value){
