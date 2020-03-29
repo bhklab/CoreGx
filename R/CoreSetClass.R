@@ -760,7 +760,7 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
 #' @describeIn CoreSet Update the summary of available sensitivity
 #'   experiments
 #' @export
-setReplaceMethod('sensNumber', signature = signature(object="CoreSet",value="matrix"), function(object, value){
+setReplaceMethod('sensNumber', signature = signature(object="CoreSet", value="matrix"), function(object, value){
   object@sensitivity$n <- value
   object
 })
@@ -1006,7 +1006,8 @@ updateCellId <- function(object, new.ids = vector("character")){
     return(sensitivity.info)
 }
 
-
+#' @export
+#' @keywords internals
 .summarizeMolecularNumbers <- function(object) {
   
   ## consider all molecular types
@@ -1020,7 +1021,6 @@ updateCellId <- function(object, new.ids = vector("character")){
   for(mDataType in mDT) {
     tt <- table(phenoInfo(object, mDataType)$cellid)
     molecular.info[names(tt), mDataType] <- tt
-
   }
   return(molecular.info)
 }
