@@ -21,15 +21,21 @@ environment:
   matrix:
     - R_VERSION: devel
       R_ARCH: x64
-      GCC_PATH: mingw_64
-      R_TOOLS_VERSION: 35
+      USE_RTOOLS: true
+      BIOC_USE_DEVEL: "TRUE"
     
     - R_VERSION: release
       R_ARCH: x64
-      R_TOOLS_VERSION: 35
+      USE_RTOOLS: true
+      BIOC_USE_DEVEL: "TRUE"
 
 build_script:
-  - travis-tool.sh install_deps 
+  - travis-tool.sh install_deps
+  - travis-tool.sh bioc_install S4Vectors
+  - travis-tool.sh bioc_install GenomeInfoDbData
+  - travis-tool.sh bioc_install GenomeInfoDb
+  - travis-tool.sh bioc_install piano
+  
   
 test_script:  
   - travis-tool.sh run_tests
