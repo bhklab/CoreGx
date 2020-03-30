@@ -16,6 +16,8 @@ platform: x64
 
 environment:
   R_ARCH: x64
+  R_VERSION: devel
+  GCC_PATH: mingw_64
   NOT_CRAN: true
   
 build_script:
