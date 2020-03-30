@@ -455,7 +455,6 @@ setGeneric("sensitivityInfo", function(object, ...) standardGeneric("sensitivity
 #' @export
 setMethod(sensitivityInfo, "CoreSet", function(object){
     return(object@sensitivity$info)
-  
 })
 
 #' sensitivityInfo<- Generic
@@ -473,7 +472,10 @@ setMethod(sensitivityInfo, "CoreSet", function(object){
 setGeneric("sensitivityInfo<-", function(object, value) standardGeneric("sensitivityInfo<-"))
 #' @describeIn CoreSet Update the sensitivity experiment info
 #' @export
-setReplaceMethod("sensitivityInfo", signature = signature(object="CoreSet", value="data.frame"), function(object, value){
+setReplaceMethod("sensitivityInfo", 
+                 signature = signature(object="CoreSet", 
+                                       value="data.frame"), 
+                 function(object, value){
     object@sensitivity$info <- value
     object
 })
@@ -515,16 +517,20 @@ setGeneric("sensitivityProfiles<-", function(object, value) standardGeneric("sen
 #' @describeIn CoreSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
-setReplaceMethod("sensitivityProfiles", signature = signature(object="CoreSet",value="data.frame"), function(object, value){
-
+setReplaceMethod("sensitivityProfiles", 
+                 signature = signature(object="CoreSet", 
+                                       value="data.frame"), 
+                 function(object, value){
     object@sensitivity$profiles <- value
     object
 })
 #' @describeIn CoreSet Update the phenotypic data for the drug dose
 #'   sensitivity
 #' @export
-setReplaceMethod("sensitivityProfiles", signature = signature(object="CoreSet",value="matrix"), function(object, value){
-
+setReplaceMethod("sensitivityProfiles", 
+                 signature = signature(object="CoreSet",
+                                       value="matrix"), 
+                 function(object, value) {
     object@sensitivity$profiles <- as.data.frame(value)
     object
 })
@@ -1007,7 +1013,7 @@ updateCellId <- function(object, new.ids = vector("character")){
 }
 
 #' @export
-#' @keywords internals
+#' @keywords internal
 .summarizeMolecularNumbers <- function(object) {
   
   ## consider all molecular types
