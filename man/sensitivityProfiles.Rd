@@ -4,10 +4,12 @@
 \alias{sensitivityProfiles}
 \title{sensitivityProfiles Generic}
 \usage{
-sensitivityProfiles(cSet)
+sensitivityProfiles(object, ...)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve sensitivity experiment data from}
+\item{object}{The \code{CoreSet} to retrieve sensitivity experiment data from}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 a \code{data.frame} with the experiment info
@@ -16,6 +18,6 @@ a \code{data.frame} with the experiment info
 Generic for sensitivityProfiles method
 }
 \examples{
-sensitivityProfiles(Cleveland_small)
+sensitivityProfiles(clevelandSmall)
 
 }

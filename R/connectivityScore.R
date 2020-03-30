@@ -1,9 +1,3 @@
-########################
-## Benjamin Haibe-Kainser 9, 2014
-########################
-
-
-
 #' Function computing connectivity scores between two signatures
 #' 
 #' A function for finding the connectivity between two signatures, using either
@@ -47,15 +41,14 @@
 #' @param gwc.method \code{character}, should gwc use a weighted spearman or pearson
 #'   statistic?
 #' @param ... Additional arguments passed down to gsea and gwc functions
+#' 
 #' @return \code{numeric} a numeric vector with the score and the p-value associated
 #'   with it
+#' 
 #' @export
-#' @importFrom piano runGSA
-#' @importFrom piano loadGSC
+#' 
+#' @importFrom piano runGSA loadGSC
 #' @importFrom stats complete.cases
-
-
-
 connectivityScore <- function(x, y, method=c("gsea", "fgsea", "gwc"), nperm=1e4, nthread=1, gwc.method=c("spearman", "pearson"), ...) {
   
   method <- match.arg(method)
@@ -104,7 +97,7 @@ connectivityScore <- function(x, y, method=c("gsea", "fgsea", "gwc"), nperm=1e4,
             } else if (length(nes.down) == 0){
               score = c("es" = nes.up[1], "p" = nes.up[2])
             } else if (complete.cases(cbind(nes.up, nes.down)) && sign(nes.up[1]) != sign(nes.down[1])) {
-              score <- c("es"=(nes.up[1] - nes.down[1]) / 2, "p"=combineTest(p=c(nes.up[2], nes.down[2]), method="fisher", na.rm=TRUE))
+              score <- c("es"=(nes.up[1] - nes.down[1]) / 2, "p"=.combineTest(p=c(nes.up[2], nes.down[2]), method="fisher", na.rm=TRUE))
             } else {
               score <- c("score"=0, "p"=1)
             }
@@ -121,3 +114,30 @@ connectivityScore <- function(x, y, method=c("gsea", "fgsea", "gwc"), nperm=1e4,
   )
   return (score)
 }
+
+#' @importFrom stats pchisq qnorm pnorm pt
+.combineTest <-
+  function(p, weight, method=c("fisher", "z.transform", "logit"), hetero=FALSE, na.rm=FALSE) {
+    if(hetero) { stop("function to deal with heterogeneity is not implemented yet!") }
+    method <- match.arg(method)
+    na.ix <- is.na(p)
+    if(any(na.ix) && !na.rm) { stop("missing values are present!") }
+    if(all(na.ix)) { return(NA) } ## all p-values are missing
+    p <- p[!na.ix]
+    k <- length(p)
+    if(k == 1) { return(p) }
+    if(missing(weight)) { weight <- rep(1, k); }
+    switch(method,  
+           "fisher"={
+             cp <- pchisq(-2 * sum(log(p)), df=2*k, lower.tail=FALSE)
+           }, 
+           "z.transform"={
+             z <- qnorm(p, lower.tail=FALSE)
+             cp <- pnorm(sum(weight * z) / sqrt(sum(weight^2)), lower.tail=FALSE)
+           }, 
+           "logit"={
+             tt <- (- sum(log(p / (1 - p)))) / sqrt(k * pi^2 * (5 * k + 2) / (3 * (5 * k + 4)))
+             cp <- pt(tt,df=5*k+4, lower.tail=FALSE)
+           })
+    return(cp)
+  }

@@ -4,20 +4,27 @@
 \alias{molecularProfiles}
 \title{molecularProfiles Generic}
 \usage{
-molecularProfiles(cSet, mDataType)
+molecularProfiles(object, mDataType, assay, ...)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve molecular profiles from}
+\item{object}{The \code{CoreSet} to retrieve molecular profiles from}
 
-\item{mDataType}{the type of molecular data}
+\item{mDataType}{\code{character} The type of molecular data}
+
+\item{assay}{\code{character} Name of the desired assay; if excluded defaults to first assay
+in the SummarizedExperiment for the given mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
+to check which assays are available for a given molecular datatype.}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
-a \code{data.frame} with the experiment info
+a \code{matrix} of data for the given mDataType and assay
 }
 \description{
 Generic for molecularProfiles method
 }
 \examples{
-molecularProfiles(Cleveland_small, "rna")
+data(clevelandSmall)
+molecularProfiles(clevelandSmall, "rna")
 
 }

@@ -2,12 +2,14 @@
 % Please edit documentation in R/CoreSetClass.R
 \name{sensitivityMeasures}
 \alias{sensitivityMeasures}
-\title{sensitivityMeasures Generic}
+\title{sensitivityMeasures Generi}
 \usage{
-sensitivityMeasures(cSet)
+sensitivityMeasures(object, ...)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet}}
+\item{object}{The \code{CoreSet}}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 A \code{character} vector of all the available sensitivity measures
@@ -16,6 +18,6 @@ A \code{character} vector of all the available sensitivity measures
 A generic for the sensitivityMeasures  method
 }
 \examples{
-sensitivityMeasures(Cleveland_small)
+sensitivityMeasures(clevelandSmall)
 
 }

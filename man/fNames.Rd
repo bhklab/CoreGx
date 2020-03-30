@@ -4,12 +4,14 @@
 \alias{fNames}
 \title{fNames Generic}
 \usage{
-fNames(cSet, mDataType)
+fNames(object, mDataType, ...)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet}}
+\item{object}{The \code{CoreSet}}
 
 \item{mDataType}{The molecular data type to return feature names for}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 A \code{character} vector of the feature names
@@ -18,6 +20,6 @@ A \code{character} vector of the feature names
 A generic for the fNames method
 }
 \examples{
-fNames(Cleveland_small, "rna")
+fNames(clevelandSmall, "rna")
 
 }

@@ -2,21 +2,24 @@
 % Please edit documentation in R/CoreSetClass.R
 \name{cellInfo}
 \alias{cellInfo}
-\title{cellInfo Generic}
+\title{cellInfo Getter}
 \usage{
-cellInfo(cSet)
+cellInfo(object, ...)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve cell info from}
+\item{object}{The \code{CoreSet} to retrieve cell info from}
+
+\item{...}{\code{list} Fall through arguments to allow generic 
+to be defined with different parameters}
 }
 \value{
 a \code{data.frame} with the cell annotations
 }
 \description{
-Generic for cellInfo method
+Get cell line information from a PharmacoSet object
 }
 \examples{
-data(Cleveland_small)
-cellInfo(Cleveland_small)
+data(clevelandSmall)
+cellInf <- cellInfo(clevelandSmall)
 
 }

@@ -4,10 +4,12 @@
 \alias{mDataNames}
 \title{mDataNames Generic}
 \usage{
-mDataNames(cSet)
+mDataNames(object, ...)
 }
 \arguments{
-\item{cSet}{CoreSet object}
+\item{object}{CoreSet object}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 Vector of names of the molecular data types
@@ -16,6 +18,6 @@ Vector of names of the molecular data types
 A generic for the mDataNames method
 }
 \examples{
-mDataNames(Cleveland_small)
+mDataNames(clevelandSmall)
 
 }

@@ -11,7 +11,7 @@ phenoInfo(object, mDataType) <- value
 
 \item{mDataType}{the type of molecular data}
 
-\item{value}{a \code{data.frame} with the new experiment annotations}
+\item{value}{a \code{dataframe}  with the new experiment annotations}
 }
 \value{
 The updated \code{CoreSet}
@@ -20,7 +20,7 @@ The updated \code{CoreSet}
 Generic for phenoInfo replace method
 }
 \examples{
-
-phenoInfo(Cleveland_small, mDataType="rna") <- phenoInfo(Cleveland_small, mDataType="rna")
+data(clevelandSmall)
+phenoInfo(clevelandSmall, mDataType="rna") <- phenoInfo(clevelandSmall, mDataType="rna")
 
 }

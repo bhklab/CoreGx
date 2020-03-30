@@ -18,6 +18,6 @@ The updated \code{CoreSet}
 A generic for the pertNumber method
 }
 \examples{
-pertNumber(Cleveland_small) <- pertNumber(Cleveland_small)
+pertNumber(clevelandSmall) <- pertNumber(clevelandSmall)
 
 }

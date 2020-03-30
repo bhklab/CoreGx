@@ -4,10 +4,12 @@
 \alias{sensitivityInfo}
 \title{sensitivityInfo Generic}
 \usage{
-sensitivityInfo(cSet)
+sensitivityInfo(object, ...)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve sensitivity experiment annotations from}
+\item{object}{The \code{CoreSet} to retrieve sensitivity experiment annotations from}
+
+\item{...}{Fallthrough arguments for defining new methods}
 }
 \value{
 a \code{data.frame} with the experiment info
@@ -16,6 +18,6 @@ a \code{data.frame} with the experiment info
 Generic for sensitivityInfo method
 }
 \examples{
-sensitivityInfo(Cleveland_small)
+sensitivityInfo(clevelandSmall)
 
 }

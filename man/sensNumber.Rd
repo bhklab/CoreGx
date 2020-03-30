@@ -4,10 +4,12 @@
 \alias{sensNumber}
 \title{sensNumber Generic}
 \usage{
-sensNumber(cSet)
+sensNumber(object, ...)
 }
 \arguments{
-\item{cSet}{A \code{CoreSet}}
+\item{object}{A \code{CoreSet}}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 A \code{data.frame} with the number of sensitivity experiments per drug and cell line
@@ -16,6 +18,6 @@ A \code{data.frame} with the number of sensitivity experiments per drug and cell
 A generic for the sensNumber method
 }
 \examples{
-sensNumber(Cleveland_small)
+sensNumber(clevelandSmall)
 
 }

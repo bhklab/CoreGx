@@ -8,10 +8,13 @@
 \alias{cellInfo<-,CoreSet,data.frame-method}
 \alias{phenoInfo,CoreSet-method}
 \alias{phenoInfo<-,CoreSet,character,data.frame-method}
-\alias{molecularProfiles,CoreSet,character-method}
-\alias{molecularProfiles<-,CoreSet,character,matrix-method}
+\alias{phenoInfo<-,CoreSet,character,DataFrame-method}
+\alias{molecularProfiles,CoreSet-method}
+\alias{molecularProfiles<-,CoreSet,character,character,matrix-method}
+\alias{molecularProfiles<-,CoreSet,character,missing,matrix-method}
 \alias{featureInfo,CoreSet-method}
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
+\alias{featureInfo<-,CoreSet,character,DataFrame-method}
 \alias{sensitivityInfo,CoreSet-method}
 \alias{sensitivityInfo<-,CoreSet,data.frame-method}
 \alias{sensitivityProfiles,CoreSet-method}
@@ -21,86 +24,94 @@
 \alias{cellNames,CoreSet-method}
 \alias{cellNames<-,CoreSet,character-method}
 \alias{fNames,CoreSet-method}
+\alias{fNames<-,CoreSet,character,character-method}
 \alias{dateCreated,CoreSet-method}
-\alias{cSetName,CoreSet-method}
+\alias{name,CoreSet-method}
 \alias{pertNumber,CoreSet-method}
 \alias{sensNumber,CoreSet-method}
 \alias{pertNumber<-,CoreSet,array-method}
 \alias{sensNumber<-,CoreSet,matrix-method}
 \title{A Superclass to Contain Data for Genetic Profiling and Viability Screens of Cancer Cell Lines}
 \usage{
-\S4method{cellInfo}{CoreSet}(cSet)
+\S4method{cellInfo}{CoreSet}(object)
 
 \S4method{cellInfo}{CoreSet,data.frame}(object) <- value
 
-\S4method{phenoInfo}{CoreSet}(cSet, mDataType)
+\S4method{phenoInfo}{CoreSet}(object, mDataType)
 
-\S4method{phenoInfo}{CoreSet,character,data.frame}(object,
-  mDataType) <- value
+\S4method{phenoInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
 
-\S4method{molecularProfiles}{CoreSet,character}(cSet, mDataType)
+\S4method{phenoInfo}{CoreSet,character,DataFrame}(object, mDataType) <- value
 
-\S4method{molecularProfiles}{CoreSet,character,matrix}(object,
-  mDataType) <- value
+\S4method{molecularProfiles}{CoreSet}(object, mDataType, assay)
 
-\S4method{featureInfo}{CoreSet}(cSet, mDataType)
+\S4method{molecularProfiles}{CoreSet,character,character,matrix}(object, mDataType, assay) <- value
 
-\S4method{featureInfo}{CoreSet,character,data.frame}(object,
-  mDataType) <- value
+\S4method{molecularProfiles}{CoreSet,character,missing,matrix}(object, mDataType, assay) <- value
 
-\S4method{sensitivityInfo}{CoreSet}(cSet)
+\S4method{featureInfo}{CoreSet}(object, mDataType)
+
+\S4method{featureInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
+
+\S4method{featureInfo}{CoreSet,character,DataFrame}(object, mDataType) <- value
+
+\S4method{sensitivityInfo}{CoreSet}(object)
 
 \S4method{sensitivityInfo}{CoreSet,data.frame}(object) <- value
 
-\S4method{sensitivityProfiles}{CoreSet}(cSet)
+\S4method{sensitivityProfiles}{CoreSet}(object)
 
 \S4method{sensitivityProfiles}{CoreSet,data.frame}(object) <- value
 
 \S4method{sensitivityProfiles}{CoreSet,matrix}(object) <- value
 
-\S4method{sensitivityMeasures}{CoreSet}(cSet)
+\S4method{sensitivityMeasures}{CoreSet}(object)
 
-\S4method{cellNames}{CoreSet}(cSet)
+\S4method{cellNames}{CoreSet}(object)
 
 \S4method{cellNames}{CoreSet,character}(object) <- value
 
-\S4method{fNames}{CoreSet}(cSet, mDataType)
+\S4method{fNames}{CoreSet}(object, mDataType)
 
-\S4method{dateCreated}{CoreSet}(cSet)
+\S4method{fNames}{CoreSet,character,character}(object, mDataType) <- value
 
-\S4method{cSetName}{CoreSet}(cSet)
+\S4method{dateCreated}{CoreSet}(object)
 
-\S4method{pertNumber}{CoreSet}(cSet)
+\S4method{name}{CoreSet}(object)
 
-\S4method{sensNumber}{CoreSet}(cSet)
+\S4method{pertNumber}{CoreSet}(object)
+
+\S4method{sensNumber}{CoreSet}(object)
 
 \S4method{pertNumber}{CoreSet,array}(object) <- value
 
 \S4method{sensNumber}{CoreSet,matrix}(object) <- value
 }
 \arguments{
-\item{cSet}{A \code{CoreSet} object}
-
 \item{object}{A \code{CoreSet} object}
 
 \item{value}{A replacement value}
 
 \item{mDataType}{A \code{character} with the type of molecular data to return/update}
+
+\item{assay}{\code{character} Name of the desired assay; if excluded defaults to first assay
+in the SummarizedExperiment for the given mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
+to check which assays are available for a given molecular datatype.}
 }
 \value{
 An object of the CoreSet class
 }
 \description{
-The CoreSet (CSet) class was developed as a superclass for objects in the 
+The CoreSet (CSet) class was developed as a superclass for pSets in the 
 PharmacoGx and RadioGx packages to contain the data generated in screens 
 of cancer cell lines for their genetic profile and sensitivities to therapy
 (Pharmacological or Radiation). This class is meant to be a superclass which 
-is contained within the PharmacoSet (PSet) and RadioSet (RSet) objects 
+is contained within the PharmacoSet (pSet) and RadioSet (RSet) objects 
 exported by PharmacoGx and RadioGx. The format of the data is similar for 
-both data PSets and RSets, allowing much of the code to be abstracted into 
+both pSets and rSets, allowing much of the code to be abstracted into 
 the CoreSet super-class. However, the models involved with quantifying 
 cellular response to Pharmacological and Radiation therapy are widely 
-different, and two seperate implementations of the CSet class allows the
+different, and extension of the cSet class allows the
 packages to apply the correct model for the given data.
 }
 \section{Methods (by generic)}{
@@ -111,13 +122,19 @@ packages to apply the correct model for the given data.
 
 \item \code{phenoInfo}: Return the experiment info from the given type of molecular data in CoreSet
 
-\item \code{phenoInfo<-}: Update the the given type of molecular data experiment info in the CoreSet
+\item \code{phenoInfo<-}: Update the given type of molecular data experiment info in the CoreSet
+
+\item \code{phenoInfo<-}: Update the given type of molecular data experiment info in the CoreSet
 
 \item \code{molecularProfiles}: Return the given type of molecular data from the CoreSet
 
 \item \code{molecularProfiles<-}: Update the given type of molecular data from the CoreSet
 
+\item \code{molecularProfiles<-}: Update the given type of molecular data from the CoreSet
+
 \item \code{featureInfo}: Return the feature info for the given molecular data
+
+\item \code{featureInfo<-}: Replace the gene info for the molecular data
 
 \item \code{featureInfo<-}: Replace the gene info for the molecular data
 
@@ -142,9 +159,11 @@ summaries, for example, whether there are IC50 values available
 
 \item \code{fNames}: Return the feature names used in the dataset
 
+\item \code{fNames<-}: Update the feature names used in a molecular profile
+
 \item \code{dateCreated}: Return the date the CoreSet was created
 
-\item \code{cSetName}: Return the name of the CoreSet
+\item \code{name}: Return the name of the CoreSet
 
 \item \code{pertNumber}: Return the summary of available perturbation
 experiments
@@ -166,9 +185,9 @@ experiments
 including the \code{$name} and the session information for how the object
 was creating, detailing the exact versions of R and all the packages used}
 
-\item{\code{molecularProfiles}}{A \code{list} containing 4 \code{Biobase::ExpressionSet} 
+\item{\code{molecularProfiles}}{A \code{list} containing \code{SummarizedExperiment}s 
 type object for holding data for RNA, DNA, SNP and Copy Number Variation 
-measurements respectively, with associated \code{fData} and \code{pData} 
+measurements respectively, with associated \code{rowData} and \code{colData} 
 containing the row and column metadata}
 
 \item{\code{cell}}{A \code{data.frame} containg the annotations for all the cell 

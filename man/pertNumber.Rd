@@ -4,10 +4,12 @@
 \alias{pertNumber}
 \title{pertNumber Generic}
 \usage{
-pertNumber(cSet)
+pertNumber(object, ...)
 }
 \arguments{
-\item{cSet}{A \code{CoreSet}}
+\item{object}{A \code{CoreSet}}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 A 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
@@ -16,6 +18,6 @@ A 3D \code{array} with the number of perturbation experiments per drug and cell 
 A generic for the pertNumber method
 }
 \examples{
-pertNumber(Cleveland_small)
+pertNumber(clevelandSmall)
 
 }

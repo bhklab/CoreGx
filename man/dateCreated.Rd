@@ -4,10 +4,12 @@
 \alias{dateCreated}
 \title{dateCreated Generic}
 \usage{
-dateCreated(cSet)
+dateCreated(object, ...)
 }
 \arguments{
-\item{cSet}{A \code{CoreSet}}
+\item{object}{A \code{CoreSet}}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
 The date the CoreSet was created
@@ -16,6 +18,6 @@ The date the CoreSet was created
 A generic for the dateCreated method
 }
 \examples{
-dateCreated(Cleveland_small)
+dateCreated(clevelandSmall)
 
 }

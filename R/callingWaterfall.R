@@ -1,35 +1,61 @@
-## Drug sensitivity calling using waterfall plots
-## Method:
-## 1. Sensitivity calls were made using one of IC50, ActArea or Amax
-## 2. Sort log IC50s (or ActArea or Amax) of the cell lines to generate a “waterfall distribution”
-## 3. Identify cutoff:
-##  3.1 If the waterfall distribution is non-linear (pearson cc to the linear fit <=0.95), estimate the major inflection point of the log IC50 curve as the point on the curve with the maximal distance to a line drawn between the start and end points of the distribution.
-##  3.2 If the waterfall distribution appears linear (pearson cc to the linear fit > 0.95), then use the median IC50 instead.
-## 4. Cell lines within a 4-fold IC50 (or within a 1.2-fold ActArea or 20% Amax difference) difference centered around this inflection point are classified as being “intermediate”,  cell lines with lower IC50s (or ActArea/Amax values) than this range are defined as sensitive, and those with IC50s (or ActArea/Amax) higher than this range are called “insensitive”.
-## 5. Require at least x sensitive and x insensitive cell lines after applying these criteria (x=5 in our case).
-
-## Input:
-##  ic50: IC50 values in micro molar (positive values)
-##  actarea: Activity Area, that is area under the drug activity curve (positive values)
-##  amax: Activity at max concentration (positive values)
-##  intermediate.fold: vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively
-#' @importFrom stats complete.cases
-#' @importFrom stats cor.test
-#' @importFrom stats lm
-#' @importFrom stats median
-#' @importFrom graphics par
-#' @importFrom grDevices rainbow
-#' @importFrom graphics points
-#' @importFrom graphics abline
-#' @importFrom graphics lines
-#' @importFrom graphics legend
+#' Drug sensitivity calling using waterfall plots
+#'
+#' 1. Sensitivity calls were made using one of IC50, ActArea or Amax
 #' 
+#' 2. Sort log IC50s (or ActArea or Amax) of the cell lines to generate a 
+#'   “waterfall distribution”
+#'   
+#' 3. Identify cutoff:
+#' 
+#'  3.1 If the waterfall distribution is non-linear (pearson cc to the linear 
+#'    fit <=0.95), estimate the major inflection point of the log IC50 curve as 
+#'    the point on the curve with the maximal distance to a line drawn between 
+#'    the start and end points of the distribution.
+#'    
+#'  3.2 If the waterfall distribution appears linear (pearson cc to the linear 
+#'    fit > 0.95), then use the median IC50 instead.
+#'    
+#' 4. Cell lines within a 4-fold IC50 (or within a 1.2-fold ActArea or 20% Amax 
+#'   difference) difference centered around this inflection point are classified 
+#'   as being “intermediate”,  cell lines with lower IC50s (or ActArea/Amax 
+#'   values) than this range are defined as sensitive, and those with IC50s (or 
+#'   ActArea/Amax) higher than this range are called “insensitive”.
+#'   
+#' 5. Require at least x sensitive and x insensitive cell lines after applying 
+#'   these criteria (x=5 in our case).
+#' 
+##FIXME:: Clarify the parameters of this function
+#' @param x What type of object does this take in?
+#' @param type  
+#'   ic50: IC50 values in micro molar (positive values)
+#' 
+#'   actarea: Activity Area, that is area under the drug activity curve (positive values)
+#'  
+#'   amax: Activity at max concentration (positive values)
+#'   
+#' @param intermediate.fold vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively
+#' @param cor.min.linear \code{numeric} The minimum linear correlation to 
+#'   require?
+#' @param name \code{character} The name of the output to use in plot
+#' @param plot \code{boolean} Whether to plot the results
+#' 
+#' @return \code{factor} Containing the status drug sensitivity status of each
+#'   cellline.
+#' 
+#' @importFrom stats complete.cases  cor.test lm median
+#' @importFrom graphics par points abline lines legend
+#' @importFrom grDevices rainbow
+#' 
+#' @export
+#' @keywords internal
 callingWaterfall <-
-function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), cor.min.linear=0.95, name="Drug", plot=FALSE) {
+  function(x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), 
+           cor.min.linear=0.95, name="Drug", plot=FALSE)
+{
   
   type <- match.arg(type)
   if (any(!is.na(intermediate.fold) & intermediate.fold < 0)) { intermediate.fold <- intermediate.fold[!is.na(intermediate.fold) & intermediate.fold < 0] <- 0 }
-  if (is.null(names(x))) { names(x) <- paste("X", 1:length(x), sep=".") }
+  if (is.null(names(x))) { names(x) <- paste("X", seq_along(x), sep=".") }
   
   xx <- x[complete.cases(x)]
   switch (type,
@@ -70,13 +96,13 @@ function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), co
   
   oo <- order(xx, decreasing=TRUE)
   ## test linearity with Pearson correlation
-  cc <- stats::cor.test(-xx[oo], 1:length(oo), method="pearson")
+  cc <- stats::cor.test(-xx[oo], seq_along(oo), method="pearson")
   ## line between the two extreme sensitivity values
   dd <- cbind("y"=xx[oo][c(1, length(oo))], "x"=c(1, length(oo)))
   rr <- lm(y ~ x, data=data.frame(dd))
   ## compute distance from sensitivity values and the line between the two extreme sensitivity values
-  ddi <- apply(cbind(1:length(oo), xx[oo]), 1, function(x, slope, intercept) {
-    return(distancePointLine(x=x[1], y=x[2], a=slope, b=intercept))
+  ddi <- apply(cbind(seq_along(oo), xx[oo]), 1, function(x, slope, intercept) {
+    return(.distancePointLine(x=x[1], y=x[2], a=slope, b=intercept))
   }, slope=rr$coefficients[2], intercept=rr$coefficients[1])
   if(cc$estimate > cor.min.linear){
     ## approximately linear waterfall
@@ -170,4 +196,85 @@ function (x, type=c("IC50", "AUC", "AMAX"), intermediate.fold=c(4, 1.2, 1.2), co
   return(tt)  
 }
 
-## End
+
+# Helper Functions --------------------------------------------------------
+
+#' Calculate shortest distance between point and line
+#'
+#' @examples .distancePointLine(0, 0, 1, -1, 1)
+#'
+#' @description This function calculates the shortest distance between a point 
+#'   and a line in 2D space.
+#'
+#' @param x x-coordinate of point
+#' @param y y-coordinate of point
+#' @param a coefficient in line equation a * x + b * y + c = 0
+#' @param b coefficient in line equation a * x + b * y + c = 0
+#' @param c coefficient in line equation a * x + b * y + c = 0
+#' 
+#' @return \code{numeric} The shortest distance between a point and a line
+#' 
+#' @export
+#' @keywords internal
+.distancePointLine <- function(x, y, a, b, c) {
+  
+  if (!(all(is.finite(c(x, y, a, b, c))))) {
+    stop("All inputs to linePtDist must be real numbers.")
+  }
+  
+  return(abs(a * x + b * y + c) / sqrt(a ^ 2 + b ^ 2))
+}
+
+#' @export
+#' @keywords interal
+.magnitude <- function(p1, p2) {
+  return(sqrt(sum((p2 - p1) ^ 2)))
+}
+
+#' Calculate shortest distance between point and line segment
+#'
+#' @description This function calculates the shortest distance between a point 
+#'   and a line segment in 2D space.
+#' 
+#' @param x x-coordinate of point
+#' @param y y-coordinate of point
+#' @param x1 x-coordinate of one endpoint of the line segment
+#' @param y1 y-coordinate of line segment endpoint with x-coordinate x1
+#' @param x2 x-coordinate of other endpoint of line segment
+#' @param y2 y-coordinate of line segment endpoint with x-coordinate x2
+#' 
+#' @return \code{numeric} The shortest distance between a point and a line
+#'   segment
+#' 
+#' @examples .distancePointSegment(0, 0, -1, 1, 1, -1)
+#' 
+#' @export
+#' @keywords internal
+.distancePointSegment <- function(x, #x-coordinate of point
+                                 y, #y-coordinate of point
+                                 x1, #x-coordinate of one endpoint of line segment
+                                 y1, #y-coordinate of line segment endpoint with x-coordinate x1
+                                 x2, #x-coordinate of other endpoint of line segment,
+                                 y2) { #y-coordinate of line segment endpoint with x-coordinate x2
+  if (!(all(is.finite(c(x, y, x1, x2, y1, y2))))) {
+    stop("All inputs to linePtDist must be real numbers.")
+  }
+  
+  bestEndpointDistance <- min(c(.magnitude(c(x, y), c(x1, y1)),
+                                .magnitude(c(x, y), c(x2, y2))))
+  
+  if (.magnitude(c(x, y), c((x1 + x2) / 2, (y1 + y2) / 2)) < bestEndpointDistance) { # length to point has only one local minimum which is the global minimum; iff this condition is true then the shortest distance is to a point on the line segment
+    if (x1 == x2) { #vertical line segment
+      a <- 1
+      b <- 0
+      c <- -x1
+    } else {
+      a <- (y2 - y1) / (x2 - x1)
+      b <- -1
+      c <- y1 - a * x1
+    }
+    return(.distancePointLine(x, y, a, b, c))
+  } else {
+    return(bestEndpointDistance)
+  }
+}

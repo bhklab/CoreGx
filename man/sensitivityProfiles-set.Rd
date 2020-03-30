@@ -18,6 +18,6 @@ Updated \code{CoreSet}
 A generic for the sensitivityProfiles replacement method
 }
 \examples{
-sensitivityProfiles(Cleveland_small) <- sensitivityProfiles(Cleveland_small)
+sensitivityProfiles(clevelandSmall) <- sensitivityProfiles(clevelandSmall)
 
 }

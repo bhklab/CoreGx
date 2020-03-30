@@ -4,20 +4,22 @@
 \alias{featureInfo}
 \title{featureInfo Generic}
 \usage{
-featureInfo(cSet, mDataType)
+featureInfo(object, mDataType, ...)
 }
 \arguments{
-\item{cSet}{The \code{CoreSet} to retrieve feature annotations from}
+\item{object}{The \code{CoreSet} to retrieve feature annotations from}
 
 \item{mDataType}{the type of molecular data}
+
+\item{...}{Fallthrough arguements for defining new methods}
 }
 \value{
-a \code{data.frame} with the experiment info
+a \code{data.frame} with the feature annotations
 }
 \description{
 Generic for featureInfo method
 }
 \examples{
-featureInfo(Cleveland_small, "rna")
+featureInfo(clevelandSmall, "rna")
 
 }
