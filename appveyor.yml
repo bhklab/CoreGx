@@ -17,8 +17,9 @@ platform: x64
 environment:
   R_ARCH: x64
   NOT_CRAN: true
-
+  
 build_script:
+  - travis-tool.sh install_github  Bioconductor/S4Vectors
   - travis-tool.sh install_github Bioconductor/GenomeInfoDbData
   - travis-tool.sh install_github Bioconductor/GenomeInfoDb
   - travis-tool.sh install_deps 
