@@ -19,8 +19,9 @@ environment:
   NOT_CRAN: true
 
 build_script:
+  - travis-tool.sh install_github Bioconductor/GenomeInfoDb 
   - travis-tool.sh install_deps
-
+  
 test_script:
   - travis-tool.sh run_tests
 
