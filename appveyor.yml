@@ -15,19 +15,20 @@ install:
 platform: x64
 
 environment:
+  R_VERSION: bioc-devel
   R_ARCH: x64
   NOT_CRAN: true
 
 build_script:
-  - travis-tool.sh install_github Bioconductor/GenomeInfoDb 
-  - travis-tool.sh install_deps
+  - travis-tool.sh install_github Bioconductor/GenomeInfoDbData
+  - travis-tool.sh install_github Bioconductor/GenomeInfoDb
+  - travis-tool.sh install_deps 
   
 test_script:
   - travis-tool.sh run_tests
 
 on_failure:
   - travis-tool.sh dump_logs
-
 
 
 artifacts:
