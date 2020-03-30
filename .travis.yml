@@ -33,28 +33,6 @@ matrix:
     script:
       - R CMD build . --resave-data --compact-vignettes=gs+qpdf
       - travis_wait 30 xvfb-run R CMD check *.tar.gz # `xvfb-run` executes the command inside the xvfb virtual GUI to catch any renders
-<<<<<<< HEAD
-  ## OSX SETTINGS
-  - r: release
-    os: osx
-    osx_image: xcode11
-    ## OSX HOMEBREW PACKAGES
-    # - Dependencies for virtual GUI
-    before_install:
-      - brew update
-      - brew cask reinstall xquartz 
-      - brew install tcl-tk
-      - brew link --overwrite --force tcl-tk; brew unlink tcl-tk
-    ## VIRTUAL GUI
-    # - Launches virtual GUI to catch renders on the headless test server
-    before_script:
-      - "export DISPLAY=:99.0"
-      - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok ) & fi
-    ## TESTING COMMANDS
-    script:
-      - R CMD build . --resave-data --no-build-vignettes # V
-      - travis_wait 30 R CMD check *.tar.gz --no-build-vignettes # `travis_wait 30` increases the maximum time without printing to log from 10 to 30 minutes
-=======
   # OSX SETTINGS
    - r: bioc-devel
      os: osx
@@ -77,7 +55,6 @@ matrix:
      script:
        - R CMD build . --resave-data --no-build-vignettes
        - travis_wait 30 R CMD check *.tar.gz --no-build-vignettes # `travis_wait 30` increases the maximum time without printing to log from 10 to 30 minutes
->>>>>>> eSet_To_SE
 
 # POST TEST COMMANDS
 after_success:
