@@ -18,6 +18,6 @@ A vector of the cell names used in the CoreSet
 A generic for the cellNames method
 }
 \examples{
-cellNames(clevelandSmall)
+cellNames(clevelandSmall_cSet)
 
 }

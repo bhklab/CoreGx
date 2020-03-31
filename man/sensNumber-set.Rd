@@ -18,6 +18,6 @@ The updated \code{CoreSet}
 A generic for the sensNumber method
 }
 \examples{
-sensNumber(clevelandSmall) <- sensNumber(clevelandSmall)
+sensNumber(clevelandSmall_cSet) <- sensNumber(clevelandSmall_cSet)
 
 }

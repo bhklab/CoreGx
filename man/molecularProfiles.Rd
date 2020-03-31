@@ -24,7 +24,7 @@ a \code{matrix} of data for the given mDataType and assay
 Generic for molecularProfiles method
 }
 \examples{
-data(clevelandSmall)
-molecularProfiles(clevelandSmall, "rna")
+data(clevelandSmall_cSet)
+molecularProfiles(clevelandSmall_cSet, "rna")
 
 }

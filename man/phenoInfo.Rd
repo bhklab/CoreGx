@@ -20,6 +20,6 @@ a \code{data.frame} with the experiment info
 Generic for phenoInfo method
 }
 \examples{
-phenoInfo(clevelandSmall, mDataType="rna")
+phenoInfo(clevelandSmall_cSet, mDataType="rna")
 
 }

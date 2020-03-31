@@ -16,6 +16,6 @@ Prints the CoreSet object to the output stream, and returns invisible NULL.
 Show a CoreSet
 }
 \examples{
-show(clevelandSmall)
+show(clevelandSmall_cSet)
 
 }

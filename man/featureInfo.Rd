@@ -20,6 +20,6 @@ a \code{data.frame} with the feature annotations
 Generic for featureInfo method
 }
 \examples{
-featureInfo(clevelandSmall, "rna")
+featureInfo(clevelandSmall_cSet, "rna")
 
 }

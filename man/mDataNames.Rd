@@ -18,6 +18,6 @@ Vector of names of the molecular data types
 A generic for the mDataNames method
 }
 \examples{
-mDataNames(clevelandSmall)
+mDataNames(clevelandSmall_cSet)
 
 }

@@ -18,6 +18,6 @@ a \code{data.frame} with the experiment info
 Generic for sensitivityProfiles method
 }
 \examples{
-sensitivityProfiles(clevelandSmall)
+sensitivityProfiles(clevelandSmall_cSet)
 
 }

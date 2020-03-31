@@ -182,8 +182,8 @@ CoreSet <-  function(name,
 #' Get cell line information from a PharmacoSet object
 #' 
 #' @examples
-#' data(clevelandSmall)
-#' cellInf <- cellInfo(clevelandSmall)
+#' data(clevelandSmall_cSet)
+#' cellInf <- cellInfo(clevelandSmall_cSet)
 #' 
 #' @param object The \code{CoreSet} to retrieve cell info from
 #' @param ... \code{list} Fall through arguments to allow generic 
@@ -207,7 +207,7 @@ setMethod(cellInfo, "CoreSet", function(object){
 #' Generic for cellInfo replace method
 #' 
 #' @examples
-#' cellInfo(clevelandSmall) <- cellInfo(clevelandSmall)
+#' cellInfo(clevelandSmall_cSet) <- cellInfo(clevelandSmall_cSet)
 #' 
 #' @param object The \code{CoreSet} to replace cell info in
 #' @param value A \code{data.frame} with the new cell annotations
@@ -235,7 +235,7 @@ setReplaceMethod("cellInfo", signature = signature(object="CoreSet", value="data
 #' Generic for phenoInfo method 
 #' 
 #' @examples
-#' phenoInfo(clevelandSmall, mDataType="rna")
+#' phenoInfo(clevelandSmall_cSet, mDataType="rna")
 #' 
 #' @param object The \code{CoreSet} to retrieve rna annotations from
 #' @param mDataType the type of molecular data
@@ -262,8 +262,8 @@ setMethod(phenoInfo, "CoreSet", function(object, mDataType){
 #' Generic for phenoInfo replace method
 #' 
 #' @examples
-#' data(clevelandSmall)
-#' phenoInfo(clevelandSmall, mDataType="rna") <- phenoInfo(clevelandSmall, mDataType="rna")
+#' data(clevelandSmall_cSet)
+#' phenoInfo(clevelandSmall_cSet, mDataType="rna") <- phenoInfo(clevelandSmall_cSet, mDataType="rna")
 #' 
 #' @param object The \code{CoreSet} to retrieve molecular experiment annotations from
 #' @param mDataType the type of molecular data 
@@ -296,8 +296,8 @@ setReplaceMethod("phenoInfo", signature = signature(object="CoreSet", mDataType 
 #' Generic for molecularProfiles method 
 #' 
 #' @examples
-#' data(clevelandSmall)
-#' molecularProfiles(clevelandSmall, "rna")
+#' data(clevelandSmall_cSet)
+#' molecularProfiles(clevelandSmall_cSet, "rna")
 #' 
 #' @param object The \code{CoreSet} to retrieve molecular profiles from
 #' @param mDataType \code{character} The type of molecular data
@@ -337,8 +337,8 @@ setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
 #' Generic for molecularProfiles replace method
 #' 
 #' @examples
-#' data(clevelandSmall)
-#' molecularProfiles(clevelandSmall, "rna") <- molecularProfiles(clevelandSmall, "rna")
+#' data(clevelandSmall_cSet)
+#' molecularProfiles(clevelandSmall_cSet, "rna") <- molecularProfiles(clevelandSmall_cSet, "rna")
 #' 
 #' @param object The \code{CoreSet} to replace molecular profiles in
 #' @param mDataType The type of molecular data to be updated
@@ -373,7 +373,7 @@ setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mD
 #' Generic for featureInfo method 
 #' 
 #' @examples
-#' featureInfo(clevelandSmall, "rna")
+#' featureInfo(clevelandSmall_cSet, "rna")
 #' 
 #' @param object The \code{CoreSet} to retrieve feature annotations from
 #' @param mDataType the type of molecular data
@@ -386,8 +386,7 @@ setGeneric("featureInfo", function(object, mDataType, ...) standardGeneric("feat
 #' @describeIn CoreSet Return the feature info for the given molecular data 
 #' @importFrom SummarizedExperiment rowData rowData<-
 #' @export
-setMethod(featureInfo, "CoreSet", function(object, mDataType){
-  
+setMethod(featureInfo, "CoreSet", function(object, mDataType) {
   if(mDataType %in% names(object@molecularProfiles)){
     return(rowData(object@molecularProfiles[[mDataType]]))
   }else{
@@ -400,7 +399,7 @@ setMethod(featureInfo, "CoreSet", function(object, mDataType){
 #' Generic for featureInfo replace method
 #' 
 #' @examples
-#' featureInfo(clevelandSmall, "rna") <- featureInfo(clevelandSmall, "rna")
+#' featureInfo(clevelandSmall_cSet, "rna") <- featureInfo(clevelandSmall_cSet, "rna")
 #' 
 #' @param object The \code{CoreSet} to replace gene annotations in
 #' @param mDataType The type of molecular data to be updated
@@ -444,7 +443,7 @@ setReplaceMethod("featureInfo", signature = signature(object="CoreSet", mDataTyp
 #' Generic for sensitivityInfo method 
 #' 
 #' @examples
-#' sensitivityInfo(clevelandSmall)
+#' sensitivityInfo(clevelandSmall_cSet)
 #' 
 #' @param object The \code{CoreSet} to retrieve sensitivity experiment annotations from
 #' @param ... Fallthrough arguments for defining new methods
@@ -463,7 +462,7 @@ setMethod(sensitivityInfo, "CoreSet", function(object){
 #' 
 #' 
 #' @examples
-#' sensitivityInfo(clevelandSmall) <- sensitivityInfo(clevelandSmall)
+#' sensitivityInfo(clevelandSmall_cSet) <- sensitivityInfo(clevelandSmall_cSet)
 #' 
 #' @param object The \code{CoreSet} to update
 #' @param value A \code{data.frame} with the new sensitivity annotations
@@ -486,7 +485,7 @@ setReplaceMethod("sensitivityInfo",
 #' Generic for sensitivityProfiles method 
 #' 
 #' @examples
-#' sensitivityProfiles(clevelandSmall)
+#' sensitivityProfiles(clevelandSmall_cSet)
 #' 
 #' @param object The \code{CoreSet} to retrieve sensitivity experiment data from
 #' @param ... Fallthrough arguements for defining new methods
@@ -505,7 +504,7 @@ setMethod(sensitivityProfiles, "CoreSet", function(object){
 #' A generic for the sensitivityProfiles replacement method
 #' 
 #' @examples
-#' sensitivityProfiles(clevelandSmall) <- sensitivityProfiles(clevelandSmall)
+#' sensitivityProfiles(clevelandSmall_cSet) <- sensitivityProfiles(clevelandSmall_cSet)
 #' 
 #' @param object The \code{CoreSet} to update
 #' @param value A \code{data.frame} with the new sensitivity profiles. If a matrix object is passed in, converted to data.frame before assignment
@@ -541,7 +540,7 @@ setReplaceMethod("sensitivityProfiles",
 #' A generic for the sensitivityMeasures  method
 #' 
 #' @examples
-#' sensitivityMeasures(clevelandSmall)
+#' sensitivityMeasures(clevelandSmall_cSet)
 #' 
 #' @param object The \code{CoreSet}
 #' @param ... Fallthrough arguements for defining new methods
@@ -561,7 +560,7 @@ setMethod(sensitivityMeasures, "CoreSet", function(object){
 #' A generic for the cellNames method
 #' 
 #' @examples
-#' cellNames(clevelandSmall)
+#' cellNames(clevelandSmall_cSet)
 #' 
 #' @param object The \code{CoreSet} to return cell names from
 #' @param ... Fallthrough arguements for defining new methods
@@ -579,7 +578,7 @@ setMethod(cellNames, "CoreSet", function(object){
 #' A generic for the cellNames replacement method
 #' 
 #' @examples
-#' cellNames(clevelandSmall) <- cellNames(clevelandSmall)
+#' cellNames(clevelandSmall_cSet) <- cellNames(clevelandSmall_cSet)
 #' 
 #' @param object The \code{CoreSet} to update
 #' @param value A \code{character} vector of the new cell names
@@ -600,7 +599,7 @@ setReplaceMethod("cellNames", signature = signature(object="CoreSet",value="char
 #' A generic for the fNames method
 #' 
 #' @examples
-#' fNames(clevelandSmall, "rna")
+#' fNames(clevelandSmall_cSet, "rna")
 #' 
 #' @param object The \code{CoreSet} 
 #' @param mDataType The molecular data type to return feature names for
@@ -623,8 +622,8 @@ setMethod(fNames, "CoreSet", function(object, mDataType){
 #' A generic for the fNames replacement method
 #' 
 #' @examples
-#' data(clevelandSmall)
-#' fNames(clevelandSmall, 'rna') <- fNames(clevelandSmall, 'rna')
+#' data(clevelandSmall_cSet)
+#' fNames(clevelandSmall_cSet, "rna") <- fNames(clevelandSmall_cSet, "rna")
 #' 
 #' @param object The \code{CoreSet} to update
 #' @param mDataType The molecular data type to update
@@ -654,7 +653,7 @@ setReplaceMethod("fNames",
 #' A generic for the dateCreated method
 #' 
 #' @examples
-#' dateCreated(clevelandSmall)
+#' dateCreated(clevelandSmall_cSet)
 #' 
 #' @param object A \code{CoreSet} 
 #' @param ... Fallthrough arguements for defining new methods
@@ -672,7 +671,7 @@ setMethod(dateCreated, "CoreSet", function(object) {
 #' A generic for the name method
 #' 
 #' @examples
-#' name(clevelandSmall)
+#' name(clevelandSmall_cSet)
 #' 
 #' @param object A \code{CoreSet} 
 #' @param ... Fallthrough arguements for defining new methods
@@ -691,7 +690,7 @@ setMethod(name, "CoreSet", function(object){
 #' A generic for the pertNumber method
 #' 
 #' @examples
-#' pertNumber(clevelandSmall)
+#' pertNumber(clevelandSmall_cSet)
 #' 
 #' @param object A \code{CoreSet}
 #' @param ... Fallthrough arguements for defining new methods
@@ -712,7 +711,7 @@ setMethod(pertNumber, "CoreSet", function(object){
 #' A generic for the sensNumber method
 #' 
 #' @examples
-#' sensNumber(clevelandSmall)
+#' sensNumber(clevelandSmall_cSet)
 #' 
 #' @param object A \code{CoreSet}
 #' @param ... Fallthrough arguements for defining new methods
@@ -732,7 +731,7 @@ setMethod(sensNumber, "CoreSet", function(object){
 #' A generic for the pertNumber method
 #' 
 #' @examples
-#' pertNumber(clevelandSmall) <- pertNumber(clevelandSmall)
+#' pertNumber(clevelandSmall_cSet) <- pertNumber(clevelandSmall_cSet)
 #' 
 #' @param object A \code{CoreSet} 
 #' @param value A new 3D \code{array} with the number of perturbation experiments per drug and cell line, and data type
@@ -754,7 +753,7 @@ setReplaceMethod('pertNumber', signature = signature(object="CoreSet", value="ar
 #' A generic for the sensNumber method
 #' 
 #' @examples
-#' sensNumber(clevelandSmall) <- sensNumber(clevelandSmall)
+#' sensNumber(clevelandSmall_cSet) <- sensNumber(clevelandSmall_cSet)
 #' 
 #' @param object A \code{CoreSet} 
 #' @param value A new \code{data.frame} with the number of sensitivity experiments per drug and cell line
@@ -776,7 +775,7 @@ setReplaceMethod('sensNumber', signature = signature(object="CoreSet", value="ma
 #' @param object \code{CoreSet}
 #' 
 #' @examples
-#' show(clevelandSmall)
+#' show(clevelandSmall_cSet)
 #' 
 #' @return Prints the CoreSet object to the output stream, and returns invisible NULL. 
 #' @export
@@ -803,7 +802,7 @@ setMethod("show", signature=signature(object="CoreSet"),
 #' 
 #' 
 #' @examples
-#' mDataNames(clevelandSmall)
+#' mDataNames(clevelandSmall_cSet)
 #' 
 #' @param object CoreSet object
 #' @param ... Fallthrough arguements for defining new methods
@@ -818,8 +817,8 @@ setGeneric("mDataNames", function(object, ...) standardGeneric("mDataNames"))
 #' Returns the molecular data names for the CoreSet.
 #' 
 #' @examples
-#' data(clevelandSmall)
-#' mDataNames(clevelandSmall)
+#' data(clevelandSmall_cSet)
+#' mDataNames(clevelandSmall_cSet)
 #' 
 #' @param object CoreSet object
 #' 
@@ -1082,7 +1081,7 @@ updateCellId <- function(object, new.ids = vector("character")){
 #' of data and with other studies.
 #' 
 #' @examples
-#' checkCsetStructure(clevelandSmall)
+#' checkCsetStructure(clevelandSmall_cSet)
 #' 
 #' @param cSet A \code{CoreSet} to be verified
 #' @param plotDist Should the function also plot the distribution of molecular data?

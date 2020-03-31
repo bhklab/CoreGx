@@ -20,7 +20,7 @@ Updated \code{CoreSet}
 A generic for the fNames replacement method
 }
 \examples{
-data(clevelandSmall)
-fNames(clevelandSmall, 'rna') <- fNames(clevelandSmall, 'rna')
+data(clevelandSmall_cSet)
+fNames(clevelandSmall_cSet, "rna") <- fNames(clevelandSmall_cSet, "rna")
 
 }

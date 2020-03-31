@@ -18,6 +18,6 @@ Updated \code{CoreSet}
 A generic for the sensitivityInfo replacement method
 }
 \examples{
-sensitivityInfo(clevelandSmall) <- sensitivityInfo(clevelandSmall)
+sensitivityInfo(clevelandSmall_cSet) <- sensitivityInfo(clevelandSmall_cSet)
 
 }

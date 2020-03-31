@@ -18,6 +18,6 @@ A \code{character} vector of all the available sensitivity measures
 A generic for the sensitivityMeasures  method
 }
 \examples{
-sensitivityMeasures(clevelandSmall)
+sensitivityMeasures(clevelandSmall_cSet)
 
 }
