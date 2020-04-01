@@ -301,8 +301,9 @@ setReplaceMethod("phenoInfo", signature = signature(object="CoreSet", mDataType 
 #' 
 #' @param object The \code{CoreSet} to retrieve molecular profiles from
 #' @param mDataType \code{character} The type of molecular data
-#' @param assay \code{character} Name of the desired assay; if excluded defaults to first assay
-#'   in the SummarizedExperiment for the given mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
+#' @param assay \code{character} Name of the desired assay; if excluded 
+#'   defaults to first assay in the SummarizedExperiment for the given 
+#'   mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
 #'   to check which assays are available for a given molecular datatype.
 #' @param ... Fallthrough arguements for defining new methods
 #' 

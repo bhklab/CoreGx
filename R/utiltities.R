@@ -10,14 +10,16 @@
 #'
 #' @param cSet \code{S4} A CoreSet containing molecular data in ExpressionSets
 #'
-#' @return \code{S4} A CoreSet containing molecular data in a SummarizedExperiments
+#' @return \code{S4} A CoreSet containing molecular data in a 
+#'   SummarizedExperiments
 #' 
 #' @importFrom parallel mclapply
-#' @importFrom SummarizedExperiment SummarizedExperiment Assays assay assayNames assayNames<-
-#' @importFrom Biobase exprs fData pData annotation protocolData assayDataElementNames
+#' @importFrom SummarizedExperiment SummarizedExperiment Assays assay 
+#'   assayNames assayNames<-
+#' @importFrom Biobase exprs fData pData annotation protocolData 
+#'   assayDataElementNames
 #' @importFrom S4Vectors SimpleList DataFrame
 #' @importFrom stats setNames
-#' 
 .convertCSetMolecularProfilesToSE <- function(cSet) {
   
   eSets <- cSet@molecularProfiles # Extract eSet data
@@ -72,20 +74,23 @@
 #' @importFrom testthat expect_equal test_that
 #' @importFrom SummarizedExperiment rowData colData assay assays assayNames assayNames<-
 #' @importFrom Biobase assayData assayData<-
-#' 
 .validateCsetMolecularProfilesToSEConversion <- function(cSet_old, cSet_new) {
   
   # Testing that cSets are in correct order
   print("Checking is cSet structures are correct")
   
   testthat::expect_true(
-    all(vapply(cSet_old@molecularProfiles, function(x) { is(x, "ExpressionSet") }, FUN.VALUE = logical(1))),
-    info = "Old cSet doesn't contain ExpressionSet objects, maybe argument order is wrong?"
+    all(vapply(cSet_old@molecularProfiles, function(x) { 
+      is(x, "ExpressionSet") }, FUN.VALUE = logical(1))),
+    info = "Old cSet doesn't contain ExpressionSet objects, maybe argument 
+    order is wrong?"
   )
   
   testthat::expect_true(
-    all(vapply(cSet_new@molecularProfiles, function(x) { is(x, "SummarizedExperiment") }, FUN.VALUE = logical(1))),
-    info = "New cSet doesn't contain SummarizedExperiment objects, maybe argument order is wrong?"
+    all(vapply(cSet_new@molecularProfiles, function(x) { 
+      is(x, "SummarizedExperiment") }, FUN.VALUE = logical(1))),
+    info = "New cSet doesn't contain SummarizedExperiment objects, maybe 
+    argument order is wrong?"
   )
   
   # Comparing molecularProfiles slot data  
@@ -104,7 +109,7 @@
     }
   }
   ## TODO:: Rewrite this as an apply statement
-  for (i in seq_len(length(cSet_old@molecularProfiles))) { # Have to compare like this due to NAs in data
+  for (i in seq_len(length(cSet_old@molecularProfiles))) { 
     # Checking phenoData
     testthat::expect_true(
       if (nrow(pData(cSet_old@molecularProfiles[[i]])) > 0) {
