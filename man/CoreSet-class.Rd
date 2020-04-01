@@ -94,8 +94,9 @@
 
 \item{mDataType}{A \code{character} with the type of molecular data to return/update}
 
-\item{assay}{\code{character} Name of the desired assay; if excluded defaults to first assay
-in the SummarizedExperiment for the given mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
+\item{assay}{\code{character} Name of the desired assay; if excluded 
+defaults to first assay in the SummarizedExperiment for the given 
+mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
 to check which assays are available for a given molecular datatype.}
 }
 \value{

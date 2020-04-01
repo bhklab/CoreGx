@@ -11,8 +11,9 @@ molecularProfiles(object, mDataType, assay, ...)
 
 \item{mDataType}{\code{character} The type of molecular data}
 
-\item{assay}{\code{character} Name of the desired assay; if excluded defaults to first assay
-in the SummarizedExperiment for the given mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
+\item{assay}{\code{character} Name of the desired assay; if excluded 
+defaults to first assay in the SummarizedExperiment for the given 
+mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
 to check which assays are available for a given molecular datatype.}
 
 \item{...}{Fallthrough arguements for defining new methods}

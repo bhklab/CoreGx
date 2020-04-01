@@ -10,7 +10,8 @@
 \item{cSet}{\code{S4} A CoreSet containing molecular data in ExpressionSets}
 }
 \value{
-\code{S4} A CoreSet containing molecular data in a SummarizedExperiments
+\code{S4} A CoreSet containing molecular data in a 
+  SummarizedExperiments
 }
 \description{
 Converts all ExpressionSet objects within the molecularProfiles slot of a 

@@ -2,15 +2,15 @@
 title: "CoreGx: Class and Function Abstractions for PharmacoGx, RadioGx and ToxicoGx"
 
 author: 
-- 'Petr Smirnov'
-- 'Ian Smith'
-- 'Christopher Eeles'
-- 'Benjamin Haibe-Kains'
+- name: Petr Smirnov
+- name: Ian Smith
+- name: Christopher Eeles
+- name: Benjamin Haibe-Kains
   
-output: pdf_document
+output: distill::distill_article
   
 vignette: |
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteIndexEntry{CoreGx: Class and Function Abstractions}
 ---
 # CoreGx
@@ -33,13 +33,10 @@ library(CoreGx)
 
 ```{r coregx_do_some_stuff}
 data(clevelandSmall_cSet)
-
 # Setter method for sample phenotype information
 phenoInfo(clevelandSmall_cSet, 'rna') <- phenoInfo(clevelandSmall_cSet, 'rna')
-
 # Setter method for molecular features available in the assay samples
 featureInfo(clevelandSmall_cSet, 'rna') <- featureInfo(clevelandSmall_cSet, 'rna')
-
 ```
 
 For more information about this package and the possibility of collaborating on 
