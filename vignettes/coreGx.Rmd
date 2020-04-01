@@ -1,8 +1,14 @@
 ---
 title: "CoreGx: Class and Function Abstractions for PharmacoGx, RadioGx and ToxicoGx"
-author: "Benjamin Haibe-Kains"
-date: "25/03/2020"
+
+author: 
+- 'Petr Smirnov'
+- 'Ian Smith'
+- 'Christopher Eeles'
+- 'Benjamin Haibe-Kains'
+  
 output: pdf_document
+  
 vignette: |
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{CoreGx: Class and Function Abstractions}
