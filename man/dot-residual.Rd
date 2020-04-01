@@ -15,6 +15,10 @@
   trunc = FALSE
 )
 }
+\value{
+A \code{numeric} containing the estimated residuals for the model
+  fit
+}
 \description{
 TODO:: Write documentation
 }

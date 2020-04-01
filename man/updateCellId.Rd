@@ -11,6 +11,9 @@ updateCellId(object, new.ids = vector("character"))
 
 \item{new.ids}{The new ids to assign to the object}
 }
+\value{
+\code{CoreSet} The modified CoreSet object
+}
 \description{
 Update the cell ids in a cSet object
 }
