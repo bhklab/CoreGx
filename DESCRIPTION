@@ -45,7 +45,8 @@ Imports:
     lsa, 
     testthat
 Suggests: 
-  pander, 
+  pander,
+  distill,
   rmarkdown,
   knitr
 License: GPL-3
