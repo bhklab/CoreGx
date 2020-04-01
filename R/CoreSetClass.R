@@ -838,6 +838,8 @@ setMethod("mDataNames", "CoreSet", function(object){
 #' @param object The object for witch the cell ids will be updated
 #' @param new.ids The new ids to assign to the object
 #' 
+#' @return \code{CoreSet} The modified CoreSet object
+#' 
 #' @export
 #' @keywords internal
 updateCellId <- function(object, new.ids = vector("character")){

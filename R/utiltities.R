@@ -923,10 +923,24 @@
 #' generate an initial guess for dose-response curve parameters by evaluating 
 #' the residuals at different lattice points of the search space
 #' 
+#' @return A \code{numeric} vector containing initial guesses for the 
+#'   dose-response curve parameters
+#' 
 #' @export
 #' @keywords internal
 #' ##FIXME:: Why is this different in PharmacoGx?
-.meshEval <- function (x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
+.meshEval <- function (x, 
+                       y, 
+                       f, 
+                       guess, 
+                       lower_bounds, 
+                       upper_bounds, 
+                       density, 
+                       n, 
+                       scale, 
+                       family, 
+                       trunc)
+{
   pars <- NULL
   guess_residual <- .residual(x = x,
                               y = y,
@@ -1180,6 +1194,10 @@
 
 #' TODO:: Write documentation
 ##FIXME:: Why is this different from PharmacoGx?
+#'
+#' @return A \code{numeric} containing the estimated residuals for the model
+#'   fit
+#'
 #' @export
 #' @keywords internal
 .residual <- 
