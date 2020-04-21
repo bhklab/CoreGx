@@ -65,7 +65,6 @@
 # and hides the annotation slot which the user does not need to manually fill. 
 # This also follows the design of the Expression Set class.
 
-
 #####
 ## CONSTRUCTOR ----
 #####
@@ -126,7 +125,6 @@ CoreSet <-  function(name,
     annotation$sessionInfo <- sessionInfo()
     annotation$call <- match.call()
     
-    #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
     for (i in seq_len(length(molecularProfiles))){
         if (!is(molecularProfiles[[i]], "SummarizedExperiment")) {
             stop(sprintf("Please provide the %s data as a SummarizedExperiment", names(molecularProfiles[i])))
@@ -140,7 +138,8 @@ CoreSet <-  function(name,
     
     sensitivity <- list()
     
-    if (!all(rownames(sensitivityInfo) == rownames(sensitivityProfiles) & rownames(sensitivityInfo) == dimnames(sensitivityRaw)[[1]])){
+    if (!all(rownames(sensitivityInfo) == rownames(sensitivityProfiles) & 
+             rownames(sensitivityInfo) == dimnames(sensitivityRaw)[[1]])){
         stop("Please ensure all the row names match between the sensitivity data.")
     }
     
@@ -157,18 +156,26 @@ CoreSet <-  function(name,
     perturbation <- list()
     perturbation$n <- perturbationN
     if (datasetType == "perturbation" || datasetType == "both") {
-        perturbation$info <- "The metadata for the perturbation experiments is available for each molecular type by calling the appropriate info function. \n For example, for RNA transcriptome perturbations, the metadata can be accessed using rnaInfo(cSet)."
+        perturbation$info <- "The metadata for the perturbation experiments is 
+          available for each molecular type by calling the appropriate info 
+          function. \n For example, for RNA transcriptome perturbations, the 
+          metadata can be accessed using rnaInfo(cSet)."
     } else {
         perturbation$info <- "Not a perturbation dataset."
     }
     
-    object  <- .CoreSet(annotation=annotation, molecularProfiles=molecularProfiles, cell=as.data.frame(cell), datasetType=datasetType, sensitivity=sensitivity, perturbation=perturbation, curation=curation)
+    object  <- .CoreSet(annotation=annotation, 
+                        molecularProfiles=molecularProfiles, 
+                        cell=as.data.frame(cell), datasetType=datasetType, 
+                        sensitivity=sensitivity, perturbation=perturbation, 
+                        curation=curation)
     if (verify) { checkCsetStructure(object)}
+
   if(length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
-    object@sensitivity$n <- .summarizeSensitivityNumbers(object)
+    sensNumber(object) <- .summarizeSensitivityNumbers(object)
   }
     if(length(perturbationN) == 0  & datasetType %in% c("perturbation", "both")) {
-      object@perturbation$n <- .summarizePerturbationNumbers(object)
+      pertNumber(object) <- .summarizePerturbationNumbers(object)
     }
   return(object)
 }
@@ -362,10 +369,52 @@ setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mD
 #' @describeIn CoreSet Update the given type of molecular data from the CoreSet 
 #' @inheritParams molecularProfiles<-
 #' @export
-setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mDataType ="character", assay="missing", value="matrix"), function(object, mDataType, assay, value){
+setReplaceMethod("molecularProfiles", 
+                 signature(object="CoreSet", mDataType ="character", 
+                           assay="missing", value="matrix"), 
+                 function(object, mDataType, assay, value) {
   if (mDataType %in% names(object@molecularProfiles)) {
     SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1) <- value
   }
+  object
+})
+
+#' molecularProfilesSlot Generic
+#' 
+#' @param object A \code{CoreSet} from which to return a list of all availble
+#'   SummarizedExperiment objects
+#' @param ... A \code{list} of additional parameters; included to allow adding
+#'   arguments to methods on this generc   
+#'   
+#' @return A \code{list} containing the molecularProfiles from a cSet
+#' 
+#' Generic for molecularProfilesSlot
+setGeneric("molecularProfilesSlot", function(object, ...) standardGeneric("molecularProfilesSlot"))
+#' @describeIn CoreSet Return a list containing all molecularProfiles in the cSet
+#' @inheritParams molecularProfilesSlot
+#' @export
+setMethod("molecularProfilesSlot", signature("CoreSet"), function(object) {
+  object@molecularProfiles
+})
+
+#' molecularProfilesSlot<-
+#' 
+#' Replace method for the molecular profiles slot of a cSet
+#' 
+#' @param object A \code{CoreSet} object for which values will be replaced
+#' @param value A \code{list} containing molecular profiles as SummarizedExperiments
+#' 
+#' @export
+setGeneric("molecularProfilesSlot<-", 
+           function(object, value) standardGeneric("molecularProfilesSlot<-"))
+#' @describeIn CoreSet Update the contents of the molecularProfiles slot in a
+#'   CoreSet and returns an update copy
+#' @inheritParams molecularProfilesSlot<-
+#' @export
+setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list"),
+                 function(object, value) {
+  ##TODO:: Implement error handling for this function
+  object@molecularProfiles <- value
   object
 })
 

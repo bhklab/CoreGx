@@ -13,7 +13,7 @@ mcc(x, y, nperm = 1000, nthread = 1, ...)
 estimation. If 0, no permutation testing is done}
 
 \item{nthread}{\code{numeric} can parallelize permutation texting using 
-parallel's mclapply}
+BiocParallels bplapply}
 
 \item{...}{\code{list} Additional arguments}
 }

@@ -5,8 +5,8 @@
 #' weighted spearman statistic. The GSEA analysis is implemented in the piano package. 
 #' 
 #' @references 
-#'    F. Pozzi, T. Di Matteo, T. Aste, "Exponential smoothing weighted
-#'    correlations", The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
+#'    F. Pozzi, T. Di Matteo, T. Aste, 'Exponential smoothing weighted
+#'    correlations', The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
 #'    10.1140/epjb/e2012-20697-x
 #' @references
 #'    Varemo, L., Nielsen, J. and Nookaew, I. (2013) Enriching the gene set
@@ -22,7 +22,7 @@
 #' xx <- cbind(xValue, xSig)
 #' yy <- cbind(yValue, ySig)
 #' rownames(xx) <- rownames(yy) <- c('1','2','3','4','5','6','7','8','9','10','11')
-#' data.cor <- connectivityScore(xx,yy,method="gwc", gwc.method="spearman", nperm=300)
+#' data.cor <- connectivityScore(xx,yy,method='gwc', gwc.method='spearman', nperm=300)
 #' 
 #' @param x A \code{matrix} with the first gene signature. In the case of GSEA the vector of
 #'   values per gene for GSEA in which we are looking for an enrichment. In the 
@@ -33,7 +33,7 @@
 #'   with the direction being determined from the sign. In the case of gwc, this
 #'   should be a matrix of identical size to x, once again with the per gene
 #'   responses in the first column, and their significance in the second.
-#' @param method \code{character} string identifying which method to use, out of 'gsea' and 'gwc'
+#' @param method \code{character} string identifying which method to use, out of 'fgsea' and 'gwc'
 #' @param nperm \code{numeric}, how many permutations should be done to determine
 #'   significance through permutation testing? The minimum is 100, default is
 #'   1e4.
@@ -49,95 +49,103 @@
 #' 
 #' @importFrom piano runGSA loadGSC
 #' @importFrom stats complete.cases
-connectivityScore <- function(x, y, method=c("gsea", "fgsea", "gwc"), nperm=1e4, nthread=1, gwc.method=c("spearman", "pearson"), ...) {
-  
-  method <- match.arg(method)
-  gwc.method <- match.arg(gwc.method)
-  if (!is.matrix(x)) {
-      x <- as.matrix(x)
-  }
-  if (!is.matrix(y)) {
-      y <- as.matrix(y)
-  }
-  if ((ncol(x) != 2 || ncol(y) != 2) && method=="gwc") {
-    stop ("x and y should have 2 columns: effect size and corresponding p-values")
-  }
-  if(method=="gsea"){
-    method <- "fgsea"
-    warning("Using fGSEA method to calculate GSEA")
-  }
-  if (method == "fgsea" && nrow(y) >= nrow(x)) {
-    warning("GSEA method: query gene set (y) larger than signature (x)")
-  }
-  
-  if (is.null(rownames(x)) || is.null(rownames(y)) || !length(intersect(rownames(x), rownames(y)))) {
-    stop ("Row names of x and y are either missing or have no intersection")
-  }
-  if (nperm < 100){
-    stop ("The minimum number of permutations for permutation testing is 100")
-  }
-  switch (method,
-          "fgsea" = {
-            ## remove missing values
-            y <- y[!is.na(y[ ,1]), , drop=FALSE]
-            x <- x[!is.na(x[ ,1]), , drop=FALSE]
-            ## create gene set
-            gset <- cbind("gene"=rownames(y), "set"=ifelse(as.numeric(y[ , 1]) >= 0, "UP", "DOWN")) 
-            gset <- piano::loadGSC(gset)
-            ## run enrichment analysis
-            nes <- piano::runGSA(geneLevelStats=x[ , 1], geneSetStat="fgsea", gsc=gset, nPerm=nperm + (nperm %% nthread), ncpus=nthread, verbose=FALSE, adjMethod="none",...)
-            ## merge p-values for negative and positive enrichment scores
-            nes$pDistinctDir <- nes$pDistinctDirUp
-            nes$pDistinctDir[is.na(nes$pDistinctDirUp), 1] <- nes$pDistinctDirDn[is.na(nes$pDistinctDirUp), 1]
-            nes.up <- c(nes$statDistinctDir[which(names(nes$gsc) == "UP"), 1], nes$pDistinctDir[which(names(nes$gsc) == "UP"), 1])
-            nes.down <- c(nes$statDistinctDir[which(names(nes$gsc) == "DOWN"), 1], nes$pDistinctDir[which(names(nes$gsc) == "DOWN"), 1])
-            ## combine UP and DOWN
-            if (length(nes.up) == 0){
-              score = c("es" = -nes.down[1], "p" = nes.down[2])
-            } else if (length(nes.down) == 0){
-              score = c("es" = nes.up[1], "p" = nes.up[2])
-            } else if (complete.cases(cbind(nes.up, nes.down)) && sign(nes.up[1]) != sign(nes.down[1])) {
-              score <- c("es"=(nes.up[1] - nes.down[1]) / 2, "p"=.combineTest(p=c(nes.up[2], nes.down[2]), method="fisher", na.rm=TRUE))
-            } else {
-              score <- c("score"=0, "p"=1)
-            }
-          },
-          "gwc" = {
-            ## intersection between x and y
-            ii <- intersect(rownames(x), rownames(y))
-            if(length(ii) < 10) {
-              stop ("Less than 10 probes/genes in common between x and y")
-            }
-            score <- gwc(x1=x[ii, 1], p1=x[ii, 2], x2=y[ii, 1], p2=y[ii, 2], method.cor=gwc.method, nperm=nperm, ...)
-            names(score) <- c("score", "p")
-          }
-  )
-  return (score)
+## TODO:: Implement 'gsea' method for this function
+connectivityScore <- function(x, y, method = c("fgsea", "gwc"), nperm = 10000, nthread = 1, gwc.method = c("spearman", "pearson"), ...) {
+    
+    if (method == "gsea") {
+        stop("The gsea method is implemented using fgsea, please change your
+             method argument to 'fgsea'. Consult ?connectivityScore for
+             more information")
+    }
+    
+    method <- match.arg(method)
+    gwc.method <- match.arg(gwc.method)
+    if (!is.matrix(x)) {
+        x <- as.matrix(x)
+    }
+    if (!is.matrix(y)) {
+        y <- as.matrix(y)
+    }
+    if ((ncol(x) != 2 || ncol(y) != 2) && method == "gwc") {
+        stop("x and y should have 2 columns: effect size and corresponding p-values")
+    }
+    if (method == "fgsea" && nrow(y) >= nrow(x)) {
+        warning("GSEA method: query gene set (y) larger than signature (x)")
+    }
+    
+    if (is.null(rownames(x)) || is.null(rownames(y)) || !length(intersect(rownames(x), rownames(y)))) {
+        stop("Row names of x and y are either missing or have no intersection")
+    }
+    if (nperm < 100) {
+        stop("The minimum number of permutations for permutation testing is 100")
+    }
+    switch(method, fgsea = {
+        ## remove missing values
+        y <- y[!is.na(y[, 1]), , drop = FALSE]
+        x <- x[!is.na(x[, 1]), , drop = FALSE]
+        ## create gene set
+        gset <- cbind(gene = rownames(y), set = ifelse(as.numeric(y[, 1]) >= 0, "UP", "DOWN"))
+        gset <- piano::loadGSC(gset)
+        ## run enrichment analysis
+        nes <- piano::runGSA(geneLevelStats = x[, 1], geneSetStat = "fgsea", gsc = gset, nPerm = nperm + (nperm%%nthread), ncpus = nthread, 
+            verbose = FALSE, adjMethod = "none", ...)
+        ## merge p-values for negative and positive enrichment scores
+        nes$pDistinctDir <- nes$pDistinctDirUp
+        nes$pDistinctDir[is.na(nes$pDistinctDirUp), 1] <- nes$pDistinctDirDn[is.na(nes$pDistinctDirUp), 1]
+        nes.up <- c(nes$statDistinctDir[which(names(nes$gsc) == "UP"), 1], nes$pDistinctDir[which(names(nes$gsc) == "UP"), 1])
+        nes.down <- c(nes$statDistinctDir[which(names(nes$gsc) == "DOWN"), 1], nes$pDistinctDir[which(names(nes$gsc) == "DOWN"), 1])
+        ## combine UP and DOWN
+        if (length(nes.up) == 0) {
+            score = c(es = -nes.down[1], p = nes.down[2])
+        } else if (length(nes.down) == 0) {
+            score = c(es = nes.up[1], p = nes.up[2])
+        } else if (complete.cases(cbind(nes.up, nes.down)) && sign(nes.up[1]) != sign(nes.down[1])) {
+            score <- c(es = (nes.up[1] - nes.down[1])/2, p = .combineTest(p = c(nes.up[2], nes.down[2]), method = "fisher", na.rm = TRUE))
+        } else {
+            score <- c(score = 0, p = 1)
+        }
+    }, gwc = {
+        ## intersection between x and y
+        ii <- intersect(rownames(x), rownames(y))
+        if (length(ii) < 10) {
+            stop("Less than 10 probes/genes in common between x and y")
+        }
+        score <- gwc(x1 = x[ii, 1], p1 = x[ii, 2], x2 = y[ii, 1], p2 = y[ii, 2], method.cor = gwc.method, nperm = nperm, ...)
+        names(score) <- c("score", "p")
+    })
+    return(score)
 }
 
 #' @importFrom stats pchisq qnorm pnorm pt
-.combineTest <-
-  function(p, weight, method=c("fisher", "z.transform", "logit"), hetero=FALSE, na.rm=FALSE) {
-    if(hetero) { stop("function to deal with heterogeneity is not implemented yet!") }
+.combineTest <- function(p, weight, method = c("fisher", "z.transform", "logit"), hetero = FALSE, na.rm = FALSE) {
+    if (hetero) {
+        stop("function to deal with heterogeneity is not implemented yet!")
+    }
     method <- match.arg(method)
     na.ix <- is.na(p)
-    if(any(na.ix) && !na.rm) { stop("missing values are present!") }
-    if(all(na.ix)) { return(NA) } ## all p-values are missing
+    if (any(na.ix) && !na.rm) {
+        stop("missing values are present!")
+    }
+    if (all(na.ix)) 
+        {
+            return(NA)
+        }  ## all p-values are missing
     p <- p[!na.ix]
     k <- length(p)
-    if(k == 1) { return(p) }
-    if(missing(weight)) { weight <- rep(1, k); }
-    switch(method,  
-           "fisher"={
-             cp <- pchisq(-2 * sum(log(p)), df=2*k, lower.tail=FALSE)
-           }, 
-           "z.transform"={
-             z <- qnorm(p, lower.tail=FALSE)
-             cp <- pnorm(sum(weight * z) / sqrt(sum(weight^2)), lower.tail=FALSE)
-           }, 
-           "logit"={
-             tt <- (- sum(log(p / (1 - p)))) / sqrt(k * pi^2 * (5 * k + 2) / (3 * (5 * k + 4)))
-             cp <- pt(tt,df=5*k+4, lower.tail=FALSE)
-           })
+    if (k == 1) {
+        return(p)
+    }
+    if (missing(weight)) {
+        weight <- rep(1, k)
+    }
+    switch(method, fisher = {
+        cp <- pchisq(-2 * sum(log(p)), df = 2 * k, lower.tail = FALSE)
+    }, z.transform = {
+        z <- qnorm(p, lower.tail = FALSE)
+        cp <- pnorm(sum(weight * z)/sqrt(sum(weight^2)), lower.tail = FALSE)
+    }, logit = {
+        tt <- (-sum(log(p/(1 - p))))/sqrt(k * pi^2 * (5 * k + 2)/(3 * (5 * k + 4)))
+        cp <- pt(tt, df = 5 * k + 4, lower.tail = FALSE)
+    })
     return(cp)
-  }
+}
