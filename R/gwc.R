@@ -26,9 +26,9 @@
 #'@return \code{numeric} a vector of two values, the correlation and associated p-value.
 #'@export
 ## - http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient#Calculating_a_weighted_correlation
-## http://www.mathworks.com/matlabcentral/fileexchange/20846-weighted-correlation-matrix F. Pozzi, T. Di Matteo, T. Aste,
-## 'Exponential smoothing weighted correlations', The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
-## 10.1140/epjb/e2012-20697-x TODO:: Give this function a more descriptive name
+## http://www.mathworks.com/matlabcentral/fileexchange/20846-weighted-correlation-matrix F. Pozzi, T. Di Matteo, T. Aste, 'Exponential
+## smoothing weighted correlations', The European Physical Journal B, Vol. 85, No 6, 2012. DOI: 10.1140/epjb/e2012-20697-x TODO:: Give
+## this function a more descriptive name
 gwc <- function(x1, p1, x2, p2, method.cor = c("pearson", "spearman"), nperm = 10000, truncate.p = 1e-16, ...) {
     method.cor <- match.arg(method.cor)
     ## intersection between x and y
@@ -54,11 +54,10 @@ gwc <- function(x1, p1, x2, p2, method.cor = c("pearson", "spearman"), nperm = 1
     return(res)
 }
 
-#### Compute a weighted correlation coefficient inspired from package boot - 
-#### TODO:: Write function documentation?
+#### Compute a weighted correlation coefficient inspired from package boot - TODO:: Write function documentation?
 #' @importFrom stats cov.wt complete.cases
-.corWeighted <- function(x, y, w, method = c("pearson", "spearman"), alternative = c("two.sided", "greater", "less"), nperm = 0, 
-    nthread = 1, na.rm = FALSE) {
+.corWeighted <- function(x, y, w, method = c("pearson", "spearman"), alternative = c("two.sided", "greater", "less"), nperm = 0, nthread = 1, 
+    na.rm = FALSE) {
     
     ###################### 
     wcor <- function(d, w, na.rm = TRUE) {

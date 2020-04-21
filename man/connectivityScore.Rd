@@ -7,7 +7,7 @@
 connectivityScore(
   x,
   y,
-  method = c("gsea", "fgsea", "gwc"),
+  method = c("fgsea", "gwc"),
   nperm = 10000,
   nthread = 1,
   gwc.method = c("spearman", "pearson"),
@@ -26,7 +26,7 @@ with the direction being determined from the sign. In the case of gwc, this
 should be a matrix of identical size to x, once again with the per gene
 responses in the first column, and their significance in the second.}
 
-\item{method}{\code{character} string identifying which method to use, out of 'gsea' and 'gwc'}
+\item{method}{\code{character} string identifying which method to use, out of 'fgsea' and 'gwc'}
 
 \item{nperm}{\code{numeric}, how many permutations should be done to determine
 significance through permutation testing? The minimum is 100, default is

@@ -12,7 +12,8 @@
 \alias{molecularProfiles,CoreSet-method}
 \alias{molecularProfiles<-,CoreSet,character,character,matrix-method}
 \alias{molecularProfiles<-,CoreSet,character,missing,matrix-method}
-\alias{molecularProfilesList,CoreSet-method}
+\alias{molecularProfilesSlot,CoreSet-method}
+\alias{molecularProfilesSlot<-,CoreSet,list-method}
 \alias{featureInfo,CoreSet-method}
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
 \alias{featureInfo<-,CoreSet,character,DataFrame-method}
@@ -50,7 +51,9 @@
 
 \S4method{molecularProfiles}{CoreSet,character,missing,matrix}(object, mDataType, assay) <- value
 
-\S4method{molecularProfilesList}{CoreSet}(object)
+\S4method{molecularProfilesSlot}{CoreSet}(object)
+
+\S4method{molecularProfilesSlot}{CoreSet,list}(object) <- value
 
 \S4method{featureInfo}{CoreSet}(object, mDataType)
 
@@ -136,7 +139,10 @@ packages to apply the correct model for the given data.
 
 \item \code{molecularProfiles<-}: Update the given type of molecular data from the CoreSet
 
-\item \code{molecularProfilesList}: Return a list containing all molecularProfiles in the cSet
+\item \code{molecularProfilesSlot}: Return a list containing all molecularProfiles in the cSet
+
+\item \code{molecularProfilesSlot<-}: Update the contents of the molecularProfiles slot in a
+CoreSet and returns an update copy
 
 \item \code{featureInfo}: Return the feature info for the given molecular data
 

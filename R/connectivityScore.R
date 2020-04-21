@@ -33,7 +33,7 @@
 #'   with the direction being determined from the sign. In the case of gwc, this
 #'   should be a matrix of identical size to x, once again with the per gene
 #'   responses in the first column, and their significance in the second.
-#' @param method \code{character} string identifying which method to use, out of 'gsea' and 'gwc'
+#' @param method \code{character} string identifying which method to use, out of 'fgsea' and 'gwc'
 #' @param nperm \code{numeric}, how many permutations should be done to determine
 #'   significance through permutation testing? The minimum is 100, default is
 #'   1e4.
@@ -49,8 +49,14 @@
 #' 
 #' @importFrom piano runGSA loadGSC
 #' @importFrom stats complete.cases
-connectivityScore <- function(x, y, method = c("gsea", "fgsea", "gwc"), nperm = 10000, nthread = 1, gwc.method = c("spearman", 
-    "pearson"), ...) {
+## TODO:: Implement 'gsea' method for this function
+connectivityScore <- function(x, y, method = c("fgsea", "gwc"), nperm = 10000, nthread = 1, gwc.method = c("spearman", "pearson"), ...) {
+    
+    if (method == "gsea") {
+        stop("The gsea method is implemented using fgsea, please change your
+             method argument to 'fgsea'. Consult ?connectivityScore for
+             more information")
+    }
     
     method <- match.arg(method)
     gwc.method <- match.arg(gwc.method)
@@ -62,10 +68,6 @@ connectivityScore <- function(x, y, method = c("gsea", "fgsea", "gwc"), nperm = 
     }
     if ((ncol(x) != 2 || ncol(y) != 2) && method == "gwc") {
         stop("x and y should have 2 columns: effect size and corresponding p-values")
-    }
-    if (method == "gsea") {
-        method <- "fgsea"
-        warning("Using fGSEA method to calculate GSEA")
     }
     if (method == "fgsea" && nrow(y) >= nrow(x)) {
         warning("GSEA method: query gene set (y) larger than signature (x)")
@@ -91,8 +93,7 @@ connectivityScore <- function(x, y, method = c("gsea", "fgsea", "gwc"), nperm = 
         nes$pDistinctDir <- nes$pDistinctDirUp
         nes$pDistinctDir[is.na(nes$pDistinctDirUp), 1] <- nes$pDistinctDirDn[is.na(nes$pDistinctDirUp), 1]
         nes.up <- c(nes$statDistinctDir[which(names(nes$gsc) == "UP"), 1], nes$pDistinctDir[which(names(nes$gsc) == "UP"), 1])
-        nes.down <- c(nes$statDistinctDir[which(names(nes$gsc) == "DOWN"), 1], nes$pDistinctDir[which(names(nes$gsc) == "DOWN"), 
-            1])
+        nes.down <- c(nes$statDistinctDir[which(names(nes$gsc) == "DOWN"), 1], nes$pDistinctDir[which(names(nes$gsc) == "DOWN"), 1])
         ## combine UP and DOWN
         if (length(nes.up) == 0) {
             score = c(es = -nes.down[1], p = nes.down[2])
