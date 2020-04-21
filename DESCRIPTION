@@ -1,7 +1,7 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
-Version: 0.99.9
+Version: 0.99.10
 Date: 2020-04-01
 Authors@R: c(
     person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca", role = c("aut")),
@@ -30,7 +30,7 @@ VignetteEngine: knitr::rmarkdown
 biocViews: Software, Pharmacogenomics, Classification, Survival
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 4.1)
+Depends: R (>= 4.0)
 Imports: 
     Biobase,
     S4Vectors,
