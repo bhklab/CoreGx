@@ -70,10 +70,23 @@ mcc <-
 
 ## Helper functions
 
+
+## Just a lot of math, multiclass MCC
+## https://en.wikipedia.org/wiki/Matthews_correlation_coefficient#Multiclass_case
 .mcc <- 
   function(ct, nbcat=nrow(ct)) {
     if(nrow(ct) != ncol(ct)) { stop("the confusion table should be square!") }
-    if(!(sum(ct)==sum(diag(ct))) &&  (length(which(apply(ct, 1, sum) == 0)) == (nbcat-1) & ((length(which(apply(ct, 2, sum) == 0)) != (nbcat-1)) | (length(which(apply(ct, 2, sum) == 0)) == (nbcat-1)))) || (length(which(apply(ct, 2, sum) == 0)) == (nbcat-1) & ((length(which(apply(ct, 1, sum) == 0)) != (nbcat-1)) | (length(which(apply(ct, 1, sum) == 0)) == (nbcat-1)) & sum(diag(ct)) == 0))) { ct <- ct + matrix(1, ncol=nbcat, nrow=nbcat) } ### add element to categories if nbcat-1 predictive categories do not contain elements. Not in case where all are correct!
+
+    ## The following code checks if there would be a division by 0 error in the computation on the Matthew's 
+    ## correlation coefficient. In practice, this occurs when there are multiple categories but all predictions end up 
+    ## in only one category - in this case, the denominator is 0. This is dealt with by adding a psuedocount to each.
+    ## This is chosen because the mcc of a matrix of 1s is 0, and such should not affect the value in expectation.  
+    ## Note this is not necessary when alll entries lie on the diagonal. 
+    if( !(sum(ct)==sum(diag(ct))) && ## Check if all entries are on the diagonal. If they are, no adjustment necessary. 
+        ((sum(rowSums(ct) == 0) == (nbcat-1)) || ## Otherwise, check if there is entries only in one column or only in one row. 
+        (sum(colSums(ct) == 0) == (nbcat-1)))) {
+        ct <- ct + matrix(1, ncol=nbcat, nrow=nbcat) 
+      } ### add element to categories if nbcat-1 predictive categories do not contain elements. Not in case where all are correct!
     
     if(sum(ct, na.rm=TRUE) <= 0) { return(NA) }
     
