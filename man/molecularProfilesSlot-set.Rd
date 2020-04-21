@@ -11,6 +11,9 @@ molecularProfilesSlot(object) <- value
 
 \item{value}{A \code{list} containing molecular profiles as SummarizedExperiments}
 }
+\value{
+A copy of the \code{CoreSet} with the molecularProfiles slot updated
+}
 \description{
 Replace method for the molecular profiles slot of a cSet
 }

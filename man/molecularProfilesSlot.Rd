@@ -21,3 +21,8 @@ Generic for molecularProfilesSlot
 \description{
 molecularProfilesSlot Generic
 }
+\examples{
+data(clevelandSmall_cSet)
+molecularProfilesSlot(clevelandSmall_cSet)
+
+}

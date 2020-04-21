@@ -40,7 +40,7 @@
         assayNames(SE) <- assayDataElementNames(eSet)
         # Assign SE to cSet
         mDataType <- Biobase::annotation(eSet)
-        cSet@molecularProfiles[[mDataType]] <- SE
+        molecularProfilesSlot(cSet)[[mDataType]] <- SE
     })
     setNames(cSet@molecularProfiles, names(eSets))
     cSet
