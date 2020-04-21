@@ -56,12 +56,12 @@ ySig <- c(0.01, 0.001, .97,0.01, 0.01,0.78,0.9,0.01,0.01,0.01,0.01)
 xx <- cbind(xValue, xSig)
 yy <- cbind(yValue, ySig)
 rownames(xx) <- rownames(yy) <- c('1','2','3','4','5','6','7','8','9','10','11')
-data.cor <- connectivityScore(xx,yy,method="gwc", gwc.method="spearman", nperm=300)
+data.cor <- connectivityScore(xx,yy,method='gwc', gwc.method='spearman', nperm=300)
 
 }
 \references{
-F. Pozzi, T. Di Matteo, T. Aste, "Exponential smoothing weighted
-   correlations", The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
+F. Pozzi, T. Di Matteo, T. Aste, 'Exponential smoothing weighted
+   correlations', The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
    10.1140/epjb/e2012-20697-x
 
 Varemo, L., Nielsen, J. and Nookaew, I. (2013) Enriching the gene set

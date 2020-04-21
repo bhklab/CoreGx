@@ -17,3 +17,4 @@
 Converts all ExpressionSet objects within the molecularProfiles slot of a 
   CoreSet to SummarizedExperiments
 }
+\keyword{internal}

@@ -126,7 +126,6 @@ CoreSet <-  function(name,
     annotation$sessionInfo <- sessionInfo()
     annotation$call <- match.call()
     
-    #molecularProfiles <- list("dna"=dna, "rna"=rna, "snp"=snp, "cnv"=cnv)
     for (i in seq_len(length(molecularProfiles))){
         if (!is(molecularProfiles[[i]], "SummarizedExperiment")) {
             stop(sprintf("Please provide the %s data as a SummarizedExperiment", names(molecularProfiles[i])))
@@ -367,6 +366,22 @@ setReplaceMethod("molecularProfiles", signature = signature(object="CoreSet", mD
     SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1) <- value
   }
   object
+})
+
+#' molecularProfilesList Generic
+#' 
+#' @param object A \code{CoreSet} from which to return a list of all availble
+#'   SummarizedExperiment objects
+#'   
+#' @return A \code{list} containing the molecularProfiles from a cSet
+#' 
+#' Generic for molecularProfilesList
+setGeneric("molecularProfilesList", function(object, ...) standardGeneric("molecularProfilesList"))
+#' @describeIn CoreSet Return a list containing all molecularProfiles in the cSet
+#' @inheritParams molecularProfilesList
+#' @export
+setMethod("molecularProfilesList", signature("CoreSet"), function(object) {
+  object@molecularProfiles
 })
 
 #' featureInfo Generic

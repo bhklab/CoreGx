@@ -33,7 +33,7 @@
 #'   value over all the splits, the p value, as well as the rank at which the 
 #'   split was done.
 #'
-#' @import parallel
+#' @importFrom BiocParallel bplapply
 #' @importFrom stats quantile
 #'
 #' @export
@@ -65,7 +65,7 @@ amcc <-
       }
       splitix <- parallel::splitIndices(nx=length(iix), ncl=nthread)
       splitix <- splitix[vapply(splitix, length, FUN.VALUE=numeric(1)) > 0]
-      mcres <- parallel::mclapply(splitix, function(x, iix, x2, y2) {
+      mcres <- bplapply(splitix, function(x, iix, x2, y2) {
         res <- t(vapply(iix[x], function(x, x2, y2) {
           x3 <- factor(ifelse (x2 <= x, "1", "0"))
           y3 <- factor(ifelse (y2 <= x, "1", "0"))
