@@ -86,9 +86,16 @@ connectivityScore <- function(x, y, method = c("fgsea", "gwc"), nperm = 10000, n
         ## create gene set
         gset <- cbind(gene = rownames(y), set = ifelse(as.numeric(y[, 1]) >= 0, "UP", "DOWN"))
         gset <- piano::loadGSC(gset)
+        
         ## run enrichment analysis
-        nes <- piano::runGSA(geneLevelStats = x[, 1], geneSetStat = "fgsea", gsc = gset, nPerm = nperm + (nperm%%nthread), ncpus = nthread, 
-            verbose = FALSE, adjMethod = "none", ...)
+        ##FIXME:: Update runGSA to use fgseaMultilevel to stop warnings
+        suppressWarnings({ 
+            nes <- piano::runGSA(geneLevelStats = x[, 1], geneSetStat = "fgsea", 
+                                 gsc = gset, nPerm = nperm + (nperm%%nthread), 
+                                 ncpus = nthread, 
+            verbose = FALSE, adjMethod = "none", ...) 
+        })
+        
         ## merge p-values for negative and positive enrichment scores
         nes$pDistinctDir <- nes$pDistinctDirUp
         nes$pDistinctDir[is.na(nes$pDistinctDirUp), 1] <- nes$pDistinctDirDn[is.na(nes$pDistinctDirUp), 1]
