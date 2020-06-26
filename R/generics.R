@@ -3,19 +3,10 @@ c#' Subset a CoreSet object based on various parameters, such as cell lines, mol
 #' @param object An object inheriting from the `CoreGx::CoreSet` class
 #' @param ... Allow definition of new arguments to this generic
 #'
+#' @return A subsetted version of the original `object`
+#'
 #' @export
 setGeneric("subsetTo", function(object, ...) standardGeneric("subsetTo"))
-
-
-##' Calculate the area under a dose-response curve
-##'
-##' @param object ?
-##' @param ... Allow definition of new arguments to this generic
-##'
-##' @retrun [`numeric`] vector containing float value for the area under the dose-response curve
-##'
-##' @export
-#setGeneric("computeAUC", function(object, ...) standardGeneric("computeAUC"))
 
 
 #' Summarize across replicates for a sensitivity dose-response experiment
@@ -23,8 +14,7 @@ setGeneric("subsetTo", function(object, ...) standardGeneric("subsetTo"))
 #' @param object An object inheriting form the `CoreGx::CoreSet` class
 #' @param ... Allow definition of new arguments to this generic
 #'
-#' @return [`data.frame`] containing treatment by cell line summary of a sensitivity experiment with values as the
-#'     selected `sensitivity.measure`. Defaults `sensitivity.measure` is `auc_recomputed`.
+#' @return [`data.frame`] containing treatment by cell line summary of a sensitivity experiment with values as the selected `sensitivity.measure`. Defaults `sensitivity.measure` is `auc_recomputed`.
 #'
 #' @export
 setGeneric("summarizeSensitivityProfiles", function(object, ...) standardGeneric("summarizeSensitivityProfiles"))

@@ -672,8 +672,7 @@
 #' generate an initial guess for dose-response curve parameters by evaluating 
 #' the residuals at different lattice points of the search space
 #' 
-#' @return A \code{numeric} vector containing initial guesses for the 
-#'   dose-response curve parameters
+#' @return A \code{numeric} vector containing initial guesses for the dose-response curve parameters
 #' 
 #' @export
 #' @keywords internal
