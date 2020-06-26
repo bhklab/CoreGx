@@ -1,4 +1,4 @@
-#' Subset a CoreSet object based on various parameters, such as cell lines, molecular features
+c#' Subset a CoreSet object based on various parameters, such as cell lines, molecular features
 #'
 #' @param object An object inheriting from the `CoreGx::CoreSet` class
 #' @param ... Allow definition of new arguments to this generic
