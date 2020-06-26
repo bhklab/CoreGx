@@ -97,14 +97,14 @@ data(clevelandSmall_cSet)
 clevelandSmall_cSet
 ```
 
-Access specific molecular profiles:
+Access a specific molecular profiles:
 
 ```{r cSet_accessor_demo}
 mProf <- molecularProfiles(clevelandSmall_cSet, "rna")
 mProf[seq_len(5), seq_len(5)]
 ```
 
-Access cell line curations:
+Access cell-line metadata:
 
 ```{r cSet_accessor_demo1}
 cInfo <- cellInfo(clevelandSmall_cSet)
@@ -161,7 +161,9 @@ expressionSets <- lapply(molecularProfilesSlot(clevelandSmall_dSet), as, 'Expres
 molecularProfilesSlot(clevelandSmall_dSet) <- expressionSets
 
 # Now this will error
-tryCatch({molecularProfiles(clevelandSmall_dSet, 'rna')}, error=function(e) print(paste("Error: ", e$message)))
+tryCatch({molecularProfiles(clevelandSmall_dSet, 'rna')}, 
+         error=function(e) 
+             print(paste("Error: ", e$message)))
 ```
 
 Since we changed the data in the `molecularProfiles` slot of the `DemoSet`, 
@@ -189,13 +191,13 @@ head(mProf)[seq_len(5), seq_len(5)]
 ```
 
 We can see our new method works! In order to finish updating the methods
-for our new class, we would have to redefine all the generics which access the
+for our new class, we would have to redefine all the methods which access the
 modified slot.
 
 However, additional work needs to be done to define accessors for the new
 `demoSlot`. Since no generics are available in CoreGx to access this slot,
 we need to first define a generic, then implement methods which distpatch on
-the 'DemoSet' class to retrieve data int he slot.
+the 'DemoSet' class to retrieve data in the slot.
 
 ```{r defining_setter_methods}
 # Define generic for setter method
