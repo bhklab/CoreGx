@@ -7,17 +7,15 @@ c#' Subset a CoreSet object based on various parameters, such as cell lines, mol
 setGeneric("subsetTo", function(object, ...) standardGeneric("subsetTo"))
 
 
-
-#' Calculate the area under a dose-response curve
-#'
-#' @param object ?
-#' @param ... Allow definition of new arguments to this generic
-#'
-#' @retrun [`numeric`] vector containing float value for the area under the dose-response curve
-#'
-#' @export
-setGeneric("computeAUC", function(object, ...) standardGeneric("computeAUC"))
-
+##' Calculate the area under a dose-response curve
+##'
+##' @param object ?
+##' @param ... Allow definition of new arguments to this generic
+##'
+##' @retrun [`numeric`] vector containing float value for the area under the dose-response curve
+##'
+##' @export
+#setGeneric("computeAUC", function(object, ...) standardGeneric("computeAUC"))
 
 
 #' Summarize across replicates for a sensitivity dose-response experiment
@@ -32,7 +30,6 @@ setGeneric("computeAUC", function(object, ...) standardGeneric("computeAUC"))
 setGeneric("summarizeSensitivityProfiles", function(object, ...) standardGeneric("summarizeSensitivityProfiles"))
 
 
-
 #' Summarize molecular profile data such that there is a single entry for each cell line/treatment combination
 #'
 #' @param object An object inheriting form the `CoreGx::CoreSet` class
@@ -42,7 +39,6 @@ setGeneric("summarizeSensitivityProfiles", function(object, ...) standardGeneric
 #'
 #' @export
 setGeneric("summarizeMolecularProfiles", function(object, ...) standardGeneric("summarizeMolecularProfiles"))
-
 
 
 #' Get the annotations for a `Signature` class object, as returned by `drugSensitivitysig` or `radSensitivtySig` functions
@@ -55,7 +51,6 @@ setGeneric("summarizeMolecularProfiles", function(object, ...) standardGeneric("
 #'
 #' @export
 setGeneric("showSigAnnot", function(object, ...) standardGeneric("showSigAnnot"))
-
 
 
 #' Compute the correlation between a molecular feature and treatment response
