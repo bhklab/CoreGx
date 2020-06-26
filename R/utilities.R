@@ -894,7 +894,7 @@
 
 # Different in PharmacoGx? ------------------------------------------------
 
-#' TODO:: Write documentation
+## TODO:: Write documentation
 ## FIXME:: Why is this different from PharmacoGx?
 #'
 #' @return A \code{numeric} containing the estimated residuals for the model
