@@ -386,6 +386,7 @@ updateCellId <- function(object, new.ids = vector("character")){
     return(sensitivity.info)
 }
 
+#' @export
 #' @keywords internal
 .summarizeMolecularNumbers <- function(object) {
   
@@ -403,7 +404,6 @@ updateCellId <- function(object, new.ids = vector("character")){
   }
   return(molecular.info)
 }
-
 
 .summarizePerturbationNumbers <- function(object) {
 
