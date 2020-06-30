@@ -11,8 +11,7 @@
 #' cellular response to Pharmacological and Radiation therapy are widely 
 #' different, and extension of the cSet class allows the
 #' packages to apply the correct model for the given data.
-#' 
-# @param cSet A \code{CoreSet} object ##TODO:: Is this needed?
+#'
 #' @param mDataType A \code{character} with the type of molecular data to return/update
 #' @param object A \code{CoreSet} object
 #' @param value A replacement value
@@ -53,10 +52,6 @@
                                             sensitivity="list",
                                             perturbation="list",
                                             curation="list"
-                                            ##TODO:: Do we want these in the constuctor?
-                                            # tables="array",
-                                            # table.summary="list",
-                                            # dateCreated="character",
                                             ))
 
 
