@@ -12,7 +12,6 @@
 #'
 #' @return A \code{character} vector containing the dataset tpye
 #'
-#' @export
 setGeneric("datasetType", function(object, ...) standardGeneric("datasetType"))
 #' @inheritParams datasetType
 #' @describeIn CoreSet Update the dataset type of an rSet and return a copy of
@@ -38,7 +37,6 @@ setMethod("datasetType", signature("CoreSet"), function(object) {
 #'
 #' @return A \code{character} vector containing the dataset tpye
 #'
-#' @export
 setGeneric("datasetType<-",  function(object, value) standardGeneric("datasetType<-"))
 #' @inheritParams datasetType<-
 #' @describeIn CoreSet Update the dataset type of an rSet and return a copy of
