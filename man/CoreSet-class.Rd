@@ -63,7 +63,7 @@
 
 \S4method{cellInfo}{CoreSet,data.frame}(object) <- value
 
-\S4method{cellNames}{CoreSet}(object, ...)
+\S4method{cellNames}{CoreSet}(object)
 
 \S4method{cellNames}{CoreSet,character}(object) <- value
 
@@ -147,8 +147,6 @@
 \item{object}{A \code{CoreSet}}
 
 \item{value}{A \code{list} of curations for the cell and tissues types in the cSet object}
-
-\item{...}{A \code{list} to allow definition of new parameters on this generic}
 
 \item{mDataType}{A \code{character} with the type of molecular data to return/update}
 
