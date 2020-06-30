@@ -17,3 +17,9 @@ summarizeSensitivityProfiles(object, ...)
 \description{
 Summarize across replicates for a sensitivity dose-response experiment
 }
+\examples{
+# Dummy examples to satisfy Bioc requiremnts
+setMethod('summarizeSensitivityProfiles', signature('CoreSet'), function(object) object)
+
+}
+\keyword{internal}

@@ -50,7 +50,7 @@
 
 ## TODO:: Add documentation!
 #' @export
-#' @keywords internal
+#' @noRd
 .sanitizeInput <- function(x, y, lower, upper, pars, x_as_log, y_as_log, y_as_pct, trunc, verbose = FALSE) {
     # Set to 2 to see debug printouts
     
@@ -314,7 +314,8 @@
 #' 
 #' @return \code{numeric} A numeric vector of interpolated concentrations
 #' 
-#' @export 
+#' @export
+#' @noRd
 .getSupportVec <- function(x, output_length = 1001) {
     return(seq(from = min(x), to = max(x), length.out = output_length))
 }
@@ -322,7 +323,7 @@
 #### reformatData ------------------------------------------------------------
 
 #' @export
-#' @keywords internal
+#' @noRd
 .reformatData <- function(x, y, pars, x_to_log, y_to_log, y_to_frac, trunc) {
     if (!(is.logical(x_to_log))) {
         stop("x_to_log must be a logical.")
@@ -422,7 +423,7 @@
 # multinom ----------------------------------------------------------------
 
 #' @export
-#' @keywords internals
+#' @noRd
 .multinom <- function(x, y) {
     coeff <- 1
     for (i in seq_len(length(y))) {
@@ -437,7 +438,7 @@
 ## TODO:: Add documentation to these functions
 #' @importFrom stats rcauchy
 #' @export
-#' @keywords internal
+#' @noRd
 .rmedncauchys = function(N, n, scale) {
     x <- matrix(NA, nrow = 1, ncol = N)
     for (i in seq_len(N)) {
@@ -448,7 +449,7 @@
 
 #' @importFrom stats dcauchy pcauchy integrate
 #' @export
-#' @keywords internal
+#' @noRd
 .dmedncauchys = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
     scale <- rep(scale, times = length(x)/length(scale))
@@ -479,7 +480,7 @@
 
 #' @importFrom stats pcauchy integrate
 #' @export
-#' @keywords internal
+#' @noRd
 .pmedncauchys = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
     scale <- rep(scale, times = length(x)/length(scale))
@@ -507,7 +508,7 @@
 
 #' @importFrom stats integrate
 #' @export
-#' @keywords internal
+#' @noRd
 .edmedncauchys = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
     scale <- rep(scale, times = length(x)/length(scale))
@@ -534,7 +535,7 @@
 #### mednnormals -------------------------------------------------------------
 
 #' @export
-#' @keywords internal
+#' @noRd
 .rmednnormals = function(N, n, scale) {
     x <- matrix(NA, nrow = 1, ncol = N)
     for (i in seq_len(N)) {
@@ -545,7 +546,7 @@
 
 #' @importFrom stats rnorm  dnorm
 #' @export
-#' @keywords internal
+#' @noRd
 .dmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
     scale <- rep(scale, times = length(x)/length(scale))
@@ -576,7 +577,7 @@
 
 #' @importFrom stats integrate
 #' @export
-#' @keywords internals
+#' @noRd
 .pmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
     scale <- rep(scale, times = length(x)/length(scale))
@@ -604,7 +605,7 @@
 
 #' @importFrom stats integrate
 #' @export
-#' @keywords internal
+#' @noRd
 .edmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
     scale <- rep(scale, times = length(x)/length(scale))
@@ -634,7 +635,7 @@
 ## TODO:: Add function documentation
 #' @importFrom stats optim var
 #' @export
-#' @keywords internal
+#' @noRd
 .fitCurve <- function(x, y, f, density, step, precision, lower_bounds, upper_bounds, scale, family, median_n, trunc, verbose, gritty_guess, 
     span) {
     
@@ -673,9 +674,6 @@
 #' the residuals at different lattice points of the search space
 #' 
 #' @return A \code{numeric} vector containing initial guesses for the dose-response curve parameters
-#' 
-#' @export
-#' @keywords internal
 #' ##FIXME:: Why is this different in PharmacoGx?
 .meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
     pars <- NULL

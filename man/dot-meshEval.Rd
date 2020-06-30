@@ -25,11 +25,3 @@ A \code{numeric} vector containing initial guesses for the dose-response curve p
 generate an initial guess for dose-response curve parameters by evaluating 
 the residuals at different lattice points of the search space
 }
-\keyword{##FIXME::}
-\keyword{PharmacoGx?}
-\keyword{Why}
-\keyword{different}
-\keyword{in}
-\keyword{internal}
-\keyword{is}
-\keyword{this}

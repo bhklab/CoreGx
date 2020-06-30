@@ -19,3 +19,9 @@ NULL Prints the signature annotations to console
 Get the annotations for a `Signature` class object, as returned by `drugSensitivitysig` or `radSensitivtySig` functions
    available in `PharmacoGx` and `RadioGx`, respectively.
 }
+\examples{
+# Dummy examples to satisfy Bioc requirements
+setMethod('showSigAnnot', signature("CoreSet"), function(object) object)
+
+}
+\keyword{internal}

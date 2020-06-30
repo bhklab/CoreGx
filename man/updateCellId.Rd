@@ -7,7 +7,7 @@
 updateCellId(object, new.ids = vector("character"))
 }
 \arguments{
-\item{object}{The object for witch the cell ids will be updated}
+\item{object}{The object for which the cell ids will be updated}
 
 \item{new.ids}{The new ids to assign to the object}
 }
@@ -16,5 +16,9 @@ updateCellId(object, new.ids = vector("character"))
 }
 \description{
 Update the cell ids in a cSet object
+}
+\examples{
+updateCellId(clevelandSmall_cSet, cellNames(clevelandSmall_cSet))
+
 }
 \keyword{internal}

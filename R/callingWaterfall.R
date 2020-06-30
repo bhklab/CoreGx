@@ -23,14 +23,17 @@
 #'   
 #' 5. Require at least x sensitive and x insensitive cell lines after applying 
 #'   these criteria (x=5 in our case).
-#' 
+#'
+## FIXME:: Write a real example
+#' @examples
+#' # Dummy example
+#' 1 + 1
+#'
 ## FIXME:: Clarify the parameters of this function
 #' @param x What type of object does this take in?
 #' @param type  
 #'   ic50: IC50 values in micro molar (positive values)
-#' 
 #'   actarea: Activity Area, that is area under the drug activity curve (positive values)
-#'  
 #'   amax: Activity at max concentration (positive values)
 #'   
 #' @param intermediate.fold vector of fold changes used to define the intermediate sensitivities for ic50, actarea and amax respectively
@@ -39,7 +42,7 @@
 #' @param name \code{character} The name of the output to use in plot
 #' @param plot \code{boolean} Whether to plot the results
 #' 
-#' @return \code{factor} Containing the status drug sensitivity status of each
+#' @return \code{factor} Containing the drug sensitivity status of each
 #'   cellline.
 #' 
 #' @importFrom stats complete.cases  cor.test lm median
@@ -48,7 +51,7 @@
 #' 
 #' @export
 #' @keywords internal
-callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fold = c(4, 1.2, 1.2), cor.min.linear = 0.95, name = "Drug", 
+callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fold = c(4, 1.2, 1.2), cor.min.linear = 0.95, name = "Drug",
     plot = FALSE) {
     
     type <- match.arg(type)
@@ -227,7 +230,7 @@ callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fo
 }
 
 #' @export
-#' @keywords interal
+#' @keywords internal
 .magnitude <- function(p1, p2) {
     return(sqrt(sum((p2 - p1)^2)))
 }

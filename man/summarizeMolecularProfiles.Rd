@@ -17,3 +17,9 @@ summarizeMolecularProfiles(object, ...)
 \description{
 Summarize molecular profile data such that there is a single entry for each cell line/treatment combination
 }
+\examples{
+# Dummy examples to satisfy Bioc requiremnts
+setMethod('summarizeMolecularProfiles', signature('CoreSet'), function(object) object)
+
+}
+\keyword{internal}
