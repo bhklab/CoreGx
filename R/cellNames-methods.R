@@ -12,7 +12,7 @@
 setGeneric("cellNames", function(object, ...) standardGeneric("cellNames"))
 #' @describeIn CoreSet Return the cell names used in the dataset
 #' @export
-setMethod(cellNames, "CoreSet", function(object, ...){
+setMethod(cellNames, "CoreSet", function(object){
   rownames(cellInfo(object))
 })
 
