@@ -633,11 +633,34 @@
 # fitCurve ----------------------------------------------------------------
 
 ## TODO:: Add function documentation
+#' .fitCurve
+#' 
+#' Curve optimization from 1 variable to 1 variable, using L-BFSG-B from optim, 
+#' with fallback to pattern search if optimization fails to converge. 
+#' 
+#' @param x [`numeric`] input/x values for function
+#' @param y [`numeric`] output/y values for function
+#' @param f [`function`] function f, parameterized by parameters to optimize 
+#' @param density [`numeric`] how many points in the dimension of each parameter should 
+#'   be evaluated (density of the grid)
+#' @param step initial step size for pattern search.
+#' @param precision [`numeric`] smallest step size used in pattern search, once step size drops below this value,
+#'   the search terminates.  
+#' @param lower_bounds [`numeric`] lower bounds for the paramater search space
+#' @param upper_bounds [`numeric`] upper bounds for the parameter search space
+#' @param median_n [`integer`] number of technical replicates per measured point in x. Used to 
+#'   evaluate the proper median distribution for the normal and cauchy error models
+#' @param scale [`numeric`] scale on which to measure probability for the error model (roughly SD of error)
+#' @param family [`character`] which error family to use. Currently, `normal` and `cauchy` are implemented
+#' @param trunc [`logical`] Whether or not to truncate the values at 100% (1.0)
+#' @param verbose [`logical`] should diagnostic messages be printed?
+#' @param gritty_guess [`numeric`] intitial, uninformed guess on parameter values (usually heuristic)
+#' @param span ['numeric'] can be safely kept at 1, multiplicative ratio for initial step size in pattern search. 
+#'   Must be larger than precision. 
 #' @importFrom stats optim var
 #' @export
-#' @noRd
 .fitCurve <- function(x, y, f, density, step, precision, lower_bounds, upper_bounds, scale, family, median_n, trunc, verbose, gritty_guess, 
-    span) {
+    span = 1) {
     
     guess <- tryCatch(optim(par = gritty_guess, fn = function(t) {
         .residual(x = x, y = y, n = median_n, pars = t, f = f, scale = scale, family = family, trunc = trunc)
@@ -668,12 +691,24 @@
 }
 
 # meshEval ----------------------------------------------------------------
-#' Generate an initial guess for dose-response curve parameters by evaluating
+#' meshEval
+#'
+#' generate an initial guess for dose-response curve parameters by evaluating
 #' the residuals at different lattice points of the search space
 #'
-#' @export
-#' @noRd
-# ##FIXME:: Why is this different in PharmacoGx?
+#' @param x [`numeric`] input/x values for function
+#' @param y [`numeric`] output/y values for function
+#' @param f [`function`] function f, parameterized by parameters to optimize 
+#' @param guess [`numeric`] initial guess for the parameter values to improve upon
+#' @param lower_bounds [`numeric`] lower bounds for the paramater search space
+#' @param upper_bounds [`numeric`] upper bounds for the parameter search space
+#' @param density [`numeric`] how many points in the dimension of each parameter should 
+#'   be evaluated (density of the grid)
+#' @param n [`integer`] number of technical replicates per measured point in x. Used to 
+#'   evaluate the proper median distribution for the normal and cauchy error models
+#' @param scale [`numeric`] scale on which to measure probability for the error model (roughly SD of error)
+#' @param family [`character`] which error family to use. Currently, `normal` and `cauchy` are implemented
+#' @param trunc [`logical`] Whether or not to truncate the values at 100% (1.0)
 .meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
     pars <- NULL
     guess_residual <- .residual(x = x, y = y, n = n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
