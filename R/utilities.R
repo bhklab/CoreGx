@@ -668,13 +668,11 @@
 }
 
 # meshEval ----------------------------------------------------------------
-#' meshEval
-#'
-#' generate an initial guess for dose-response curve parameters by evaluating
+#' Generate an initial guess for dose-response curve parameters by evaluating
 #' the residuals at different lattice points of the search space
 #'
-#' @return A \code{numeric} vector containing initial guesses for the dose-response curve parameters
 #' @export
+#' @noRd
 # ##FIXME:: Why is this different in PharmacoGx?
 .meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
     pars <- NULL
