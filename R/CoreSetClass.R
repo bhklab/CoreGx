@@ -49,7 +49,7 @@
                                             molecularProfiles = "list",
                                             cell="data.frame", 
                                             datasetType="character", 
-                                            sensitivity="list",
+                                            sensitivity="LongTable",
                                             perturbation="list",
                                             curation="list"
                                             ))
@@ -559,26 +559,26 @@ checkCsetStructure <-
     if(!is(cSet@cell, "data.frame")) {
       warning("cell slot class type should be dataframe")
     }
-    if(cSet@datasetType %in% c("sensitivity", "both"))
-    {
-      if(!is(cSet@sensitivity$info, "data.frame")) {
-        warning("sensitivity info slot class type should be dataframe")
-      }
-      if("cellid" %in% colnames(cSet@sensitivity$info)) {
-        if(!all(cSet@sensitivity$info[,"cellid"] %in% rownames(cSet@cell))) {
-          warning("not all the cell lines in sensitivity data are in cell slot")
-        }
-      }else {
-        warning("cellid does not exist in sensitivity info")
-      }
-    
-      if(any(!is.na(cSet@sensitivity$raw))) {
-        if(!all(dimnames(cSet@sensitivity$raw)[[1]] %in% rownames(cSet@sensitivity$info))) {
-          warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
-        }
-      }
-      if(!all(rownames(cSet@sensitivity$profiles) %in% rownames(cSet@sensitivity$info))) {
-        warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
-      }
-    }
+  #  if(cSet@datasetType %in% c("sensitivity", "both"))
+  #  {
+  #    if(!is(cSet@sensitivity$info, "data.frame")) {
+  #      warning("sensitivity info slot class type should be dataframe")
+  #    }
+  #    if("cellid" %in% colnames(cSet@sensitivity$info)) {
+  #      if(!all(cSet@sensitivity$info[,"cellid"] %in% rownames(cSet@cell))) {
+  #        warning("not all the cell lines in sensitivity data are in cell slot")
+  #      }
+  #    }else {
+  #      warning("cellid does not exist in sensitivity info")
+  #    }
+  #
+  #    if(any(!is.na(cSet@sensitivity$raw))) {
+  #      if(!all(dimnames(cSet@sensitivity$raw)[[1]] %in% rownames(cSet@sensitivity$info))) {
+  #        warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
+  #      }
+  #    }
+  #    if(!all(rownames(cSet@sensitivity$profiles) %in% rownames(cSet@sensitivity$info))) {
+  #      warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
+  #    }
+  #  }
   }
