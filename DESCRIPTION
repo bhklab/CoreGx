@@ -50,4 +50,4 @@ Suggests:
   rmarkdown,
   knitr
 License: GPL-3
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
