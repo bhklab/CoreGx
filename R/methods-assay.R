@@ -22,8 +22,8 @@ setMethod('assay',
 
     # validate input
     if (length(i) > 1)
-        stop(.errorMsg('\nPlease specifying a single character assay name or',
-            'integer index. See assayNames(x) for available assays.'))
+        stop(.errorMsg('\n[CoreGx::assay] Please specifying a single character ',
+            'assay name or integer index. See assayNames(x) for available assays.'))
 
     keepAssay <- if (is.character(i)) which(assayNames(x) == i) else i
     if (length(keepAssay) < 1)
@@ -43,14 +43,25 @@ setMethod('assay',
         assayData <- colData(x, key=TRUE)[assayData, on='colKey']
     }
 
+    # drop any duplicated columns to prevent issues in the setter methods,
+    # actually drops any columns prefixed with i.
+    duplicates <- grep('^i\\..*', colnames(assayData), value=TRUE)
+    warnDuplicates <- setdiff(duplicates, 'i.drug_cell_rep')
+    if (length(duplicates) > 0) {
+        if (length(warnDuplicates) > 0)
+            warning(.warnMsg('\n[CoreGx::assay] Dropping columns duplicated when ',
+                'joining assays with from ', i, 'when joining with rowData and ',
+                'colData: ', .collapse(warnDuplicates)))
+        assayData <- assayData[, -duplicates, with=FALSE]
+    }
+
     if (!key) assayData <- assayData[, -c('rowKey', 'colKey')]
 
     if (!withDimnames && metadata)
-    warning(.warnMsg('\nCannot use metadata=TRUE when withDimnames=FALSE.',
-        'Ignoring the metadata argument.'))
+        warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
+            ' withDimnames=FALSE. Ignoring the metadata argument.'))
 
     assayData
-
 })
 
 
@@ -68,11 +79,11 @@ setReplaceMethod('assay',
                  signature(x='LongTable', i='character'),
                  function(x, i, value) {
 
-    if (!is.data.frame(value)) stop(.errorMsg('Only a data.frame or data.table
-        can be assiged to the assay slot.'))
+    if (!is.data.frame(value)) stop(.errorMsg('\n[CoreGx::assay<-] Only a ',
+        'data.frame or data.table can be assiged to the assay slot!'))
 
-    if (length(i) > 1) stop(.errorMsg("Only a single assay name can be assiged
-        with assay(x, i) <- value."))
+    if (length(i) > 1) stop(.errorMsg('\n[CoreGx::assay<-] Only a single assay ',
+        'name can be assiged with assay(x, i) <- value.'))
 
     whichAssay <- which(i %in% assayNames(x))
 
@@ -80,14 +91,32 @@ setReplaceMethod('assay',
 
     if (!is.data.table(value)) setDT(value)
 
+    #if (!all(c('colKey', 'rowKey') %in% colnames(value)))
+    #    stop(.errorMsg('\n[CoreGx::assay<-] The identifier columns, colKey and ',
+    #        'rowKey, are missing from value. Please ensure you fetch your assay ',
+    #        'using assay(longTable, "assayName", key=TRUE)'))
+
+    # extract the row and column values
+    rowIDCols <- rowIDs(x, key=FALSE)
+    colIDCols <- colIDs(x, key=FALSE)
+    rowMetaCols <- rowMeta(x, key=FALSE)
+    colMetaCols <- colMeta(x, key=FALSE)
+
+    # check that all the id columns are present
+    idCols <- c(rowIDCols, colIDCols)
+    hasIDCols <- idCols %in% colnames(value)
+    if (!all(hasIDCols))
+        stop(.errorMsg('\n[CoreGx::assay<-] Missing required id columns from',
+            'value: ', idCols[!hasIDCols], '. Please ensure you modify assay ',
+            'as returned by assay(longTable, "assayName", withDimnames=TRUE, ',
+            'metadata=TRUE).', collapse=', '))
+
     if (length(whichAssay) > 0) {
         assayData[[i]] <- value
     } else {
         assayData <- c(assayData, eval(str2lang(paste0('list(', i, '=value)'))))
     }
 
-    ## TODO:: Do I need to call the build function?
-
-    x@assays <- assayData
+    assays(x) <- assayData
     x
 })

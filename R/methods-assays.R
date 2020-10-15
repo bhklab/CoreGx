@@ -40,18 +40,18 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
     isDF <- is.items(value, 'data.frame')
     isDT <- is.items(value, 'data.table')
     if (!all(isDF))
-        stop(.errorMsg('Items ', which(!isDT)), ' in value are not data.tables or
-            data.frames. These are the only types allowed in the value argument!',
-            collapse=', ')
+        stop(.errorMsg('\n[CoreGx::assays<-] Items ', which(!isDT), ' in value',
+            ' are not data.tables or data.frames. These are the only types ',
+            'allowed in the value argument!', collapse=', '))
 
     if (!all(isDT))
         for (i in which(!isDT)) setDT(values[[i]])
 
     # check new assay names
     if (is.null(names(value))) {
-        warning(.warnMsg('\nThe list being assigned to assays has no names.',
-            'Defaulting to numbered assays. You can correct his with',
-            'assayNames(x) <- value.'))
+        warning(.warnMsg('\n[CoreGx::assays<-] The list being assigned to ',
+            'assays has no names. Defaulting to numbered assays. You can ',
+            'correct his with assayNames(x) <- value.'))
         names(value) <- paste0('assay', seq_along(value))
     }
 
@@ -60,6 +60,23 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
     colIDCols <- colIDs(x, key=FALSE)
     rowMetaCols <- rowMeta(x, key=FALSE)
     colMetaCols <- colMeta(x, key=FALSE)
+
+    # check that all the id columns are present
+    idCols <- unique(c(rowIDCols, colIDCols))
+    assayCols <- lapply(value, colnames)
+    hasIDCols <- lapply(assayCols, `%in%`, x=idCols)
+    assayHasIDCols <- lapply(hasIDCols, all)
+    if (!all(assayHasIDCols)) {
+        assayMissingCols <- names(value)[!assayHasIDCols]
+        missingCols <- idCols[unique(Reduce(c, lapply(hasIDCols, which)))]
+        stop(.errorMsg('\n[CoreGx::assays<-] Assay(s) ', .collapse(assayMissingCols),
+            , 'are missing one or more id cols: ', .collapse(missingCols),
+            '. Please ensure you modify assays as returned by assays(longTable,',
+            ' withDimnames=TRUE, metadata=TRUE).', collapse=', '))
+    }
+
+    ## TODO:: Should we support passing colKey and rowKey if the metadata columns are missing?
+    ## TODO:: Could then use them to join with the rowData and colData?
 
     # get the rowData and colData column mappings
     rowDataCols <- if (length(rowMetaCols) > 0) list(rowIDCols, rowMetaCols) else list(rowIDCols)

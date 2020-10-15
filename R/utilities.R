@@ -976,7 +976,7 @@
 #' @keywords internal
 #' @export
 #' @noRd
-.errorMsg <- function(...) magenta$bold(paste0(...))
+.errorMsg <- function(..., collapse=', ') magenta$bold(paste0(..., collapse=collapse))
 
 #' Returns a colorized warning message (cyan)
 #'
@@ -988,7 +988,7 @@
 #' @keywords internal
 #' @export
 #' @noRd
-.warnMsg <- function(...) cyan$bold(paste0(...))
+.warnMsg <- function(..., collapse=', ') cyan$bold(paste0(..., collapse=collapse))
 
 #' Get the types of all items in a list
 #'

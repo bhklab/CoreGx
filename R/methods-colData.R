@@ -32,34 +32,36 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
     if (is(value, 'data.frame'))
         setDT(value)
     if (!is(value, 'data.table'))
-        stop(magenta$bold('Please pass a data.frame or data.table to update
-            the colData slot. We recommend modifying the object returned by
-            colData(x) then reassigning it with colData(x) <- newColData'))
+        stop(.errorMsg('\n[CoreGx::colData<-] Please pass a data.frame or ',
+            'data.table to update the rowData slot. We recommend modifying the ',
+            'object returned by colData(x) then reassigning it with colData(x) ',
+            '<- newColData'))
 
     # remove key column
-    ## TODO: Do I need this warning?
     if ('colKey' %in% colnames(value)) {
         value[, colKey := NULL]
-        warning(cyan$bold('Dropping colKey from replacement value, this
-            function will deal with mapping the colKey automatically.'))
+        warning(.warnMsg('\n[CoreGx::colData<-] Dropping colKey from replacement',
+            ' value, this function will deal with mapping the colKey',
+            ' automatically.'))
     }
 
     # assemble information to select proper update method
     colIDCols <- colIDs(x)
     sharedColIDCols <- intersect(colIDCols, colnames(value))
 
-    metadataCols <- setdiff(sharedColIDCols, colnames(colData(x)))
-    sharedMetadataCols <- intersect(metadataCols, colnames(value))
+    ## TODO:: Can I remove this?
+    #metadataCols <- setdiff(sharedColIDCols, colnames(colData(x)))
+    #sharedMetadataCols <- intersect(metadataCols, colnames(value))
 
-    ## TODO:: Add message indicating if metadata columns change
+    ## FIXME:: Do I still want to throw this error?
     ## TODO:: Add parameter that allows modification of colID cols which errors if they change when FALSE
 
     # error if all the colID columns are not present in the new colData
     equalColIDs <- sharedColIDCols %in% colIDCols
-    if (!all(equalColIDs)) stop(.errorMsg('The ID columns ',
-        sharedIDCols[!equalColIDs]), 'are not present in value. Currently
-            this function only supports updates with the same
-            colID columns as the current colData!')
+    if (!all(equalColIDs)) stop(.errorMsg('\n[CoreGx::colData<-] The ID ',
+        ' columns ', sharedColIDCols[!equalColIDs], 'are not present in value. ',
+        'Currently this function only supports updates with the same colID ',
+        'columns as the current colData!', collapse=', '))
 
     colIDs <- colIDs(x, data=TRUE, key=TRUE)
 
@@ -68,7 +70,7 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
     ## TODO:: Refactor .pasteColons into utilities.R or make a function to update .colnames
     .pasteColons <- function(...) paste(..., collapse=':')
     colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))), .SDcols=sharedColIDCols]
-    setkey(colData, 'colKey')
+    setkeyv(colData, 'colKey')
 
     x@colData <- colData
     x
