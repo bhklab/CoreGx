@@ -53,12 +53,6 @@
                  perturbation="list",
                  curation="list"))
 
-# ---- Class unions for CoreSet slots
-#' A class union to allow multiple types in a CoreSet slot
-#'
-#' @export
-setClassUnion('list_or_LongTable', c('list', 'LongTable'))
-
 # The default constructor above does a poor job of explaining the required structure of a CoreSet. 
 # The constructor function defined below guides the user into providing the required components of the curation and senstivity lists
 # and hides the annotation slot which the user does not need to manually fill. 

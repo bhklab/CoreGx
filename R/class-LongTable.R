@@ -11,13 +11,14 @@
 #'
 #' @import data.table
 #' @keywords internal
+#' @exportClass LongTable
+#' @export
 .LongTable <- setClass("LongTable",
                        slots=list(rowData='data.table',
                                   colData='data.table',
                                   assays='list',
                                   metadata='list',
-                                  .intern='environment'),
-                       contains='long.table')
+                                  .intern='environment'))
 
 #' LongTable constructor method
 #'
@@ -128,6 +129,12 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                       assays=assays, metadata=metadata,
                       .intern=internals))
 }
+
+# ---- Class unions for CoreSet slots
+#' A class union to allow multiple types in a CoreSet slot
+#'
+#' @export
+setClassUnion('list_or_LongTable', c('list', 'LongTable'))
 
 #' Ensure that all rowID and colID keys are valid
 #'
