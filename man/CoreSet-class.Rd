@@ -123,7 +123,7 @@
 
 \S4method{sensitivityInfo}{CoreSet}(object, dimension = c("cells", "drugs"), ...)
 
-\S4method{sensitivityInfo}{CoreSet,data.frame}(object, dimension, ...) <- value
+\S4method{sensitivityInfo}{CoreSet,data.frame}(object, dimension = c("cells", "drugs"), ...) <- value
 
 \S4method{sensitivityMeasures}{CoreSet}(object)
 

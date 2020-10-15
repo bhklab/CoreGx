@@ -36,8 +36,9 @@ setMethod(sensitivityInfo, "CoreSet", function(object, dimension=c('cells', 'dru
   # sensitivity is a list
   } else {
     if (!missing(dimension))
-      warning(.warnMsg('The dimension argument is only valid if the sensitivity',
-        'slot contains a LongTable object. Ignoring function parameters'))
+        warning(.warnMsg('\n[CoreGx::sensitivityInfo] The dimension argument ',
+            'is only valid if the sensitivity slot contains a LongTable object.',
+            ' Ignoring the dimension and ... parameters.'))
     return(sensitivitySlot(object)$info)
   }
 
@@ -64,16 +65,29 @@ setMethod(sensitivityInfo, "CoreSet", function(object, dimension=c('cells', 'dru
 #' @describeIn CoreSet Update the sensitivity experiment info
 #' @export
 setReplaceMethod("sensitivityInfo",
-                 signature = signature(object="CoreSet",
-                                       value="data.frame"),
-                 function(object, dimension, ..., value) {
+                 signature(object="CoreSet", value="data.frame"),
+                 function(object, dimension=c('cells', 'drugs'), ..., value) {
+
   if (is(sensitivitySlot(object), 'LongTable')) {
-      stop(.errorMsg("Assignment for the sensitivityInfo slot is not allowed!"))
+    if (missing(dimension))
+        stop(.errorMsg('\n[CoreGx::sensitivityInfo<-] Assignment for ',
+            'sensitivtyInfo requires the dimension when @sensitivity contains ',
+            'a LongTable object. Please select the one of "cells", "drugs" to ',
+            'avoid this error.'))
+    dimension <- match.arg(dimension)
+    switch(dimension,
+        cells={ rowData(object@sensitivity, ...) <- value},
+        drugs={ colData(object@sensitivity, ...) <- value},
+        stop(.errorMsg('\n[CoreGx::sensitivityInfo<-] Invalid argument to',
+            'dimension parameter'))
+    )
   } else {
     if (!missing(dimension))
-      warning(.warnMsg('The dimension argument is only valid if the sensitivity',
-        'slot contains a LongTable object. Ignoring function dimension and ...',
-        ' parameters.'))
+      warning(.warnMsg('\n [CoreGx:::sensitivityInfo<-] The dimension argument ',
+        'is only valid if the sensitivity slot contains a LongTable object. ',
+        'Ignoring dimension and ... parameters.'))
     object@sensitivity$info <- value
   }
+  return(object)
+
 })
