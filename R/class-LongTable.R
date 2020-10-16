@@ -65,12 +65,12 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 
     # check parameter types and coerce or error
     if (!is(colData, 'data.table'))
-        tryCatch({ setDT(colData, keep.rownames=keep.rownames) },
+        tryCatch({ colData <- data.table(colData, keep.rownames=keep.rownames) },
             error=function(e)
                 stop(.errorMsg("colData must be coercible to a data.frame!")))
 
     if (!is(rowData, 'data.table'))
-        tryCatch({ setDT(rowData, keep.rownames=keep.rownames) },
+        tryCatch({ rowData <- data.table(rowData, keep.rownames=keep.rownames) },
             error=function(e)
                 stop(.errorMsg('rowData must be coerceible to a data.frame!')))
 
@@ -78,7 +78,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     isDF <- is.items(assays, FUN=is.data.frame) & !isDT
     if (!all(isDT))
         tryCatch({
-            for (i in which(isDF)) setDT(assay[i], keep.rownames)
+            for (i in which(isDF)) assays[[i]] <- data.table(assays[[i]], keep.rownames)
         }, error = function(e, assays) {
             message(e)
             types <- lapply(assays, typeof)

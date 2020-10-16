@@ -89,7 +89,7 @@ setReplaceMethod('assay',
 
     assayData <- assays(x, withDimnames=TRUE, metadata=TRUE)
 
-    if (!is.data.table(value)) setDT(value)
+    if (!is.data.table(value)) value <- data.table(value)
 
     #if (!all(c('colKey', 'rowKey') %in% colnames(value)))
     #    stop(.errorMsg('\n[CoreGx::assay<-] The identifier columns, colKey and ',
@@ -107,7 +107,7 @@ setReplaceMethod('assay',
     hasIDCols <- idCols %in% colnames(value)
     if (!all(hasIDCols))
         stop(.errorMsg('\n[CoreGx::assay<-] Missing required id columns from',
-            'value: ', idCols[!hasIDCols], '. Please ensure you modify assay ',
+            'value: ', .collapse(idCols[!hasIDCols]), '. Please ensure you modify assay ',
             'as returned by assay(longTable, "assayName", withDimnames=TRUE, ',
             'metadata=TRUE).', collapse=', '))
 

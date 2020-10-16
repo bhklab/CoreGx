@@ -1,43 +1,54 @@
-#' sensitivityRaw Generic
+#' sensitivityRaw CoreSet Getter Method
+#'
+#' @describeIn CoreSet Get the raw dose and vaibility data from a CoreSet object.
 #'
 #' @examples
 #' data(clevelandSmall_cSet)
 #' sensRaw <- sensitivityRaw(clevelandSmall_cSet)
 #' head(sensRaw)
 #'
-#' @param object An \code{object} to extract the raw sensitivity data from
-#' @param ... A \code{list} to allow new parameters in specific methods
+#' @param object A [`CoreSet`] to extract the raw sensitivity data from
 #'
-#' @return A \code{array} containing the raw sensitivity data as experiment by dose level by metric
+#' @return A [`array`] containing the raw sensitivity data as experiment by
+#'     dose level by metric.
 #'
-#' @export
-setGeneric("sensitivityRaw", function(object, ...) standardGeneric("sensitivityRaw"))
-#'
-#' @describeIn CoreSet Get the raw dose and vaibility data for a cSet
 #' @export
 setMethod('sensitivityRaw', signature("CoreSet"), function(object){
+
+  if (is(object@sensitivity, 'LongTable'))
+      stop(.errorMsg('\n[CoreGx::sensitivityRaw] This getter has not been
+          implemented for a CoreSet. Please define a method using setMethod()
+          on the subclass of CoreSet in your current package!'))
+
   object@sensitivity$raw
 })
 
-#' sensitivityRaw<- Generic
+#' sensitivityRaw<- CoreSet Setter Method
 #'
-#' #' @examples
+#' @describeIn CoreSet Set the raw dose and viability data for a cSet and return
+#'   and updated copty
+#'
+#' @examples
 #' data(clevelandSmall_cSet)
 #' sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
 #'
-#' @param object An \code{object} to extract the raw sensitivity data from
-#' @param ... A \code{list} to allow new parameters in specific methods
-#' @param value A 3D \code{array} containing dose and viability metrics to update the object with
+#' @param object An [`CoreSet`] to extract the raw sensitivity data from.
+#' @param value A 3D [`array`] containing the raw dose and viability
+#'    measurements to update the object with.
 #'
-#' @return A \code{array} containing the raw sensitivity data as experiment by dose level by metric
+#' @return A 3D [`array`] containing the raw sensitivity data as experiment by
+#'    dose level by metric.
 #'
-#' @export
-setGeneric("sensitivityRaw<-", function(object, ..., value) standardGeneric("sensitivityRaw<-"))
-#' @describeIn CoreSet Set the raw dose and viability data for a cSet and return
-#'   and updated copty
 #' @export
 setReplaceMethod("sensitivityRaw", signature("CoreSet", "array"),
                  function(object, value) {
+
+  if (is(object@sensitivity, 'LongTable'))
+      stop(.errorMsg('\n[CoreGx::sensitivityRaw<-] This setter has not been ',
+          'implemented for a CoreSet. Please define a method using ',
+          'setReplaceMethod() on the subclass of CoreSet in your current ',
+          'package!'))
+
   object@sensitivity$raw <- value
   object
 })

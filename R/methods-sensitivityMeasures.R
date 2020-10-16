@@ -1,37 +1,37 @@
-#' sensitivityMeasures Generic
+#' sensitivityMeasures CoreSet Getter Method
 #'
-#' A generic for the sensitivityMeasures  method
+#' @describeIn CoreSet Returns the available sensitivity profile
+#'   summaries, for example, whether there are IC50 values available
 #'
 #' @examples
 #' sensitivityMeasures(clevelandSmall_cSet)
 #'
-#' @param object The \code{CoreSet}
-#' @param ... Fallthrough arguements for defining new methods
+#' @param object A [`CoreSet`] object to retrieve the names of sensitivty
+#'    profile summary measurements for.
 #'
-#' @return A \code{character} vector of all the available sensitivity measures
-setGeneric("sensitivityMeasures", function(object, ...) standardGeneric("sensitivityMeasures"))
-#' @describeIn CoreSet Returns the available sensitivity profile
-#'   summaries, for example, whether there are IC50 values available
+#' @return A [`character`] vector of all the available sensitivity measures.
+
 #' @export
 setMethod(sensitivityMeasures, "CoreSet", function(object){
     return(colnames(sensitivityProfiles(object)))
 })
 
-#' sensitivityMeasures<- Generic
+#' sensitivityMeasures<- CoreSet Setter Method
 #'
-#' A generic for the sensitivityMeasure<- method
+#' @describeIn CoreSet Updates the sensitivity measures in a `CoreSet` object
+#'     and returns the updated object
 #'
 #' @examples
 #' sensitivityMeasures(clevelandSmall_cSet) <- sensitivityMeasures(clevelandSmall_cSet)
 #'
 #' @param object  The \code{CoreSet} object to update
-#' @param ... Fallthrough arguements for defining new methods
 #' @param value A \code{character} vector of sensitivity measures to use to update the cSet object
 #'
 #' @return A update \code{CoreSet} object with the new sensitivity measures
-setGeneric('sensitivityMeasures<-', function(object, ..., value) standardGeneric('sensitivityMeasures<-'))
-#' @describeIn CoreSet Updates the sensitivity measures in a cSet object and returns the updated object
+#'
 #' @export
-setReplaceMethod('sensitivityMeasures', signature(object='CoreSet', value='character'), function(object, value) {
+setReplaceMethod('sensitivityMeasures',
+    signature(object='CoreSet', value='character'),
+    function(object, value) {
   colnames(sensitivityProfiles(object)) <- value
 })

@@ -121,9 +121,9 @@
 
 \S4method{sensNumber}{CoreSet,matrix}(object) <- value
 
-\S4method{sensitivityInfo}{CoreSet}(object, dimension, ...)
+\S4method{sensitivityInfo}{CoreSet}(object)
 
-\S4method{sensitivityInfo}{CoreSet,data.frame}(object, dimension, ...) <- value
+\S4method{sensitivityInfo}{CoreSet,data.frame}(object) <- value
 
 \S4method{sensitivityMeasures}{CoreSet}(object)
 
@@ -144,9 +144,10 @@
 \S4method{sensitivitySlot}{CoreSet,list}(object) <- value
 }
 \arguments{
-\item{object}{The [`CoreSet`] to update}
+\item{object}{An [`CoreSet`] to extract the raw sensitivity data from.}
 
-\item{value}{A \code{data.frame} with the new sensitivity annotations}
+\item{value}{A 3D [`array`] containing the raw dose and viability
+measurements to update the object with.}
 
 \item{mDataType}{A \code{character} with the type of molecular data to return/update}
 
@@ -156,12 +157,10 @@ mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
 to check which assays are available for a given molecular datatype.}
 
 \item{dimension}{[`character`] Optional name of the dimension to extract,
-either 'cells' or 'drugs'. Only used if the sensitivity slot contains a
-`LongTable` object instead of a `list`.}
+either 'cells', 'drugs', 'experiments'. Only used if the sensitivity slot
+contains a `LongTable` object instead of a `list`.}
 
-\item{...}{Additional arguments to the rowData or colData
-`LongTable` methods. Only used if the sensitivity slot contains a
-`LongTable` object instead of a `list`.}
+\item{...}{Fallthrough arguments for defining new methods}
 }
 \value{
 An object of the CoreSet class
@@ -178,6 +177,19 @@ a \code{data.frame} with the experiment info if dimension is excluded,
   of the LongTable.
 
 Updated \code{CoreSet}
+
+A [`character`] vector of all the available sensitivity measures.
+
+A update \code{CoreSet} object with the new sensitivity measures
+
+a [`data.frame`] with sensitivity profile summaries for CoreSet
+
+Updated \code{CoreSet}
+
+A [`array`] containing the raw sensitivity data as experiment by
+    dose level by metric.
+
+A \code{array} containing the raw sensitivity data as experiment by dose level by metric
 }
 \description{
 The CoreSet (CSet) class was developed as a superclass for pSets in the 
@@ -276,17 +288,19 @@ experiments
 \item \code{sensitivityMeasures}: Returns the available sensitivity profile
 summaries, for example, whether there are IC50 values available
 
-\item \code{sensitivityMeasures<-}: Updates the sensitivity measures in a cSet object and returns the updated object
+\item \code{sensitivityMeasures<-}: Updates the sensitivity measures in a `CoreSet` object
+and returns the updated object
 
-\item \code{sensitivityProfiles}: Return the phenotypic data for the drug dose sensitivity
+\item \code{sensitivityProfiles}: Return the sensitivity profile summaries from the
+sensitivity slot.
+
+\item \code{sensitivityProfiles<-}: Update the sensitivity profile summaries the sensitivity
+slot.
 
 \item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
 sensitivity
 
-\item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
-sensitivity
-
-\item \code{sensitivityRaw}: Get the raw dose and vaibility data for a cSet
+\item \code{sensitivityRaw}: Get the raw dose and vaibility data from a CoreSet object.
 
 \item \code{sensitivityRaw<-}: Set the raw dose and viability data for a cSet and return
 and updated copty
@@ -345,5 +359,20 @@ data(clevelandSmall_cSet)
 sensitivityInfo(clevelandSmall_cSet)
 
 sensitivityInfo(clevelandSmall_cSet) <- sensitivityInfo(clevelandSmall_cSet)
+
+sensitivityMeasures(clevelandSmall_cSet)
+
+sensitivityMeasures(clevelandSmall_cSet) <- sensitivityMeasures(clevelandSmall_cSet)
+
+sensitivityProfiles(clevelandSmall_cSet)
+
+sensitivityProfiles(clevelandSmall_cSet) <- sensitivityProfiles(clevelandSmall_cSet)
+
+data(clevelandSmall_cSet)
+sensRaw <- sensitivityRaw(clevelandSmall_cSet)
+head(sensRaw)
+
+data(clevelandSmall_cSet)
+sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
 
 }

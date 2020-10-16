@@ -45,13 +45,13 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
             'allowed in the value argument!', collapse=', '))
 
     if (!all(isDT))
-        for (i in which(!isDT)) setDT(values[[i]])
+        for (i in which(!isDT)) values[[i]] <- data.table(values[[i]])
 
     # check new assay names
     if (is.null(names(value))) {
         warning(.warnMsg('\n[CoreGx::assays<-] The list being assigned to ',
             'assays has no names. Defaulting to numbered assays. You can ',
-            'correct his with assayNames(x) <- value.'))
+            'correct his with assayNames(value) <- names.'))
         names(value) <- paste0('assay', seq_along(value))
     }
 
@@ -65,7 +65,7 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
     idCols <- unique(c(rowIDCols, colIDCols))
     assayCols <- lapply(value, colnames)
     hasIDCols <- lapply(assayCols, `%in%`, x=idCols)
-    assayHasIDCols <- lapply(hasIDCols, all)
+    assayHasIDCols <- unlist(lapply(hasIDCols, all))
     if (!all(assayHasIDCols)) {
         assayMissingCols <- names(value)[!assayHasIDCols]
         missingCols <- idCols[unique(Reduce(c, lapply(hasIDCols, which)))]
@@ -77,6 +77,9 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
 
     ## TODO:: Should we support passing colKey and rowKey if the metadata columns are missing?
     ## TODO:: Could then use them to join with the rowData and colData?
+    # Need to drop the keys because buildLongTable redoes indexing
+    .drop.in <- function(x, y) x[!(x %in% y)]
+    assayCols <- lapply(assayCols, .drop.in, y=c('colKey', 'rowKey'))
 
     # get the rowData and colData column mappings
     rowDataCols <- if (length(rowMetaCols) > 0) list(rowIDCols, rowMetaCols) else list(rowIDCols)
@@ -84,7 +87,6 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
 
     # get assay column names
     allCols <- c(unlist(rowDataCols), unlist(colDataCols))
-    assayCols <- lapply(value, colnames)
     assayCols <- lapply(assayCols, setdiff, y=allCols)
     names(assayCols) <- names(value)
 

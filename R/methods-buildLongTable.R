@@ -42,7 +42,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
 
     # convert to data.table by refernce
     if (!is.data.table(from))
-        setDT(from)
+        from <- data.table(from)
 
     # build drug and cell metadata tables and index by the appropriate ID
     colData <- unique(from[, .unlist(colDataCols), with=FALSE])
@@ -75,6 +75,12 @@ setMethod('buildLongTable', signature(from='data.frame'),
             setnames(colData, colDataCols[[i]], names(colDataCols[[i]]))
             colDataCols[[i]] <- names(colDataCols[[i]])
         }
+
+    # drop colKey or rowKey from assayCols, since we are adding it back in the
+    # next step
+    ## TODO:: Add a check to see if the keys are there to avoid dropping/re-adding
+    .drop.in <- function(x, y) x[!(x %in% y)]
+    assayCols <- lapply(assayCols, .drop.in, y=c('colKey', 'rowKey'))
 
     # add the index columns to the different assay column vectors
     # this allows the .selectDataTable helper to be more general
@@ -159,12 +165,12 @@ setMethod('buildLongTable', signature(from='list'),
     isDF <- is.items(from, FUN=is.data.frame) & !isDT
 
     if (!all(isChar | isDT | isDF))
-        stop(.errorMsg('List items at indexes ',
-             which(!(isChar | isDT | isDF )),
-             ' are not character, data.table or data.frame.', collapse=', '))
+        stop(.errorMsg('\n[CoreGx::buildLongTable,list-method] List items at',
+            ' indexes ', .collapse(which(!(isChar | isDT | isDF ))),
+            ' are not character, data.table or data.frame.', collapse=', '))
 
     if (any(isChar)) from <- c(from[!isChar], lapply(from[isChar], FUN=.freadNA))
-    if (any(isDF)) for (i in which(isDF)) setDT(from[[i]])
+    if (any(isDF)) for (i in which(isDF)) from[[i]] <- data.table(from[[i]])
 
     # validate mappings
     idCols <- c(unlist(rowDataCols[[1]]), unlist(colDataCols[[1]]))
@@ -173,8 +179,8 @@ setMethod('buildLongTable', signature(from='list'),
     hasAllIdCols <- unlist(lapply(idColsIn, FUN=all))
     if (!all(hasAllIdCols)) {
         missingCols <- unique(unlist(.mapply(`[`, x=idCols, i=idColsIn)))
-        stop(.errorMsg('Assays ', which(hasAllIdCols),
-             ' are missing one or more id columns: ', missingCols,
+        stop(.errorMsg('Assays ', .collapse(which(hasAllIdCols)),
+             ' are missing one or more id columns: ', .collapse(missingCols),
              collapse=', '))
     }
 
@@ -189,17 +195,24 @@ setMethod('buildLongTable', signature(from='list'),
 
     # fix assayCols if there are duplicate column names between assays
     # the join will append '._n' where n is the assay index - 1
-    .greplAny <- function(...) any(grepl(...))
-    .paste0IfElse <- function(vector, suffix, isIn=c('rowKey', 'colKey'))
-        ifelse(vector %in% isIn, vector, paste0(vector, suffix))
-    hasSuffixes <- unlist(lapply(paste0('._', seq_along(from)), .greplAny, x=colnames(DT)))
-    if (any(hasSuffixes)) {
-        whichHasSuffixes <- which(hasSuffixes) + 1
-        assayCols[whichHasSuffixes] <-
-            .mapply(FUN=.paste0IfElse,
-                    vector=assayCols[whichHasSuffixes],
-                    suffix=paste0('._', seq_along(from))[hasSuffixes])
-    }
+    assaySuffixCols <- lapply(paste0('\\._', seq_along(from)), grep, x=colnames(DT), value=TRUE)
+    .length.gt.0 <- function(x) length(x) > 0
+    hasSuffixes <- unlist(lapply(assaySuffixCols, FUN=.length.gt.0))
+    duplicatedCols <- lapply(assaySuffixCols[hasSuffixes], gsub,
+        pattern='\\._\\d+', replacement='')
+
+    message('\nduplicatedCols')
+    print(duplicatedCols)
+    .which.in <- function(x, y) which(x %in% y)
+    whichHasSuffixes <- which(hasSuffixes) + 1
+    whichDuplicated <- .mapply(.which.in,
+        x=assayCols[whichHasSuffixes], y=duplicatedCols)
+    assayCols[whichHasSuffixes] <-
+        .mapply(replace, x=assayCols[whichHasSuffixes],
+            list=whichDuplicated, values=assaySuffixCols[hasSuffixes])
+
+    message('\nassayCols')
+    print(assayCols)
 
     # construct new LongTable
     buildLongTable(from=DT, rowDataCols, colDataCols, assayCols)

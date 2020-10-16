@@ -33,7 +33,7 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
 
     # type check input
     if (is(value, 'data.frame'))
-        setDT(value)
+        value <- data.table(value)
     if (!is(value, 'data.table'))
         stop(.errorMsg('\n[CoreGx::rowData<-] Please pass a data.frame or ',
             'data.table to update the rowData slot. We recommend modifying the ',

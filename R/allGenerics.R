@@ -2,30 +2,21 @@
 
 #' Summarize across replicates for a sensitivity dose-response experiment
 #'
-#' @param object An object inheriting form the `CoreGx::CoreSet` class
+#' @param object An [`S4`] object to summarize sensitivity profiles for.
 #' @param ... Allow definition of new arguments to this generic
 #'
-#' @return [`data.frame`] containing treatment by cell line summary of a
-#'   sensitivity experiment with values as the selected `sensitivity.measure`.
-#'   Defaults `sensitivity.measure` is `auc_recomputed`.
-#'
 #' @export
-#' @keywords internal
-#' @noRd
 setGeneric("summarizeSensitivityProfiles",
     function(object, ...) standardGeneric("summarizeSensitivityProfiles"))
 
 
-#' Summarize molecular profile data such that there is a single entry for each cell line/treatment combination
+#' Summarize molecular profile data such that there is a single entry for each
+#'   cell line/treatment combination
 #'
-#' @param object An object inheriting form the `CoreGx::CoreSet` class
+#' @param object An [`S4`] object to summarize the molecular profiles for.
 #' @param ... Allow definition of new arguments to this generic
 #'
-#' @return [`SummarizedExperiment`] containing the summarized molecular profile data
-#'
 #' @export
-#' @keywords internal
-#' @noRd
 setGeneric("summarizeMolecularProfiles",
     function(object, ...) standardGeneric("summarizeMolecularProfiles"))
 
@@ -40,8 +31,6 @@ setGeneric("summarizeMolecularProfiles",
 #' @return NULL Prints the signature annotations to console
 #'
 #' @export
-#' @keywords internal
-#' @noRd
 setGeneric("showSigAnnot",
     function(object, ...) standardGeneric("showSigAnnot"))
 
@@ -54,13 +43,14 @@ setGeneric("showSigAnnot",
 #' @param ... Allow new arguments to be defined for this generic.
 #'
 #' @export
-#' @keywords internal
-#' @noRd
 setGeneric("sensitivityInfo",
     function(object, ...) standardGeneric("sensitivityInfo"))
 
+
+#' sensitivityInfo<- Generic Method
+#'
 #' Generic function to get the annotations for a treatment response experiment
-#'   from an S4 class
+#'   from an S4 class.
 #'
 #' @param object An [`S4`] object to set treatment response experiment
 #'    annotations for.
@@ -68,10 +58,94 @@ setGeneric("sensitivityInfo",
 #' @param value The new treatment response experiment annotations.
 #'
 #' @export
-#' @keywords internal
-#' @noRd
 setGeneric("sensitivityInfo<-",
     function(object, ..., value) standardGeneric("sensitivityInfo<-"))
+
+
+#' sensitivityRaw Generic Method
+#'
+#' Generic function to get the raw data array for a treatment response experiment
+#'   from an S4 class.
+#'
+#' @param object An [`S4`] object to extract the raw sensitivity experiment
+#'     data from.
+#' @param ... [`pairlist`]  Allow new parameters to be defined for this generic.
+#'
+#' @export
+setGeneric("sensitivityRaw",
+    function(object, ...) standardGeneric("sensitivityRaw"))
+
+#' sensitivityRaw<- Generic
+#'
+#' Generic function to set the raw data array for a treatment response experiment
+#'   in an S4 class.
+#'
+#' @param object An [`S4`] object to extract the raw sensitivity data from.
+#' @param ... [`pairlist`] Allow new parameters to be defined for this generic.
+#' @param value An object containing dose and viability metrics to update
+#'   the object with.
+#'
+#' @export
+setGeneric("sensitivityRaw<-",
+    function(object, ..., value) standardGeneric("sensitivityRaw<-"))
+
+#' sensitivityProfiles Generic
+#'
+#' A generic for sensitivityProfiles getter method
+#'
+#' @param object The [`S4`] object to retrieve sensitivity profile summaries
+#'   from.
+#' @param ... [`pairlist`] Allow defining new arguments for this generic.
+#'
+#'
+#' @export
+setGeneric("sensitivityProfiles", function(object, ...) standardGeneric("sensitivityProfiles"))
+
+#' sensitivityProfiles<- Generic
+#'
+#' A generic for the sensitivityProfiles replacement method
+#'
+#' @param object An [`S4`] object to update the sensitivity profile summaries
+#'    for.
+#' @param ... Fallthrough arguments for defining new methods
+#' @param value An object with the new sensitivity profiles. If a
+#'   matrix object is passed in, converted to data.frame before assignment
+#'
+#' @return Updated \code{CoreSet}
+#'
+#' @export
+setGeneric("sensitivityProfiles<-",
+    function(object, ..., value) standardGeneric("sensitivityProfiles<-"))
+
+#' sensitivityMeasures Generic
+#'
+#' Get the names of the sensitivity summary metrics available in an S4
+#'   object.
+#'
+#' @examples
+#' sensitivityMeasures(clevelandSmall_cSet)
+#'
+#' @param object An [`S4`] object to retrieve the names of sensitivty summary
+#'    measurements for.
+#' @param ... Fallthrough arguements for defining new methods
+#'
+#' @export
+setGeneric("sensitivityMeasures",
+    function(object, ...) standardGeneric("sensitivityMeasures"))
+
+#' sensitivityMeasures<- Generic
+#'
+#' Set the names of the sensitivity summary metrics available in an S4
+#'   object.
+#'
+#' @param object An [`S4`] object to update.
+#' @param ... Allow new methods to be defined for this generic.
+#' @param value A set of names for sensitivity measures to use to
+#'   update the object with.
+#'
+#' @export
+setGeneric('sensitivityMeasures<-',
+    function(object, ..., value) standardGeneric('sensitivityMeasures<-'))
 
 # ==== LongTable Class
 
@@ -100,7 +174,8 @@ setGeneric('reindex', function(object, ...) standardGeneric('reindex'))
 #' @export
 #' @keywords internal
 #' @noRd
-setGeneric('buildLongTable', function(from, ...) standardGeneric('buildLongTable'))
+setGeneric('buildLongTable',
+    function(from, ...) standardGeneric('buildLongTable'))
 
 
 # ===== Other Generics
@@ -118,9 +193,8 @@ setGeneric('buildLongTable', function(from, ...) standardGeneric('buildLongTable
 #'    object@.intern environment.
 #'
 #' @export
-#' @keywords internal
-#' @noRd
-setGeneric('getIntern', function(object, x, ...) standardGeneric('getIntern'))
+setGeneric('getIntern',
+    function(object, x, ...) standardGeneric('getIntern'))
 
 #' Generic to access the row identifiers from
 #'
@@ -128,7 +202,6 @@ setGeneric('getIntern', function(object, x, ...) standardGeneric('getIntern'))
 #' @param ... Allow new arguments to this generic.
 #'
 #' @export
-#' @noRd
 setGeneric('rowIDs', function(object, ...) standardGeneric('rowIDs'))
 
 #' Generic to access the row identifiers from
@@ -137,8 +210,6 @@ setGeneric('rowIDs', function(object, ...) standardGeneric('rowIDs'))
 #' @param ... Allow new arguments to this generic.
 #'
 #' @export
-#' @keywords internal
-#' @noRd
 setGeneric('rowMeta', function(object, ...) standardGeneric('rowMeta'))
 
 #' Generic to access the row identifiers for an object.
@@ -147,26 +218,24 @@ setGeneric('rowMeta', function(object, ...) standardGeneric('rowMeta'))
 #' @param ... ALlow new arguments to this generic
 #'
 #' @export
-#' @noRd
 setGeneric('colIDs', function(object, ...) standardGeneric('colIDs'))
 
-#' Generic to access the column identifiers for an object.
+#' Generic to access the column identifiers for a rectangular object.
 #'
 #' @param object [`S4`] An object to get column metadata columns from.
 #' @param ... ALlow new arguments to this generic
 #'
 #' @export
-#' @noRd
 setGeneric('colMeta', function(object, ...) standardGeneric('colMeta'))
 
-#' Generic to access the assay columns of an object.
+#' Generic to access the assay columns of a rectangular object.
 #'
 #' @param object [`S4`] An object to get assay ids from.
 #' @param ... Allow new arguments to this generic.
 #'
 #' @export
-#' @noRd
-setGeneric('assayCols', function(object, ...) standardGeneric('assayCols'))
+setGeneric('assayCols',
+    function(object, ...) standardGeneric('assayCols'))
 
 ##' Generic to access the build configuration for an S4 object.
 ##'
