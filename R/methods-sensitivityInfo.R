@@ -22,7 +22,7 @@
 #' @export
 setMethod(sensitivityInfo, "CoreSet", function(object) {
 
-    if (is(sensitivitySlot(object, 'LongTable')))
+    if (is(sensitivitySlot(object), 'LongTable'))
         stop(.errorMsg('\n[CoreGx::sensitivityInfo] No getter is implemented ',
             'for @sensitviity containing a LongTable in a CoreSet. Please define',
             ' a new method using setMethod() in the current package!'))
@@ -47,7 +47,7 @@ setMethod(sensitivityInfo, "CoreSet", function(object) {
 setReplaceMethod("sensitivityInfo",
                  signature(object="CoreSet", value="data.frame"),
                  function(object, value) {
-    if (is(sensitivitySlot(object, 'LongTable')))
+    if (is(sensitivitySlot(object), 'LongTable'))
         stop(.errorMsg('\n[CoreGx::sensitivityInfo<-] No setter is implemented ',
             'for @sensitviity containing a LongTable in a CoreSet. Please define',
             ' a new method using setMethod() in the current package!'))

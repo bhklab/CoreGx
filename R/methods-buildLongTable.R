@@ -28,38 +28,41 @@
 setMethod('buildLongTable', signature(from='data.frame'),
           function(from, rowDataCols, colDataCols, assayCols)
 {
-    # local helpers
+    # -- local helpers
     .unlist <- function(x) unlist(x, recursive=TRUE, use.names=FALSE)
 
-    # handle missing params
+    # -- handle missing params
     missingParams <- c(missing(rowDataCols), missing(colDataCols), missing(assayCols))
     if (any(missingParams))
         stop(magenta$bold('The following parameters are required:',
             c('rowDataCols', 'colDataCols', 'assayCols')[missingParams]))
 
-    # validate input and return useful messages if invalid
+    # -- validate input and return useful messages if invalid
     ## TODO:: Check input parameters are valid
 
-    # convert to data.table by refernce
+    # -- convert to data.table by refernce
     if (!is.data.table(from))
         from <- data.table(from)
 
-    # build drug and cell metadata tables and index by the appropriate ID
+    # -- build drug and cell metadata tables and index by the appropriate ID
     colData <- unique(from[, .unlist(colDataCols), with=FALSE])
+    setorderv(colData, colDataCols[[1]])  # order by id columns
     colData[, colKey := seq_len(.N)]
     rowData <- unique(from[, .unlist(rowDataCols), with=FALSE])
+    setorderv(rowData, rowDataCols[[1]])  # order by id columns
     rowData[, rowKey := seq_len(.N)]
 
-    # add the row and column ids to the value data
+    # -- add the row and column ids to the value data
     assayData <- from[rowData, on=.unlist(rowDataCols)][colData, on=as.character(unlist(colDataCols))]
     rm(from)
     assayData[, as.character(unique(c(.unlist(rowDataCols), .unlist(colDataCols)))) := NULL]
+    # row reason to prevent sort in join because key sorts
     setkey(assayData, rowKey, colKey)
 
     setkey(rowData, rowKey)
     setkey(colData, colKey)
 
-    # rename columns, if necessary
+    # -- rename columns, if necessary
     rowDataColnames <- lapply(rowDataCols, names)
     notNullRownames <- !vapply(rowDataColnames, FUN=is.null, FUN.VALUE=logical(1))
     if (any(notNullRownames))
@@ -76,27 +79,25 @@ setMethod('buildLongTable', signature(from='data.frame'),
             colDataCols[[i]] <- names(colDataCols[[i]])
         }
 
-    # drop colKey or rowKey from assayCols, since we are adding it back in the
+    # -- drop colKey or rowKey from assayCols, since we are adding it back in the
     # next step
     ## TODO:: Add a check to see if the keys are there to avoid dropping/re-adding
     .drop.in <- function(x, y) x[!(x %in% y)]
     assayCols <- lapply(assayCols, .drop.in, y=c('colKey', 'rowKey'))
 
-    # add the index columns to the different assay column vectors
+    # -- add the index columns to the different assay column vectors
     # this allows the .selectDataTable helper to be more general
     .prependToVector <- function(vector, values) c(values, vector)
     assayCols <- lapply(assayCols, FUN=.prependToVector, values=c('rowKey', 'colKey'))
     if (is.null(names(assayCols))) names(assayCols) <- paste0('assay', seq_along(assayCols))
     assays <- lapply(assayCols, .selectDataTable, DT=assayData)
 
-    # remove the colname suffixes by reference from assays which had the same
+    # -- remove the colname suffixes by reference from assays which had the same
     # colnames prior to joining into a single DT
     for (assay in assays) {
         setnames(assay, colnames(assay), gsub('\\._\\d+$', '', colnames(assay)))
     }
 
-    ## applicable to any type of data. Maybe allow user to specify? For example
-    ## by naming the elements of rowDataCols and colDataCols?
     return(LongTable(rowData=rowData, rowIDs=rowDataCols[[1]],
                      colData=colData, colIDs=colDataCols[[1]],
                      assays=assays))

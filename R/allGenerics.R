@@ -147,6 +147,20 @@ setGeneric("sensitivityMeasures",
 setGeneric('sensitivityMeasures<-',
     function(object, ..., value) standardGeneric('sensitivityMeasures<-'))
 
+#' sensitivitySlotToLongTable Generic
+#'
+#' Convert the sensitivity slot in an object inheriting from a CoreSet from a
+#'   list to a LongTable.
+#'
+#' @param object [`CoreSet`] Object inheriting from CoreSet.
+#' @param ... Allow new arguments to be defined on this generic.
+#'
+#' @return A [`LongTable`] object containing the data in the sensitivity slot
+#'
+#' @export
+setGeneric('sensitivitySlotToLongTable',
+    function(object, ...) standardGeneric('sensitivitySlotToLongTable'))
+
 # ==== LongTable Class
 
 #' Generic method for resetting indexing in an S4 object

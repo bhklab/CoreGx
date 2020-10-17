@@ -15,7 +15,7 @@
 #' @export
 setMethod('sensitivityRaw', signature("CoreSet"), function(object){
 
-  if (is(object@sensitivity, 'LongTable'))
+  if (is(sensitivitySlot(object), 'LongTable'))
       stop(.errorMsg('\n[CoreGx::sensitivityRaw] This getter has not been
           implemented for a CoreSet. Please define a method using setMethod()
           on the subclass of CoreSet in your current package!'))
@@ -43,7 +43,7 @@ setMethod('sensitivityRaw', signature("CoreSet"), function(object){
 setReplaceMethod("sensitivityRaw", signature("CoreSet", "array"),
                  function(object, value) {
 
-  if (is(object@sensitivity, 'LongTable'))
+  if (is(sensitivitySlot(object), 'LongTable'))
       stop(.errorMsg('\n[CoreGx::sensitivityRaw<-] This setter has not been ',
           'implemented for a CoreSet. Please define a method using ',
           'setReplaceMethod() on the subclass of CoreSet in your current ',

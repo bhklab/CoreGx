@@ -189,7 +189,8 @@ Updated \code{CoreSet}
 A [`array`] containing the raw sensitivity data as experiment by
     dose level by metric.
 
-A \code{array} containing the raw sensitivity data as experiment by dose level by metric
+A 3D [`array`] containing the raw sensitivity data as experiment by
+   dose level by metric.
 }
 \description{
 The CoreSet (CSet) class was developed as a superclass for pSets in the 
