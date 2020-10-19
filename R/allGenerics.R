@@ -210,6 +210,7 @@ setGeneric('buildLongTable',
 setGeneric('getIntern',
     function(object, x, ...) standardGeneric('getIntern'))
 
+
 #' Generic to access the row identifiers from
 #'
 #' @param object [`S4`] An object to get row id columns from.
@@ -217,6 +218,7 @@ setGeneric('getIntern',
 #'
 #' @export
 setGeneric('rowIDs', function(object, ...) standardGeneric('rowIDs'))
+
 
 #' Generic to access the row identifiers from
 #'
@@ -226,6 +228,7 @@ setGeneric('rowIDs', function(object, ...) standardGeneric('rowIDs'))
 #' @export
 setGeneric('rowMeta', function(object, ...) standardGeneric('rowMeta'))
 
+
 #' Generic to access the row identifiers for an object.
 #'
 #' @param object [`S4`] An object to get column id columns from.
@@ -233,6 +236,7 @@ setGeneric('rowMeta', function(object, ...) standardGeneric('rowMeta'))
 #'
 #' @export
 setGeneric('colIDs', function(object, ...) standardGeneric('colIDs'))
+
 
 #' Generic to access the column identifiers for a rectangular object.
 #'
@@ -242,6 +246,7 @@ setGeneric('colIDs', function(object, ...) standardGeneric('colIDs'))
 #' @export
 setGeneric('colMeta', function(object, ...) standardGeneric('colMeta'))
 
+
 #' Generic to access the assay columns of a rectangular object.
 #'
 #' @param object [`S4`] An object to get assay ids from.
@@ -250,6 +255,16 @@ setGeneric('colMeta', function(object, ...) standardGeneric('colMeta'))
 #' @export
 setGeneric('assayCols',
     function(object, ...) standardGeneric('assayCols'))
+
+
+#' Generic to access the unique id columns in an S4 object used to
+#'
+#' @param object An [`S4`] object to get id columns from.
+#' @param ... Allow new arguments to this generic.
+#'
+#' @export
+setGeneric('idCols',
+    function(object, ...) standardGeneric('idCols'))
 
 ##' Generic to access the build configuration for an S4 object.
 ##'

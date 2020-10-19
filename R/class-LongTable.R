@@ -357,4 +357,16 @@ setMethod('assayCols', signature(object='LongTable'),
 
 })
 
-## TODO:: Implement a function to get the entire configuration needed to make a LongTable object
+#' Retrieve the unique identifier columns used for primary keys in rowData and
+#'    colData.
+#'
+#' @param object [`LongTable`]
+#'
+#' @return [`character`] A character vector containing the unique rowIDs and
+#'   colIDs in a LongTable object.
+#'
+#' @export
+setMethod('idCols', signature('LongTable'),
+    function(object) {
+    return(unique(c(rowIDs(object), colIDs(object))))
+})
