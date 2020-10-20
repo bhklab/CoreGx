@@ -1,7 +1,9 @@
 # ==== LongTable Class
 
-#' Redo indexing for a LongTable object to remove any gaps in integer indexes
+#' @title Redo indexing for a LongTable object to remove any gaps in integer
+#'   indexes
 #'
+#' @description
 #' After subsetting a LongTable, it is possible that values of rowKey or colKey
 #'   could no longer be present in the object. As a result there the indexes
 #'   will no longer be contiguous integers. This method will calcualte a new
@@ -43,10 +45,7 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
 
 })
 
-#'
-#' @param
-#'
-#'
+
 #' @keywords internal
 #' @noRd
 .extractIDData <- function(assayDataList, idCols, keyName) {

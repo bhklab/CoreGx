@@ -1,13 +1,19 @@
-#' LongTable class definition
+#' @title LongTable class definition
 #'
-#' Define a private constructor method to be used to build a `LongTable` object.
+#' @description Define a private constructor method to be used to build a
+#'   `LongTable` object.
 #'
-#' @param drugs [`data.table`]
-#' @param cells [`data.table`]
-#' @param assays [`list`]
-#' @param metadata [`list`]
+#' @slot rowData A [`data.table`] containing the metadata associated with the
+#'   row dimension of a `LongTable`.
+#' @slot colData A [`data.table`] containing the metadata associated with the
+#'   column dimension of a `LongTable`.
+#' @slot assays A [`list`] of [`data.table`s], one for each assay in a
+#'   `LongTable`.
+#' @slot metadata An optional [`list`] of additional metadata for a `LongTable`
+#'   which doesn't map to one of the dimensions.
 #'
-#' @return [`LongTable`] object containing the assay data from a
+#' @return [`LongTable`] object containing the assay data from a treatment
+#'   response experiment
 #'
 #' @import data.table
 #' @keywords internal
@@ -19,10 +25,23 @@
                                   assays='list',
                                   metadata='list',
                                   .intern='environment'))
+#' @export
+setOldClass('long.table', S4Class='LongTable')
 
-#' LongTable constructor method
+#' @title LongTable constructor method
 #'
-#' Constrcuts a long table #FIXME:: Better description
+#' @description Builds a `LongTable` object from rectangular objects. The
+#'   `rowData` argument should contain row level metadata, while the `colData`
+#'   argument should contain column level metadata, for the experimental assays
+#'   in the `assays` list. The `rowIDs` and `colIDs` lists are used to configure
+#'   the internal keys mapping rows or columns to rows in the assays. Each list
+#'   should contain at minimum one character vector, specifying which columns
+#'   in `rowData` or `colData` are required to uniquely identify each row. An
+#'   optional second character vector can be included, specifying any metadata
+#'   columns for either dimension. These should contain information about each
+#'   row but NOT be required to uniquely identify a row in the `colData` or
+#'   `rowData` objects. Additional metadata can be attached to a `LongTable` by
+#'   passing a list to the metadata argument.
 #'
 #' @param rowData [`data.table`, `data.frame`, `matrix`] A table like object
 #'   coercible to a `data.table` containing the a unique `rowID` column which
@@ -48,7 +67,8 @@
 #'   If TRUE, rownames are added to the column 'rn'. Character: specify a custom
 #'   column name to store the rownames in.
 #'
-#' @return [`LongTable`] object
+#' @return A [`LongTable`] object containing the data for a treatment response
+#'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
 #' @import data.table
 #' @export
@@ -57,7 +77,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 
     # handle missing parameters
     isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
-                 colData=missing(colData), assays=missing(assays))
+        colData=missing(colData), assays=missing(assays))
 
     if (any(isMissing))
         stop(.errorMsg('\nRequired parameter(s) missing: ',
@@ -133,14 +153,15 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 # ---- Class unions for CoreSet slots
 #' A class union to allow multiple types in a CoreSet slot
 #'
+#' @include class-LongTable.R
 #' @export
 setClassUnion('list_or_LongTable', c('list', 'LongTable'))
 
 #' Ensure that all rowID and colID keys are valid
 #'
-#' @param rowData [`data.table`]
-#' @param colData [`data.table`]
-#' @param assays [`list`]
+#' @param rowData A [`data.table`]
+#' @param colData A [`data.table`]
+#' @param assays A [`list`]
 #'
 #' @keywords internal
 ## FIXME:: Finish this and implement class validity methods for LongTable!

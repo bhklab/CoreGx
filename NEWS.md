@@ -1,7 +1,13 @@
 # CoreGx News File
 
+## v1.1.5
+- Implemented a new class, the `LongTable`, to store the results of a treatment
+response experiment. This class provides a flexible and fast data storage 
+object which can be subclassed for use in other R packages.
+- Added vignette documenting `LongTable` accessors and usage of the new object.
+
 ## v1.0.2
-- Bug fix: supress warnings thrown by piano::runGSA inside the connectivitScore
+- Bug fix: suppress warnings thrown by piano::runGSA inside the connectivitScore
 function
 
 ## v1.0.1

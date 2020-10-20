@@ -4,7 +4,7 @@
 \alias{as.data.frame.LongTable}
 \title{Coerce a LongTable to a data.frame}
 \usage{
-\method{as.data.frame}{LongTable}(x)
+\method{as.data.frame}{LongTable}(x, row.names, optional = TRUE, ...)
 }
 \arguments{
 \item{x}{[`LongTable`] to coerce to `data.frame`.}
@@ -12,8 +12,8 @@
 \value{
 [`data.frame`] containing the data from the LongTable, with the
   `LongTable.config' attribute containg the metadata needed to reverse
-   the coercion operation.
+  the coercion operation.
 }
 \description{
-Coerce a LongTable to a data.frame
+S3 version of coerce method fro convenience.
 }

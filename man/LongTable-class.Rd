@@ -24,24 +24,36 @@ performing data aggregation using the `data.table` API.}
 \item{metadata}{[`logical`] Should the row and column metadata also
 be joined to the to the returned assay. Default is FALSE, but could be
 useful if the metadata will be used for group by operation.}
-
-\item{drugs}{[`data.table`]}
-
-\item{cells}{[`data.table`]}
-
-\item{assays}{[`list`]}
 }
 \value{
-[`LongTable`] object containing the assay data from a
+[`LongTable`] object containing the assay data from a treatment
+  response experiment
 }
 \description{
-Define a private constructor method to be used to build a `LongTable` object.
+Define a private constructor method to be used to build a
+  `LongTable` object.
 
 Select an assay from within a LongTable object.
 }
 \section{Methods (by generic)}{
 \itemize{
 \item \code{[[}: 
+}}
+
+\section{Slots}{
+
+\describe{
+\item{\code{rowData}}{A [`data.table`] containing the metadata associated with the
+row dimension of a `LongTable`.}
+
+\item{\code{colData}}{A [`data.table`] containing the metadata associated with the
+column dimension of a `LongTable`.}
+
+\item{\code{assays}}{A [`list`] of [`data.table`s], one for each assay in a
+`LongTable`.}
+
+\item{\code{metadata}}{An optional [`list`] of additional metadata for a `LongTable`
+which doesn't map to one of the dimensions.}
 }}
 
 \keyword{internal}

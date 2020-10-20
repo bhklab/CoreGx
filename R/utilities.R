@@ -892,6 +892,7 @@
 
 ## TODO:: Write documentation
 ## FIXME:: Why is this different from PharmacoGx?
+#' @title Residual calculation
 #'
 #' @return A \code{numeric} containing the estimated residuals for the model
 #'   fit

@@ -7,11 +7,11 @@
 .verifyKeyIntegrity(rowData, colData, assays)
 }
 \arguments{
-\item{rowData}{[`data.table`]}
+\item{rowData}{A [`data.table`]}
 
-\item{colData}{[`data.table`]}
+\item{colData}{A [`data.table`]}
 
-\item{assays}{[`list`]}
+\item{assays}{A [`list`]}
 }
 \description{
 Ensure that all rowID and colID keys are valid

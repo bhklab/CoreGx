@@ -2,7 +2,8 @@
 % Please edit documentation in R/methods-reindex.R
 \name{reindex,LongTable-method}
 \alias{reindex,LongTable-method}
-\title{Redo indexing for a LongTable object to remove any gaps in integer indexes}
+\title{Redo indexing for a LongTable object to remove any gaps in integer
+  indexes}
 \usage{
 \S4method{reindex}{LongTable}(object)
 }

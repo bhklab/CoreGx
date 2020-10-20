@@ -317,7 +317,7 @@ and updated copty
 \describe{
 \item{\code{annotation}}{A \code{list} of annotation data about the CoreSet,
 including the \code{$name} and the session information for how the object
-was creating, detailing the exact versions of R and all the packages used}
+was created, detailing the exact versions of R and all the packages used}
 
 \item{\code{molecularProfiles}}{A \code{list} containing \code{SummarizedExperiment}s 
 type object for holding data for RNA, DNA, SNP and Copy Number Variation 

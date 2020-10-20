@@ -1,12 +1,14 @@
 # ==== LongTable Class
 
-#' Coerce a LongTable into a `data.table`
+#' @title LongTable to data.table conversion
+#'
+#' @description Coerce a LongTable into a `data.table`
 #'
 #' @param from [`LongTable`] Object to coerce.
 #' @param to [`character`] Class name to coerce to, currently only 'data.table'
-#'    and 'data.frame' are supported
+#'   and 'data.frame' are supported
 #'
-#' return [`data.table`]
+#' @return A [`data.table`] with the data from a LongTable.
 #'
 #' @import data.table
 #' @export
@@ -64,10 +66,9 @@ setAs('LongTable', 'data.table', def=function(from) {
     # return the data.table
     return(DT)
 })
-
-#' Coerce a LongTable into a `data.table`
+#' @title Coerce a LongTable into a `data.table`
 #'
-#' S3 version of coerce method for convenience.
+#' @description S3 version of coerce method for convenience.
 #'
 #' @param x [`LongTable`] to coerce to a `data.table`
 #'
@@ -77,46 +78,59 @@ setAs('LongTable', 'data.table', def=function(from) {
 #'
 #' @export
 as.data.table.LongTable <- function(x) as(x, 'data.table')
-
-#' Coerce a LongTable into a `data.frame`
+#' @title Coerce a LongTable into a `data.frame`
 #'
-#' Currently only supports coercing to data.table or data.frame
+#' @description Currently only supports coercing to data.table or data.frame
 #'
 #' @param from [`LongTable`] Object to coerce.
 #' @param to [`character`] Class name to coerce to, currently only 'data.table'
-#'    and 'data.frame' are supported
+#'   and 'data.frame' are supported
 #'
 #' @return [`data.table`] containing the data from the LongTable, with the
 #'   `LongTable.config' attribute containg the metadata needed to reverse
-#'    the coercing operation.
+#'   the coercing operation.
 #'
 #' @import data.table
 #' @export
-setAs('LongTable', 'data.frame', def=function(from){
+setAs('LongTable', 'data.frame', def=function(from) {
     DT <- as(from, 'data.table')
     setDF(DT)
     return(DT)
 })
 
-#' Coerce a LongTable to a data.frame
+#' @title Coerce a LongTable to a data.frame
+#'
+#' @description S3 version of coerce method fro convenience.
 #'
 #' @param x [`LongTable`] to coerce to `data.frame`.
 #'
 #' @return [`data.frame`] containing the data from the LongTable, with the
 #'   `LongTable.config' attribute containg the metadata needed to reverse
-#'    the coercion operation.
+#'   the coercion operation.
 #'
 #' @export
-as.data.frame.LongTable <- function(x) as(x, 'data.frame')
+as.data.frame.LongTable <- function(x, row.names, optional=TRUE, ...) {
+    DF <- as(x, 'data.frame')
+    if (!missing(row.names)) {
+        if (!is.character(x) || length(row.names) != nrow(DF))
+            stop(.errorMsg('[CoreGx::as.data.frame.LongTable] The row.names ',
+                'argument must be a character vector with length equal to ',
+                nrow(DF)))
+        if (!optional) row.names <- make.names(row.names)
+        rownames(DF) <- row.names
+    }
+    DF
+}
 
 
-#' Coerce to data.table to LongTable
+#' @title Coerce to data.table to LongTable
 #'
-#' Coerce a data.table with the proper configuration attributes back to a LongTable
+#' @description Coerce a data.table with the proper configuration attributes
+#'   back to a LongTable
 #'
 #' @param from A [`data.table`] with the 'LongTable.config' attribute, containing
-#'    three lists named assayCols, rowDataCols and colDataCols. This attribute is
-#'    automatically created when coercing from a LongTable to a data.table.
+#'   three lists named assayCols, rowDataCols and colDataCols. This attribute is
+#'   automatically created when coercing from a `LongTable` to a `data.table`.
 #'
 #' @return [`LongTable`] object configured with the LongTable.config
 #'
@@ -124,8 +138,9 @@ as.data.frame.LongTable <- function(x) as(x, 'data.frame')
 setAs('data.table', 'LongTable', def=function(from) {
 
     if (!('LongTable.config' %in% names(attributes(from))))
-        stop(.errorMsg('Coercing from data.table to LongTable only works if ',
-                        'the LongTable.config attribute has been set.'))
+        stop(.errorMsg('[CoreGx::as,data.table,LongTable] Coercing from ',
+            'data.table to LongTable only works if the LongTable.config ',
+            'attribute has been set!'))
 
     LongTable.config <- attr(from, 'LongTable.config')
 
@@ -138,14 +153,15 @@ setAs('data.table', 'LongTable', def=function(from) {
     with(LongTable.config,
          buildLongTable(from, rowDataCols, colDataCols, assayCols))
 })
-
-#' Coerce to data.table to LongTable
+#' @title Coerce from data.table to LongTable
 #'
-#' Coerce a data.table with the proper configuration attributes back to a LongTable
+#' @description Coerce a data.table with the proper configuration attributes
+#'   back to a LongTable
 #'
-#' @param x A [`data.table`] with the 'LongTable.config' attribute, containing
+#' @param x A [`data.frame`] with the 'LongTable.config' attribute, containing
 #'    three lists named assayCols, rowDataCols and colDataCols. This attribute is
 #'    automatically created when coercing from a LongTable to a data.table.
 #'
 #' @return [`LongTable`] object configured with the LongTable.config
+#' @export
 as.long.table <- function(x) as(x, 'LongTable')

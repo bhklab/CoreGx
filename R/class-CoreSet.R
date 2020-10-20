@@ -18,7 +18,7 @@
 #' 
 #' @slot annotation A \code{list} of annotation data about the CoreSet,
 #'    including the \code{$name} and the session information for how the object
-#'    was creating, detailing the exact versions of R and all the packages used
+#'    was created, detailing the exact versions of R and all the packages used
 #' @slot molecularProfiles A \code{list} containing \code{SummarizedExperiment}s 
 #'   type object for holding data for RNA, DNA, SNP and Copy Number Variation 
 #'   measurements respectively, with associated \code{rowData} and \code{colData} 
@@ -43,6 +43,7 @@
 #' @return An object of the CoreSet class
 #' 
 #' @exportClass CoreSet
+#' @include class-LongTable.R
 #' @export
 .CoreSet <- setClass("CoreSet",
     slots = list(sensitivity="list_or_LongTable",
@@ -92,7 +93,8 @@
 #'   print out any errors it finds after construction?
 #' @return An object of class CoreSet
 #' @export
-#' 
+#'
+#' @include class-LongTable.R
 #' @import methods
 #' @importFrom utils sessionInfo
 #' @importFrom stats na.omit
