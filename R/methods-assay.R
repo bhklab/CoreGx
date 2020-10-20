@@ -10,12 +10,12 @@
 #' @param metadata [`logical`] Should all of the metadata also be joined to
 #'   the assay. This is useful when modifying assays as the resulting list
 #'   has all the information needed to recreated the LongTable object.
-#' @param key [`logical`] Should the key columns also be returned?
+#' @param key [`logical`] Should the key columns also be returned? Defaults to
+#'   TRUE.
 #'
 #' @importMethodsFrom SummarizedExperiment assay
 #' @importFrom crayon magenta cyan
 #' @export
-##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
 setMethod('assay',
           signature(x='LongTable'),
           function(x, i, withDimnames=FALSE, metadata=FALSE, key=TRUE) {

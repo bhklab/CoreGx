@@ -42,7 +42,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
     # -- validate input and return useful messages if invalid
     ## TODO:: Check input parameters are valid
 
-    # -- convert to data.table by refernce
+    # -- convert to data.table by reference
     if (!is.data.table(from))
         from <- data.table(from)
 
@@ -193,19 +193,20 @@ setMethod('buildLongTable', signature(from='list'),
     if (any(isDF)) for (i in which(isDF)) from[[i]] <- data.table(from[[i]])
 
     # validate mappings
-    idCols <- c(unlist(rowDataCols[[1]]), unlist(colDataCols[[1]]))
+    ## TODO:: Ensure there is no case where joining on rowMeta or colMeta gives different results than just ids
+    joinCols <- unique(unlist(c(rowDataCols, colDataCols)))
     dataColNames <- lapply(from, FUN=colnames)
-    idColsIn <- lapply(dataColNames, `%in%`, x=idCols)
-    hasAllIdCols <- unlist(lapply(idColsIn, FUN=all))
+    joinColsIn <- lapply(dataColNames, `%in%`, x=joinCols)
+    hasAllIdCols <- unlist(lapply(joinColsIn, FUN=all))
     if (!all(hasAllIdCols)) {
-        missingCols <- unique(unlist(.mapply(`[`, x=idCols, i=idColsIn)))
+        missingCols <- unique(unlist(.mapply(`[`, x=joinCols, i=joinColsIn)))
         stop(.errorMsg('Assays ', .collapse(which(hasAllIdCols)),
              ' are missing one or more id columns: ', .collapse(missingCols),
              collapse=', '))
     }
 
-    # Set key for faster joins
-    from <- lapply(from, setkeyv, cols=idCols)
+    # Set keys for faster joins
+    for (i in seq_along(from)) setkeyv(from[[i]], cols=joinCols)
 
     # join assays into a single table
     DT <- from[[1]]
@@ -215,7 +216,8 @@ setMethod('buildLongTable', signature(from='list'),
 
     # fix assayCols if there are duplicate column names between assays
     # the join will append '._n' where n is the assay index - 1
-    assaySuffixCols <- lapply(paste0('\\._', seq_along(from)), grep, x=colnames(DT), value=TRUE)
+    nonDataCols <- setdiff(colnames(DT), unique(c(unlist(rowDataCols), unlist(colDataCols))))
+    assaySuffixCols <- lapply(paste0('\\._', seq_along(from)), grep, x=nonDataCols, value=TRUE)
     .length.gt.0 <- function(x) length(x) > 0
     hasSuffixes <- unlist(lapply(assaySuffixCols, FUN=.length.gt.0))
     duplicatedCols <- lapply(assaySuffixCols[hasSuffixes], gsub,
