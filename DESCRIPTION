@@ -50,7 +50,8 @@ Suggests:
   pander,
   BiocStyle,
   rmarkdown,
-  knitr
+  knitr,
+  formatR
 License: GPL-3
 RoxygenNote: 7.1.1
 Collate: 

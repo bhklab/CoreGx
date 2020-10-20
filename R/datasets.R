@@ -15,3 +15,18 @@
 #' @format CoreSet object
 #'
 NULL
+
+#' Merck Drug Combination Data
+#'
+#' This is a LongTable object created from some drug combination data provided
+#'   to our lab by Merck.
+#'
+#' @references
+#' TODO:: Include a reference
+#'
+#' @docType data
+#' @name merckDrugCombosSmall
+#' @usage data(merckDrugCombosSmall)
+#' @keywords datasets
+#' @format LongTable object
+NULL

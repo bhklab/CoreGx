@@ -15,5 +15,5 @@
 logs
 appveyor.yml
 .idea
-^vignettes/LongTable.*
 ^scripts
+vignettes/.*html

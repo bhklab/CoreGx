@@ -21,7 +21,8 @@ and returns them attached to the}
 the assay. This is useful when modifying assays as the resulting list
 has all the information needed to recreated the LongTable object.}
 
-\item{key}{[`logical`] Should the key columns also be returned?}
+\item{key}{[`logical`] Should the key columns also be returned? Defaults to
+TRUE.}
 }
 \description{
 Retrieve an assay `data.table` object from the `assays` slot of a `LongTable`

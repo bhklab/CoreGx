@@ -7,7 +7,7 @@ author:
 - name: Christopher Eeles
   affiliation: *pm
   email: christopher.eeles@uhnresearch.ca
-package: PharmacoGx
+package: CoreGx
 output:
   BiocStyle::html_document
 vignette: |
@@ -59,10 +59,9 @@ tools for high performance data processing implemented in C.
 
 # Anatomy of a LongTable: Class Diagram
 
-\vspace{-1em}
-\centering\includegraphics[height = 0.9\textheight]{LongTableClassDiagram.png}
-
-\flushleft
+```{r class_diagram, fig.wide=TRUE, caption='LongTable Class Diagram'}
+knitr::include_graphics('LongTableClassDiagram.png')
+```
 
 We have borrowed directly from the `SummarizedExperiment` class
 for the `rowData`, `colData`, `metadata` and `assays` slot names.
@@ -73,8 +72,9 @@ We also implemented the `SummarizedExperiment` accessor generics for the `LongTa
 There are, however, some important differences which make this object more
 flexible when dealing with high dimensional data.
 
-\vspace{-1.2em}
-\center\includegraphics[height=0.8\textheight]{LongTableStucture.png}
+```{r long_table_structure, fig.wide=TRUE, caption='LongTable Structure'}
+knitr::include_graphics('LongTableStructure.png')
+```
 
 Unlike a `SummarizedExperiment`, there are three distinct
 classes of columns in `rowData` and `colData`.
@@ -109,7 +109,7 @@ test the data structure thus far.
 
 ```{r head_data, echo=TRUE}
 
-filePath <- 'data/drug_combo_merck_small.csv'
+filePath <- '../data/merckDrugCombosSmall.csv'
 merckDT <- fread(filePath, na.strings=c('NULL'))
 colnames(merckDT)
 ```
@@ -178,7 +178,7 @@ longTable2
 a list of assay tables containing the required row and column IDs
 
 - Additionally, any row or column IDs not already in rowData or colData will
-be appended to these slots automiatically!
+be appended to these slots automatically!
 
 # LongTable Object
 
@@ -260,7 +260,7 @@ for `dataTable[i, j]`.
 where drug1 is Temozolomide and drug2 is either Lapatinib or Bortezomib:
 
 ```{r , echo=TRUE}
-longTable[.(cell_line1 == 'VCAP'),  # row query
+longTable[.(cell_line1 == 'CAOV3'),  # row query
           .(drug1 == 'Temozolomide' & drug2 %in% c('Lapatinib', 'Bortezomib'))]  # column query
 ```
 

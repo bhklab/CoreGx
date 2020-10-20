@@ -8,3 +8,4 @@ CoreGx.Rcheck
 doc
 Meta
 logs
+vignettes/.*html
