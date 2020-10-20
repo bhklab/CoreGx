@@ -32,9 +32,9 @@ names to subset. Can be used to subset the assays list further,
 returning only the selected items in the new LongTable.}
 
 \item{reindex}{[`logical`] Should the col/rowKeys be remapped after subsetting.
-defaults to FALSE, since reindexing can have significant performance
-costs in chained subsetting. We recommend using the `reindex` function
-to manually reset the indexes after chained subsets.}
+defaults to TRUE. For chained subsetting you may be able to get performance
+gains by setting to FALSE and calling reindex() manually after subsetting
+is finished.}
 }
 \value{
 [`LongTable`] A new `LongTable` object subset based on the specified

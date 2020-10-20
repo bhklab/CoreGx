@@ -27,7 +27,7 @@ setMethod('assay',
 
     keepAssay <- if (is.character(i)) which(assayNames(x) == i) else i
     if (length(keepAssay) < 1)
-        stop(.errorMsg('\nThere is no assay ', i,
+        stop(.errorMsg('\n[CoreGx::assay] There is no assay ', i,
             ' in this LongTable. Use assayNames(longTable) for a list',
             'of valid assay names.'))
 
@@ -46,7 +46,9 @@ setMethod('assay',
     # drop any duplicated columns to prevent issues in the setter methods,
     # actually drops any columns prefixed with i.
     duplicates <- grep('^i\\..*', colnames(assayData), value=TRUE)
-    warnDuplicates <- setdiff(duplicates, 'i.drug_cell_rep')
+    ## TODO:: Is there any situation where ignoring duplicated keys could break the object?
+    ## TODO:: Maybe add equality test for duplicate columns?
+    warnDuplicates <- setdiff(duplicates, c('i.drug_cell_rep', 'i.rowKey', 'i.colKey'))
     if (length(duplicates) > 0) {
         if (length(warnDuplicates) > 0)
             warning(.warnMsg('\n[CoreGx::assay] Dropping columns duplicated when ',

@@ -4,10 +4,10 @@
 \alias{.}
 \title{Convenience function for converting R code to a call}
 \usage{
-.(...)
+.()
 }
 \arguments{
-\item{...}{[`parilist`] Arbitrary R code to subsitute.}
+\item{...}{[`parilist`] Arbitrary R code to quote.}
 }
 \value{
 [`call`] An R call object containing the R code from `...`

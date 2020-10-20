@@ -27,12 +27,12 @@
 #'      for the `colData` data.table.
 #'
 #' @param assays [`character`, `numeric` or `logical`] Optional list of assay
-#'      names to subset. Can be used to subset the assays list further,
-#'      returning only the selected items in the new LongTable.
+#'     names to subset. Can be used to subset the assays list further,
+#'     returning only the selected items in the new LongTable.
 #' @param reindex [`logical`] Should the col/rowKeys be remapped after subsetting.
-#'      defaults to FALSE, since reindexing can have significant performance
-#'      costs in chained subsetting. We recommend using the `reindex` function
-#'      to manually reset the indexes after chained subsets.
+#'     defaults to TRUE. For chained subsetting you may be able to get performance
+#'     gains by setting to FALSE and calling reindex() manually after subsetting
+#'     is finished.
 #'
 #' @return [`LongTable`] A new `LongTable` object subset based on the specified
 #'      parameters.
@@ -58,7 +58,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     if (!missing(i)) {
         ## TODO:: Clean up this if-else block
         if (.tryCatchNoWarn(is.call(i), error=function(e) FALSE)) {
-            # Do nothing
+            rowDataSubset <- .rowData(longTable)[eval(i), ]
         } else if (.tryCatchNoWarn(is.character(i), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
             idCols <- rowIDs(longTable, key=TRUE)
@@ -68,10 +68,10 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
                     paste0(idCols, collapse=':')))
             i <- grepl(.preprocessRegexQuery(i), rownames(longTable), ignore.case=TRUE)
             i <- str2lang(.variableToCodeString(i))
+            rowDataSubset <- .rowData(longTable)[eval(i), ]
         } else {
-            i <- substitute(i)
+            rowDataSubset <- .rowData(longTable)[i, ]
         }
-        rowDataSubset <- .rowData(longTable)[eval(i), ]
     } else {
         rowDataSubset <- .rowData(longTable)
     }
@@ -80,7 +80,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     if (!missing(j)) {
         ## TODO:: Clean up this if-else block
         if (.tryCatchNoWarn(is.call(j), error=function(e) FALSE, silent=TRUE)) {
-            # Do nothing
+            colDataSubset <- .colData(longTable)[eval(j), ]
         } else if (.tryCatchNoWarn(is.character(j), error=function(e) FALSE, silent=TRUE)) {
             ## TODO:: Implement diagnosis for failed regex queries
             idCols <- colIDs(longTable, key=TRUE)
@@ -90,10 +90,10 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
                     paste0(idCols, collapse=':')))
             j <- grepl(.preprocessRegexQuery(j), colnames(longTable), ignore.case=TRUE)
             j <- str2lang(.variableToCodeString(j))
+            colDataSubset <- .colData(longTable)[eval(j), ]
         } else {
-            j <- substitute(j)
+            colDataSubset <- .colData(longTable)[j, ]
         }
-        colDataSubset <- .colData(longTable)[eval(j), ]
     } else {
         colDataSubset <- .colData(longTable)
     }
@@ -130,12 +130,12 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #' This is used to pass through unevaluated R expressions into subset and
 #'   `[`, where they will be evaluated in the correct context.
 #'
-#' @param ... [`parilist`] Arbitrary R code to subsitute.
+#' @param ... [`parilist`] Arbitrary R code to quote.
 #'
 #' @return [`call`] An R call object containing the R code from `...`
 #'
 #' @export
-. <- function(...) substitute(...)
+. <- quote
 
 # ---- subset LongTable helpers
 

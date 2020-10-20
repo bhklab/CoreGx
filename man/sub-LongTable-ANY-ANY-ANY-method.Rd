@@ -45,8 +45,24 @@
 it defaults to FALSE and changing it does nothing.}
 }
 \description{
-Single bracket subsetting for a LongTable object.
+Single bracket subsetting for a LongTable object. See subset for more details.
 }
 \details{
 This function is endomorphic, it always returns a LongTable object.
+}
+\examples{
+data(merckDrugCombosSmall)
+
+# Character
+merckDrugCombosSmall['CAOV3', 'ABT-888']
+
+# Numeric
+merckDrugCombosSmall[1, c(1, 2)]
+
+# Logical
+merckDrugCombosSmall[rowData(merckDrugCombosSmall)$cell_line1 == 'A2058', ]
+
+# Call
+merckDrugCombosSmall[.(cell_line1 == 'A2058'), .(drug1 == 'Dasatinib' & drug2 != '5-FU')]
+
 }
