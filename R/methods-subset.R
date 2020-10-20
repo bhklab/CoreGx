@@ -5,17 +5,14 @@
 #' Allows use of the colData and rowData `data.table` objects to query based on
 #'  rowID and colID, which is then used to subset all value data.tables stored
 #'  in the dataList slot.
-#'
 #' This function is endomorphic, it always returns a LongTable object.
 #'
 #' @param x [`LongTable`] The object to subset.
 #' @param i [`character`], [`numeric`], [`logical`] or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all row id columns matching the vector.
-#'
 #'  Numeric or Logical: these select based on the rowKey from the `rowData`
 #'      method for the `LongTable`.
-#'
 #'  Expression: Accepts valid query statements to the `data.table` i parameter,
 #'      this can be used to make complex queries using the `data.table` API
 #'      for the `rowData` data.table.
@@ -23,16 +20,14 @@
 #' @param j [`character`], [`numeric`], [`logical`] or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all drug id columns matching the vector.
-#'
 #'  Numeric or Logical: these select based on the rowID from the `rowData`
 #'      method for the `LongTable`.
-#'
 #'  Expression: Accepts valid query statements to the `data.table` i parameter,
 #'      this can be used to make complex queries using the `data.table` API
 #'      for the `colData` data.table.
 #'
-#' @param values [`character`, `numeric` or `logical`] Optional list of value
-#'      names to subset. Can be used to subset the dataList column further,
+#' @param assays [`character`, `numeric` or `logical`] Optional list of assay
+#'      names to subset. Can be used to subset the assays list further,
 #'      returning only the selected items in the new LongTable.
 #' @param reindex [`logical`] Should the col/rowKeys be remapped after subsetting.
 #'      defaults to FALSE, since reindexing can have significant performance

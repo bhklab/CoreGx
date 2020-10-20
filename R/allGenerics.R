@@ -176,7 +176,6 @@ setGeneric('sensitivitySlotToLongTable',
 #'
 #' @export
 #' @keywords internal
-#' @noRd
 setGeneric('reindex', function(object, ...) standardGeneric('reindex'))
 
 #' Build a LongTable object
@@ -187,7 +186,6 @@ setGeneric('reindex', function(object, ...) standardGeneric('reindex'))
 #'
 #' @export
 #' @keywords internal
-#' @noRd
 setGeneric('buildLongTable',
     function(from, ...) standardGeneric('buildLongTable'))
 
@@ -205,6 +203,7 @@ setGeneric('buildLongTable',
 #' @param object [`S4`] An object with an @.itern slot containing an environment.
 #' @param x [`character`] One or more symbol names to retrieve from the
 #'    object@.intern environment.
+#' @param ... Allow new parmeters to be defined for this generic.
 #'
 #' @export
 setGeneric('getIntern',

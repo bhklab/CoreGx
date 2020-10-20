@@ -11,9 +11,8 @@
 #' @return value of x if length(x) == 1 else named list of values for all
 #'     symbols in x
 #'
-#' @keywords internal
+#' @include class-LongTable.R
 #' @export
-#' @noRd
 setMethod('getIntern', signature(object='LongTable', x='character'),
     function(object, x, ...) {
 

@@ -7,8 +7,10 @@
 #' @param metadata [`logical`] Should row and column metadata also be joined
 #'   to the returned assays. This is useful for modifying assays before
 #'   reconstructing a new LongTable.
+#' @param key [`logical`] Should the key columns also be returned? Defaults
+#'   to TRUE.
 #'
-#' @return
+#' @return A [`list`] of `data.table` objects, one per assay in the object.
 #'
 #' @importMethodsFrom SummarizedExperiment assays
 #' @export
@@ -30,11 +32,13 @@ setMethod('assays', signature(x='LongTable'),
 #' @param value A [`list`] of `data.frame` or `data.table` objects, all of which
 #'   contain the row and column identifiers and metadata.
 #'
-#' @return A copy of the [`LongTable`] with the assays modified
+#' @return A copy of the [`LongTable`] with the assays modified.
 #'
 #' @importMethodsFrom SummarizedExperiment assays<-
 #' @export
 setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, value) {
+
+    is.items <- CoreGx::is.items
 
     # check input is correct
     isDF <- is.items(value, 'data.frame')

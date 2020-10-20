@@ -1000,7 +1000,9 @@
 #'   uses `is`, specify the desired type in `...`. You can also use other
 #'   type checking functions such as is.character, is.numeric, or is.data.frame.
 #'
+#' @return [`logical`] A vector indicating if the list item is the specified
+#'   type.
+#'
 #' @export
-#' @noRd
 is.items <- function(list, ..., FUN=is)
     vapply(list, FUN=FUN, FUN.VALUE=logical(1), ...)

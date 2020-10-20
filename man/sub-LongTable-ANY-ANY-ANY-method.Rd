@@ -35,9 +35,17 @@
  Call: Accepts valid query statements to the `data.table` i parameter as
      a call object. We have provided the function .() to conveniently
      convert raw R statements into a call for use in this function.}
+
+\item{assays}{[`character`] Names of assays which should be kept in the
+`LongTable` after subsetting.}
+
+\item{...}{Included to ensure drop can only be set by name.}
+
+\item{drop}{[`logical`] Included for compatibility with the '[' primitive,
+it defaults to FALSE and changing it does nothing.}
 }
 \description{
-Single bracket subsetting for
+Single bracket subsetting for a LongTable object.
 }
 \details{
 This function is endomorphic, it always returns a LongTable object.

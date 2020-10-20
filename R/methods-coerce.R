@@ -45,9 +45,9 @@ setAs('LongTable', 'data.table', def=function(from) {
     }
 
     # join the row and column data
-    DT <- merge.data.table(DT, rowData(longTable, key=TRUE))
+    DT <- merge.data.table(DT, rowData(from, key=TRUE))
     setkeyv(DT, c('rowKey', 'colKey'))
-    DT <- merge.data.table(DT, colData(longTable, key=TRUE))
+    DT <- merge.data.table(DT, colData(from, key=TRUE))
 
     # drop interal key columns
     DT[, c('rowKey', 'colKey') := NULL]
@@ -99,10 +99,18 @@ setAs('LongTable', 'data.frame', def=function(from) {
 })
 
 #' @title Coerce a LongTable to a data.frame
+#' @name name
 #'
 #' @description S3 version of coerce method fro convenience.
 #'
 #' @param x [`LongTable`] to coerce to `data.frame`.
+#' @param row.names An optional [`character`] vector of rownames. We do not
+#'   recommend using this parameter, it is included for S3 method consistency
+#'   with `as.data.frame`.
+#' @param optional [`logical`] Is it optional for row and column names to be
+#'   valid R names? If FALSE will use the make.names function to ensure the
+#'   row and column names are valid R names. Defaults to TRUE.
+#' @param ... Does nothing.
 #'
 #' @return [`data.frame`] containing the data from the LongTable, with the
 #'   `LongTable.config' attribute containg the metadata needed to reverse
@@ -116,7 +124,10 @@ as.data.frame.LongTable <- function(x, row.names, optional=TRUE, ...) {
             stop(.errorMsg('[CoreGx::as.data.frame.LongTable] The row.names ',
                 'argument must be a character vector with length equal to ',
                 nrow(DF)))
-        if (!optional) row.names <- make.names(row.names)
+        if (!optional) {
+            row.names <- make.names(row.names)
+            colnames(DF) <- make.names(colnames(DF))
+        }
         rownames(DF) <- row.names
     }
     DF
@@ -148,7 +159,7 @@ setAs('data.table', 'LongTable', def=function(from) {
     hasRequiredConfig <- requiredConfig %in% names(LongTable.config)
     if (!all(hasRequiredConfig))
         stop(.errorMsg('The LongTable.config attribute is missing the ',
-            requiredConfig[!hasRequiedConfig], ' attribute(s).', collapse=', '))
+            requiredConfig[!hasRequiredConfig], ' attribute(s).', collapse=', '))
 
     with(LongTable.config,
          buildLongTable(from, rowDataCols, colDataCols, assayCols))

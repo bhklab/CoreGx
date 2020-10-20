@@ -13,7 +13,7 @@
 contain the row and column identifiers and metadata.}
 }
 \value{
-A copy of the [`LongTable`] with the assays modified
+A copy of the [`LongTable`] with the assays modified.
 }
 \description{
 Setter method for the assays slot in a LongTable object

@@ -54,6 +54,12 @@ column dimension of a `LongTable`.}
 
 \item{\code{metadata}}{An optional [`list`] of additional metadata for a `LongTable`
 which doesn't map to one of the dimensions.}
+
+\item{\code{.intern}}{An [`enivornment`] that holds internal structural metadata
+about a LongTable object, such as which columns are required to key
+the object. An environment has been used to allow locking items, which
+can prevent accidental modification of a property required for the class
+to work.}
 }}
 
 \keyword{internal}

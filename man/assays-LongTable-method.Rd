@@ -16,9 +16,12 @@ the row and column identifiers (i.e., the pseudo dimnames of the object).}
 \item{metadata}{[`logical`] Should row and column metadata also be joined
 to the returned assays. This is useful for modifying assays before
 reconstructing a new LongTable.}
+
+\item{key}{[`logical`] Should the key columns also be returned? Defaults
+to TRUE.}
 }
 \value{
-
+A [`list`] of `data.table` objects, one per assay in the object.
 }
 \description{
 Return a list of `data.table` objects with the assay measurements from a

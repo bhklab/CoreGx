@@ -22,6 +22,7 @@ setMethod(sensitivityMeasures, "CoreSet", function(object){
 #'     and returns the updated object
 #'
 #' @examples
+#' data(clevelandSmall_cSet)
 #' sensitivityMeasures(clevelandSmall_cSet) <- sensitivityMeasures(clevelandSmall_cSet)
 #'
 #' @param object  The \code{CoreSet} object to update
@@ -34,4 +35,5 @@ setReplaceMethod('sensitivityMeasures',
     signature(object='CoreSet', value='character'),
     function(object, value) {
   colnames(sensitivityProfiles(object)) <- value
+  object
 })

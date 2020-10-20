@@ -149,18 +149,12 @@
 \item{value}{A 3D [`array`] containing the raw dose and viability
 measurements to update the object with.}
 
-\item{mDataType}{A \code{character} with the type of molecular data to return/update}
+\item{mDataType}{\code{character} The type of molecular data}
 
 \item{assay}{\code{character} Name of the desired assay; if excluded
 defaults to first assay in the SummarizedExperiment for the given
 mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
 to check which assays are available for a given molecular datatype.}
-
-\item{dimension}{[`character`] Optional name of the dimension to extract,
-either 'cells', 'drugs', 'experiments'. Only used if the sensitivity slot
-contains a `LongTable` object instead of a `list`.}
-
-\item{...}{Fallthrough arguments for defining new methods}
 }
 \value{
 An object of the CoreSet class
@@ -363,6 +357,7 @@ sensitivityInfo(clevelandSmall_cSet) <- sensitivityInfo(clevelandSmall_cSet)
 
 sensitivityMeasures(clevelandSmall_cSet)
 
+data(clevelandSmall_cSet)
 sensitivityMeasures(clevelandSmall_cSet) <- sensitivityMeasures(clevelandSmall_cSet)
 
 sensitivityProfiles(clevelandSmall_cSet)

@@ -11,10 +11,6 @@
 #' cellular response to Pharmacological and Radiation therapy are widely 
 #' different, and extension of the cSet class allows the
 #' packages to apply the correct model for the given data.
-#'
-#' @param mDataType A \code{character} with the type of molecular data to return/update
-#' @param object A \code{CoreSet} object
-#' @param value A replacement value
 #' 
 #' @slot annotation A \code{list} of annotation data about the CoreSet,
 #'    including the \code{$name} and the session information for how the object

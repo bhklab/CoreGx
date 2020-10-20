@@ -7,12 +7,6 @@
 #' sensitivityInfo(clevelandSmall_cSet)
 #'
 #' @param object The [`CoreSet`] to retrieve sensitivity experiment annotations from
-#' @param dimension [`character`] Optional name of the dimension to extract,
-#'     either 'cells', 'drugs', 'experiments'. Only used if the sensitivity slot
-#'     contains a `LongTable` object instead of a `list`.
-#' @param ... [`pairlist`] Additional arguments to the rowData or colData
-#'     `LongTable` methods. Only used if the sensitivity slot contains a
-#'     `LongTable` object instead of a `list`.
 #'
 #' @return a \code{data.frame} with the experiment info if dimension is excluded,
 #'   otherwise a `data.table` with annotations for the cells or drugs dimension
