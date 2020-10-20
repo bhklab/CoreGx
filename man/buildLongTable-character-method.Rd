@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods-buildLongTable.R
 \name{buildLongTable,character-method}
 \alias{buildLongTable,character-method}
-\title{Create a LongTable object from a single .csv file}
+\title{LongTable build method from character}
 \usage{
 \S4method{buildLongTable}{character}(from, rowDataCols, colDataCols, assayCols)
 }

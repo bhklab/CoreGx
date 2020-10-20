@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods-buildLongTable.R
 \name{buildLongTable,data.frame-method}
 \alias{buildLongTable,data.frame-method}
-\title{Create a LongTable object from a single data.table or data.frame object}
+\title{LongTable build method}
 \usage{
 \S4method{buildLongTable}{data.frame}(from, rowDataCols, colDataCols, assayCols)
 }

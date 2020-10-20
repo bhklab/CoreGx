@@ -11,6 +11,8 @@ getIntern(object, x, ...)
 
 \item{x}{[`character`] One or more symbol names to retrieve from the
 object@.intern environment.}
+
+\item{...}{Allow new parmeters to be defined for this generic.}
 }
 \description{
 Internal slot for storing metadata relevant to the internal operation of an

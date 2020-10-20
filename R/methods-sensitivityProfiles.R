@@ -30,7 +30,6 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
 #' sensitivityProfiles(clevelandSmall_cSet) <- sensitivityProfiles(clevelandSmall_cSet)
 #'
 #' @param object The \code{CoreSet} to update
-#' @param ... Fallthrough arguments for defining new methods
 #' @param value A \code{data.frame} with the new sensitivity profiles. If a
 #'   matrix object is passed in, converted to data.frame before assignment
 #'
