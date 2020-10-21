@@ -22,7 +22,7 @@
 #' @importFrom stats setNames
 #' @keywords internal
 .convertCSetMolecularProfilesToSE <- function(cSet) {
-    
+
     eSets <- molecularProfilesSlot(cSet)  # Extract eSet data
     
     molecularProfilesSlot(cSet) <- lapply(eSets, function(eSet) {
@@ -438,6 +438,7 @@
 ## TODO:: Add documentation to these functions
 #' @importFrom stats rcauchy
 #' @export
+#' @keywords internal
 #' @noRd
 .rmedncauchys = function(N, n, scale) {
     x <- matrix(NA, nrow = 1, ncol = N)
@@ -449,6 +450,7 @@
 
 #' @importFrom stats dcauchy pcauchy integrate
 #' @export
+#' @keywords internal
 #' @noRd
 .dmedncauchys = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -480,6 +482,7 @@
 
 #' @importFrom stats pcauchy integrate
 #' @export
+#' @keywords internal
 #' @noRd
 .pmedncauchys = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -507,6 +510,7 @@
 }
 
 #' @importFrom stats integrate
+#' @keywords internal
 #' @export
 #' @noRd
 .edmedncauchys = function(x, n, scale, divisions = 100) {
@@ -535,6 +539,7 @@
 #### mednnormals -------------------------------------------------------------
 
 #' @export
+#' @keywords internal
 #' @noRd
 .rmednnormals = function(N, n, scale) {
     x <- matrix(NA, nrow = 1, ncol = N)
@@ -546,6 +551,7 @@
 
 #' @importFrom stats rnorm  dnorm
 #' @export
+#' @keywords internal
 #' @noRd
 .dmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -577,6 +583,7 @@
 
 #' @importFrom stats integrate
 #' @export
+#' @keywords internal
 #' @noRd
 .pmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -605,6 +612,7 @@
 
 #' @importFrom stats integrate
 #' @export
+#' @keywords intenral
 #' @noRd
 .edmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -659,6 +667,8 @@
 #'   Must be larger than precision. 
 #' @importFrom stats optim var
 #' @export
+#' @keywords internal
+#' @noRd
 .fitCurve <- function(x, y, f, density, step, precision, lower_bounds, upper_bounds, scale, family, median_n, trunc, verbose, gritty_guess, 
     span = 1) {
     
@@ -696,19 +706,10 @@
 #' generate an initial guess for dose-response curve parameters by evaluating
 #' the residuals at different lattice points of the search space
 #'
-#' @param x [`numeric`] input/x values for function
-#' @param y [`numeric`] output/y values for function
-#' @param f [`function`] function f, parameterized by parameters to optimize 
-#' @param guess [`numeric`] initial guess for the parameter values to improve upon
-#' @param lower_bounds [`numeric`] lower bounds for the paramater search space
-#' @param upper_bounds [`numeric`] upper bounds for the parameter search space
-#' @param density [`numeric`] how many points in the dimension of each parameter should 
-#'   be evaluated (density of the grid)
-#' @param n [`integer`] number of technical replicates per measured point in x. Used to 
-#'   evaluate the proper median distribution for the normal and cauchy error models
-#' @param scale [`numeric`] scale on which to measure probability for the error model (roughly SD of error)
-#' @param family [`character`] which error family to use. Currently, `normal` and `cauchy` are implemented
-#' @param trunc [`logical`] Whether or not to truncate the values at 100% (1.0)
+#' @export
+#' @keywords internal
+#' @noRd
+# ##FIXME:: Why is this different in PharmacoGx?
 .meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
     pars <- NULL
     guess_residual <- .residual(x = x, y = y, n = n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
@@ -850,6 +851,7 @@
 
 #' @export
 #' @keywords internal
+#' @noRd
 # @param matInd array indices @param dimsizes array containing size of array of interest in each dimension
 .linInd <- function(matInd, dimsizes) {
     y <- matInd[1]
@@ -863,6 +865,7 @@
 
 #' @export
 #' @keywords internal
+#' @noRd
 # @param linInd linear index @param dimsizes array containing size of array of interest in each dimension
 .matInd <- function(linInd, dimsizes) {
     y <- matrix(0, nrow = length(dimsizes), ncol = 1)
@@ -878,6 +881,7 @@
 
 #' @export
 #' @keywords internal
+#' @noRd
 .patternSearch <- function(x, y, f, guess, n, guess_residual, lower_bounds, upper_bounds, span, precision, step, scale, family, trunc) {
     neighbours <- matrix(nrow = 2 * length(guess), ncol = length(guess))
     neighbour_residuals <- matrix(NA, nrow = 1, ncol = nrow(neighbours))
@@ -918,6 +922,7 @@
 #' @return A named vector where index `Rsquare` contains the attributes of the object
 #' @export
 #' @keywords internal
+#' @noRd
 .examineGOF <- function(pars) {
     return(c(Rsquare = attr(pars, "Rsquare")))
 }
@@ -927,12 +932,14 @@
 
 ## TODO:: Write documentation
 ## FIXME:: Why is this different from PharmacoGx?
+#' @title Residual calculation
 #'
 #' @return A \code{numeric} containing the estimated residuals for the model
 #'   fit
 #'
 #' @export
 #' @keywords internal
+#' @noRd
 .residual <- function(x, y, n, pars, f, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
     family <- match.arg(family)
     diffs <- do.call(f, list(x, pars)) - y
@@ -966,6 +973,7 @@
 ## FIXME:: This function already exists as base::trimws? Is there any reason we need to reimplement it?
 #' @export
 #' @keywords internal
+#' @noRd
 .stripWhiteSpace <- function(str, method = c("both", "head", "tail")) {
     method <- match.arg(method)
     str2 <- NULL
@@ -984,3 +992,72 @@
         return(str2)
     }
 }
+
+
+# ==== LongTable
+
+#' Convenience function for collapsing a character vector
+#'
+#' @examples
+#' .collapse(c("Vector", "of", "words")
+#'
+#' @param ... [`pairlist`] One or more character vectors
+#' @param collapse [`character`] Argument to collapse of paste0, default is ' '.
+#'
+#' @return [`character`] A single character vector.
+#'
+#' @keywords internal
+#' @export
+#' @noRd
+.collapse <- function(..., collapse=' ')
+    paste0(..., collapse=collapse)
+
+#' Returns a colorized error message (magenta)
+#'
+#' @examples
+#' cat(.errorMsg('This ', 'is ', 'an ', 'error ', 'message'))
+#'
+#' @param ... [`pairlist`] One or more strings or character vectors, also
+#'   accepts any params to paste0.
+#'
+#' @return [`character`] Colorized string with results from paste0(...)
+#'
+#' @keywords internal
+#' @export
+#' @noRd
+.errorMsg <- function(..., collapse=', ') magenta$bold(paste0(..., collapse=collapse))
+
+#' Returns a colorized warning message (cyan)
+#'
+#' @examples
+#' cat(.warnMsg('This ', 'is ', 'a ', 'warning ', 'message'))
+#'
+#' @param ... [`pairlist`] One or more strings or character vectors, also
+#'   accepts any params to paste0.
+#'
+#' @return [`character`] Colorized string with results from paste0(...)
+#'
+#' @keywords internal
+#' @export
+#' @noRd
+.warnMsg <- function(..., collapse=', ') cyan$bold(paste0(..., collapse=collapse))
+
+#' Get the types of all items in a list
+#'
+#' @examples
+#' list <- list(c(1,2,3), c('a','b','c'))
+#' is.items(list, 'character')
+#'
+#' @param list A [`list`] to get the types from
+#' @param ... [`pairlist`] Additional arguments to FUN
+#' @param FUN [`function`] or [`character`] Either a function, or the name
+#'   of a function which returns a single logical value. The default function
+#'   uses `is`, specify the desired type in `...`. You can also use other
+#'   type checking functions such as is.character, is.numeric, or is.data.frame.
+#'
+#' @return [`logical`] A vector indicating if the list item is the specified
+#'   type.
+#'
+#' @export
+is.items <- function(list, ..., FUN=is)
+    vapply(list, FUN=FUN, FUN.VALUE=logical(1), ...)

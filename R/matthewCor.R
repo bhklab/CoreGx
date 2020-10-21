@@ -1,4 +1,5 @@
 ## Matthews correlatipon coefficient
+## TODO:: Give this function a more descriptive name
 #' Compute a Mathews Correlation Coefficient 
 #' 
 #' The function computes a Matthews correlation coefficient for two factors 
@@ -23,8 +24,6 @@
 #'   
 #' @return A list with the MCC as the $estimate, and p value as $p.value
 #' @export
-#' 
-## TODO:: Give this function a more descriptive name
 mcc <- function(x, y, nperm = 1000, nthread = 1, ...) {
     # PARAMETER CHANGE WARNING
     if (!missing(...)) {

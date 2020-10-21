@@ -3,7 +3,6 @@
 #' Get cell line information from a PharmacoSet object
 #'
 #' @examples
-#' data(clevelandSmall_cSet)
 #' cellInf <- cellInfo(clevelandSmall_cSet)
 #'
 #' @param object The \code{CoreSet} to retrieve cell info from

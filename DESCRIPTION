@@ -1,8 +1,8 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
-Version: 1.1.4
-Date: 2020-06-30
+Version: 1.1.5
+Date: 2020-10-20
 Authors@R: c(
     person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca", role = c("aut")),
     person("Ian","Smith", email = "ianc.smith@mail.utoronto.ca", role = c("aut")),
@@ -14,7 +14,7 @@ Description: A collection of functions and classes which serve as the foundation
     package was created to abstract shared functionality from other lab package 
     releases to increase ease of maintainability and reduce code repetition in 
     current and future 'Gx' suite programs. Major features include a 'CoreSet' 
-    class, from which 'RadioSet' and 'PharmaSet' are derived, along with get and 
+    class, from which 'RadioSet' and 'PharmacoSet' are derived, along with get and
     set methods for each respective slot. Additional functions related to 
     fitting and plotting dose response curves, quantifying statistical 
     correlation and calculating area under the curve (AUC) or survival fraction
@@ -43,11 +43,66 @@ Imports:
     utils, 
     graphics, 
     grDevices, 
-    lsa
+    lsa,
+    data.table,
+    crayon
 Suggests: 
   pander,
   BiocStyle,
   rmarkdown,
-  knitr
+  knitr,
+  formatR
 License: GPL-3
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
+Collate: 
+    'adaptiveMatthewCor.R'
+    'allGenerics.R'
+    'callingWaterfall.R'
+    'class-LongTable.R'
+    'class-CoreSet.R'
+    'connectivityScore.R'
+    'cosinePerm.R'
+    'datasets.R'
+    'globals.R'
+    'gwc.R'
+    'matthewCor.R'
+    'methods-$.R'
+    'methods-[.R'
+    'methods-[[.R'
+    'methods-annotation.R'
+    'methods-assay.R'
+    'methods-assayNames.R'
+    'methods-assays.R'
+    'methods-buildLongTable.R'
+    'methods-cellInfo.R'
+    'methods-cellNames.R'
+    'methods-coerce.R'
+    'methods-colData.R'
+    'methods-curation.R'
+    'methods-datasetType.R'
+    'methods-dateCreated.R'
+    'methods-dim.R'
+    'methods-dimnames.R'
+    'methods-drugSensitivitySig.R'
+    'methods-fNames-methods.R'
+    'methods-featureInfo.R'
+    'methods-getIntern.R'
+    'methods-intersect.R'
+    'methods-mDataNames.R'
+    'methods-metadata.R'
+    'methods-molecularProfiles.R'
+    'methods-molecularProfilesSlot.R'
+    'methods-name.R'
+    'methods-pertNumber.R'
+    'methods-phenoInfo.R'
+    'methods-reindex.R'
+    'methods-rowData.R'
+    'methods-sensNumber.R'
+    'methods-sensitivityInfo.R'
+    'methods-sensitivityMeasures.R'
+    'methods-sensitivityProfiles.R'
+    'methods-sensitivityRaw-methods.R'
+    'methods-sensitivitySlot-methods.R'
+    'methods-subset.R'
+    'methods-subsetTo.R'
+    'utilities.R'

@@ -11,14 +11,10 @@
 #' cellular response to Pharmacological and Radiation therapy are widely 
 #' different, and extension of the cSet class allows the
 #' packages to apply the correct model for the given data.
-#'
-#' @param mDataType A \code{character} with the type of molecular data to return/update
-#' @param object A \code{CoreSet} object
-#' @param value A replacement value
 #' 
 #' @slot annotation A \code{list} of annotation data about the CoreSet,
 #'    including the \code{$name} and the session information for how the object
-#'    was creating, detailing the exact versions of R and all the packages used
+#'    was created, detailing the exact versions of R and all the packages used
 #' @slot molecularProfiles A \code{list} containing \code{SummarizedExperiment}s 
 #'   type object for holding data for RNA, DNA, SNP and Copy Number Variation 
 #'   measurements respectively, with associated \code{rowData} and \code{colData} 
@@ -42,18 +38,17 @@
 #' 
 #' @return An object of the CoreSet class
 #' 
-#' @exportClass CoreSet
+#' @export CoreSet
+#' @include class-LongTable.R
 #' @export
-.CoreSet <- setClass("CoreSet", slots = list(
-                                            annotation = "list",
-                                            molecularProfiles = "list",
-                                            cell="data.frame", 
-                                            datasetType="character", 
-                                            sensitivity="list",
-                                            perturbation="list",
-                                            curation="list"
-                                            ))
-
+.CoreSet <- setClass("CoreSet",
+    slots = list(sensitivity="list_or_LongTable",
+                 annotation = "list",
+                 molecularProfiles = "list",
+                 cell="data.frame",
+                 datasetType="character",
+                 perturbation="list",
+                 curation="list"))
 
 # The default constructor above does a poor job of explaining the required structure of a CoreSet. 
 # The constructor function defined below guides the user into providing the required components of the curation and senstivity lists
@@ -94,7 +89,8 @@
 #'   print out any errors it finds after construction?
 #' @return An object of class CoreSet
 #' @export
-#' 
+#'
+#' @include class-LongTable.R
 #' @import methods
 #' @importFrom utils sessionInfo
 #' @importFrom stats na.omit
@@ -559,26 +555,26 @@ checkCsetStructure <-
     if(!is(cSet@cell, "data.frame")) {
       warning("cell slot class type should be dataframe")
     }
-    if(cSet@datasetType %in% c("sensitivity", "both"))
-    {
-      if(!is(cSet@sensitivity$info, "data.frame")) {
-        warning("sensitivity info slot class type should be dataframe")
-      }
-      if("cellid" %in% colnames(cSet@sensitivity$info)) {
-        if(!all(cSet@sensitivity$info[,"cellid"] %in% rownames(cSet@cell))) {
-          warning("not all the cell lines in sensitivity data are in cell slot")
-        }
-      }else {
-        warning("cellid does not exist in sensitivity info")
-      }
-    
-      if(any(!is.na(cSet@sensitivity$raw))) {
-        if(!all(dimnames(cSet@sensitivity$raw)[[1]] %in% rownames(cSet@sensitivity$info))) {
-          warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
-        }
-      }
-      if(!all(rownames(cSet@sensitivity$profiles) %in% rownames(cSet@sensitivity$info))) {
-        warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
-      }
-    }
+    #if(cSet@datasetType %in% c("sensitivity", "both"))
+    #{
+    #  if(!is(cSet@sensitivity$info, "data.frame")) {
+    #    warning("sensitivity info slot class type should be dataframe")
+    #  }
+    #  if("cellid" %in% colnames(cSet@sensitivity$info)) {
+    #    if(!all(cSet@sensitivity$info[,"cellid"] %in% rownames(cSet@cell))) {
+    #      warning("not all the cell lines in sensitivity data are in cell slot")
+    #    }
+    #  }else {
+    #    warning("cellid does not exist in sensitivity info")
+    #  }
+    #
+    #  if(any(!is.na(cSet@sensitivity$raw))) {
+    #    if(!all(dimnames(cSet@sensitivity$raw)[[1]] %in% rownames(cSet@sensitivity$info))) {
+    #      warning("For some experiments there is raw sensitivity data but no experimet information in sensitivity info")
+    #    }
+    #  }
+    #  if(!all(rownames(cSet@sensitivity$profiles) %in% rownames(cSet@sensitivity$info))) {
+    #    warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
+    #  }
+    #}
   }

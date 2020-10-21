@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This package provides a foundation for the PharmacoGx, RadioGx and ToxicoGx 
 packages. It is not intended for standalone use, only as a dependency for the 
-aforementioned software. Its' existence allows abstracting generic definitions, 
+aforementioned software. Its existence allows abstracting generic definitions,
 method definitions and class structures common to all three of the Gx suite 
 packages.
 
@@ -41,10 +41,10 @@ library(SummarizedExperiment)
 The CoreSet class is intended as a general purpose data structure for storing
 multiomic treatment response data. Extensions of this class have been 
 customized for their respective fields of study. For example, the PharmacoSet
-class inherits form the CoreSet and is specialized for storing and analyzing
+class inherits from the CoreSet and is specialized for storing and analyzing
 drug sensitivity and perturbation experiments on cancer cell lines together with
 associated multiomic data for each sample treatment. The RadioSet class serves
-a role similar to the PharmacoSet with radiation instead of drug treaments. 
+a role similar to the PharmacoSet with radiation instead of drug treatments.
 Finally, the ToxicoSet class is used to store toxicity data for healthy
 human and rat hepatocytes along with the associated multiomic profile for each
 treatment.
@@ -148,7 +148,7 @@ methods(class="DemoSet")
 ```
 
 We see that all the accessors defined for the `CoreSet` are also defined for the
-inherting `DemoSet`. These methods all assume the inherit slots have the same
+inheriting `DemoSet`. These methods all assume the inherit slots have the same
 structure as the `CoreSet`. If this is not true, for example, if molecularProfiles
 holds `ExpressionSets` instead of `SummarizedExperiments`, we can redefine 
 existing methods as follows:
@@ -196,7 +196,7 @@ modified slot.
 
 However, additional work needs to be done to define accessors for the new
 `demoSlot`. Since no generics are available in CoreGx to access this slot,
-we need to first define a generic, then implement methods which distpatch on
+we need to first define a generic, then implement methods which dispatch on
 the 'DemoSet' class to retrieve data in the slot.
 
 ```{r defining_setter_methods}
