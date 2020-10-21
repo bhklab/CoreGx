@@ -16,7 +16,7 @@
 #'
 NULL
 
-#' Merck Drug Combination Data
+#' Merck Drug Combination Data LongTable
 #'
 #' This is a LongTable object created from some drug combination data provided
 #'   to our lab by Merck.
@@ -25,8 +25,8 @@ NULL
 #' TODO:: Include a reference
 #'
 #' @docType data
-#' @name merckDrugCombosSmall
-#' @usage data(merckDrugCombosSmall)
+#' @name merckLongTable
+#' @usage data(merckLongTable)
 #' @keywords datasets
 #' @format LongTable object
 NULL

@@ -2,7 +2,12 @@
 
 #' @title LongTable to data.table conversion
 #'
-#' @description Coerce a LongTable into a `data.table`
+#' @examples
+#' as(merckLongTable, 'data.table')
+#'
+#' as.data.table(merckLongTable)
+#'
+#' @description Coerce a LongTable into a `data.table`.
 #'
 #' @param from [`LongTable`] Object to coerce.
 #' @param to [`character`] Class name to coerce to, currently only 'data.table'
@@ -99,7 +104,11 @@ setAs('LongTable', 'data.frame', def=function(from) {
 })
 
 #' @title Coerce a LongTable to a data.frame
-#' @name name
+#' @name Coece method for LongTable
+#'
+#' @examples
+#' as(merckLongTable, 'data.frame')
+#' as.data.frame(merckLongTable)
 #'
 #' @description S3 version of coerce method fro convenience.
 #'
@@ -135,6 +144,13 @@ as.data.frame.LongTable <- function(x, row.names, optional=TRUE, ...) {
 
 
 #' @title Coerce to data.table to LongTable
+#'
+#' @examples
+#' dataTable <- as.data.table(merckLongTable)
+#' print(attr(dataTable, 'LongTable.config')) # Method doesn't work without this
+#'
+#' as(dataTable, 'LongTable')
+#' as.long.table(dataTable)
 #'
 #' @description Coerce a data.table with the proper configuration attributes
 #'   back to a LongTable

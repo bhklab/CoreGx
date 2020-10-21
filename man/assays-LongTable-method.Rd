@@ -5,7 +5,7 @@
 \title{Return a list of `data.table` objects with the assay measurements from a
  `LongTable` object.}
 \usage{
-\S4method{assays}{LongTable}(x, withDimnames = FALSE, metadata = FALSE, key = TRUE)
+\S4method{assays}{LongTable}(x, withDimnames = FALSE, metadata = FALSE, key = !withDimnames)
 }
 \arguments{
 \item{x}{[`LongTable`] What to extract the assay data from.}
@@ -18,7 +18,7 @@ to the returned assays. This is useful for modifying assays before
 reconstructing a new LongTable.}
 
 \item{key}{[`logical`] Should the key columns also be returned? Defaults
-to TRUE.}
+to !withDimnames.}
 }
 \value{
 A [`list`] of `data.table` objects, one per assay in the object.
@@ -26,4 +26,9 @@ A [`list`] of `data.table` objects, one per assay in the object.
 \description{
 Return a list of `data.table` objects with the assay measurements from a
  `LongTable` object.
+}
+\examples{
+data(merckLongTable)
+assays(merckLongTable)
+
 }

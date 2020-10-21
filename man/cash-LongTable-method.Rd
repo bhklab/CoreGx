@@ -18,7 +18,7 @@
 Select an assay from a LongTable object
 }
 \examples{
-data(merckDrugCombosSmall)
-merckDrugCombosSmall['viability']
+data(merckLongTable)
+merckLongtable$viability
 
 }

@@ -7,13 +7,29 @@
 #'  in the dataList slot.
 #' This function is endomorphic, it always returns a LongTable object.
 #'
+#' @examples
+#' data(merckLongTable)
+#'
+#' # Character
+#' subset(merckLongTable, 'CAOV3', 'ABT-888')
+#'
+#' # Numeric
+#' subset(merckLongTable, 1, c(1, 2))
+#'
+#' # Logical
+#' subset(merckLongTable, rowData(merckLongtable)$cell_line1 == 'A2058')
+#'
+#' # Call
+#' subset(merckLongTable, cell_line1 == 'A2058',
+#'  drug1 == 'Dasatinib' & drug2 != '5-FU')
+#'
 #' @param x [`LongTable`] The object to subset.
 #' @param i [`character`], [`numeric`], [`logical`] or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all row id columns matching the vector.
 #'  Numeric or Logical: these select based on the rowKey from the `rowData`
 #'      method for the `LongTable`.
-#'  Expression: Accepts valid query statements to the `data.table` i parameter,
+#'  Call: Accepts valid query statements to the `data.table` i parameter,
 #'      this can be used to make complex queries using the `data.table` API
 #'      for the `rowData` data.table.
 #'
@@ -22,7 +38,7 @@
 #'      object on all drug id columns matching the vector.
 #'  Numeric or Logical: these select based on the rowID from the `rowData`
 #'      method for the `LongTable`.
-#'  Expression: Accepts valid query statements to the `data.table` i parameter,
+#'  Call: Accepts valid query statements to the `data.table` i parameter,
 #'      this can be used to make complex queries using the `data.table` API
 #'      for the `colData` data.table.
 #'
@@ -70,7 +86,10 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
             i <- str2lang(.variableToCodeString(i))
             rowDataSubset <- .rowData(longTable)[eval(i), ]
         } else {
-            rowDataSubset <- .rowData(longTable)[i, ]
+            isub <- substitute(i)
+            print(isub)
+            rowDataSubset <- .tryCatchNoWarn(.rowData(longTable)[i, ],
+                error=function(e) .rowData(longTable)[eval(isub), ])
         }
     } else {
         rowDataSubset <- .rowData(longTable)
@@ -92,7 +111,10 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
             j <- str2lang(.variableToCodeString(j))
             colDataSubset <- .colData(longTable)[eval(j), ]
         } else {
-            colDataSubset <- .colData(longTable)[j, ]
+            jsub <- substitute(j)
+            print(jsub)
+            colDataSubset <- .tryCatchNoWarn(.colData(longTable)[j, ],
+                error=function(e) .colData(longTable)[eval(jsub), ])
         }
     } else {
         colDataSubset <- .colData(longTable)

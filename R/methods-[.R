@@ -7,20 +7,20 @@
 #' This function is endomorphic, it always returns a LongTable object.
 #'
 #' @examples
-#' data(merckDrugCombosSmall)
+#' data(merckLongTable)
 #'
 #' # Character
-#' merckDrugCombosSmall['CAOV3', 'ABT-888']
+#' merckLongTable['CAOV3', 'ABT-888']
 #'
 #' # Numeric
-#' merckDrugCombosSmall[1, c(1, 2)]
+#' merckLongTable[1, c(1, 2)]
 #'
 #' # Logical
-#' merckDrugCombosSmall[rowData(merckDrugCombosSmall)$cell_line1 == 'A2058', ]
+#' merckLongTable[rowData(merckLongTable)$cell_line1 == 'A2058', ]
 #'
 #' # Call
-#' merckDrugCombosSmall[.(cell_line1 == 'A2058'),
-#'  .(drug1 == 'Dasatinib' & drug2 != '5-FU')]
+#' merckLongTable[.(cell_line1 == 'A2058'),
+#'   .(drug1 == 'Dasatinib' & drug2 != '5-FU')]
 #'
 #' @param x [`LongTable`] The object to subset.
 #' @param i [`character`], [`numeric`], [`logical`] or [`call`]

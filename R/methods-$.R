@@ -3,8 +3,8 @@
 #' Select an assay from a LongTable object
 #'
 #' @examples
-#' data(merckDrugCombosSmall)
-#' merckDrugCombosSmall['viability']
+#' data(merckLongTable)
+#' merckLongtable$viability
 #'
 #' @param x A [`LongTable`] object to retrieve an assay from
 #' @param name [`character`] The name of the assay to get.

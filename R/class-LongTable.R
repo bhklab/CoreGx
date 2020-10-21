@@ -304,7 +304,7 @@ setMethod('rowIDs', signature(object='LongTable'),
 setMethod('rowMeta', signature(object='LongTable'),
     function(object, data=FALSE, key=FALSE){
 
-    cols <- getIntern(object, 'colMeta')
+    cols <- getIntern(object, 'rowMeta')
     if (key) cols <- c(cols, 'rowKey')
     if (data) rowData(object, key=TRUE)[, ..cols] else cols
 

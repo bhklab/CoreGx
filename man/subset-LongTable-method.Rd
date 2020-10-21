@@ -14,7 +14,7 @@ Character: pass in a character vector of drug names, which will subset the
     object on all row id columns matching the vector.
 Numeric or Logical: these select based on the rowKey from the `rowData`
     method for the `LongTable`.
-Expression: Accepts valid query statements to the `data.table` i parameter,
+Call: Accepts valid query statements to the `data.table` i parameter,
     this can be used to make complex queries using the `data.table` API
     for the `rowData` data.table.}
 
@@ -23,7 +23,7 @@ Character: pass in a character vector of drug names, which will subset the
     object on all drug id columns matching the vector.
 Numeric or Logical: these select based on the rowID from the `rowData`
     method for the `LongTable`.
-Expression: Accepts valid query statements to the `data.table` i parameter,
+Call: Accepts valid query statements to the `data.table` i parameter,
     this can be used to make complex queries using the `data.table` API
     for the `colData` data.table.}
 
@@ -45,4 +45,21 @@ Allows use of the colData and rowData `data.table` objects to query based on
  rowID and colID, which is then used to subset all value data.tables stored
  in the dataList slot.
 This function is endomorphic, it always returns a LongTable object.
+}
+\examples{
+data(merckLongTable)
+
+# Character
+subset(merckLongTable, 'CAOV3', 'ABT-888')
+
+# Numeric
+subset(merckLongTable, 1, c(1, 2))
+
+# Logical
+subset(merckLongTable, rowData(merckLongtable)$cell_line1 == 'A2058')
+
+# Call
+subset(merckLongTable, cell_line1 == 'A2058',
+ drug1 == 'Dasatinib' & drug2 != '5-FU')
+
 }

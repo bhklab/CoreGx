@@ -1,6 +1,12 @@
 #' Return a list of `data.table` objects with the assay measurements from a
 #'  `LongTable` object.
 #'
+#' @examples
+#' data(merckLongTable)
+#' assays(merckLongTable)
+#'
+#' @describIn LongTable Get a list containing all the assays in a `LongTable`
+#'
 #' @param x [`LongTable`] What to extract the assay data from.
 #' @param withDimnames [`logical`] Should the returned assays be joined to
 #'   the row and column identifiers (i.e., the pseudo dimnames of the object).
@@ -8,7 +14,7 @@
 #'   to the returned assays. This is useful for modifying assays before
 #'   reconstructing a new LongTable.
 #' @param key [`logical`] Should the key columns also be returned? Defaults
-#'   to TRUE.
+#'   to !withDimnames.
 #'
 #' @return A [`list`] of `data.table` objects, one per assay in the object.
 #'
@@ -16,7 +22,7 @@
 #' @export
 ##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
 setMethod('assays', signature(x='LongTable'),
-    function(x, withDimnames=FALSE, metadata=FALSE, key=TRUE) {
+    function(x, withDimnames=FALSE, metadata=FALSE, key=!withDimnames) {
 
     return(structure(
         lapply(assayNames(x),
@@ -27,6 +33,15 @@ setMethod('assays', signature(x='LongTable'),
 
 
 #' Setter method for the assays slot in a LongTable object
+#'
+#' @examples
+#' data(merckLongTable)
+#' assays(merckLongTable) <- assays(merckLongTable, withDimnames=TRUE)
+#'
+#' @describeIn LongTable Update the assays in a LongTable object. The rowIDs
+#'   and colIDs must be present in all assays to allow successfully remapping
+#'   the keys. We recommend modifying the list returned by
+#'   assays(longTable, withDimnames=TRUE) and the reassigning to the `LongTable`.
 #'
 #' @param x A [`LongTable`] to modify the assays in.
 #' @param value A [`list`] of `data.frame` or `data.table` objects, all of which

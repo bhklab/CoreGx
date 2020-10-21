@@ -1,5 +1,20 @@
-#' Retrieve an assay `data.table` object from the `assays` slot of a `LongTable`
-#'    object
+#' Get an assay from a LongTable object
+#'
+#' @describeIn LongTable Retrieve an assay `data.table` object from the
+#'   `assays` slot of a `LongTable` object.
+#'
+#' @examples
+#' data(merckLongTable)
+#'
+#' # Default annotations, just the key columns
+#' assay(merckLongTable, 'viability')
+#' assay(merckLongTable, 1)
+#'
+#' # With identifiers joined
+#' assay(merckLongTable, 'viability', withDimnames=TRUE)
+#'
+#' # With identifiers and metadata
+#' assay(merckLongTable, 'viability_summary', withDimnames=TRUE, metadata=TRUE)
 #'
 #' @param x [`LongTable`] The `LongTable` object to get the assay from.
 #' @param i [`integer`] or [`character`] vector containing the index or name
@@ -11,14 +26,14 @@
 #'   the assay. This is useful when modifying assays as the resulting list
 #'   has all the information needed to recreated the LongTable object.
 #' @param key [`logical`] Should the key columns also be returned? Defaults to
-#'   TRUE.
+#'   !withDimnames.
 #'
 #' @importMethodsFrom SummarizedExperiment assay
 #' @importFrom crayon magenta cyan
 #' @export
 setMethod('assay',
           signature(x='LongTable'),
-          function(x, i, withDimnames=FALSE, metadata=FALSE, key=TRUE) {
+          function(x, i, withDimnames=FALSE, metadata=FALSE, key=!withDimnames) {
 
     # validate input
     if (length(i) > 1)
@@ -67,11 +82,24 @@ setMethod('assay',
 })
 
 
-#' Add or replace an assay in a LongTable by name
+#' Add or replace an assay in a LongTable by name or index
 #'
-#' @param x [`LongTable`]
-#' @param i [`character`]
-#' @param value [`data.frame`] or [`data.table`]
+#' @describeIn LongTable Add or replace an assay in a LongTable by name.
+#'
+#' @examples
+#' data(merckLongTable)
+#' assay(merckLongTable, 'viability') <- assay(merckLongTable, 'viability', withDimnames=TRUE)
+#' assay(merckLongTable, 'viability') <- merckLongTable$viability
+#'
+#' @param x A [`LongTable`] to update.
+#' @param i [`integer`] or [`character`] vector containing the index or name
+#'   of the assay to update.
+#' @param value A [`data.frame`] or [`data.table`] to update the assay data
+#'   with. This must at minumum contain the row and column data identifier
+#'   columns to allow correctly mapping the assay keys. We recommend modifying
+#'   the results returned by assay(longTable, 'assayName', withDimnames=TRUE).
+#'   For convenience, both the `[[` and `$` LongTable accessors return an assay
+#'   with the dimnames and metadata already attached.
 #'
 #' @return [`LongTable`] With updated assays slot.
 #'
