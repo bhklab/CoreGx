@@ -63,6 +63,7 @@ merckDrugCombosSmall[1, c(1, 2)]
 merckDrugCombosSmall[rowData(merckDrugCombosSmall)$cell_line1 == 'A2058', ]
 
 # Call
-merckDrugCombosSmall[.(cell_line1 == 'A2058'), .(drug1 == 'Dasatinib' & drug2 != '5-FU')]
+merckDrugCombosSmall[.(cell_line1 == 'A2058'),
+ .(drug1 == 'Dasatinib' & drug2 != '5-FU')]
 
 }

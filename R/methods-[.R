@@ -57,5 +57,5 @@
 #'
 #' @export
 setMethod('[', signature('LongTable'), function(x, i, j, assays, ..., drop=FALSE) {
-    eval(substitute(subset(x, i, j, assays)))
+    subset(x, i, j, assays)
 })
