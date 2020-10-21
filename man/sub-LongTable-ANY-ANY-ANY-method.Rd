@@ -51,8 +51,6 @@ Single bracket subsetting for a LongTable object. See subset for more details.
 This function is endomorphic, it always returns a LongTable object.
 }
 \examples{
-data(merckLongTable)
-
 # Character
 merckLongTable['CAOV3', 'ABT-888']
 

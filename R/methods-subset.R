@@ -17,11 +17,11 @@
 #' subset(merckLongTable, 1, c(1, 2))
 #'
 #' # Logical
-#' subset(merckLongTable, rowData(merckLongtable)$cell_line1 == 'A2058')
+#' subset(merckLongTable, rowData(merckLongTable)$cell_line1 == 'A2058')
 #'
 #' # Call
 #' subset(merckLongTable, cell_line1 == 'A2058',
-#'  drug1 == 'Dasatinib' & drug2 != '5-FU')
+#'   drug1 == 'Dasatinib' & drug2 != '5-FU')
 #'
 #' @param x [`LongTable`] The object to subset.
 #' @param i [`character`], [`numeric`], [`logical`] or [`expression`]
@@ -87,7 +87,6 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
             rowDataSubset <- .rowData(longTable)[eval(i), ]
         } else {
             isub <- substitute(i)
-            print(isub)
             rowDataSubset <- .tryCatchNoWarn(.rowData(longTable)[i, ],
                 error=function(e) .rowData(longTable)[eval(isub), ])
         }
@@ -112,7 +111,6 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
             colDataSubset <- .colData(longTable)[eval(j), ]
         } else {
             jsub <- substitute(j)
-            print(jsub)
             colDataSubset <- .tryCatchNoWarn(.colData(longTable)[j, ],
                 error=function(e) .colData(longTable)[eval(jsub), ])
         }
@@ -147,17 +145,17 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     return(if (reindex) reindex(newLongTable) else newLongTable)
 })
 
+
+## TODO:: Can we import this from one of the tidyverse pacakges?
 #' Convenience function for converting R code to a call
 #'
 #' This is used to pass through unevaluated R expressions into subset and
 #'   `[`, where they will be evaluated in the correct context.
 #'
-#' @param ... [`parilist`] Arbitrary R code to quote.
-#'
-#' @return [`call`] An R call object containing the R code from `...`
+#' @param ... [`parilist`] One or more R expressions to convert to calls.
 #'
 #' @export
-. <- quote
+. <- function(...) substitute(...)
 
 # ---- subset LongTable helpers
 

@@ -7,11 +7,12 @@
 .verifyKeyIntegrity(rowData, colData, assays)
 }
 \arguments{
-\item{rowData}{A [`data.table`]}
+\item{rowData}{A [`data.table`] containing row level annotations.}
 
-\item{colData}{A [`data.table`]}
+\item{colData}{A [`data.table`] containing column level annotations for a
+`LongTable`.}
 
-\item{assays}{A [`list`]}
+\item{assays}{A [`list`] of `data.table`s, one for each assay in an `LongTable`.}
 }
 \description{
 Ensure that all rowID and colID keys are valid

@@ -22,7 +22,7 @@
 #' @importFrom stats setNames
 #' @keywords internal
 .convertCSetMolecularProfilesToSE <- function(cSet) {
-    
+
     eSets <- molecularProfilesSlot(cSet)  # Extract eSet data
     
     molecularProfilesSlot(cSet) <- lapply(eSets, function(eSet) {

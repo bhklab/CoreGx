@@ -56,10 +56,10 @@ subset(merckLongTable, 'CAOV3', 'ABT-888')
 subset(merckLongTable, 1, c(1, 2))
 
 # Logical
-subset(merckLongTable, rowData(merckLongtable)$cell_line1 == 'A2058')
+subset(merckLongTable, rowData(merckLongTable)$cell_line1 == 'A2058')
 
 # Call
 subset(merckLongTable, cell_line1 == 'A2058',
- drug1 == 'Dasatinib' & drug2 != '5-FU')
+  drug1 == 'Dasatinib' & drug2 != '5-FU')
 
 }

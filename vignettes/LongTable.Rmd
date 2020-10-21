@@ -109,7 +109,7 @@ test the data structure thus far.
 
 ```{r head_data, echo=TRUE}
 
-filePath <- '../data/merckDrugCombosSmall.csv'
+filePath <- '../data/merckLongTable.csv'
 merckDT <- fread(filePath, na.strings=c('NULL'))
 colnames(merckDT)
 ```

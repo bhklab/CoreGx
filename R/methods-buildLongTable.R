@@ -200,9 +200,9 @@ setMethod('buildLongTable', signature(from='list'),
     hasAllIdCols <- unlist(lapply(joinColsIn, FUN=all))
     if (!all(hasAllIdCols)) {
         missingCols <- unique(unlist(.mapply(`[`, x=joinCols, i=joinColsIn)))
-        stop(.errorMsg('Assays ', .collapse(which(hasAllIdCols)),
-             ' are missing one or more id columns: ', .collapse(missingCols),
-             collapse=', '))
+        stop(.errorMsg('[CoreGx::buildLongTable,list] Assay(s) ',
+            .collapse(which(hasAllIdCols)), ' are missing one or more id ',
+            'columns: ', .collapse(missingCols), collapse=', '))
     }
 
     # Set keys for faster joins

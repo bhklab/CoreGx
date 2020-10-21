@@ -4,13 +4,10 @@
 \alias{.}
 \title{Convenience function for converting R code to a call}
 \usage{
-.()
+.(...)
 }
 \arguments{
-\item{...}{[`parilist`] Arbitrary R code to quote.}
-}
-\value{
-[`call`] An R call object containing the R code from `...`
+\item{...}{[`parilist`] One or more R expressions to convert to calls.}
 }
 \description{
 This is used to pass through unevaluated R expressions into subset and

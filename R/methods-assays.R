@@ -2,10 +2,9 @@
 #'  `LongTable` object.
 #'
 #' @examples
-#' data(merckLongTable)
 #' assays(merckLongTable)
 #'
-#' @describIn LongTable Get a list containing all the assays in a `LongTable`
+#' @describeIn LongTable Get a list containing all the assays in a `LongTable`.
 #'
 #' @param x [`LongTable`] What to extract the assay data from.
 #' @param withDimnames [`logical`] Should the returned assays be joined to
@@ -22,7 +21,7 @@
 #' @export
 ##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
 setMethod('assays', signature(x='LongTable'),
-    function(x, withDimnames=FALSE, metadata=FALSE, key=!withDimnames) {
+    function(x, withDimnames=FALSE, metadata=withDimnames, key=!withDimnames) {
 
     return(structure(
         lapply(assayNames(x),
@@ -35,7 +34,6 @@ setMethod('assays', signature(x='LongTable'),
 #' Setter method for the assays slot in a LongTable object
 #'
 #' @examples
-#' data(merckLongTable)
 #' assays(merckLongTable) <- assays(merckLongTable, withDimnames=TRUE)
 #'
 #' @describeIn LongTable Update the assays in a LongTable object. The rowIDs
@@ -50,18 +48,17 @@ setMethod('assays', signature(x='LongTable'),
 #' @return A copy of the [`LongTable`] with the assays modified.
 #'
 #' @importMethodsFrom SummarizedExperiment assays<-
+#' @import data.table
 #' @export
 setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, value) {
-
-    is.items <- CoreGx::is.items
 
     # check input is correct
     isDF <- is.items(value, 'data.frame')
     isDT <- is.items(value, 'data.table')
     if (!all(isDF))
-        stop(.errorMsg('\n[CoreGx::assays<-] Items ', which(!isDT), ' in value',
-            ' are not data.tables or data.frames. These are the only types ',
-            'allowed in the value argument!', collapse=', '))
+        stop(.errorMsg('\n[CoreGx::assays<-] Items ', .collapse(which(!isDT)),
+            ' in value are not data.tables or data.frames. These are the only ',
+            'types allowed in the value argument!', collapse=', '))
 
     if (!all(isDT))
         for (i in which(!isDT)) values[[i]] <- data.table(values[[i]])
@@ -101,8 +98,12 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
     assayCols <- lapply(assayCols, .drop.in, y=c('colKey', 'rowKey'))
 
     # get the rowData and colData column mappings
-    rowDataCols <- if (length(rowMetaCols) > 0) list(rowIDCols, rowMetaCols) else list(rowIDCols)
-    colDataCols <- if (length(colMetaCols) > 0) list(colIDCols, colMetaCols) else list(colIDCols)
+    rowDataCols <- if (length(rowMetaCols) > 0)
+        list(rowIDCols, rowMetaCols) else list(rowIDCols)
+    colDataCols <- if (length(colMetaCols) > 0)
+        list(colIDCols, colMetaCols) else list(colIDCols)
+
+    # TODO:: Join metadata cols if they are excluded?
 
     # get assay column names
     allCols <- c(unlist(rowDataCols), unlist(colDataCols))

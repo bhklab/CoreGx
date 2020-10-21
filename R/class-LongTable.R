@@ -164,9 +164,10 @@ setClassUnion('list_or_LongTable', c('list', 'LongTable'))
 
 #' Ensure that all rowID and colID keys are valid
 #'
-#' @param rowData A [`data.table`]
-#' @param colData A [`data.table`]
-#' @param assays A [`list`]
+#' @param rowData A [`data.table`] containing row level annotations.
+#' @param colData A [`data.table`] containing column level annotations for a
+#'   `LongTable`.
+#' @param assays A [`list`] of `data.table`s, one for each assay in an `LongTable`.
 #'
 #' @keywords internal
 ## FIXME:: Finish this and implement class validity methods for LongTable!

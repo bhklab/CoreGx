@@ -2,6 +2,16 @@
 
 #' Get the symbol(s) x from the object@.intern slot of a LongTable
 #'
+#' This is used as an alternative to R attributes for storing structural
+#' metadata of S4 objects.
+#'
+#' @examples
+#' getIntern(merckLongTable, 'rowIDs')
+#' getIntern(merckLongTable, c('colIDs', 'colMeta'))
+#'
+#' @describeIn LongTable Access structural metadata present within a
+#'   LongTable object. This is mostly for developmer use.
+#'
 #' @param object [`LongTable`]
 #' @param x [`character`] One or more symbol name strings to retrieve from
 #'     the object@.intern environment.

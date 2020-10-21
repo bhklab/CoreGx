@@ -2,6 +2,15 @@
 
 #' Retrieve the column metadata table from a LongTable object
 #'
+#' @examples
+#' colData(merckLongTable)
+#'
+#' # Get the keys as well, mostly for internal use
+#' colData(merckLongTable, key=TRUE)
+#'
+#' @describeIn LongTable Get the column level annotations for a LongTable
+#'   object.
+#'
 #' @param x A [`LongTable`] to retrieve column metadata from.
 #' @param key [`logical`] She the colKey column also be returned? Defaults to
 #'     FALSE.
@@ -17,14 +26,23 @@ setMethod('colData', signature(x='LongTable'), function(x, key=FALSE) {
 
 #' Updates the `colData` slot as long as the ID columns are not changed.
 #'
+#' @examples
+#' colData(merckLongTable) <- colData(merckLongTable)
+#'
+#' @describeIn LongTable Upadte the colData of a LongTable object. Currently
+#'   requires that all of the colIDs(longTable) be in the value object.
+#'
 #' @param x A [`LongTable`] object to modify.
-#' @param value A [`data.table`] or [`data.frame`] to update with.
+#' @param value A [`data.table`] or [`data.frame`] to update with. Must have
+#'   all of the colIDs currently in the `LongTable` object in order to ensure
+#'   assay key mappings are consistent.
 #'
 #' @return A copy of the [`LongTable`] object with the `colData`
 #'   slot updated.
 #'
 #' @importFrom crayon cyan magenta
 #' @importFrom SummarizedExperiment colData<-
+#' @import data.table
 #' @export
 setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 

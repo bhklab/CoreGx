@@ -2,6 +2,11 @@
 
 #' Retrieve the row metadata table from a LongTable object
 #'
+#' @examples
+#' rowData(merckLongTable)
+#'
+#' @describeIn LongTable Get the row level annotations for a `LongTable` object.
+#'
 #' @param x A [`LongTable`] object to retrieve the row metadata from.
 #' @param key [`logical`] Should the rowKey column also be returned? Defaults
 #'     to FALSE.
@@ -20,6 +25,13 @@ setMethod('rowData', signature(x='LongTable'), function(x, key=FALSE, use.names=
 
 #' Updates the `rowData` slot as long as the ID columns are not changed.
 #'
+#' @examples
+#' rowData(merckLongTable) <- rowData(merckLongTable)
+#'
+#' @describeIn LongTable Update the row annotations for a `LongTable` object.
+#'   Currently requires that all columns in rowIDs(longTable) be present in
+#'   value.
+#'
 #' @param x A [`LongTable`] object to modify.
 #' @param value A [`data.table`] or [`data.frame`] to update
 #'
@@ -28,6 +40,7 @@ setMethod('rowData', signature(x='LongTable'), function(x, key=FALSE, use.names=
 #'
 #' @importFrom crayon cyan magenta
 #' @importFrom SummarizedExperiment `rowData<-`
+#' @import data.table
 #' @export
 setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
 

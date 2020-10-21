@@ -4,8 +4,6 @@
 #'   `assays` slot of a `LongTable` object.
 #'
 #' @examples
-#' data(merckLongTable)
-#'
 #' # Default annotations, just the key columns
 #' assay(merckLongTable, 'viability')
 #' assay(merckLongTable, 1)
@@ -30,10 +28,11 @@
 #'
 #' @importMethodsFrom SummarizedExperiment assay
 #' @importFrom crayon magenta cyan
+#' @import data.table
 #' @export
 setMethod('assay',
           signature(x='LongTable'),
-          function(x, i, withDimnames=FALSE, metadata=FALSE, key=!withDimnames) {
+          function(x, i, withDimnames=FALSE, metadata=withDimnames, key=!withDimnames) {
 
     # validate input
     if (length(i) > 1)
@@ -84,10 +83,12 @@ setMethod('assay',
 
 #' Add or replace an assay in a LongTable by name or index
 #'
-#' @describeIn LongTable Add or replace an assay in a LongTable by name.
+#' @describeIn LongTable Add or replace an assay in a LongTable by name. Currently
+#'    this function only works when the assay has all columns in row and column
+#'    data tables (i.e., when assays is retured withDimnames=TRUE). This will
+#'    be fixed in future updates.
 #'
 #' @examples
-#' data(merckLongTable)
 #' assay(merckLongTable, 'viability') <- assay(merckLongTable, 'viability', withDimnames=TRUE)
 #' assay(merckLongTable, 'viability') <- merckLongTable$viability
 #'
@@ -104,6 +105,7 @@ setMethod('assay',
 #' @return [`LongTable`] With updated assays slot.
 #'
 #' @importMethodsFrom SummarizedExperiment assay<-
+#' @import data.table
 #' @export
 setReplaceMethod('assay',
                  signature(x='LongTable', i='character'),
