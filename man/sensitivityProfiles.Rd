@@ -12,6 +12,13 @@ from.}
 
 \item{...}{[`pairlist`] Allow defining new arguments for this generic.}
 }
+\value{
+Depends on the implemented method
+}
 \description{
 A generic for sensitivityProfiles getter method
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

@@ -11,6 +11,13 @@ assayCols(object, ...)
 
 \item{...}{Allow new arguments to this generic.}
 }
+\value{
+Depends on the implemented method.
+}
 \description{
 Generic to access the assay columns of a rectangular object.
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

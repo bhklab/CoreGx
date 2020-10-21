@@ -11,6 +11,13 @@ colIDs(object, ...)
 
 \item{...}{ALlow new arguments to this generic}
 }
+\value{
+Depends on the implemented method.
+}
 \description{
 Generic to access the row identifiers for an object.
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

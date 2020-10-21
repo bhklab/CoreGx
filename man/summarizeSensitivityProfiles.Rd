@@ -11,6 +11,13 @@ summarizeSensitivityProfiles(object, ...)
 
 \item{...}{Allow definition of new arguments to this generic}
 }
+\value{
+Depends on the implemented method
+}
 \description{
 Summarize across replicates for a sensitivity dose-response experiment
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

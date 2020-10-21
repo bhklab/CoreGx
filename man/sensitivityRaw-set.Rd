@@ -14,6 +14,9 @@ sensitivityRaw(object, ...) <- value
 \item{value}{An object containing dose and viability metrics to update
 the object with.}
 }
+\value{
+Depends on the implemented method
+}
 \description{
 Generic function to set the raw data array for a treatment response experiment
   in an S4 class.

@@ -12,6 +12,9 @@ measurements for.}
 
 \item{...}{Fallthrough arguements for defining new methods}
 }
+\value{
+Depends on the implemented method
+}
 \description{
 Get the names of the sensitivity summary metrics available in an S4
   object.

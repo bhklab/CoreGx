@@ -12,7 +12,14 @@ summarizeMolecularProfiles(object, ...)
 
 \item{...}{Allow definition of new arguments to this generic}
 }
+\value{
+Depends on the implemented method
+}
 \description{
 Summarize molecular profile data such that there is a single entry for each
   cell line/treatment combination
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

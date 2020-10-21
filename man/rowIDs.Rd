@@ -11,6 +11,13 @@ rowIDs(object, ...)
 
 \item{...}{Allow new arguments to this generic.}
 }
+\value{
+Depends on the implemented method.
+}
 \description{
 Generic to access the row identifiers from
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

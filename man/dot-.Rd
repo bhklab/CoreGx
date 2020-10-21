@@ -9,6 +9,9 @@
 \arguments{
 \item{...}{[`parilist`] One or more R expressions to convert to calls.}
 }
+\value{
+[`call`] An R call object containing the quoted expression.
+}
 \description{
 This is used to pass through unevaluated R expressions into subset and
   `[`, where they will be evaluated in the correct context.

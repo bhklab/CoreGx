@@ -21,3 +21,7 @@ Get the annotations for a `Signature` class object, as returned by
   `drugSensitivitysig` or `radSensitivtySig` functions available in
   `PharmacoGx` and `RadioGx`, respectively.
 }
+\examples{
+print("Generics shouldn't need examples?")
+
+}

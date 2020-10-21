@@ -12,9 +12,13 @@ sensitivitySlotToLongTable(object, ...)
 \item{...}{Allow new arguments to be defined on this generic.}
 }
 \value{
-A [`LongTable`] object containing the data in the sensitivity slot
+A [`LongTable`] object containing the data in the sensitivity slot.
 }
 \description{
 Convert the sensitivity slot in an object inheriting from a CoreSet from a
   list to a LongTable.
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

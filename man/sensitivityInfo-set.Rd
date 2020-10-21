@@ -14,7 +14,14 @@ annotations for.}
 
 \item{value}{The new treatment response experiment annotations.}
 }
+\value{
+Depends on the implemented method
+}
 \description{
 Generic function to get the annotations for a treatment response experiment
   from an S4 class.
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

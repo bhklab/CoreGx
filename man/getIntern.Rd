@@ -14,6 +14,9 @@ object@.intern environment.}
 
 \item{...}{Allow new parmeters to be defined for this generic.}
 }
+\value{
+Depends on the implemented method
+}
 \description{
 Internal slot for storing metadata relevant to the internal operation of an
     S4 object.
@@ -21,4 +24,8 @@ Internal slot for storing metadata relevant to the internal operation of an
 \details{
 Warning: This method is intended for developer use and can be ignored by
   users.
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

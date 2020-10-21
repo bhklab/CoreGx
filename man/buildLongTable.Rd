@@ -12,6 +12,13 @@ buildLongTable(from, ...)
 \item{...}{[`pairlist`] Allow definition of new parameters for
 implementations of this generic.}
 }
+\value{
+Depends on the implemented method
+}
 \description{
 Build a LongTable object
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

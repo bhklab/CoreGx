@@ -14,7 +14,14 @@ sensitivityMeasures(object, ...) <- value
 \item{value}{A set of names for sensitivity measures to use to
 update the object with.}
 }
+\value{
+Depends on the implemented method
+}
 \description{
 Set the names of the sensitivity summary metrics available in an S4
   object.
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

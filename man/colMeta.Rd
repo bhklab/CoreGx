@@ -11,6 +11,13 @@ colMeta(object, ...)
 
 \item{...}{ALlow new arguments to this generic}
 }
+\value{
+Depends on impemented method.
+}
 \description{
 Generic to access the column identifiers for a rectangular object.
+}
+\examples{
+print("Generics shouldn't need examples?")
+
 }

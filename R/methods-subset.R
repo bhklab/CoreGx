@@ -27,7 +27,6 @@
 #'  Call: Accepts valid query statements to the `data.table` i parameter,
 #'    this can be used to make complex queries using the `data.table` API
 #'    for the `rowData` data.table.
-#'
 #' @param j [`character`], [`numeric`], [`logical`] or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'    object on all drug id columns matching the vector.
@@ -36,7 +35,6 @@
 #'  Call: Accepts valid query statements to the `data.table` i parameter,
 #'    this can be used to make complex queries using the `data.table` API
 #'    for the `colData` data.table.
-#'
 #' @param assays [`character`, `numeric` or `logical`] Optional list of assay
 #'   names to subset. Can be used to subset the assays list further,
 #'   returning only the selected items in the new LongTable.
@@ -151,6 +149,8 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #' .(cell_line1 == 'A2058')
 #'
 #' @param ... [`parilist`] One or more R expressions to convert to calls.
+#'
+#' @return [`call`] An R call object containing the quoted expression.
 #'
 #' @export
 . <- function(...) substitute(...)
