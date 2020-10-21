@@ -15,3 +15,4 @@ logs
 appveyor.yml
 .idea
 ^scripts
+^.git/.*

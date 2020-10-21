@@ -7,6 +7,11 @@
 \name{LongTable-class}
 \alias{LongTable-class}
 \alias{.LongTable}
+\alias{rowIDs,LongTable-method}
+\alias{rowMeta,LongTable-method}
+\alias{colIDs,LongTable-method}
+\alias{colMeta,LongTable-method}
+\alias{assayCols,LongTable-method}
 \alias{[[,LongTable,ANY,ANY-method}
 \alias{assay,LongTable,ANY-method}
 \alias{assay<-,LongTable,character-method}
@@ -24,6 +29,16 @@
 \alias{rowData<-,LongTable-method}
 \title{LongTable class definition}
 \usage{
+\S4method{rowIDs}{LongTable}(object, data = FALSE, key = FALSE)
+
+\S4method{rowMeta}{LongTable}(object, data = FALSE, key = FALSE)
+
+\S4method{colIDs}{LongTable}(object, data = FALSE, key = FALSE)
+
+\S4method{colMeta}{LongTable}(object, data = FALSE, key = FALSE)
+
+\S4method{assayCols}{LongTable}(object, i)
+
 \S4method{[[}{LongTable,ANY,ANY}(x, i, withDimnames = TRUE, metadata = withDimnames, keys = !withDimnames)
 
 \S4method{assay}{LongTable,ANY}(x, i, withDimnames = FALSE, metadata = withDimnames, key = !withDimnames)
@@ -55,10 +70,18 @@
 \S4method{rowData}{LongTable}(x) <- value
 }
 \arguments{
-\item{x}{A [`LongTable`] object to modify.}
+\item{object}{[`LongTable`]}
+
+\item{data}{[`logical`] Should the colData for the metadata columns be returned
+instead of the column names? Default is FALSE.}
+
+\item{key}{[`logical`] Should the rowKey column also be returned? Defaults
+to FALSE.}
 
 \item{i}{[`integer`] or [`character`] vector containing the index or name
 of the assay to update.}
+
+\item{x}{A [`LongTable`] object to modify.}
 
 \item{withDimnames}{[`logical`] Should the returned assays be joined to
 the row and column identifiers (i.e., the pseudo dimnames of the object).}
@@ -70,12 +93,7 @@ reconstructing a new LongTable.}
 \item{keys}{[`logical`] Should the row and column keys also be returned?
 Defaults to !withDimnames.}
 
-\item{key}{[`logical`] Should the rowKey column also be returned? Defaults
-to FALSE.}
-
 \item{value}{A [`data.table`] or [`data.frame`] to update}
-
-\item{object}{[`LongTable`]}
 
 \item{...}{[`pairlist`] Addtional arguments to get or mget inside of the
 function.}
@@ -87,6 +105,22 @@ anything at this time and can be ignored.}
 \value{
 [`LongTable`] object containing the assay data from a treatment
   response experiment
+
+A [`character`] vector of rowData column names if data is FALSE,
+  otherwise a [`data.table`] with the data from the rowData id columns.
+
+A [`character`] vector of rowData column names if data is FALSE,
+  otherwise a [`data.table`] with the data from the rowData metadta columns.
+
+A [`character`] vector of colData column names if data is FALSE,
+  otherwise a [`data.table`] with the data from the colData id columns.
+
+A [`character`] vector of colData column names if data is FALSE,
+     otherwise a [`data.table`] with the data from the colData metadta columns.
+
+A [`list`] of `character` vectors containing the value column names for
+  each assay if i is missing, otherwise a `character` vector of value column
+  names for the selected assay.
 
 [`LongTable`] With updated assays slot.
 
@@ -129,6 +163,20 @@ metadata of S4 objects.
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{rowIDs}: Get the names of the rowData columns required to
+uniquely identify each row.
+
+\item \code{rowMeta}: Get the names of the non-id columns from rowData.
+
+\item \code{colIDs}: Get the names of the columns in colData required to
+uniquely identify each row.
+
+\item \code{colMeta}: Get the names of the non-id columns in the colData
+`data.table`.
+
+\item \code{assayCols}: Get a list of column names for each assay in a
+`LongTable`.
+
 \item \code{[[}: Get an assay from a LongTable object. This method
 returns the row and column annotations by default to make assignment
 and aggregate operations easiers.
@@ -206,6 +254,16 @@ to work.}
 }}
 
 \examples{
+rowIDs(merckLongTable)
+
+rowMeta(merckLongTable)
+
+colIDs(merckLongTable)
+
+colMeta(merckLongTable)
+
+assayCols(merckLongTable)
+
 merckLongTable[['viability']]
 
 # Default annotations, just the key columns

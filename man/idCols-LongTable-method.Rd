@@ -18,3 +18,7 @@
 Retrieve the unique identifier columns used for primary keys in rowData and
    colData.
 }
+\examples{
+idCols(merckLongTable)
+
+}

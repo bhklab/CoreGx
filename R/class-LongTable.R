@@ -34,6 +34,7 @@
 setOldClass('long.table', S4Class='LongTable')
 
 #' @title LongTable constructor method
+#' @name LongTable
 #'
 #' @description Builds a `LongTable` object from rectangular objects. The
 #'   `rowData` argument should contain row level metadata, while the `colData`
@@ -162,29 +163,34 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 #' @export
 setClassUnion('list_or_LongTable', c('list', 'LongTable'))
 
-#' Ensure that all rowID and colID keys are valid
-#'
-#' @param rowData A [`data.table`] containing row level annotations.
-#' @param colData A [`data.table`] containing column level annotations for a
-#'   `LongTable`.
-#' @param assays A [`list`] of `data.table`s, one for each assay in an `LongTable`.
-#'
-#' @keywords internal
-## FIXME:: Finish this and implement class validity methods for LongTable!
-.verifyKeyIntegrity <- function(rowData, colData, assays) {
-    if (!('rowKey' %in% colnames(rowData)) || !is.numeric(rowData$rowID))
-        message(blue('The rowKey column is missing from rowData! Please try
-            rebuilding the LongTable object with the constructor.'))
-    if (!('colKey' %in% colnames(colData)) || !is.numeric(colData$colID))
-        stop()
-}
+##' Ensure that all rowID and colID keys are valid
+##'
+##' @param rowData A [`data.table`] containing row level annotations.
+##' @param colData A [`data.table`] containing column level annotations for a
+##'   `LongTable`.
+##' @param assays A [`list`] of `data.table`s, one for each assay in an `LongTable`.
+##'
+##' @keywords internal
+### FIXME:: Finish this and implement class validity methods for LongTable!
+#.verifyKeyIntegrity <- function(rowData, colData, assays) {
+#    if (!('rowKey' %in% colnames(rowData)) || !is.numeric(rowData$rowID))
+#        message(blue('The rowKey column is missing from rowData! Please try
+#            rebuilding the LongTable object with the constructor.'))
+#    if (!('colKey' %in% colnames(colData)) || !is.numeric(colData$colID))
+#        stop()
+#}
 
 # ---- LongTable Class Methods
 
 ## NOTE:: Issues printing are caused by ggplot::%+% over riding crayon::%+%
 #' Show method for the LongTable class
 #'
+#' @examples
+#' merckLongTable
+#'
 #' @param object A [`LongTable`] object to print the results for.
+#'
+#' @return [`invisible`] Prints to console.
 #'
 #' @importFrom crayon %+% yellow red green blue cyan magenta
 #' @import data.table
@@ -272,13 +278,19 @@ setMethod('show', signature(object='LongTable'), function(object) {
 
 #' Get the id column names for the rowData slot of a LongTable
 #'
+#' @examples
+#' rowIDs(merckLongTable)
+#'
+#' @describeIn LongTable Get the names of the rowData columns required to
+#'   uniquely identify each row.
+#'
 #' @param object A [`LongTable`] to get the rowData id columns for.
 #' @param data [`logical`] Should the rowData for the id columns be returned
-#'     instead of the column names? Default is FALSE.
+#'   instead of the column names? Default is FALSE.
 #' @param key [`logical`] Should the key column also be returned?
 #'
 #' @return A [`character`] vector of rowData column names if data is FALSE,
-#'      otherwise a [`data.table`] with the data from the rowData id columns.
+#'   otherwise a [`data.table`] with the data from the rowData id columns.
 #'
 #' @import data.table
 #' @export
@@ -292,13 +304,18 @@ setMethod('rowIDs', signature(object='LongTable'),
 
 #' Get the id column names for the rowData slot of a LongTable
 #'
+#' @examples
+#' rowMeta(merckLongTable)
+#'
+#' @describeIn LongTable Get the names of the non-id columns from rowData.
+#'
 #' @param object A [`LongTable`] to get the rowData metadata columns for.
 #' @param data [`logical`] Should the rowData for the metadata columns be returned
-#'     instead of the column names? Default is FALSE.
+#'   instead of the column names? Default is FALSE.
 #' @param key [`logical`] Should the key column also be returned? Default is FALSE
 #'
 #' @return A [`character`] vector of rowData column names if data is FALSE,
-#'      otherwise a [`data.table`] with the data from the rowData metadta columns.
+#'   otherwise a [`data.table`] with the data from the rowData metadta columns.
 #'
 #' @import data.table
 #' @export
@@ -313,13 +330,19 @@ setMethod('rowMeta', signature(object='LongTable'),
 
 #' Get the id column names for the colData slot of a LongTable
 #'
+#' @examples
+#' colIDs(merckLongTable)
+#'
+#' @describeIn LongTable Get the names of the columns in colData required to
+#'   uniquely identify each row.
+#'
 #' @param object A [`LongTable`] to get the colData id columns for.
 #' @param data [`logical`] Should the colData for the id columns be returned
-#'     instead of the column names? Default is FALSE.
+#'   instead of the column names? Default is FALSE.
 #' @param key [`logical`] Should the key column also be returned? Default is FALSE.
 #'
 #' @return A [`character`] vector of colData column names if data is FALSE,
-#'      otherwise a [`data.table`] with the data from the colData id columns.
+#'   otherwise a [`data.table`] with the data from the colData id columns.
 #'
 #' @import data.table
 #' @export
@@ -333,6 +356,12 @@ setMethod('colIDs', signature(object='LongTable'),
 })
 
 #' Get the id column names for the colData slot of a LongTable
+#'
+#' @examples
+#' colMeta(merckLongTable)
+#'
+#' @describeIn LongTable Get the names of the non-id columns in the colData
+#'   `data.table`.
 #'
 #' @param object A [`LongTable`] to get the colData metadata columns for.
 #' @param data [`logical`] Should the colData for the metadata columns be returned
@@ -354,14 +383,20 @@ setMethod('colMeta', signature(object='LongTable'),
 
 #' Retrieve the value columns for the assays in a LongTable
 #'
+#' @examples
+#' assayCols(merckLongTable)
+#'
+#' @describeIn LongTable Get a list of column names for each assay in a
+#'   `LongTable`.
+#'
 #' @param object [`LongTable`]
 #' @param i Optional parameter specifying the [`character`] name or [`interger`]
-#'     index of the assay to get the column names for. If missing, returns a
-#'     list of value column names for all the assays.
+#'   index of the assay to get the column names for. If missing, returns a
+#'   list of value column names for all the assays.
 #'
 #' @return A [`list`] of `character` vectors containing the value column names for
-#'     each assay if i is missing, otherwise a `character` vector of value column
-#'     names for the selected assay.
+#'   each assay if i is missing, otherwise a `character` vector of value column
+#'   names for the selected assay.
 #'
 #' @import data.table
 #' @export
@@ -386,6 +421,9 @@ setMethod('assayCols', signature(object='LongTable'),
 
 #' Retrieve the unique identifier columns used for primary keys in rowData and
 #'    colData.
+#'
+#' @examples
+#' idCols(merckLongTable)
 #'
 #' @param object [`LongTable`]
 #'
