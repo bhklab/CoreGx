@@ -18,4 +18,3 @@ This method allows integer indexes used to maintain referential integrity
   object data. Reindexing removes gaps integer indexes and ensures that the
   smallest contiguous integer values are used in an objects indexes.
 }
-\keyword{internal}

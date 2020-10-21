@@ -1,6 +1,7 @@
 # ==== LongTable Class
 
 #' @title LongTable to data.table conversion
+#' @name as
 #'
 #' @examples
 #' as(merckLongTable, 'data.table')
@@ -84,6 +85,7 @@ setAs('LongTable', 'data.table', def=function(from) {
 #' @export
 as.data.table.LongTable <- function(x) as(x, 'data.table')
 #' @title Coerce a LongTable into a `data.frame`
+#' @name as
 #'
 #' @description Currently only supports coercing to data.table or data.frame
 #'
@@ -104,7 +106,6 @@ setAs('LongTable', 'data.frame', def=function(from) {
 })
 
 #' @title Coerce a LongTable to a data.frame
-#' @name Coece method for LongTable
 #'
 #' @examples
 #' as(merckLongTable, 'data.frame')
@@ -144,6 +145,7 @@ as.data.frame.LongTable <- function(x, row.names, optional=TRUE, ...) {
 
 
 #' @title Coerce to data.table to LongTable
+#' @name as
 #'
 #' @examples
 #' dataTable <- as.data.table(merckLongTable)

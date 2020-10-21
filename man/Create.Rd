@@ -29,6 +29,19 @@ specified in the character vector of column names in each list item.}
 A [`LongTable`] object constructed with the data in `from`.
 }
 \description{
-Create a LongTable object from a list containing file paths, data.frames and
-  data.tables.
+LongTable build method from list
+}
+\section{Functions}{
+\itemize{
+\item \code{buildLongTable,list-method}: a LongTable object from a list containing file paths,
+data.frames and data.tables.
+}}
+
+\examples{
+assayList <- assays(merckLongTable, withDimnames=TRUE)
+rowDataCols <- list(rowIDs(merckLongTable))
+colDataCols <- list(colIDs(merckLongTable), colMeta(merckLongTable))
+assayCols <- assayCols(merckLongTable)
+longTable <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)
+
 }

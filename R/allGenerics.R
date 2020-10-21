@@ -175,7 +175,6 @@ setGeneric('sensitivitySlotToLongTable',
 #' @param ... [`pairlist`] Allow definition of new parameters to this generic.
 #'
 #' @export
-#' @keywords internal
 setGeneric('reindex', function(object, ...) standardGeneric('reindex'))
 
 #' Build a LongTable object
@@ -185,7 +184,6 @@ setGeneric('reindex', function(object, ...) standardGeneric('reindex'))
 #'     implementations of this generic.
 #'
 #' @export
-#' @keywords internal
 setGeneric('buildLongTable',
     function(from, ...) standardGeneric('buildLongTable'))
 

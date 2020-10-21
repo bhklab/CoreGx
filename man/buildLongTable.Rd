@@ -15,4 +15,3 @@ implementations of this generic.}
 \description{
 Build a LongTable object
 }
-\keyword{internal}

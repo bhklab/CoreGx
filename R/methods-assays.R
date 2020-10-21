@@ -18,6 +18,7 @@
 #' @return A [`list`] of `data.table` objects, one per assay in the object.
 #'
 #' @importMethodsFrom SummarizedExperiment assays
+#' @import data.table
 #' @export
 ##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
 setMethod('assays', signature(x='LongTable'),

@@ -2,7 +2,8 @@
 
 #' LongTable build method
 #'
-#' Create a LongTable object from a single data.table or data.frame object
+#' @describeIn LongTable Create a LongTable object from a single data.table or
+#'   data.frame object
 #'
 #' @param from [`character`] Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.
@@ -36,8 +37,9 @@ setMethod('buildLongTable', signature(from='data.frame'),
     # -- handle missing params
     missingParams <- c(missing(rowDataCols), missing(colDataCols), missing(assayCols))
     if (any(missingParams))
-        stop(magenta$bold('The following parameters are required:',
-            c('rowDataCols', 'colDataCols', 'assayCols')[missingParams]))
+        stop(magenta$bold('[CoreGx::buildLongTable,data.frame] The following',
+            ' parameters are required:',
+            .collapse(c('rowDataCols', 'colDataCols', 'assayCols')[missingParams])))
 
     # -- validate input and return useful messages if invalid
     ## TODO:: Check input parameters are valid
@@ -107,7 +109,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
 
 #' LongTable build method from character
 #'
-#' Create a LongTable object from a single .csv file
+#' @describeIn LongTable Create a LongTable object from a single .csv file
 #'
 #' @param from [`character`] Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.
@@ -147,8 +149,15 @@ setMethod('buildLongTable', signature(from='character'),
 
 #' LongTable build method from list
 #'
-#' Create a LongTable object from a list containing file paths, data.frames and
-#'   data.tables.
+#' @describeIn Create a LongTable object from a list containing file paths,
+#'   data.frames and data.tables.
+#'
+#' @examples
+#' assayList <- assays(merckLongTable, withDimnames=TRUE)
+#' rowDataCols <- list(rowIDs(merckLongTable))
+#' colDataCols <- list(colIDs(merckLongTable), colMeta(merckLongTable))
+#' assayCols <- assayCols(merckLongTable)
+#' longTable <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)
 #'
 #' @param from [`list`] A list containing any combination of character file paths,
 #'  data.tables and data.frames which will be used to construct the LongTable.

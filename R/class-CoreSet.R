@@ -38,7 +38,7 @@
 #' 
 #' @return An object of the CoreSet class
 #' 
-#' @exportClass CoreSet
+#' @export CoreSet
 #' @include class-LongTable.R
 #' @export
 .CoreSet <- setClass("CoreSet",
