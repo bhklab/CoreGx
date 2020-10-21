@@ -16,3 +16,5 @@ appveyor.yml
 .idea
 ^scripts
 ^.git/.*
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
