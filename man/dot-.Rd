@@ -13,3 +13,7 @@
 This is used to pass through unevaluated R expressions into subset and
   `[`, where they will be evaluated in the correct context.
 }
+\examples{
+.(cell_line1 == 'A2058')
+
+}

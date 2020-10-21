@@ -23,7 +23,7 @@
 Ensure that all rowID and colID keys are valid
 }
 \examples{
-merckLongTable
+show(merckLongTable)
 
 }
 \keyword{LongTable}

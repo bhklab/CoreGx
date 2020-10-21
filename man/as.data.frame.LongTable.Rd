@@ -29,6 +29,5 @@ S3 version of coerce method fro convenience.
 }
 \examples{
 as(merckLongTable, 'data.frame')
-as.data.frame(merckLongTable)
 
 }

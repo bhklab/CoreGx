@@ -19,7 +19,6 @@ a \code{data.frame} with the cell annotations
 Get cell line information from a PharmacoSet object
 }
 \examples{
-data(clevelandSmall_cSet)
 cellInf <- cellInfo(clevelandSmall_cSet)
 
 }

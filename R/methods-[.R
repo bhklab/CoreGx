@@ -9,13 +9,10 @@
 #' @examples
 #' # Character
 #' merckLongTable['CAOV3', 'ABT-888']
-#'
 #' # Numeric
 #' merckLongTable[1, c(1, 2)]
-#'
 #' # Logical
 #' merckLongTable[rowData(merckLongTable)$cell_line1 == 'A2058', ]
-#'
 #' # Call
 #' merckLongTable[.(cell_line1 == 'A2058'),
 #'   .(drug1 == 'Dasatinib' & drug2 != '5-FU')]

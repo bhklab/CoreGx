@@ -8,17 +8,12 @@
 #' This function is endomorphic, it always returns a LongTable object.
 #'
 #' @examples
-#' data(merckLongTable)
-#'
 #' # Character
 #' subset(merckLongTable, 'CAOV3', 'ABT-888')
-#'
 #' # Numeric
 #' subset(merckLongTable, 1, c(1, 2))
-#'
 #' # Logical
 #' subset(merckLongTable, rowData(merckLongTable)$cell_line1 == 'A2058')
-#'
 #' # Call
 #' subset(merckLongTable, cell_line1 == 'A2058',
 #'   drug1 == 'Dasatinib' & drug2 != '5-FU')
@@ -26,29 +21,29 @@
 #' @param x [`LongTable`] The object to subset.
 #' @param i [`character`], [`numeric`], [`logical`] or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
-#'      object on all row id columns matching the vector.
+#'    object on all row id columns matching the vector.
 #'  Numeric or Logical: these select based on the rowKey from the `rowData`
-#'      method for the `LongTable`.
+#'    method for the `LongTable`.
 #'  Call: Accepts valid query statements to the `data.table` i parameter,
-#'      this can be used to make complex queries using the `data.table` API
-#'      for the `rowData` data.table.
+#'    this can be used to make complex queries using the `data.table` API
+#'    for the `rowData` data.table.
 #'
 #' @param j [`character`], [`numeric`], [`logical`] or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
-#'      object on all drug id columns matching the vector.
+#'    object on all drug id columns matching the vector.
 #'  Numeric or Logical: these select based on the rowID from the `rowData`
-#'      method for the `LongTable`.
+#'    method for the `LongTable`.
 #'  Call: Accepts valid query statements to the `data.table` i parameter,
-#'      this can be used to make complex queries using the `data.table` API
-#'      for the `colData` data.table.
+#'    this can be used to make complex queries using the `data.table` API
+#'    for the `colData` data.table.
 #'
 #' @param assays [`character`, `numeric` or `logical`] Optional list of assay
-#'     names to subset. Can be used to subset the assays list further,
-#'     returning only the selected items in the new LongTable.
+#'   names to subset. Can be used to subset the assays list further,
+#'   returning only the selected items in the new LongTable.
 #' @param reindex [`logical`] Should the col/rowKeys be remapped after subsetting.
-#'     defaults to TRUE. For chained subsetting you may be able to get performance
-#'     gains by setting to FALSE and calling reindex() manually after subsetting
-#'     is finished.
+#'   defaults to TRUE. For chained subsetting you may be able to get performance
+#'   gains by setting to FALSE and calling reindex() manually after subsetting
+#'   is finished.
 #'
 #' @return [`LongTable`] A new `LongTable` object subset based on the specified
 #'      parameters.
@@ -152,6 +147,9 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #' This is used to pass through unevaluated R expressions into subset and
 #'   `[`, where they will be evaluated in the correct context.
 #'
+#' @examples
+#' .(cell_line1 == 'A2058')
+#'
 #' @param ... [`parilist`] One or more R expressions to convert to calls.
 #'
 #' @export
@@ -175,10 +173,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     return(gsub('\\*', '.*', query))
 }
 
-#'
-#'
-#'
-#'
+
 #' @keywords internal
 #' @noRd
 .validateRegexQuery <- function(regex, names) {
@@ -213,6 +208,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #'
 #' @import data.table
 #' @keywords internal
+#' @noRd
 .filterLongDataTable <- function(DT, indexList) {
 
     # validate input

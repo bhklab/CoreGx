@@ -3,7 +3,7 @@
 #' Get the column names from a `LongTable` object.
 #'
 #' @examples
-#' colnames(merckLongTable)
+#' head(colnames(merckLongTable))
 #'
 #' @describeIn LongTable Retrieve the pseudo-colnames of a LongTable object,
 #'   these are constructed by pasting together the colIDs(longTable) and
@@ -21,7 +21,7 @@ setMethod('colnames', signature(x='LongTable'), function(x) {
 #' Get the row names from a `LongTable` object.
 #'
 #' @examples
-#' rownames(merckLongTable)
+#' head(rownames(merckLongTable))
 #'
 #' @describeIn LongTable Retrieve the pseudo-rownames of a LongTable object,
 #'   these are constructed by pasting together the rowIDs(longTable) and
@@ -39,7 +39,7 @@ setMethod('rownames', signature(x='LongTable'), function(x) {
 #' Getter for the dimnames of a `LongTable` object
 #'
 #' @examples
-#' dimnames(merckLongTable)
+#' lapply(dimnames(merckLongTable), head)
 #'
 #' @describeIn LongTable Get the pseudo-dimnames for a LongTable object. See
 #'   colnames and rownames for more information.

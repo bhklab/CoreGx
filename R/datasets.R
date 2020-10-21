@@ -13,7 +13,6 @@
 #' @usage data(clevelandSmall_cSet)
 #' @keywords datasets
 #' @format CoreSet object
-#'
 NULL
 
 #' Merck Drug Combination Data LongTable

@@ -24,7 +24,6 @@ annotation<- Slot Setter
 }}
 
 \examples{
-data(clevelandSmall_cSet)
 annotation(clevelandSmall_cSet) <- annotation(clevelandSmall_cSet)
 
 }

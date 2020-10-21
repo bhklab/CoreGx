@@ -131,20 +131,20 @@ anything at this time and can be ignored.}
   response experiment
 
 A [`character`] vector of rowData column names if data is FALSE,
-  otherwise a [`data.table`] with the data from the rowData id columns.
+otherwise a [`data.table`] with the data from the rowData id columns.
 
 A [`character`] vector of rowData column names if data is FALSE,
-  otherwise a [`data.table`] with the data from the rowData metadta columns.
+otherwise a [`data.table`] with the data from the rowData metadta columns.
 
 A [`character`] vector of colData column names if data is FALSE,
-  otherwise a [`data.table`] with the data from the colData id columns.
+otherwise a [`data.table`] with the data from the colData id columns.
 
 A [`character`] vector of colData column names if data is FALSE,
-     otherwise a [`data.table`] with the data from the colData metadta columns.
+  otherwise a [`data.table`] with the data from the colData metadta columns.
 
 A [`list`] of `character` vectors containing the value column names for
-  each assay if i is missing, otherwise a `character` vector of value column
-  names for the selected assay.
+each assay if i is missing, otherwise a `character` vector of value column
+names for the selected assay.
 
 [`LongTable`] With updated assays slot.
 
@@ -331,11 +331,11 @@ dim(merckLongTable)
 
 dim(merckLongTable)
 
-colnames(merckLongTable)
+head(colnames(merckLongTable))
 
-rownames(merckLongTable)
+head(rownames(merckLongTable))
 
-dimnames(merckLongTable)
+lapply(dimnames(merckLongTable), head)
 
 getIntern(merckLongTable, 'rowIDs')
 getIntern(merckLongTable, c('colIDs', 'colMeta'))

@@ -250,7 +250,6 @@ setMethod('buildLongTable', signature(from='list'),
 #' fread with more default na.strings
 #'
 #' @keywords internal
-#' @export
 #' @noRd
 .freadNA <- function(...) {
     as.na <- unique(c(getOption('datatable.na.string'),
@@ -274,7 +273,6 @@ setMethod('buildLongTable', signature(from='list'),
 #'
 #' @import data.table
 #' @keywords internal
-#' @export
 #' @noRd
 .selectDataTable <- function(colNames, DT, keep.rownames=FALSE) {
 

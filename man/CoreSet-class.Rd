@@ -341,7 +341,6 @@ CoreSet, for proper processing of the data}
 }}
 
 \examples{
-data(clevelandSmall_cSet)
 annotation(clevelandSmall_cSet)
 
 data(clevelandSmall_cSet)

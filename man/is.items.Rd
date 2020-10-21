@@ -23,3 +23,8 @@ type checking functions such as is.character, is.numeric, or is.data.frame.}
 \description{
 Get the types of all items in a list
 }
+\examples{
+list <- list(c(1,2,3), c('a','b','c'))
+is.items(list, 'character')
+
+}

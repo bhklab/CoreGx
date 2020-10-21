@@ -47,19 +47,19 @@ column name to store the rownames in.}
 }
 \value{
 A [`LongTable`] object containing the data for a treatment response
-  experiment and configured according to the rowIDs and colIDs arguments.
+experiment and configured according to the rowIDs and colIDs arguments.
 }
 \description{
 Builds a `LongTable` object from rectangular objects. The
-  `rowData` argument should contain row level metadata, while the `colData`
-  argument should contain column level metadata, for the experimental assays
-  in the `assays` list. The `rowIDs` and `colIDs` lists are used to configure
-  the internal keys mapping rows or columns to rows in the assays. Each list
-  should contain at minimum one character vector, specifying which columns
-  in `rowData` or `colData` are required to uniquely identify each row. An
-  optional second character vector can be included, specifying any metadata
-  columns for either dimension. These should contain information about each
-  row but NOT be required to uniquely identify a row in the `colData` or
-  `rowData` objects. Additional metadata can be attached to a `LongTable` by
-  passing a list to the metadata argument.
+`rowData` argument should contain row level metadata, while the `colData`
+argument should contain column level metadata, for the experimental assays
+in the `assays` list. The `rowIDs` and `colIDs` lists are used to configure
+the internal keys mapping rows or columns to rows in the assays. Each list
+should contain at minimum one character vector, specifying which columns
+in `rowData` or `colData` are required to uniquely identify each row. An
+optional second character vector can be included, specifying any metadata
+columns for either dimension. These should contain information about each
+row but NOT be required to uniquely identify a row in the `colData` or
+`rowData` objects. Additional metadata can be attached to a `LongTable` by
+passing a list to the metadata argument.
 }

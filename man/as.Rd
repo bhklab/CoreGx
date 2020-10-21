@@ -31,12 +31,8 @@ Coerce a data.table with the proper configuration attributes
 \examples{
 as(merckLongTable, 'data.table')
 
-as.data.table(merckLongTable)
-
-dataTable <- as.data.table(merckLongTable)
+dataTable <- as(merckLongTable, 'data.table')
 print(attr(dataTable, 'LongTable.config')) # Method doesn't work without this
-
 as(dataTable, 'LongTable')
-as.long.table(dataTable)
 
 }

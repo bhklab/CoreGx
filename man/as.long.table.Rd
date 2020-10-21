@@ -18,3 +18,9 @@ automatically created when coercing from a LongTable to a data.table.}
 Coerce a data.table with the proper configuration attributes
   back to a LongTable
 }
+\examples{
+dataTable <- as(merckLongTable, 'data.table')
+print(attr(dataTable, 'LongTable.config')) # Method doesn't work without this
+as.long.table(dataTable)
+
+}

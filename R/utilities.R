@@ -438,6 +438,7 @@
 ## TODO:: Add documentation to these functions
 #' @importFrom stats rcauchy
 #' @export
+#' @keywords internal
 #' @noRd
 .rmedncauchys = function(N, n, scale) {
     x <- matrix(NA, nrow = 1, ncol = N)
@@ -449,6 +450,7 @@
 
 #' @importFrom stats dcauchy pcauchy integrate
 #' @export
+#' @keywords internal
 #' @noRd
 .dmedncauchys = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -480,6 +482,7 @@
 
 #' @importFrom stats pcauchy integrate
 #' @export
+#' @keywords internal
 #' @noRd
 .pmedncauchys = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -507,6 +510,7 @@
 }
 
 #' @importFrom stats integrate
+#' @keywords internal
 #' @export
 #' @noRd
 .edmedncauchys = function(x, n, scale, divisions = 100) {
@@ -535,6 +539,7 @@
 #### mednnormals -------------------------------------------------------------
 
 #' @export
+#' @keywords internal
 #' @noRd
 .rmednnormals = function(N, n, scale) {
     x <- matrix(NA, nrow = 1, ncol = N)
@@ -546,6 +551,7 @@
 
 #' @importFrom stats rnorm  dnorm
 #' @export
+#' @keywords internal
 #' @noRd
 .dmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -577,6 +583,7 @@
 
 #' @importFrom stats integrate
 #' @export
+#' @keywords internal
 #' @noRd
 .pmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -605,6 +612,7 @@
 
 #' @importFrom stats integrate
 #' @export
+#' @keywords intenral
 #' @noRd
 .edmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
@@ -635,6 +643,7 @@
 ## TODO:: Add function documentation
 #' @importFrom stats optim var
 #' @export
+#' @keywords internal
 #' @noRd
 .fitCurve <- function(x, y, f, density, step, precision, lower_bounds, upper_bounds, scale, family, median_n, trunc, verbose, gritty_guess, 
     span) {
@@ -672,6 +681,7 @@
 #' the residuals at different lattice points of the search space
 #'
 #' @export
+#' @keywords internal
 #' @noRd
 # ##FIXME:: Why is this different in PharmacoGx?
 .meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
@@ -815,6 +825,7 @@
 
 #' @export
 #' @keywords internal
+#' @noRd
 # @param matInd array indices @param dimsizes array containing size of array of interest in each dimension
 .linInd <- function(matInd, dimsizes) {
     y <- matInd[1]
@@ -828,6 +839,7 @@
 
 #' @export
 #' @keywords internal
+#' @noRd
 # @param linInd linear index @param dimsizes array containing size of array of interest in each dimension
 .matInd <- function(linInd, dimsizes) {
     y <- matrix(0, nrow = length(dimsizes), ncol = 1)
@@ -843,6 +855,7 @@
 
 #' @export
 #' @keywords internal
+#' @noRd
 .patternSearch <- function(x, y, f, guess, n, guess_residual, lower_bounds, upper_bounds, span, precision, step, scale, family, trunc) {
     neighbours <- matrix(nrow = 2 * length(guess), ncol = length(guess))
     neighbour_residuals <- matrix(NA, nrow = 1, ncol = nrow(neighbours))
@@ -883,6 +896,7 @@
 #' @return A named vector where index `Rsquare` contains the attributes of the object
 #' @export
 #' @keywords internal
+#' @noRd
 .examineGOF <- function(pars) {
     return(c(Rsquare = attr(pars, "Rsquare")))
 }
@@ -899,6 +913,7 @@
 #'
 #' @export
 #' @keywords internal
+#' @noRd
 .residual <- function(x, y, n, pars, f, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
     family <- match.arg(family)
     diffs <- do.call(f, list(x, pars)) - y
@@ -932,6 +947,7 @@
 ## FIXME:: This function already exists as base::trimws? Is there any reason we need to reimplement it?
 #' @export
 #' @keywords internal
+#' @noRd
 .stripWhiteSpace <- function(str, method = c("both", "head", "tail")) {
     method <- match.arg(method)
     str2 <- NULL
@@ -956,6 +972,9 @@
 
 #' Convenience function for collapsing a character vector
 #'
+#' @examples
+#' .collapse(c("Vector", "of", "words")
+#'
 #' @param ... [`pairlist`] One or more character vectors
 #' @param collapse [`character`] Argument to collapse of paste0, default is ' '.
 #'
@@ -969,6 +988,9 @@
 
 #' Returns a colorized error message (magenta)
 #'
+#' @examples
+#' cat(.errorMsg('This ', 'is ', 'an ', 'error ', 'message'))
+#'
 #' @param ... [`pairlist`] One or more strings or character vectors, also
 #'   accepts any params to paste0.
 #'
@@ -981,6 +1003,9 @@
 
 #' Returns a colorized warning message (cyan)
 #'
+#' @examples
+#' cat(.warnMsg('This ', 'is ', 'a ', 'warning ', 'message'))
+#'
 #' @param ... [`pairlist`] One or more strings or character vectors, also
 #'   accepts any params to paste0.
 #'
@@ -992,6 +1017,10 @@
 .warnMsg <- function(..., collapse=', ') cyan$bold(paste0(..., collapse=collapse))
 
 #' Get the types of all items in a list
+#'
+#' @examples
+#' list <- list(c(1,2,3), c('a','b','c'))
+#' is.items(list, 'character')
 #'
 #' @param list A [`list`] to get the types from
 #' @param ... [`pairlist`] Additional arguments to FUN

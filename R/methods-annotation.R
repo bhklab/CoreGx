@@ -5,7 +5,6 @@
 #' @return A \code{list} of named annotaiton
 #'
 #' @examples
-#' data(clevelandSmall_cSet)
 #' annotation(clevelandSmall_cSet)
 #'
 #' @describeIn CoreSet Retrieve the annotations slot form an rSet
@@ -25,7 +24,6 @@ setMethod('annotation', signature("CoreSet"), function(object) {
 #' @return A copy of the \code{CoreSet} with the updated annotation slot
 #'
 #' @examples
-#' data(clevelandSmall_cSet)
 #' annotation(clevelandSmall_cSet) <- annotation(clevelandSmall_cSet)
 #'
 #' @describeIn RadioSet Update the annotation slot of a tSet
