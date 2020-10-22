@@ -69,15 +69,15 @@ jobs:
           do
             eval sudo $cmd
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
-          sudo apt-get install gcc-7 g++-7 gfortran-7
-          sudo apt-get install libxml2-dev
-          sudo apt-get install -y libglpk-dev
+          sudo apt-get install -y libglpk-dev  # this was the on that fixed piano
 
       - name: Install dependencies
         run: |
-          remotes::install_cran("igraph")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
+          failed_installs <- setdiff(unique(unlist(tools::package_dependencies()), rownames(installed.packages())
+          if (!require('BiocManager')) remotes::install_cran('BiocManager')
+          if (length(failed_installs) > 0) BiocManager::install(failed_installs)
         shell: Rscript {0}
 
       - name: Session info
@@ -90,7 +90,10 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
+        run: |
+          rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
+          if (!require('BiocCheck') BiocManager::install('BiocCheck')
+          BiocCheck::BiocCheck(`no-check-bioc-help`=TRUE)
         shell: Rscript {0}
 
       - name: Show testthat output
