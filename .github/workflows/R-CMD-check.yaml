@@ -92,7 +92,7 @@ jobs:
           _R_CHECK_CRAN_INCOMING_: false
         run: |
           rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
-          if (!require('BiocCheck') BiocManager::install('BiocCheck')
+          if (!require('BiocCheck')) BiocManager::install('BiocCheck')
           BiocCheck::BiocCheck(`no-check-bioc-help`=TRUE)
         shell: Rscript {0}
 
