@@ -12,7 +12,7 @@
 setGeneric("cellNames", function(object, ...) standardGeneric("cellNames"))
 #' @describeIn CoreSet Return the cell names used in the dataset
 #' @export
-setMethod(cellNames, "CoreSet", function(object){
+setMethod(cellNames, signature("CoreSet"), function(object){
   rownames(cellInfo(object))
 })
 
@@ -32,7 +32,7 @@ setMethod(cellNames, "CoreSet", function(object){
 setGeneric("cellNames<-", function(object, ..., value) standardGeneric("cellNames<-"))
 #' @describeIn CoreSet Update the cell names used in the dataset
 #' @export
-setReplaceMethod("cellNames", signature = signature(object="CoreSet",value="character"), function(object, value){
+setReplaceMethod("cellNames", signature(object="CoreSet",value="character"), function(object, value){
     object <- updateCellId(object, value)
     return(object)
-    })
+})

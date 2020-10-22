@@ -220,7 +220,6 @@ updateCellId <- function(object, new.ids = vector("character")){
   if(object@datasetType=="sensitivity"|object@datasetType=="both"){
     myx <- match(sensitivityInfo(object)[,"cellid"],rownames(cellInfo(object)))
     sensitivityInfo(object)[,"cellid"] <- new.ids[myx]
-
   }
   
   

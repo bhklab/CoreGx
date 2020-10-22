@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/bhklab/CoreGx.svg?branch=master)](https://travis-ci.org/bhklab/CoreGx)
-[![codecov](https://codecov.io/gh/bhklab/CoreGx/branch/master/graph/badge.svg)](https://codecov.io/gh/bhklab/CoreGx)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/bhklab/CoreGx?branch=master&svg=true)](https://ci.appveyor.com/project/bhklab/CoreGx)
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/bhklab/CoreGx/workflows/R-CMD-check/badge.svg)](https://github.com/bhklab/CoreGx/actions)
+<!-- badges: end -->
 
 CoreGx
 ==========
