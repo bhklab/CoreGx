@@ -51,7 +51,8 @@ Suggests:
     BiocStyle,
     rmarkdown,
     knitr,
-    formatR
+    formatR,
+    testthat
 License: GPL-3
 RoxygenNote: 7.1.1
 Collate: 
