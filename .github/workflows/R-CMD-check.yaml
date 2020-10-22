@@ -75,7 +75,7 @@ jobs:
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
-          failed_installs <- setdiff(unique(unlist(tools::package_dependencies()), rownames(installed.packages())
+          failed_installs <- setdiff(unique(unlist(tools::package_dependencies())), rownames(installed.packages()))
           if (!require('BiocManager')) remotes::install_cran('BiocManager')
           if (length(failed_installs) > 0) BiocManager::install(failed_installs)
         shell: Rscript {0}
