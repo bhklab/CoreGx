@@ -1,4 +1,5 @@
 library(CoreGx)
+library(testthat)
 library(parallel)
 library(data.table)
 
