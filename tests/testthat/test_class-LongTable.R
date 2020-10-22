@@ -14,31 +14,34 @@ assayCols <- list(viability=paste0('viability', seq_len(4)),
 
 context('Checking LongTable Class Methods.')
 
-
 # ---- 1. buildLongTable
 context('Testing buildLongTable function...')
 
 context('Testing buildLongTable from a single table or file')
 test_that('Can build LongTable from a file path', {
-    longTable <- buildLongTable(from=filePath, rowDataCols, colDataCols, assayCols)
+     longTable <- buildLongTable(from=filePath, rowDataCols,
+        colDataCols, assayCols)
      expect_s4_class(longTable,'LongTable')
      expect_equal_to_reference(longTable, 'merckLongTable.rds')
 })
 
-merckDT <- fread(filePath, na.strings=c('NULL', 'NA', 'None', 'NULL'))
+merckDT <- fread('merckLongTable.csv', na.strings=c('NULL', 'NA', 'None', 'NULL'))
 test_that('Can build longTable from a data.table', {
-    longTable1 <- buildLongTable(from=merckDT, rowDataCols, colDataCols, assayCols)
+    longTable1 <- buildLongTable(from=merckDT, rowDataCols,
+        colDataCols, assayCols)
     expect_s4_class(longTable1,'LongTable')
     expect_equal_to_reference(longTable1, 'merckLongTable.rds')
 })
 
 test_that('   from a data.frame', {
-    longTable2 <- buildLongTable(from=setDF(merckDT), rowDataCols, colDataCols, assayCols)
+    longTable2 <- buildLongTable(from=setDF(merckDT),
+        rowDataCols, colDataCols, assayCols)
     expect_s4_class(longTable2, 'LongTable')
     expect_equal_to_reference(longTable2, 'merckLongTable.rds')
 })
 
 
+context('Testing buildLongTable from mutliple tables or files')
 # already know this works from previous test
 longTable <- buildLongTable(from=filePath, rowDataCols, colDataCols, assayCols)
 
@@ -51,7 +54,7 @@ colDataCols <- lapply(colDataCols, names)
 assayList <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
 
 ## TODO:: Read in raw data for this step so we don't require working accessors
-context('Testing buildLongTable from mutliple tables or files')
+
 test_that('Can build LongTable from list of data.tables', {
     longTable1 <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)
     expect_s4_class(longTable1, 'LongTable')

@@ -142,7 +142,7 @@ setMethod('buildLongTable', signature(from='character'),
             check the location of the source file!'))
 
     # read in data
-    tableData <- .freadNA(filePath)
+    tableData <- .freadNA(from)
 
     return(buildLongTable(from=tableData, rowDataCols, colDataCols, assayCols))
 })
