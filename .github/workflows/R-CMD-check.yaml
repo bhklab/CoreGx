@@ -71,6 +71,7 @@ jobs:
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
           sudo apt-get install gcc-7 g++-7 gfortran-7
           sudo apt-get install libxml2-dev
+          sudo apt-get install -y libglpk-dev
 
       - name: Install dependencies
         run: |
