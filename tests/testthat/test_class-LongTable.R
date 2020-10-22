@@ -1,4 +1,4 @@
-library(PharmacoGx)
+library(CoreGx)
 library(parallel)
 library(data.table)
 
