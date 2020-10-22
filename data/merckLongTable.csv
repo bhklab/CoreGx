@@ -1,4 +1,4 @@
-cell_line,combination_name,BatchID,drugA_name,drugA Conc (µM),drugB_name,drugB Conc (µM),viability1,viability2,viability3,viability4,mu/muMax,X/X0
+cell_line,combination_name,BatchID,drugA_name,drugA Conc (uM),drugB_name,drugB Conc (uM),viability1,viability2,viability3,viability4,mu/muMax,X/X0
 A2058,5-FU & ABT-888,1,5-FU,0.35,ABT-888,0.35,0.971,1.090,0.949,0.996,0.992,0.988
 A2058,5-FU & BEZ-235,1,5-FU,0.35,BEZ-235,0.0045,0.921,0.947,0.915,0.956,0.965,0.953
 A2058,5-FU & Bortezomib,1,5-FU,0.35,Bortezomib,0.00045,0.983,0.962,0.950,0.954,0.978,0.97

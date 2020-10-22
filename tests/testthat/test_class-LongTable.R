@@ -9,7 +9,7 @@ library(data.table)
 filePath <- 'merckLongTable.csv'
 rowDataCols <- list(c(cell_line1='cell_line', BatchID='BatchID'))
 colDataCols <- list(c(drug1='drugA_name', drug2='drugB_name',
-    drug1dose='drugA Conc (µM)', drug2dose='drugB Conc (µM)'))
+    drug1dose='drugA Conc (uM)', drug2dose='drugB Conc (uM)'))
 assayCols <- list(viability=paste0('viability', seq_len(4)),
                   viability_summary=c('mu/muMax', 'X/X0'))
 
