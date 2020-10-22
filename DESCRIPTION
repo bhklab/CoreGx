@@ -35,23 +35,23 @@ Imports:
     Biobase,
     S4Vectors,
     SummarizedExperiment,
-    piano, 
+    piano,
     BiocParallel,
     BiocGenerics,
-    methods, 
-    stats, 
-    utils, 
-    graphics, 
-    grDevices, 
+    methods,
+    stats,
+    utils,
+    graphics,
+    grDevices,
     lsa,
     data.table,
     crayon
 Suggests: 
-  pander,
-  BiocStyle,
-  rmarkdown,
-  knitr,
-  formatR
+    pander,
+    BiocStyle,
+    rmarkdown,
+    knitr,
+    formatR
 License: GPL-3
 RoxygenNote: 7.1.1
 Collate: 
