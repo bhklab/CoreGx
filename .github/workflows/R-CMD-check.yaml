@@ -68,7 +68,8 @@ jobs:
           while read -r cmd
           do
             eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "18.04"))')
+          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
+          sudo apt-get install
 
       - name: Install dependencies
         run: |
@@ -86,7 +87,7 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), error_on = "error", check_dir = "check")
+        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--no-build-vignettes"), build_args="--no-build-vignettes", error_on = "error", check_dir = "check")
         shell: Rscript {0}
 
       - name: Show testthat output
