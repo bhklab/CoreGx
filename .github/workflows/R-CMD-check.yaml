@@ -95,12 +95,12 @@ jobs:
           rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
         shell: Rscript {0}
 
-      - name: BiocCheck
-        run: |
-          checkResults <- BiocCheck::BiocCheck(`no-check-bioc-help`=TRUE)
-          if (length(checkResults$error) > 0)
-            stop(paste0(checkResults$error, collapse='\n'))
-        shell: Rscript {0}
+#      - name: BiocCheck
+#        run: |
+#          checkResults <- BiocCheck::BiocCheck(`no-check-bioc-help`=TRUE)
+#          if (length(checkResults$error) > 0)
+#            stop(paste0(checkResults$error, collapse='\n'))
+#        shell: Rscript {0}
 
       - name: Show testthat output
         if: always()
