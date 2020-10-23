@@ -96,7 +96,7 @@ jobs:
         shell: Rscript {0}
 
       - name: BiocCheck
-      - run: |
+        run: |
           checkResults <- BiocCheck::BiocCheck(`no-check-bioc-help`=TRUE)
           if (length(checkResults$error) > 0)
             stop(paste0(checkResults$error, collapse='\n'))
