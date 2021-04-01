@@ -19,3 +19,5 @@ appveyor.yml
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 ^\.github$
+scripts
+combos

@@ -20,7 +20,7 @@ nci_DT <- merge.data.table(nci_DT, drug_DT, by.x='NSC2', by.y='NSC')
 setnames(nci_DT, 'drug_name', 'drug2_name', skip_absent=TRUE)
 
 # -- Keep a backup of the original
-.nci_DT <- nci_DTmaps
+.nci_DT <- nci_DT
 
 # -- Explore the dimensonality
 .length_unique <- function(x) length(unique(x))

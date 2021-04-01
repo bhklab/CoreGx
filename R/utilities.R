@@ -1061,3 +1061,12 @@
 #' @export
 is.items <- function(list, ..., FUN=is)
     vapply(list, FUN=FUN, FUN.VALUE=logical(1), ...)
+
+#' @export
+.length_unique <- function(x) length(unique(x))
+
+#' @export
+.list_unique <- function(x) list(unique(x))
+
+#' @export
+.all_equals <- function(x, y) all(x == y)

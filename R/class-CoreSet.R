@@ -1,4 +1,4 @@
-#' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
+#' @importFrom MultiAssayExperiment MultiAssayExperiment
 setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 
 #' A Superclass to Contain Data for Genetic Profiling and Viability Screens of Cancer Cell Lines
