@@ -1,3 +1,6 @@
+#' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
+setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
+
 #' A Superclass to Contain Data for Genetic Profiling and Viability Screens of Cancer Cell Lines
 #' 
 #' The CoreSet (CSet) class was developed as a superclass for pSets in the 
@@ -44,7 +47,7 @@
 .CoreSet <- setClass("CoreSet",
     slots = list(sensitivity="list_or_LongTable",
                  annotation = "list",
-                 molecularProfiles = "list",
+                 molecularProfiles = "list_or_MAE",
                  cell="data.frame",
                  datasetType="character",
                  perturbation="list",

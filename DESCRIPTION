@@ -54,7 +54,7 @@ Suggests:
     formatR,
     testthat
 License: GPL-3
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.1.9001
 Collate: 
     'adaptiveMatthewCor.R'
     'allGenerics.R'
