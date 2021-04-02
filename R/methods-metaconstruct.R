@@ -20,21 +20,7 @@
 #' @export
 setGeneric('metaconstruct', function(mapper, ...) standardGeneric('metaconstruct'))
 
-#' Guess which columns in raw experiment data map to which dimensions.
-#' 
-#' Checks for columns which are uniquely identified 
-#' 
-#' @param mapper A `LongTableDataMapper` object.
-#' @param groups A `list` containing one or more vector of column names
-#'   to group-by. The function uses these to determine 1:1 mappings between
-#'   the combination of columns in each vector and unique values in the raw
-#'   data columns.
-#' @param subset A `logical` vector indicating whether to to subset out mapped
-#'   columns after each grouping. Must be a single `TRUE` or `FALSE` or have
-#'   the same length as groups, indicating whether to subset out mapped columns
-#'   after each grouping.
-#' 
-#' @return The `mapper` object, with predicted mappings.
+
 #' 
 #' @md
 #' @export

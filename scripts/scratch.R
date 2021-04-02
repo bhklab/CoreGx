@@ -22,11 +22,6 @@ setnames(nci_DT, 'drug_name', 'drug2_name', skip_absent=TRUE)
 # -- Keep a backup of the original
 .nci_DT <- nci_DT
 
-# -- Explore the dimensonality
-.length_unique <- function(x) length(unique(x))
-.list_unique <- function(x) list(unique(x))
-.all_equals <- function(x, y) all(x == y)
-
 # -- Identify already unique columns
 onlyOneValueCols <- names(which(vapply(nci_DT, .length_unique, numeric(1)) == 1))
 expMetadata <- as.list(unique(nci_DT[, ..onlyOneValueCols]))
