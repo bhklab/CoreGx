@@ -9,7 +9,7 @@ setClassUnion("list_or_List", c('list', 'List'))
 #'   that will be processed and mapped to the slots of an `S4` object.
 #' 
 #' @md
-#' @alias DataMapper-class
+#' @aliases DataMapper-class
 .DataMapper <- setClass('DataMapper', 
     contains=c('VIRTUAL', 'Annotated'), slots=list(rawdata='list_or_List'))
 
@@ -45,7 +45,7 @@ setMethod('rawdata', signature(object='DataMapper'), function(object) {
 #' @slot metadataMap A list of mappings from
 #' @slot metadata A list of mappings from
 #' 
-#' @alias LongTableDataMapper-class
+#' @aliases LongTableDataMapper-class
 #' @keywords internal
 #' @export
 .LongTableDataMapper <- setClass('LongTableDataMapper', 

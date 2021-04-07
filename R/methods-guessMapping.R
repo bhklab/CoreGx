@@ -35,7 +35,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     mapData <- rawdata(object)
     if (!is.data.table(mapData)) setDT(mapData)
 
-    if (!length(subset==length(groups) || !length(subset) == 1))
+    if (length(subset) != length(groups) && !length(subset) == 1)
         stop(.errorMsg(funContext, ' The subset parameter must be
             either length 1 or length equal to the groups parameter!'))
     
@@ -48,13 +48,15 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     DT <- mapData[, .SD, .SDcols=!metadataColumns]
 
     for (i in seq_along(groups)) {
+        message(funContext, paste0('Mapping to ', 
+            paste0(groups[[i]], collapse=', '), ' columns.'))
         mappedCols <- checkColumnCardinality(DT, groups[[i]])
         assign(names(groups)[i], DT[, .SD, .SDcols=mappedCols])
         if (subset[i]) DT <- DT[, .SD, .SDcols=!mappedCols]
     }
     mappings <- mget(c('metadata', names(groups)))
-    unmapped <- setdiff(colnames(DT), 
-        unique(c(unlist(groups)), Reduce(c, lapply(mappings, colnames))))
+    unmapped <- setdiff(colnames(mapData), 
+        unique(c(unlist(groups), Reduce(c, lapply(mappings, colnames)))))
     if (length(unmapped) > 0) mappings[['unmapped']] <- unmapped
 
     return(mappings)
