@@ -24,18 +24,19 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 #'   the same length as groups, indicating whether to subset out mapped columns
 #'   after each grouping.
 #' 
-#' 
+#' @return
+#'
 #' @md
 #' @export
 setMethod('guessMapping', signature(object='LongTableDataMapper'), 
     function(object, groups, subset)
 {
-    funContext <- .context(1)
-    
-    mapData <- rawdata(object)
+    funContext <- '[CoreGx::guessMapping,LongTableDataMapper-method]\n\t'
+  
+    mapData <- copy(rawdata(object))
     if (!is.data.table(mapData)) setDT(mapData)
 
-    if (length(subset) != length(groups) && !length(subset) == 1)
+    if (length(subset) != length(groups) && length(subset) != 1)
         stop(.errorMsg(funContext, ' The subset parameter must be
             either length 1 or length equal to the groups parameter!'))
     
@@ -48,8 +49,8 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     DT <- mapData[, .SD, .SDcols=!metadataColumns]
 
     for (i in seq_along(groups)) {
-        message(funContext, paste0('Mapping to ', 
-            paste0(groups[[i]], collapse=', '), ' columns.'))
+        message(funContext, paste0('Mapping for group ', names(groups)[i], 
+            ': ', paste0(groups[[i]], collapse=', ')))
         mappedCols <- checkColumnCardinality(DT, groups[[i]])
         assign(names(groups)[i], DT[, .SD, .SDcols=mappedCols])
         if (subset[i]) DT <- DT[, .SD, .SDcols=!mappedCols]
@@ -72,17 +73,36 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #' @param cardinality The cardinality of to search for (i.e., 1:`cardinality`)
 #'   relationships with the combination of columns in group. Defaults to 1 
 #'   (i.e., 1:1 mappings).
+#' @param ... Fall through arguments to data.table::`[`. For developer use. 
+#'   One use case is setting verbose=TRUE to diagnose slow data.table 
+#'   operations.
 #' 
+#' @return A `character` vector with the names of the columns with
+#'    cardinality of 1:`cardinality` with the columns lised in `group`.
+#'
 #' @aliases cardinality
 #' 
 #' @md
 #' @export
-checkColumnCardinality <- function(df, group, cardinality=1) {
+checkColumnCardinality <- function(df, group, cardinality=1, ...) {
+    
+    funContext <- '[CoreGx::checkColumnCardinality]\n\t'
+
+    # Copy to prevent accidental modify by references
+    df <- copy(df)
     if (!is.data.table(df)) setDT(df)
 
-    dimDT <- df[, lapply(.SD, FUN=.length_unique), by=group]
-    columnsHaveCardinality <- names(which(
-        vapply(dimDT, .all_equals, y=cardinality, logical(1))))
+    setindexv(df, cols=group)
+    groupDT <- df[, .(group_index = .GRP), by=group, ...]
+    if (nrow(df) == max(groupDT$group_index)) {
+        if (cardinality != 1) stop(.errorMsg(funContext, 'The group argument 
+            uniquely identifies each row, so the cardinality is 1:1!'))
+        columnsHaveCardinality <- setdiff(colnames(df), group)
+    } else {
+        dimDT <- df[, lapply(.SD, FUN=.length_unique), by=group, ...]
+        columnsHaveCardinality <- names(which(
+            vapply(dimDT, .all_equals, y=cardinality, logical(1))))
+    }
 
     return(columnsHaveCardinality)
 }

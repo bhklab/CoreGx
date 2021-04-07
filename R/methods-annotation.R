@@ -1,6 +1,6 @@
 #' annotation Slot Getter
 #'
-#' @param object A \code{RadioSet}
+#' @param object A \code{CoreSet}
 #'
 #' @return A \code{list} of named annotaiton
 #'
@@ -17,7 +17,7 @@ setMethod('annotation', signature("CoreSet"), function(object) {
 
 #' annotation<- Slot Setter
 #'
-#' @param object A \code{RadioSet}
+#' @param object A \code{CoreSet}
 #' @param value A \code{list} of annotations to add to the annotatiosn slot of
 #'   an rSet
 #'
@@ -26,7 +26,7 @@ setMethod('annotation', signature("CoreSet"), function(object) {
 #' @examples
 #' annotation(clevelandSmall_cSet) <- annotation(clevelandSmall_cSet)
 #'
-#' @describeIn RadioSet Update the annotation slot of a tSet
+#' @describeIn CoreSet Update the annotation slot of a tSet
 #'
 #' @importMethodsFrom BiocGenerics annotation<-
 #' @export

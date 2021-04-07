@@ -6,7 +6,7 @@
 \title{Search a data.frame for 1:\code{cardinality} relationships between a group
 of columns (your identifiers) and all other columns.}
 \usage{
-checkColumnCardinality(df, group, cardinality = 1)
+checkColumnCardinality(df, group, cardinality = 1, ...)
 }
 \arguments{
 \item{df}{A \code{data.frame} to search for 1:\code{cardinality} mappings with
@@ -18,6 +18,14 @@ check the cardinality of other columns against.}
 \item{cardinality}{The cardinality of to search for (i.e., 1:\code{cardinality})
 relationships with the combination of columns in group. Defaults to 1
 (i.e., 1:1 mappings).}
+
+\item{...}{Fall through arguments to data.table::\code{[}. For developer use.
+One use case is setting verbose=TRUE to diagnose slow data.table
+operations.}
+}
+\value{
+A \code{character} vector with the names of the columns with
+cardinality of 1:\code{cardinality} with the columns lised in \code{group}.
 }
 \description{
 Search a data.frame for 1:\code{cardinality} relationships between a group

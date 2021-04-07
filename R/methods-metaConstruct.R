@@ -18,25 +18,26 @@
 #' 
 #' @md
 #' @export
-setGeneric('metaconstruct', function(mapper, ...) standardGeneric('metaconstruct'))
+setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct'))
 
 
 #' 
 #' @md
 #' @export
-setMethod('metaconstruct', signature(mapper='LongTableDataMapper'), 
+setMethod('metaConstruct', signature(mapper='LongTableDataMapper'), 
     function(mapper, groups, subset=TRUE)
 {
 
     # -- parse data into long format
-
+    
 
     # -- 
+    
 
 })
 
 
-#'
+#' 
 #' 
 #' 
 #' 

@@ -13,6 +13,7 @@
 \alias{CoreSet-class}
 \alias{.CoreSet}
 \alias{annotation,CoreSet-method}
+\alias{annotation<-,CoreSet,list-method}
 \alias{cellInfo,CoreSet-method}
 \alias{cellInfo<-,CoreSet,data.frame-method}
 \alias{cellNames,CoreSet-method}
@@ -58,6 +59,8 @@
 \title{A Superclass to Contain Data for Genetic Profiling and Viability Screens of Cancer Cell Lines}
 \usage{
 \S4method{annotation}{CoreSet}(object)
+
+\S4method{annotation}{CoreSet,list}(object) <- value
 
 \S4method{cellInfo}{CoreSet}(object)
 
@@ -161,6 +164,8 @@ An object of the CoreSet class
 
 A \code{list} of named annotaiton
 
+A copy of the \code{CoreSet} with the updated annotation slot
+
 A \code{list} of unique cell and tissue identifiers to check validity
   of a cSet
 
@@ -206,6 +211,8 @@ A generic for the sensitivityInfo replacement method
 \section{Methods (by generic)}{
 \itemize{
 \item \code{annotation}: Retrieve the annotations slot form an rSet
+
+\item \code{annotation<-}: Update the annotation slot of a tSet
 
 \item \code{cellInfo}: Returns the annotations for all the cell lines tested on in the CoreSet
 
@@ -342,6 +349,8 @@ CoreSet, for proper processing of the data}
 
 \examples{
 annotation(clevelandSmall_cSet)
+
+annotation(clevelandSmall_cSet) <- annotation(clevelandSmall_cSet)
 
 data(clevelandSmall_cSet)
 curation(clevelandSmall_cSet)

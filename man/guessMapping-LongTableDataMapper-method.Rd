@@ -19,6 +19,9 @@ after each grouping.}
 
 \item{mapper}{A \code{LongTableDataMapper} object.}
 }
+\value{
+
+}
 \description{
 Checks for columns which are uniquely identified
 }

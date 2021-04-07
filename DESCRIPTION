@@ -30,15 +30,13 @@ VignetteEngine: knitr::rmarkdown
 biocViews: Software, Pharmacogenomics, Classification, Survival
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 4.0)
+Depends: R (>= 4.0), BiocGenerics, SummarizedExperiment
 Imports: 
     Biobase,
     S4Vectors,
     MultiAssayExperiment,
-    SummarizedExperiment,
     piano,
     BiocParallel,
-    BiocGenerics,
     methods,
     stats,
     utils,
@@ -93,7 +91,7 @@ Collate:
     'methods-guessMapping.R'
     'methods-intersect.R'
     'methods-mDataNames.R'
-    'methods-metaconstruct.R'
+    'methods-metaConstruct.R'
     'methods-metadata.R'
     'methods-molecularProfiles.R'
     'methods-molecularProfilesSlot.R'
