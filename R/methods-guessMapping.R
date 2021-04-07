@@ -32,22 +32,26 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     function(object, groups, subset)
 {
     funContext <- '[CoreGx::guessMapping,LongTableDataMapper-method]\n\t'
-  
+    
+    # Extract the raw data
     mapData <- copy(rawdata(object))
     if (!is.data.table(mapData)) setDT(mapData)
 
-    if (length(subset) != length(groups) && length(subset) != 1)
+    # Error handle for subset parameter
+    if (!(length(subset) == length(groups) || length(subset) == 1))
         stop(.errorMsg(funContext, ' The subset parameter must be
             either length 1 or length equal to the groups parameter!'))
     
     if (length(subset) == 1) subset <- rep(subset, length(groups))
 
+    # Map unique columns in the data to the metadata slot
     metadataColumns <- names(which(vapply(mapData, FUN=.length_unique, 
         numeric(1)) == 1))
     metadata <- mapData[, .SD, .SDcols=metadataColumns]
 
     DT <- mapData[, .SD, .SDcols=!metadataColumns]
 
+    # Check the mappings for each group in groups
     for (i in seq_along(groups)) {
         message(funContext, paste0('Mapping for group ', names(groups)[i], 
             ': ', paste0(groups[[i]], collapse=', ')))
@@ -55,9 +59,14 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
         assign(names(groups)[i], DT[, .SD, .SDcols=mappedCols])
         if (subset[i]) DT <- DT[, .SD, .SDcols=!mappedCols]
     }
-    mappings <- mget(c('metadata', names(groups)))
+
+    # Merge the results
+    groups <- c(list(metadata=NA), groups)
+    mappings <- mget(names(groups))
+    mappings <- mapply(list, mappings, groups, SIMPLIFY=FALSE)
+    mappings <- lapply(mappings, `names<-`, value=c('data', 'id_columns'))
     unmapped <- setdiff(colnames(mapData), 
-        unique(c(unlist(groups), Reduce(c, lapply(mappings, colnames)))))
+        unique(c(unlist(groups), unlist(lapply(mappings, colnames)))))
     if (length(unmapped) > 0) mappings[['unmapped']] <- unmapped
 
     return(mappings)
