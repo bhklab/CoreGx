@@ -42,7 +42,7 @@ setMethod('[[', signature('LongTable'),
             ' keys=TRUE.'))
         return(assay(x, i))
     } else {
-        if (withDimnames | metadata)
+        if (withDimnames || metadata)
             return(assay(x, i, withDimnames, metadata))
         else
             return(assay(x, i)[, -c('rowKey', 'colKey')])

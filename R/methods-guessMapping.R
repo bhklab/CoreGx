@@ -63,10 +63,11 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     # Merge the results
     groups <- c(list(metadata=NA), groups)
     mappings <- mget(names(groups))
-    mappings <- mapply(list, mappings, groups, SIMPLIFY=FALSE)
-    mappings <- lapply(mappings, `names<-`, value=c('data', 'id_columns'))
     unmapped <- setdiff(colnames(mapData), 
         unique(c(unlist(groups), unlist(lapply(mappings, colnames)))))
+    mappings <- mapply(list, mappings, groups, SIMPLIFY=FALSE)
+    mappings <- lapply(mappings, `names<-`, value=c('data', 'id_columns'))
+
     if (length(unmapped) > 0) mappings[['unmapped']] <- unmapped
 
     return(mappings)
@@ -101,6 +102,7 @@ checkColumnCardinality <- function(df, group, cardinality=1, ...) {
     df <- copy(df)
     if (!is.data.table(df)) setDT(df)
 
+    # Intercept slow data.table group by when nrow == .NGRP
     setindexv(df, cols=group)
     groupDT <- df[, .(group_index = .GRP), by=group, ...]
     if (nrow(df) == max(groupDT$group_index)) {

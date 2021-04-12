@@ -71,10 +71,136 @@ setMethod('rawdata', signature(object='DataMapper'), function(object) {
 LongTableDataMapper <- function(rawdata, rowDataMap=list(), 
     colDataMap=list(), assayMap=list(), metadataMap=list())
 {
-    funContext <- .context(1)
+    funContext <- '[CoreGx::LongTableDataMapper]\n\t'
     if (missing(rawdata)) stop(.errorMsg(funContext, 'The rawdata parameter ',
         'is mandatory. Please provide a list of raw data to map from.'))
     
     .LongTableDataMapper(rawdata=rawdata, rowDataMap=rowDataMap, 
         colDataMap=colDataMap, assayMap=assayMap, metadataMap=metadataMap)
 }
+
+# ---- LongTableDataMapper Accessors
+
+# -- rowDataMap
+
+#'
+#' @param object An `S4` object to access the rowDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return 
+#'
+#' @md
+#' @export
+setGeneric('rowDataMap', function(object, ...) standardGeneric('rowDataMap'))
+#'
+#' @param object An `S4` object to access the rowDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return 
+#'
+#' @md
+#' @export
+setMethod('rowDataMap', signature(object='LongTableDataMapper'), function(object) 
+{
+    object@rowDataMap
+})
+
+#'
+#' @param object An `S4` object to access the rowDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#' @param value
+#'
+#' @return 
+#'
+#' @md
+#' @export
+setGeneric('rowDataMap<-', function(object, ...) standardGeneric('rowDataMap'))
+#'
+#' @param object An `S4` object to access the rowDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return 
+#'
+#' @md
+#' @export
+setMethod('rowDataMap', signature(object='LongTableDataMapper'), function(object) 
+{
+    object@rowDataMap
+})
+
+# -- colDataMap
+
+#'
+#'
+#' @param object An `S4` object to access the colDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return 
+#'
+#' @md
+#' @export
+setGeneric('colDataMap', function(object, ...) standardGeneric('colDataMap'))
+#'
+#'
+#' @param object An `S4` object to access the rowDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return 
+#' 
+#' @md
+#' @export
+setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object) 
+{
+    object@colDataMap
+})
+
+# -- assayMap
+
+#'
+#'
+#' @param object An `LongTableDataMapper` object to access the assayMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return 
+#'
+#' @md
+#' @export
+setGeneric('assayMap', function(object, ...) standardGeneric('assayMap'))
+#'
+#'
+#' @param object An `LongTableDataMapper` object to access the rowDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return 
+#'
+#' @md
+#' @export
+setMethod('assayMap', signature(object='LongTableDataMapper'), function(object) 
+{
+    object@assayMap
+})
+
+# -- metadataMap
+
+#'
+#' @param object An `S4` object to access the metadataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return
+#'
+#' @md
+#' @export
+setGeneric('metadataMap', function(object, ...) standardGeneric('metadataMap'))
+#'
+#' @param object A `LongTableDataMapper` object to access the rowDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return
+#'
+#' @md
+#' @export
+setMethod('metadataMap', signature(object='LongTableDataMapper'), function(object) 
+{
+    object@metadataMap
+})
+
