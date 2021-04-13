@@ -23,13 +23,16 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 #'   columns after each grouping. Must be a single `TRUE` or `FALSE` or have
 #'   the same length as groups, indicating whether to subset out mapped columns
 #'   after each grouping.
+#' @param data A `logical` vector indicating whether you would like the data
+#'   for mapped columns to be returned instead of their column names. Defaults
+#'   to `FALSE` for easy use assigning mapped columns to a `DataMapper` object.
 #' 
 #' @return
 #'
 #' @md
 #' @export
 setMethod('guessMapping', signature(object='LongTableDataMapper'), 
-    function(object, groups, subset)
+    function(object, groups, subset, data=FALSE)
 {
     funContext <- '[CoreGx::guessMapping,LongTableDataMapper-method]\n\t'
     
@@ -65,8 +68,9 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     mappings <- mget(names(groups))
     unmapped <- setdiff(colnames(mapData), 
         unique(c(unlist(groups), unlist(lapply(mappings, colnames)))))
-    mappings <- mapply(list, mappings, groups, SIMPLIFY=FALSE)
-    mappings <- lapply(mappings, `names<-`, value=c('data', 'id_columns'))
+    if (!data) mappings <- lapply(mappings, colnames)
+    mappings <- mapply(list, groups, mappings, SIMPLIFY=FALSE)
+    mappings <- lapply(mappings, `names<-`, value=c('id_columns', 'data'))
 
     if (length(unmapped) > 0) mappings[['unmapped']] <- unmapped
 

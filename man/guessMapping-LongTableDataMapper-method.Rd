@@ -4,7 +4,7 @@
 \alias{guessMapping,LongTableDataMapper-method}
 \title{Guess which columns in raw experiment data map to which dimensions.}
 \usage{
-\S4method{guessMapping}{LongTableDataMapper}(object, groups, subset)
+\S4method{guessMapping}{LongTableDataMapper}(object, groups, subset, data = FALSE)
 }
 \arguments{
 \item{groups}{A \code{list} containing one or more vector of column names
@@ -16,6 +16,10 @@ data columns.}
 columns after each grouping. Must be a single \code{TRUE} or \code{FALSE} or have
 the same length as groups, indicating whether to subset out mapped columns
 after each grouping.}
+
+\item{data}{A \code{logical} vector indicating whether you would like the data
+for mapped columns to be returned instead of their column names. Defaults
+to \code{FALSE} for easy use assigning mapped columns to a \code{DataMapper} object.}
 
 \item{mapper}{A \code{LongTableDataMapper} object.}
 }
