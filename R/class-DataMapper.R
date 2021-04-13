@@ -5,7 +5,8 @@ setClassUnion("list_or_List", c('list', 'List'))
 #' 
 #' This object will be used as a way to abstract away data preprocessing.
 #' 
-#' @slot rawdata A list-like object containing one or more pieces of raw data
+#' @section Slots:
+#' * rawdata: A list-like object containing one or more pieces of raw data
 #'   that will be processed and mapped to the slots of an `S4` object.
 #' 
 #' @md
@@ -19,6 +20,8 @@ setClassUnion("list_or_List", c('list', 'List'))
 #' 
 #' @return The raw data object.
 #' 
+#' @describeIn DataMapper-methods
+#'
 #' @md
 #' @export
 setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
@@ -30,6 +33,8 @@ setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
 #' @return A list-like containing one or more raw data inputs to the 
 #'   `DataMapper` object.
 #' 
+#' @describeIn DataMapper-methods
+#'
 #' @md
 #' @export
 setMethod('rawdata', signature(object='DataMapper'), function(object) {
@@ -37,14 +42,17 @@ setMethod('rawdata', signature(object='DataMapper'), function(object) {
 })
 
 #' A Class for Mapping Between Raw Data and an `LongTable` Object
+#'
+#' @section Slots:
+#' * rowDataMap: A list of mappings from.
+#' * colDataMap: A list of mappings from.
+#' * assayMap: A list of mappings from .
+#' * metadataMap: A list of mappings from.
+#' * metadata: A list of mappings from.
 #' 
-#' @inherit DataMapper-class
-#' @slot rowDataMap A list of mappings from 
-#' @slot colDataMap A list of mappings from
-#' @slot assayMap A list of mappings from 
-#' @slot metadataMap A list of mappings from
-#' @slot metadata A list of mappings from
-#' 
+#' @inheritSection DataMapper-class Slots
+#'
+#' @md
 #' @aliases LongTableDataMapper-class
 #' @keywords internal
 #' @export
@@ -106,9 +114,10 @@ setMethod('rowDataMap', signature(object='LongTableDataMapper'), function(object
 })
 
 #'
-#' @param object A `S4` object to assign a rowDataMap to.
+#' @param object An `S4` object to access the colDataMap from.
 #' @param ... Allow new parameters to be defined for this generic.
-#' @param value A named list-like object where the first item is the
+#' @param value A like-like object containing the values to assign to the
+#'   `rowDataMap` slot of the `S4` object.
 #'   
 #' @return 
 #'
@@ -118,7 +127,11 @@ setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowData
 #'
 #' @param object A `LongTableDataMapper` object to access the rowDataMap from.
 #' @param ... Allow new parameters to be defined for this generic.
-#' @param value A named list-like object where the first item is the
+#' @param value A `list` or `List` where the first item is the names of the
+#'   identifier columns -- columns needed to uniquely identify each row in
+#'   rowData -- and the second item is the metadata associated with those
+#'   the identifier columns, but not required to uniquely identify rows in
+#'   the object rowData.
 #'
 #' @return 
 #'
@@ -163,6 +176,7 @@ setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
 
     # -- Function body
     object@rowDataMap <- value
+    return(object)
 })
 
 # -- colDataMap
@@ -195,6 +209,8 @@ setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object
 #'
 #' @param object An `S4` object to access the colDataMap from.
 #' @param ... Allow new parameters to be defined for this generic.
+#' @param value A like-like object containing the values to assign to the
+#'   `colDataMap` slot of the `S4` object.
 #'
 #' @return 
 #'
@@ -203,22 +219,26 @@ setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object
 setGeneric('colDataMap<-', function(object, ..., value) standardGeneric('colDataMap<-'))
 #'
 #'
-#' @param object A `LongTableDataMapper` object to access the rowDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
+#' @param object A `LongTableDataMapper` object to assign a colDataMap to.
+#' @param value A `list` or `List` where the first item is the named of the
+#'   identifier columns -- columns needed to uniquely identify each row in
+#'   colData -- and the second item is the metadata associated with those
+#'   the identifier columns, but not required to uniquely identify rows in
+#'   the object colData.
 #'
-#' @return 
+#' @return None, modifies the object.
 #' 
 #' @md
 #' @export
-setReplaceMethod('colDataMap', signature(object='LongTableDataMapper'), 
-    function(object, value) 
+setReplaceMethod('colDataMap', signature(object='LongTableDataMapper',
+    value='list_or_List'), function(object, value) 
 {
     funContext <- '[CoreGx::`colDataMap<-`,LongTableDataMapper-method]\n\t'
     rawdataCols <- colnames(rawdata(object))
 
     # -- Handle error conditions
     if (length(value) > 2 || !is.list(value)) {
-        stop(.errorMsg(funContext, 'Assignments to cowDataMap should be a list ',
+        stop(.errorMsg(funContext, 'Assignments to colDataMap should be a list ',
             'of length 2, where the first item is the name of the id columns ',
             'and the second item is the name of the metadata columns which ',
             'map to those id columns.'))
@@ -249,6 +269,7 @@ setReplaceMethod('colDataMap', signature(object='LongTableDataMapper'),
 
     # -- Function body
     object@colDataMap <- value
+    return(object)
 })
 
 # -- assayMap

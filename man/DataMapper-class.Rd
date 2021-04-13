@@ -10,8 +10,9 @@ This object will be used as a way to abstract away data preprocessing.
 }
 \section{Slots}{
 
-\describe{
-\item{\code{rawdata}}{A list-like object containing one or more pieces of raw data
-that will be processed and mapped to the slots of an \code{S4} object.}
-}}
+\itemize{
+\item rawdata: A list-like object containing one or more pieces of raw data
+that will be processed and mapped to the slots of an \code{S4} object.
+}
+}
 

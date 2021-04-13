@@ -4,22 +4,25 @@
 \name{LongTableDataMapper-class}
 \alias{LongTableDataMapper-class}
 \alias{.LongTableDataMapper}
-\title{A Class for Mapping Between Raw Data and an `LongTable` Object}
+\title{A Class for Mapping Between Raw Data and an \code{LongTable} Object}
 \description{
-This object will be used as a way to abstract away data preprocessing.
+A Class for Mapping Between Raw Data and an \code{LongTable} Object
 }
 \section{Slots}{
 
-\describe{
-\item{\code{rowDataMap}}{A list of mappings from}
+\itemize{
+\item rowDataMap: A list of mappings from.
+\item colDataMap: A list of mappings from.
+\item assayMap: A list of mappings from .
+\item metadataMap: A list of mappings from.
+\item metadata: A list of mappings from.
+}
 
-\item{\code{colDataMap}}{A list of mappings from}
 
-\item{\code{assayMap}}{A list of mappings from}
-
-\item{\code{metadataMap}}{A list of mappings from}
-
-\item{\code{metadata}}{A list of mappings from}
-}}
+\itemize{
+\item rawdata: A list-like object containing one or more pieces of raw data
+that will be processed and mapped to the slots of an \code{S4} object.
+}
+}
 
 \keyword{internal}
