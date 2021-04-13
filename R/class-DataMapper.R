@@ -106,26 +106,63 @@ setMethod('rowDataMap', signature(object='LongTableDataMapper'), function(object
 })
 
 #'
-#' @param object An `S4` object to access the rowDataMap from.
+#' @param object A `S4` object to assign a rowDataMap to.
 #' @param ... Allow new parameters to be defined for this generic.
-#' @param value
+#' @param value A named list-like object where the first item is the
+#'   
+#' @return 
+#'
+#' @md
+#' @export
+setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowDataMap<-'))
+#'
+#' @param object A `LongTableDataMapper` object to access the rowDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#' @param value A named list-like object where the first item is the
 #'
 #' @return 
 #'
 #' @md
 #' @export
-setGeneric('rowDataMap<-', function(object, ...) standardGeneric('rowDataMap'))
-#'
-#' @param object An `S4` object to access the rowDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#'
-#' @return 
-#'
-#' @md
-#' @export
-setMethod('rowDataMap', signature(object='LongTableDataMapper'), function(object) 
+setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper', 
+    value='list_or_List'), function(object, value) 
 {
-    object@rowDataMap
+    funContext <- '[CoreGx::`rowDataMap<-`,LongTableDataMapper-method]\n\t'
+    rawdataCols <- colnames(rawdata(object))
+
+    # -- Handle error conditions
+    if (length(value) > 2) {
+        stop(.errorMsg(funContext, 'Assignments to rowDataMap should be a list ',
+            'of length 2, where the first item is the name of the id columns ',
+            'and the second item is the name of the metadata columns which ',
+            'map to those id columns.'))
+    }
+
+    hasIDcols <- value[[1]] %in% rawdataCols
+    if (!all(hasIDcols)) {
+        stop(.errorMsg(funContext, 'One or more of the id columns specified ',
+            'in value[[1]] are not valid column names in the rawdata slot of ',
+            'this ', class(object)[1], ' object!'))
+    }
+    
+    if (length(value) > 1 && length(value[[2]]) != 0) {
+        hasMetaCols <- value[[2]] %in% rawdataCols
+        if (!all(hasMetaCols)) {
+            stop(.errorMsg(funContext, 'The follow metadata columns in value[[2]] ',
+                'are not present in rawdata(object): ', 
+                .collapse(value[[2]][!hasMetaCols]), '!'))
+        }
+        hasOneToOneRelationship <- 
+            value[[2]] %in% cardinality(rawdata(object), group=value[[1]])
+        if (!all(hasOneToOneRelationship)) {
+            stop(.errorMsg(funContext, 'The columns ', 
+                .collapse(value[[2]][!hasOneToOneRelationship], ' do not have a ',
+                '1:1 relationship with the specified ID columns!')))
+        }
+    }
+
+    # -- Function body
+    object@rowDataMap <- value
 })
 
 # -- colDataMap
@@ -152,6 +189,66 @@ setGeneric('colDataMap', function(object, ...) standardGeneric('colDataMap'))
 setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object) 
 {
     object@colDataMap
+})
+
+#'
+#'
+#' @param object An `S4` object to access the colDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return 
+#'
+#' @md
+#' @export
+setGeneric('colDataMap<-', function(object, ..., value) standardGeneric('colDataMap<-'))
+#'
+#'
+#' @param object A `LongTableDataMapper` object to access the rowDataMap from.
+#' @param ... Allow new parameters to be defined for this generic.
+#'
+#' @return 
+#' 
+#' @md
+#' @export
+setReplaceMethod('colDataMap', signature(object='LongTableDataMapper'), 
+    function(object, value) 
+{
+    funContext <- '[CoreGx::`colDataMap<-`,LongTableDataMapper-method]\n\t'
+    rawdataCols <- colnames(rawdata(object))
+
+    # -- Handle error conditions
+    if (length(value) > 2 || !is.list(value)) {
+        stop(.errorMsg(funContext, 'Assignments to cowDataMap should be a list ',
+            'of length 2, where the first item is the name of the id columns ',
+            'and the second item is the name of the metadata columns which ',
+            'map to those id columns.'))
+    }
+
+    hasIDcols <- value[[1]] %in% rawdataCols
+    if (!all(hasIDcols)) {
+        stop(.errorMsg(funContext, 'One or more of the id columns specified ',
+            'in value[[1]] are not valid column names in the rawdata slot of ',
+            'this ', class(object)[1], ' object!'))
+    }
+    
+    if (length(value) > 1 && length(value[[2]]) != 0) {
+        hasMetaCols <- value[[2]] %in% rawdataCols
+        if (!all(hasMetaCols)) {
+            stop(.errorMsg(funContext, 'The follow metadata columns in value[[2]] ',
+                'are not present in rawdata(object): ', 
+                .collapse(value[[2]][!hasMetaCols]), '!'))
+        }
+        hasOneToOneRelationship <- 
+            value[[2]] %in% cardinality(rawdata(object), group=value[[1]])
+        if (!all(hasOneToOneRelationship)) {
+            stop(.errorMsg(funContext, 'The columns ', 
+                .collapse(value[[2]][!hasOneToOneRelationship], ' do not have a ',
+                '1:1 relationship with the specified ID columns!')))
+        }
+    }
+
+    # -- Function body
+    object@colDataMap <- value
 })
 
 # -- assayMap
