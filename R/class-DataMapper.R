@@ -212,7 +212,7 @@ setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object
 #' @param value A like-like object containing the values to assign to the
 #'   `colDataMap` slot of the `S4` object.
 #'
-#' @return 
+#' @return None, modifies the object.
 #'
 #' @md
 #' @export
@@ -298,6 +298,40 @@ setMethod('assayMap', signature(object='LongTableDataMapper'), function(object)
     object@assayMap
 })
 
+#'
+#'
+#'
+#'
+#' @md
+#' @export
+setGeneric('assayMap<-', function(object, ..., value) standardGeneric('assayMap<-'))
+#'
+#'
+#'
+#' @md
+#' @export
+setReplaceMethod('assayMap', signature(object='LongTableDataMapper', 
+    value='list_or_List'), function(object, value) 
+{
+    funContext <- '[CoreGx::`assayMap<-,LongTableDataMapper-method`]\n\t'
+    rawdataCols <- colnames(rawdata(object))
+    if (length(names(value)) == 0) stop(.errorMsg('The value argument must
+        be a named list-like of column name character vectors!'))
+
+    for (i in seq_along(value)) {
+        hasRawdataCols <- value[[i]] %in% rawdataCols
+        if (!all(hasRawdataCols)) {
+            stop(.errorMsg(funContext, 'There are no columns named ',
+                .collapse(value[[i]][!hasRawdataCols]), ' in the rawdata ',
+                'of this ', class(object)[1], ' object. Please ensure item ',
+                names(value)[i], ' of value has valid column names.'))
+        }
+    }
+
+    object@assayMap <- value
+    return(object)
+})
+
 # -- metadataMap
 
 #'
@@ -322,3 +356,36 @@ setMethod('metadataMap', signature(object='LongTableDataMapper'), function(objec
     object@metadataMap
 })
 
+#'
+#'
+#'
+#'
+#' @md
+#' @export
+setGeneric('metadataMap<-', function(object, ..., value) standardGeneric('metadataMap<-'))
+#'
+#'
+#'
+#' @md
+#' @export
+setReplaceMethod('metadataMap', signature(object='LongTableDataMapper', 
+    value='list_or_List'), function(object, value) 
+{
+    funContext <- '[CoreGx::`metadataMap<-,LongTableDataMapper-method`]\n\t'
+    rawdataCols <- colnames(rawdata(object))
+    if (length(names(value)) == 0) stop(.errorMsg('The value argument must
+        be a named list-like of column name character vectors!'))
+
+    for (i in seq_along(value)) {
+        hasRawdataCols <- value[[i]] %in% rawdataCols
+        if (!all(hasRawdataCols)) {
+            stop(.errorMsg(funContext, 'There are no columns named ',
+                .collapse(value[[i]][!hasRawdataCols]), ' in the rawdata ',
+                'of this ', class(object)[1], ' object. Please ensure item ',
+                names(value)[i], ' of value has valid column names.'))
+        }
+    }
+
+    object@metadataMap <- value
+    return(object)
+})

@@ -37,7 +37,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
     # -- handle missing params
     missingParams <- c(missing(rowDataCols), missing(colDataCols), missing(assayCols))
     if (any(missingParams))
-        stop(magenta$bold('[CoreGx::buildLongTable,data.frame] The following',
+        stop(.errorMsg('[CoreGx::buildLongTable,data.frame] The following',
             ' parameters are required:',
             .collapse(c('rowDataCols', 'colDataCols', 'assayCols')[missingParams])))
 
