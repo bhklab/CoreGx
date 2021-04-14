@@ -31,20 +31,20 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
     
     DT <- rawdata(mapper)
 
-    rowDataDT <- unique(DT[, unlist(rowDataMap(mapper))])
+    rowDataDT <- unique(DT[, unlist(rowDataMap(mapper)), with=FALSE])
     rowIDs <- rowDataMap(mapper)[[1]]
 
-    colDataDT <- unique(DT[, unlist(colDataMap(mapper))])
+    colDataDT <- unique(DT[, unlist(colDataMap(mapper)), with=FALSE])
     colIDs <- colDataMap(mapper)[[1]]
 
     metadataL <- lapply(metadataMap(mapper), 
         function(j, x) as.list(unique(x[, j, with=FALSE])), x=DT)
 
     assayIDs <- c(rowIDs, colIDs)
-    assayColumns <- lapply(assayMap(mapper), c, assayIDs)
-    assayDtL <- lapply(assayColumns, subset, x=DT, subset=TRUE)
+    assayColumns <- lapply(assayMap(mapper), FUN=c, assayIDs)
+    assayDtL <- lapply(assayColumns, FUN=subset, x=DT, subset=TRUE)
 
-    LongTable(
+    CoreGx:::LongTable(
         rowData=rowDataDT, rowIDs=rowIDs,
         colData=colDataDT, colIDs=colIDs,
         assays=assayDtL,

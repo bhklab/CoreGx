@@ -75,6 +75,7 @@ setOldClass('long.table', S4Class='LongTable')
 #' @return A [`LongTable`] object containing the data for a treatment response
 #' experiment and configured according to the rowIDs and colIDs arguments.
 #'
+#''@export
 #' @import data.table
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                       metadata=list(), keep.rownames=FALSE) {
@@ -111,6 +112,10 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                  types, '\nPlease ensure all items in the assays list are ',
                  'coercable to a data.frame!'), collapse=', ')
         })
+
+    # Create the row and column keys for LongTable internal mappings
+    rowData[, rowKey := .GRP, by=rowIDs]
+    colData[, colKey := .GRP, by=colIDs]
 
     # initialize the internals object to store private metadata for a LongTable
     internals <- new.env()
