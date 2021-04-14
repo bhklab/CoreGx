@@ -2,34 +2,20 @@
 % Please edit documentation in R/class-LongTable.R
 \name{show,LongTable-method}
 \alias{show,LongTable-method}
-\title{Ensure that all rowID and colID keys are valid}
+\title{Show method for the LongTable class}
 \usage{
 \S4method{show}{LongTable}(object)
 }
 \arguments{
 \item{object}{A [`LongTable`] object to print the results for.}
-
-\item{rowData}{A [`data.table`] containing row level annotations.}
-
-\item{colData}{A [`data.table`] containing column level annotations for a
-`LongTable`.}
-
-\item{assays}{A [`list`] of `data.table`s, one for each assay in an `LongTable`.}
 }
 \value{
 [`invisible`] Prints to console.
 }
 \description{
-Ensure that all rowID and colID keys are valid
+Show method for the LongTable class
 }
 \examples{
 show(merckLongTable)
 
 }
-\keyword{LongTable}
-\keyword{Show}
-\keyword{class}
-\keyword{for}
-\keyword{internal}
-\keyword{method}
-\keyword{the}

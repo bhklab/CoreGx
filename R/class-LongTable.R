@@ -160,14 +160,15 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 #' @include class-LongTable.R
 setClassUnion('list_or_LongTable', c('list', 'LongTable'))
 
-##' Ensure that all rowID and colID keys are valid
-##'
-##' @param rowData A [`data.table`] containing row level annotations.
-##' @param colData A [`data.table`] containing column level annotations for a
-##'   `LongTable`.
-##' @param assays A [`list`] of `data.table`s, one for each assay in an `LongTable`.
-##'
-##' @keywords internal
+# #' Ensure that all rowID and colID keys are valid
+# #'
+# #' @param rowData A [`data.table`] containing row level annotations.
+# #' @param colData A [`data.table`] containing column level annotations for a
+# #'   `LongTable`.
+# #' @param assays A [`list`] of `data.table`s, one for each assay in an
+# #'   `LongTable`.
+# #'
+# #' @keywords internal
 ### FIXME:: Finish this and implement class validity methods for LongTable!
 #.verifyKeyIntegrity <- function(rowData, colData, assays) {
 #    if (!('rowKey' %in% colnames(rowData)) || !is.numeric(rowData$rowID))
@@ -194,7 +195,7 @@ setClassUnion('list_or_LongTable', c('list', 'LongTable'))
 #' @export
 setMethod('show', signature(object='LongTable'), function(object) {
 
-    ## FIXME:: Function too long. Can I refacter to a helper that prints each slot?
+    ## FIXME:: Function too long. Can I refactor to a helper that prints each slot?
 
     # ---- class descriptions
     cat(yellow$bold$italic('< LongTable >', '\n'))
@@ -216,12 +217,12 @@ setMethod('show', signature(object='LongTable'), function(object) {
     # --- rownames
     rows <- nrow(rowData(object))
     rowsString <- paste0('rownames(', rows, '): ')
-    rownames <- rownames(object)
+    rowNames <- rownames(object)
     rownamesString <-
-        if (length(rownames) > 6) {
-            paste0(.collapse(head(rownames, 3)), ' ... ', .collapse(tail(rownames, 3)))
+        if (length(rowNames) > 6) {
+            paste0(.collapse(head(rowNames, 3)), ' ... ', .collapse(tail(rowNames, 3)))
         } else {
-            .collapse(rownames)
+            .collapse(rowNames)
         }
     cat(yellow$bold(rowsString) %+% green(rownamesString), '\n')
 

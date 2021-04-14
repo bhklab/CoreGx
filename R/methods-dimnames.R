@@ -52,5 +52,5 @@ setMethod('rownames', signature(x='LongTable'), function(x) {
 #' @importMethodsFrom Biobase dimnames
 #' @export
 setMethod('dimnames', signature(x='LongTable'), function(x) {
-    return(list(rownames(x), colnames(x)))
+    return(list(x@rowData$.rownames, x@colData$.colnames))
 })
