@@ -27,13 +27,27 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 setMethod('metaConstruct', signature(mapper='LongTableDataMapper'), 
     function(mapper)
 {
+    funContext <- '[CoreGx::`metaConstruct,LongTableDataMapper-method`]'
+    
     DT <- rawdata(mapper)
 
+    rowDataDT <- unique(DT[, unlist(rowDataMap(mapper))])
+    rowIDs <- rowDataMap(mapper)[[1]]
+
+    colDataDT <- unique(DT[, unlist(colDataMap(mapper))])
+    colIDs <- colDataMap(mapper)[[1]]
+
+    metadataL <- lapply(metadataMap(mapper), 
+        function(j, x) as.list(unique(x[, j, with=FALSE])), x=DT)
+
+    assayIDs <- c(rowIDs, colIDs)
+    assayColumns <- lapply(assayMap(mapper), c, assayIDs)
+    assayDtL <- lapply(assayColumns, subset, x=DT, subset=TRUE)
+
+    LongTable(
+        rowData=rowDataDT, rowIDs=rowIDs,
+        colData=colDataDT, colIDs=colIDs,
+        assays=assayDtL,
+        metadata=metadataL
+        )
 })
-
-
-#' 
-#' 
-#' 
-#' 
-#' 
