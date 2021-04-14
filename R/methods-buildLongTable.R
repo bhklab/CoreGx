@@ -202,7 +202,8 @@ setMethod('buildLongTable', signature(from='list'),
     if (any(isDF)) for (i in which(isDF)) from[[i]] <- data.table(from[[i]])
 
     # validate mappings
-    ## TODO:: Ensure there is no case where joining on rowMeta or colMeta gives different results than just ids
+    ## TODO:: Ensure there is no case where joining on rowMeta or colMeta gives 
+    #  different results than just ids
     joinCols <- unique(unlist(c(rowDataCols, colDataCols)))
     dataColNames <- lapply(from, FUN=colnames)
     joinColsIn <- lapply(dataColNames, `%in%`, x=joinCols)

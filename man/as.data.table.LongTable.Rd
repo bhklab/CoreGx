@@ -4,7 +4,7 @@
 \alias{as.data.table.LongTable}
 \title{Coerce a LongTable into a `data.table`}
 \usage{
-\method{as.data.table}{LongTable}(x)
+as.data.table.LongTable(x)
 }
 \arguments{
 \item{x}{[`LongTable`] to coerce to a `data.table`}

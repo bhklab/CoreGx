@@ -25,14 +25,9 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 #' @md
 #' @export
 setMethod('metaConstruct', signature(mapper='LongTableDataMapper'), 
-    function(mapper, groups, subset=TRUE)
+    function(mapper)
 {
-
-    # -- parse data into long format
-    
-
-    # -- 
-    
+    DT <- rawdata(mapper)
 
 })
 
