@@ -75,7 +75,7 @@ setOldClass('long.table', S4Class='LongTable')
 #' @return A [`LongTable`] object containing the data for a treatment response
 #' experiment and configured according to the rowIDs and colIDs arguments.
 #'
-#''@export
+#'@export
 #' @import data.table
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                       metadata=list(), keep.rownames=FALSE) {
@@ -225,7 +225,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
     rowNames <- rownames(object)
     rownamesString <-
         if (length(rowNames) > 6) {
-            paste0(.collapse(head(rowNames, 3)), ' ... ', .collapse(tail(rowNames, 3)))
+            paste0(.collapse(head(rowNames, 2)), ' ... ', .collapse(tail(rowNames, 2)))
         } else {
             .collapse(rowNames)
         }
@@ -274,7 +274,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
     metadataNamesString <-
         if (length(metadataNames) > 6) {
             paste0(.collapse(head(metadataNames, 3), ' ... ', .collapse(tail(metadataNames, 3))))
-        } else if (length(metadataNames) > 1) {
+        } else if (length(metadataNames) >= 1) {
             .collapse(metadataNames)
         } else {
             'none'
