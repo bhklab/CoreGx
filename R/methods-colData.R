@@ -20,8 +20,8 @@
 #' @import data.table
 #' @export
 setMethod('colData', signature(x='LongTable'), function(x, key=FALSE) {
-    return(if (key) x@colData[, -'.colnames'] else
-        x@colData[, -c('.colnames', 'colKey')])
+    return(if (key) copy(x@colData[, -'.colnames']) else
+        copy(x@colData[, -c('.colnames', 'colKey')]))
 })
 
 #' Updates the `colData` slot as long as the ID columns are not changed.

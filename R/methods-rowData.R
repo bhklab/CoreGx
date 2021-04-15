@@ -19,8 +19,8 @@
 #' @import data.table
 #' @export
 setMethod('rowData', signature(x='LongTable'), function(x, key=FALSE, use.names=FALSE) {
-    return(if (key) x@rowData[, -'.rownames'] else
-        x@rowData[, -c('.rownames', 'rowKey')])
+    return(if (key) copy(x@rowData[, -'.rownames']) else
+        copy(x@rowData[, -c('.rownames', 'rowKey')]))
 })
 
 #' Updates the `rowData` slot as long as the ID columns are not changed.
