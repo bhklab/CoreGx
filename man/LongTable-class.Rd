@@ -230,7 +230,7 @@ the keys. We recommend modifying the list returned by
 assays(longTable, withDimnames=TRUE) and the reassigning to the `LongTable`.
 
 \item \code{buildLongTable}: Create a LongTable object from a single data.table or
-data.frame object
+data.frame object.
 
 \item \code{buildLongTable}: Create a LongTable object from a single .csv file
 

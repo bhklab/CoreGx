@@ -22,20 +22,24 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 
 
 #' 
+#'
+#' 
 #' @md
 #' @export
 setMethod('metaConstruct', signature(mapper='LongTableDataMapper'), 
     function(mapper)
 {
-    funContext <- '[CoreGx::`metaConstruct,LongTableDataMapper-method`]'
+    funContext <- paste0('[', .S4MethodContext('metaConstruct', class(mapper)[1]))
     
     DT <- rawdata(mapper)
 
     rowDataDT <- unique(DT[, unlist(rowDataMap(mapper)), with=FALSE])
     rowIDs <- rowDataMap(mapper)[[1]]
+    rowDataDT[, c('rowKey') := .GRP, by=rowIDs]
 
     colDataDT <- unique(DT[, unlist(colDataMap(mapper)), with=FALSE])
     colIDs <- colDataMap(mapper)[[1]]
+    colDataDT[, c('colKey') := .GRP, by=colIDs]
 
     metadataL <- lapply(metadataMap(mapper), 
         function(j, x) as.list(unique(x[, j, with=FALSE])), x=DT)
@@ -43,6 +47,16 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
     assayIDs <- c(rowIDs, colIDs)
     assayColumns <- lapply(assayMap(mapper), FUN=c, assayIDs)
     assayDtL <- lapply(assayColumns, FUN=subset, x=DT, subset=TRUE)
+
+    ## TODO:: make this prettier with pipes once R 4.1 launches
+    for (i in seq_along(assayDtL)) {
+        assayDT <- copy(assayDtL[[i]])
+        assayDT <- merge(assayDT, rowDataDT[, c('rowKey', ..rowIDs)], by=rowIDs)
+        assayDT <- merge(assayDT, colDataDT[, c('colKey', ..colIDs)], by=colIDs)
+        assayDT[, c(rowIDs, colIDs) := NULL]
+        setkeyv(assayDT, c('rowKey', 'colKey'))
+        assayDtL[[i]] <- assayDT
+    }
 
     CoreGx:::LongTable(
         rowData=rowDataDT, rowIDs=rowIDs,

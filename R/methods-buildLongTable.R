@@ -3,7 +3,7 @@
 #' LongTable build method
 #'
 #' @describeIn LongTable Create a LongTable object from a single data.table or
-#'   data.frame object
+#'   data.frame object.
 #'
 #' @param from [`character`] Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.

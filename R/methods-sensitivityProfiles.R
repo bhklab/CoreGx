@@ -13,12 +13,13 @@
 #'
 #' @export
 setMethod(sensitivityProfiles, "CoreSet", function(object) {
-    if (is(sensitivitySlot(object), 'LongTable'))
-        stop(.errorMsg('\n[CoreGx::sensitivityProfiles] No getter has been
-            implemented for this method when the sensitivity slot in a CoreSet
-            is a LongTable. Please define a method using setMethod() for the
-            subclass of CoreSet in your current package!'))
-    return(object@sensitivity$profiles)
+    funContext <- paste0()
+    if (is(sensitivitySlot(object), 'LongTable')) {
+        if (!('profiles' %in% assayNames(sensitivitySlot(object)))) 
+            stop(.errorMsg())
+    } else {
+        return(object@sensitivity$profiles)
+    }
 })
 
 #' sensitivityProfiles<- CoreSet Method

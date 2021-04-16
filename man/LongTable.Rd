@@ -47,7 +47,7 @@ column name to store the rownames in.}
 }
 \value{
 A [`LongTable`] object containing the data for a treatment response
-experiment and configured according to the rowIDs and colIDs arguments.
+  experiment and configured according to the rowIDs and colIDs arguments.
 }
 \description{
 Builds a `LongTable` object from rectangular objects. The

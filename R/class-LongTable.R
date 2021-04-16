@@ -49,33 +49,32 @@ setOldClass('long.table', S4Class='LongTable')
 #' passing a list to the metadata argument.
 #'
 #' @param rowData [`data.table`, `data.frame`, `matrix`] A table like object
-#' coercible to a `data.table` containing the a unique `rowID` column which
-#' is used to key assays, as well as additional row metadata to subset on.
+#'   coercible to a `data.table` containing the a unique `rowID` column which
+#'   is used to key assays, as well as additional row metadata to subset on.
 #' @param rowIDs [`character`, `integer`] A vector specifying
-#' the names or integer indexes of the row data identifier columns. These
-#' columns will be pasted together to make up the row.names of the
-#' `LongTable` object.
+#'   the names or integer indexes of the row data identifier columns. These
+#'   columns will be pasted together to make up the row.names of the
+#'   `LongTable` object.
 #' @param colData [`data.table`, `data.frame`, `matrix`] A table like object
-#' coercible to a `data.table` containing the a unique `colID` column which
-#' is used to key assays, as well as additional column metadata to subset on.
+#'   coercible to a `data.table` containing the a unique `colID` column which
+#'   is used to key assays, as well as additional column metadata to subset on.
 #' @param colIDs [`character`, `integer`] A vector specifying
-#' the names or integer indexes of the col data identifier columns. These
-#' columns will be pasted together to make up the col.names of the
-#' `LongTable` object.
+#'   the names or integer indexes of the col data identifier columns. These
+#'   columns will be pasted together to make up the col.names of the
+#'   `LongTable` object.
 #' @param assays A [`list`] containing one or more objects coercible to a
-#' `data.table`, and keyed by rowID and colID corresponding to the rowID and
-#' colID columns in colData and rowData.
+#'   `data.table`, and keyed by rowID and colID corresponding to the rowID and
+#'   colID columns in colData and rowData.
 #' @param metadata A [`list`] of metadata associated with the `LongTable`
 #'   object being constructed
 #' @param keep.rownames [`logical` or `character`] Logical: whether rownames
-#' should be added as a column if coercing to a `data.table`, default is FALSE.
-#' If TRUE, rownames are added to the column 'rn'. Character: specify a custom
-#' column name to store the rownames in.
+#'   should be added as a column if coercing to a `data.table`, default is FALSE.
+#'   If TRUE, rownames are added to the column 'rn'. Character: specify a custom
+#'   column name to store the rownames in.
 #'
 #' @return A [`LongTable`] object containing the data for a treatment response
-#' experiment and configured according to the rowIDs and colIDs arguments.
+#'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
-#'@export
 #' @import data.table
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                       metadata=list(), keep.rownames=FALSE) {
@@ -110,18 +109,20 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
             stop(.errorMsg(
                  '\nList items are types: ',
                  types, '\nPlease ensure all items in the assays list are ',
-                 'coercable to a data.frame!'), collapse=', ')
+                 'coerceable to a data.frame!'), collapse=', ')
         })
 
     # Create the row and column keys for LongTable internal mappings
-    rowData[, rowKey := .GRP, by=rowIDs]
-    colData[, colKey := .GRP, by=colIDs]
+    rowData[, c('rowKey') := .GRP, by=rowIDs]
+    setkeyv(rowData, 'rowKey')
+    colData[, c('colKey') := .GRP, by=colIDs]
+    setkeyv(colData, 'colKey')
 
     # initialize the internals object to store private metadata for a LongTable
     internals <- new.env()
 
     # capture row interal metadata
-    if (is.numeric(rowIDs) | is.logical(rowIDs)) rowIDs <- colnames(rowData)[rowIDs]
+    if (is.numeric(rowIDs) || is.logical(rowIDs)) rowIDs <- colnames(rowData)[rowIDs]
     if (!all(rowIDs %in% colnames(rowData)))
         stop(.errorMsg('\nRow IDs not in rowData: ',
             setdiff(rowIDs, colnames(rowData)), collapse=', '))
