@@ -124,9 +124,9 @@
 
 \S4method{sensNumber}{CoreSet,matrix}(object) <- value
 
-\S4method{sensitivityInfo}{CoreSet}(object)
+\S4method{sensitivityInfo}{CoreSet}(object, dimension, ...)
 
-\S4method{sensitivityInfo}{CoreSet,data.frame}(object) <- value
+\S4method{sensitivityInfo}{CoreSet,data.frame}(object, dimension, ...) <- value
 
 \S4method{sensitivityMeasures}{CoreSet}(object)
 
@@ -158,6 +158,14 @@ measurements to update the object with.}
 defaults to first assay in the SummarizedExperiment for the given
 mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
 to check which assays are available for a given molecular datatype.}
+
+\item{dimension}{[`character`] Optional name of the dimension to extract,
+either 'cells' or 'drugs'. Only used if the sensitivity slot contains a
+`LongTable` object instead of a `list`.}
+
+\item{...}{Additional arguments to the rowData or colData
+`LongTable` methods. Only used if the sensitivity slot contains a
+`LongTable` object instead of a `list`.}
 }
 \value{
 An object of the CoreSet class
@@ -171,9 +179,7 @@ A \code{list} of unique cell and tissue identifiers to check validity
 
 A copy of the \code{RadioSet} with the updated curation slot
 
-a \code{data.frame} with the experiment info if dimension is excluded,
-  otherwise a `data.table` with annotations for the cells or drugs dimension
-  of the LongTable.
+a [`DataFrame`] with the experiment info
 
 Updated \code{CoreSet}
 
@@ -204,9 +210,9 @@ cellular response to Pharmacological and Radiation therapy are widely
 different, and extension of the cSet class allows the
 packages to apply the correct model for the given data.
 
-Generic for sensitivityInfo method
+Get the senstivity information DataFrame from a CoreSet object
 
-A generic for the sensitivityInfo replacement method
+Set the sensitivityInfo data.frame in a CoreSet object
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -285,7 +291,8 @@ experiments
 
 \item \code{sensitivityInfo}: Return the drug dose sensitivity experiment info
 
-\item \code{sensitivityInfo<-}: Update the sensitivity experiment info
+\item \code{sensitivityInfo<-}: Update the metadata for the treatment response
+experiments in the sensitivity slot.
 
 \item \code{sensitivityMeasures}: Returns the available sensitivity profile
 summaries, for example, whether there are IC50 values available
@@ -358,10 +365,11 @@ curation(clevelandSmall_cSet)
 data(clevelandSmall_cSet)
 curation(clevelandSmall_cSet) <- curation(clevelandSmall_cSet)
 
-data(clevelandSmall_cSet)
-sensitivityInfo(clevelandSmall_cSet)
+data(CCLEsmall)
+sensInf <- sensitivityInfo(CCLEsmall)
 
-sensitivityInfo(clevelandSmall_cSet) <- sensitivityInfo(clevelandSmall_cSet)
+data(CCLEsmall)
+sensitivityInfo(CCLEsmall) <- sensitivityInfo(CCLEsmall)
 
 sensitivityMeasures(clevelandSmall_cSet)
 
