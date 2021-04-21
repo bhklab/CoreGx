@@ -83,7 +83,7 @@ setMethod('assay',
 
 #' Add or replace an assay in a LongTable by name or index
 #'
-#' @describeIn LongTable Add or replace an assay in a LongTable by name. Currently
+#' @description Add or replace an assay in a LongTable by name. Currently
 #'    this function only works when the assay has all columns in row and column
 #'    data tables (i.e., when assays is retured withDimnames=TRUE). This will
 #'    be fixed in future updates.
@@ -92,24 +92,34 @@ setMethod('assay',
 #' assay(merckLongTable, 'viability') <- assay(merckLongTable, 'viability', withDimnames=TRUE)
 #' assay(merckLongTable, 'viability') <- merckLongTable$viability
 #'
-#' @param x A [`LongTable`] to update.
-#' @param i [`integer`] or [`character`] vector containing the index or name
+#' @param x A `LongTable` to update.
+#' @param i `integer` or `character` vector containing the index or name
 #'   of the assay to update.
-#' @param value A [`data.frame`] or [`data.table`] to update the assay data
+#' @param join `logical` If `TRUE` this function will try to left inner join
+#'   the `value` data.frame to the existing assay `i`. If `i` is not an
+#'   existing assay in `x`, this parameter will be ignored with a warning.
+#' @param value 
+#' A `data.frame` or `data.table` to update the assay data
 #'   with. This must at minumum contain the row and column data identifier
 #'   columns to allow correctly mapping the assay keys. We recommend modifying
 #'   the results returned by assay(longTable, 'assayName', withDimnames=TRUE).
 #'   For convenience, both the `[[` and `$` LongTable accessors return an assay
-#'   with the dimnames and metadata already attached.
+#'   with the dimnames and metadata already attached. In the case where your
+#'   assay has only some of the row or column indentifiers and the an assay, `i`,
+#'   already exists in `x`, then try join=TRUE to attempt to join with existing
+#'   data.
 #'
-#' @return [`LongTable`] With updated assays slot.
+#' @return `LongTable` With updated assays slot.
 #'
+#' @describeIn LongTable
+#'
+#' @md
 #' @importMethodsFrom SummarizedExperiment assay<-
 #' @import data.table
 #' @export
-setReplaceMethod('assay',
-                 signature(x='LongTable', i='character'),
-                 function(x, i, value) {
+setReplaceMethod('assay', signature(x='LongTable', i='character'),
+    function(x, i, join=FALSE, value) 
+{
 
     if (!is.data.frame(value)) stop(.errorMsg('\n[CoreGx::assay<-] Only a ',
         'data.frame or data.table can be assiged to the assay slot!'))
@@ -137,11 +147,22 @@ setReplaceMethod('assay',
     # check that all the id columns are present
     idCols <- c(rowIDCols, colIDCols)
     hasIDCols <- idCols %in% colnames(value)
-    if (!all(hasIDCols))
+    if (!all(hasIDCols)) {
+        if (join && !missing(i))
+            tryCatch({
+                value <- merge.data.table(
+                    assay(x, i, withDimnames=TRUE, metadata=FALSE), 
+                    value, 
+                    on=intersect(idCols, colnames(value)), 
+                    all.x=TRUE)
+            }, error=function(e) stop(.errorMsg('\n[CoreGx::`assay<-`] ',
+                'Join failed with error: ', e)))
+    } else {
         stop(.errorMsg('\n[CoreGx::assay<-] Missing required id columns from',
             'value: ', .collapse(idCols[!hasIDCols]), '. Please ensure you modify assay ',
             'as returned by assay(longTable, "assayName", withDimnames=TRUE, ',
             'metadata=TRUE).', collapse=', '))
+    }
 
     if (length(whichAssay) > 0) {
         assayData[[i]] <- value

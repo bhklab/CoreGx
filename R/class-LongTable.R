@@ -3,25 +3,31 @@
 #' @description Define a private constructor method to be used to build a
 #'   `LongTable` object.
 #'
-#' @slot rowData A [`data.table`] containing the metadata associated with the
+#' @section Slots:
+#' - *rowData*: A [`data.table`] containing the metadata associated with the
 #'   row dimension of a `LongTable`.
-#' @slot colData A [`data.table`] containing the metadata associated with the
+#' - *colData*: A [`data.table`] containing the metadata associated with the
 #'   column dimension of a `LongTable`.
-#' @slot assays A [`list`] of [`data.table`s], one for each assay in a
+#' - *assays*: A [`list`] of [`data.table`s], one for each assay in a
 #'   `LongTable`.
-#' @slot metadata An optional [`list`] of additional metadata for a `LongTable`
+#' - *metadata*: An optional `list` of additional metadata for a `LongTable`
 #'   which doesn't map to one of the dimensions.
-#' @slot .intern An [`enivornment`] that holds internal structural metadata
+#' - *.intern*: An `environment` that holds internal structural metadata
 #'   about a LongTable object, such as which columns are required to key
 #'   the object. An environment has been used to allow locking items, which
 #'   can prevent accidental modification of a property required for the class
 #'   to work.
 #'
-#' @return [`LongTable`] object containing the assay data from a treatment
+#' @return `LongTable` object containing the assay data from a treatment
 #'   response experiment
 #'
+#' @inherit rowIDs.Rd
+#'
+#' @md
 #' @import data.table
 #' @keywords internal
+#' @rdname LongTable-class
+#' @aliases .LongTable
 #' @exportClass LongTable
 .LongTable <- setClass("LongTable",
                        slots=list(rowData='data.table',
@@ -33,7 +39,8 @@
 setOldClass('long.table', S4Class='LongTable')
 
 #' @title LongTable constructor method
-#' @name LongTable
+#'
+#' @rdname LongTable
 #'
 #' @description Builds a `LongTable` object from rectangular objects. The
 #' `rowData` argument should contain row level metadata, while the `colData`
@@ -76,6 +83,7 @@ setOldClass('long.table', S4Class='LongTable')
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
 #' @import data.table
+#' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                       metadata=list(), keep.rownames=FALSE) {
 
@@ -291,9 +299,6 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #' @examples
 #' rowIDs(merckLongTable)
 #'
-#' @describeIn LongTable Get the names of the rowData columns required to
-#' uniquely identify each row.
-#'
 #' @param object A [`LongTable`] to get the rowData id columns for.
 #' @param data [`logical`] Should the rowData for the id columns be returned
 #' instead of the column names? Default is FALSE.
@@ -301,6 +306,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #'
 #' @return A [`character`] vector of rowData column names if data is FALSE,
 #' otherwise a [`data.table`] with the data from the rowData id columns.
+#'
+#' @rdname LongTable-class
+#' @family LongTable-class
+#' @family LongTable-accessors
 #'
 #' @import data.table
 #' @export

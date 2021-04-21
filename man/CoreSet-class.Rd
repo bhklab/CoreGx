@@ -388,3 +388,6 @@ data(clevelandSmall_cSet)
 sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
 
 }
+\author{
+Christopher Eeels
+}

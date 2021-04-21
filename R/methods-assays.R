@@ -95,8 +95,8 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
     ## TODO:: Should we support passing colKey and rowKey if the metadata columns are missing?
     ## TODO:: Could then use them to join with the rowData and colData?
     # Need to drop the keys because buildLongTable redoes indexing
-    .drop.in <- function(x, y) x[!(x %in% y)]
-    assayCols <- lapply(assayCols, .drop.in, y=c('colKey', 'rowKey'))
+    .drop_in <- function(x, y) x[!(x %in% y)]
+    assayCols <- lapply(assayCols, .drop_in, y=c('colKey', 'rowKey'))
 
     # get the rowData and colData column mappings
     rowDataCols <- if (length(rowMetaCols) > 0)

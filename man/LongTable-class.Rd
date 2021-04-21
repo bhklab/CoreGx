@@ -45,7 +45,7 @@
 
 \S4method{assay}{LongTable,ANY}(x, i, withDimnames = FALSE, metadata = withDimnames, key = !withDimnames)
 
-\S4method{assay}{LongTable,character}(x, i) <- value
+\S4method{assay}{LongTable,character}(x, i, join = FALSE) <- value
 
 \S4method{assayNames}{LongTable}(x)
 
@@ -84,7 +84,7 @@ instead of the column names? Default is FALSE.}
 \item{key}{[`logical`] Should the rowKey column also be returned? Defaults
 to FALSE.}
 
-\item{i}{[`integer`] or [`character`] vector containing the index or name
+\item{i}{\code{integer} or \code{character} vector containing the index or name
 of the assay to update.}
 
 \item{x}{A [`LongTable`] object to modify.}
@@ -98,6 +98,10 @@ reconstructing a new LongTable.}
 
 \item{keys}{[`logical`] Should the row and column keys also be returned?
 Defaults to !withDimnames.}
+
+\item{join}{\code{logical} If \code{TRUE} this function will try to left inner join
+the \code{value} data.frame to the existing assay \code{i}. If \code{i} is not an
+existing assay in \code{x}, this parameter will be ignored with a warning.}
 
 \item{value}{A [`data.table`] or [`data.frame`] to update}
 
@@ -127,8 +131,8 @@ the key argument to use.names from the rowData generic. It doesn't do
 anything at this time and can be ignored.}
 }
 \value{
-[`LongTable`] object containing the assay data from a treatment
-  response experiment
+\code{LongTable} object containing the assay data from a treatment
+response experiment
 
 A [`character`] vector of rowData column names if data is FALSE,
 otherwise a [`data.table`] with the data from the rowData id columns.
@@ -146,7 +150,7 @@ A [`list`] of `character` vectors containing the value column names for
 each assay if i is missing, otherwise a `character` vector of value column
 names for the selected assay.
 
-[`LongTable`] With updated assays slot.
+\code{LongTable} With updated assays slot.
 
 [`character`] Names of the assays contained in the `LongTable`.
 
@@ -184,18 +188,20 @@ A copy of the [`LongTable`] object with the `rowData`
 }
 \description{
 Define a private constructor method to be used to build a
-  `LongTable` object.
+\code{LongTable} object.
 
 Select an assay from within a LongTable object.
+
+Add or replace an assay in a LongTable by name. Currently
+this function only works when the assay has all columns in row and column
+data tables (i.e., when assays is retured withDimnames=TRUE). This will
+be fixed in future updates.
 
 This is used as an alternative to R attributes for storing structural
 metadata of S4 objects.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{rowIDs}: Get the names of the rowData columns required to
-uniquely identify each row.
-
 \item \code{rowMeta}: Get the names of the non-id columns from rowData.
 
 \item \code{colIDs}: Get the names of the columns in colData required to
@@ -214,10 +220,7 @@ and aggregate operations easiers.
 \item \code{assay}: Retrieve an assay `data.table` object from the
 `assays` slot of a `LongTable` object.
 
-\item \code{assay<-}: Add or replace an assay in a LongTable by name. Currently
-this function only works when the assay has all columns in row and column
-data tables (i.e., when assays is retured withDimnames=TRUE). This will
-be fixed in future updates.
+\item \code{assay<-}: 
 
 \item \code{assayNames}: Return the names of the assays contained in a
 `LongTable`
@@ -268,25 +271,22 @@ value.
 
 \section{Slots}{
 
-\describe{
-\item{\code{rowData}}{A [`data.table`] containing the metadata associated with the
-row dimension of a `LongTable`.}
-
-\item{\code{colData}}{A [`data.table`] containing the metadata associated with the
-column dimension of a `LongTable`.}
-
-\item{\code{assays}}{A [`list`] of [`data.table`s], one for each assay in a
-`LongTable`.}
-
-\item{\code{metadata}}{An optional [`list`] of additional metadata for a `LongTable`
-which doesn't map to one of the dimensions.}
-
-\item{\code{.intern}}{An [`enivornment`] that holds internal structural metadata
+\itemize{
+\item \emph{rowData}: A \code{\link{data.table}} containing the metadata associated with the
+row dimension of a \code{LongTable}.
+\item \emph{colData}: A \code{\link{data.table}} containing the metadata associated with the
+column dimension of a \code{LongTable}.
+\item \emph{assays}: A \code{\link{list}} of \link[=`data.table`s]{\code{data.table}s}, one for each assay in a
+\code{LongTable}.
+\item \emph{metadata}: An optional \code{list} of additional metadata for a \code{LongTable}
+which doesn't map to one of the dimensions.
+\item \emph{.intern}: An \code{environment} that holds internal structural metadata
 about a LongTable object, such as which columns are required to key
 the object. An environment has been used to allow locking items, which
 can prevent accidental modification of a property required for the class
-to work.}
-}}
+to work.
+}
+}
 
 \examples{
 rowIDs(merckLongTable)
@@ -345,4 +345,6 @@ rowData(merckLongTable)
 rowData(merckLongTable) <- rowData(merckLongTable)
 
 }
+\concept{LongTable-accessors}
+\concept{LongTable-class}
 \keyword{internal}

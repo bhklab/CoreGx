@@ -113,8 +113,11 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 #'     `LongTable` methods. Only used if the sensitivity slot contains a
 #'     `LongTable` object instead of a `list`.
 #' @param value A \code{data.frame} with the new sensitivity annotations
-#'
+#' 
+#' 
 #' @return Updated \code{CoreSet}
+#'
+#' @author Christopher Eeels
 #'
 #' @import data.table
 #' @export
@@ -125,16 +128,13 @@ setReplaceMethod("sensitivityInfo",
     if (is(sensitivitySlot(object), 'LongTable')) {
         # coerce to data.table
         if (!is.data.table(value)) value <- data.table(value, keep.rownames=TRUE)
-        value[, drug_cell_rep := seq_len(.N), by=.(cellid, drugid)]
         if (missing(dimension)) {
             valueCols <- colnames(value)
             # get existing column names
             rowDataCols <- colnames(rowData(object@sensitivity))
             colDataCols <- colnames(colData(object@sensitivity))
-            assayMetaCols <- colnames(assay(object@sensitivity,
-                'experiment_metadata', withDimnames=TRUE, key=FALSE))
             # drop any value columns that don't already exist
-            hasValueCols <- valueCols %in% c(rowDataCols, colDataCols, assayMetaCols)
+            hasValueCols <- valueCols %in% c(rowDataCols, colDataCols)
             if (!all(hasValueCols))
                 warning(.warnMsg('\n[CoreGx::sensitivityInfo<-] Dropping ',
                     'columns ', .collapse(valueCols[!hasValueCols]), ' from ',
@@ -143,20 +143,15 @@ setReplaceMethod("sensitivityInfo",
                     'more fine grained updates please use the dimension ',
                     'argument.',  collapse=', '))
             # update the object
-            message("Doing rowData")
             rowData(object@sensitivity, ...) <-
                 unique(value[, .SD, .SDcols=valueCols %in% rowDataCols])
-            message("Doing colData")
             colData(object@sensitivity, ...) <-
                 unique(value[, .SD, .SDcols=valueCols %in% colDataCols])
-            message('Doing assay_metadata')
-            assay(object@sensitivity, 'experiment_metadata') <-
-                unique(value[, .SD, .SDcols=valueCols %in% assayMetaCols])
         } else {
             switch(dimension,
                 drugs={ rowData(object@sensitivity, ...) <- value },
                 cells={ colData(object@sensitivity, ...) <- value },
-                experiments={ assay(object@sensitivity, 'experiment_metadata') <- value },
+                experiments={ assay(object@sensitivity, 'assay_metadata') <- value },
                 stop(.errorMsg('\n[CoreGx::sensitivityInfo<-] Invalid argument to',
                     'dimension parameter. Please choose one of "cells" or "drugsA"')))
         }
