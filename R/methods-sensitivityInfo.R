@@ -53,33 +53,45 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 #' @param longTable [`LongTable`]
 #'
 #' @keywords internal
+#' @importFrom MatrixGenerics colAlls
+#' @importFrom data.table setkeyv merge.data.table `:=` setDF
 #' @noRd
 .rebuildInfo <- function(longTable) {
 
-    # Extract the information needed to reconstruct the sensitivityRaw array
-    if ('assay_metadata' %in% assayNames(longTable)) {
-        meta <- assay(longTable, 'assay_metadata')
-    } else {
-        meta <- assays(longTable)[[1]][, .(rowKey, colKey)]
-    }
-    setkeyv(meta, c('rowKey', 'colKey'))
-    rowData <- rowData(longTable, key=TRUE)
-    rowData[, .(drug1id, drug2id, cellid)]
-    setkeyv(rowData, 'rowKey')
-    colData <- colData(longTable, key=TRUE)
-    setkeyv(colData, 'colKey')
+    # Extract the information needed to reconstruct the sensitivityInfo data.frame
+    assayIndexDT <- assay(longTable, 1, key=TRUE)[, .(rowKey, colKey)]
+    setkeyv(assayIndexDT, c('rowKey', 'colKey'))
+    rowDataDT <- rowData(longTable, key=TRUE)
+    setkeyv(rowDataDT, 'rowKey')
+    colDataDT <- colData(longTable, key=TRUE)
+    setkeyv(colDataDT, 'colKey')
+
+    rowIDcols <- rowIDs(longTable)[!grepl('dose', rowIDs(longTable))]
+    colIDcols <- colIDs(longTable)
+    rownameCols <- c(rowIDcols, colIDcols)
 
     # join the tables into the original data
-    info <- merge.data.table(meta, rowData, all=TRUE)
-    setkeyv(info, 'colKey')
-    info <- merge.data.table(info, colData, all=TRUE)[, -c('rowKey', 'colKey')]
-    rownames <- info$rn
-    info[, rn := NULL]
+    infoDT <- merge.data.table(assayIndexDT, rowDataDT, all=TRUE)
+    setkeyv(infoDT, 'colKey')
+    infoDT <- merge.data.table(infoDT, colDataDT, all=TRUE)[, -c('rowKey', 'colKey')]
 
-    # convert to data.frame by reference, assigning rownames
-    setDF(info, rownames=rownames)
+    # determine which columns map 1:1 with new identifiers and subset to those
+    infoDT_first <- infoDT[, head(.SD, 1), by=rownameCols]
+    infoDT_last <- infoDT[, tail(.SD, 1), by=rownameCols]
+    keepCols <- names(which(apply(infoDT_first == infoDT_last, MARGIN=2, 
+        FUN=all)))
+    infoDT_sub <- unique(infoDT[, ..keepCols])
 
-    return(info)
+    # rebuld the rownames
+    .paste_ <- function(x, y) paste(x, y, sep='_')
+    .paste_colon <- function(x, y) paste(x, y, sep=':')
+    infoDT_sub[, drugid := Reduce(.paste_colon, mget(..rowIDcols))]
+    infoDT_sub[, cellid := Reduce(.paste_colon, mget(..colIDcols))]
+    infoDT_sub[, exp_id := Reduce(.paste_, .(drugid, cellid))]
+
+    # convert to data.frame
+    setDF(infoDT_sub, rownames=infoDT_sub$exp_id)
+    return(infoDT_sub)
 }
 
 #' sensitivityInfo<- setter
