@@ -33,11 +33,16 @@ setMethod('rowData', signature(x='LongTable'), function(x, key=FALSE, use.names=
 #'   value.
 #'
 #' @param x A [`LongTable`] object to modify.
-#' @param value A [`data.table`] or [`data.frame`] to update
+# ' @param join A `logical` vector. If `TRUE` and not all existing rowIDs are
+# '   in the  `value` object, the function will attempt to a left join with
+# '   the existing `rowData` in `x`.
+#' @param value A [`data.table`] or [`data.frame`] to update the `rowData` of
+#'   `x` with.
 #'
 #' @return A copy of the [`LongTable`] object with the `rowData`
 #'   slot updated.
 #'
+#' @md
 #' @importFrom crayon cyan magenta
 #' @importFrom SummarizedExperiment `rowData<-`
 #' @import data.table
@@ -70,18 +75,17 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
     #sharedMetadataCols <- intersect(metadataCols, colnames(value))
 
     # error if all the rowID columns are not present in the new rowData
-    equalRowIDs <- sharedRowIDCols %in% rowIDCols
-    if (!all(equalRowIDs)) stop(.errorMsg('\n[CoreGx::rowData<-] The ID columns ',
-        sharedIDCols[!equalRowIDs], 'are not present in value. Currently ',
-        'this function only supports updates with the same rowID columns as',
-        ' the current rowData!', collapse=', '))
+    equalRowIDs <- rowIDCols %in% sharedRowIDCols
+    if (!all(equalRowIDs)) warning(.warnMsg('\n[CoreGx::rowData<-] The ID columns ',
+        rowIDCols[!equalRowIDs], 'are not present in value. The function ',
+        'will attempt to join with existing rowIDs, but this may fail!', 
+        collapse=', '))
 
     rowIDs <- rowIDs(x, data=TRUE, key=TRUE)
 
-    rowData <- rowIDs[value, on=sharedRowIDCols]
-    .pasteColons <- function(...) paste(..., collapse=':')
-    rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))), .SDcols=sharedRowIDCols]
+    rowData <- rowIDs[unique(value), on=.NATURAL]
     setkeyv(rowData, 'rowKey')
+    rowData[, .rownames := paste0(mget(..rowIDCols), collapse=':')]
 
     x@rowData <- rowData
     x

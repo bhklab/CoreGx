@@ -87,7 +87,7 @@ to FALSE.}
 \item{i}{\code{integer} or \code{character} vector containing the index or name
 of the assay to update.}
 
-\item{x}{A [`LongTable`] object to modify.}
+\item{x}{A \code{\link{LongTable}} object to modify.}
 
 \item{withDimnames}{[`logical`] Should the returned assays be joined to
 the row and column identifiers (i.e., the pseudo dimnames of the object).}
@@ -103,7 +103,8 @@ Defaults to !withDimnames.}
 the \code{value} data.frame to the existing assay \code{i}. If \code{i} is not an
 existing assay in \code{x}, this parameter will be ignored with a warning.}
 
-\item{value}{A [`data.table`] or [`data.frame`] to update}
+\item{value}{A \code{\link{data.table}} or \code{\link{data.frame}} to update the \code{rowData} of
+\code{x} with.}
 
 \item{from}{[`character`] Path to the .csv file containing the data and
 metadata from which to build the `LongTable`.}
@@ -183,8 +184,8 @@ value of x if length(x) == 1 else named list of values for all
 
 A [`data.table`] containing rowID, row identifiers, and row metadata.
 
-A copy of the [`LongTable`] object with the `rowData`
-  slot updated.
+A copy of the \code{\link{LongTable}} object with the \code{rowData}
+slot updated.
 }
 \description{
 Define a private constructor method to be used to build a
@@ -264,7 +265,7 @@ LongTable object. This is mostly for developmer use.
 
 \item \code{rowData}: Get the row level annotations for a `LongTable` object.
 
-\item \code{rowData<-}: Update the row annotations for a `LongTable` object.
+\item \code{rowData<-}: Update the row annotations for a \code{LongTable} object.
 Currently requires that all columns in rowIDs(longTable) be present in
 value.
 }}

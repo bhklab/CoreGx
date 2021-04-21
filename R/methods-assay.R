@@ -133,11 +133,6 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
 
     if (!is.data.table(value)) value <- data.table(value)
 
-    #if (!all(c('colKey', 'rowKey') %in% colnames(value)))
-    #    stop(.errorMsg('\n[CoreGx::assay<-] The identifier columns, colKey and ',
-    #        'rowKey, are missing from value. Please ensure you fetch your assay ',
-    #        'using assay(longTable, "assayName", key=TRUE)'))
-
     # extract the row and column values
     rowIDCols <- rowIDs(x, key=FALSE)
     colIDCols <- colIDs(x, key=FALSE)

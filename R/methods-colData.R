@@ -62,34 +62,14 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
             ' value, this function will deal with mapping the colKey',
             ' automatically.'))
     }
+    colIDcols <- colIDs(x)
 
-    # assemble information to select proper update method
-    colIDCols <- colIDs(x)
-    sharedColIDCols <- intersect(colIDCols, colnames(value))
+    existingColDataDT <- colData(x, key=TRUE)
+    colDataDT <- unique(value)[existingColDataDT, on=.NATURAL]
 
-    ## TODO:: Can I remove this?
-    #metadataCols <- setdiff(sharedColIDCols, colnames(colData(x)))
-    #sharedMetadataCols <- intersect(metadataCols, colnames(value))
-
-    ## FIXME:: Do I still want to throw this error?
-    ## TODO:: Add parameter that allows modification of colID cols which errors if they change when FALSE
-
-    # error if all the colID columns are not present in the new colData
-    equalColIDs <- sharedColIDCols %in% colIDCols
-    if (!all(equalColIDs)) stop(.errorMsg('\n[CoreGx::colData<-] The ID ',
-        ' columns ', sharedColIDCols[!equalColIDs], 'are not present in value. ',
-        'Currently this function only supports updates with the same colID ',
-        'columns as the current colData!', collapse=', '))
-
-    colIDs <- colIDs(x, data=TRUE, key=TRUE)
-
-    colData <- colIDs[value, on=sharedColIDCols]
-
-    ## TODO:: Refactor .pasteColons into utilities.R or make a function to update .colnames
-    .pasteColons <- function(...) paste(..., collapse=':')
-    colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))), .SDcols=sharedColIDCols]
     setkeyv(colData, 'colKey')
+    colDataDT[, .colnames := paste(mget(..colIDcols, collapse=':'))]
 
-    x@colData <- colData
+    x@colData <- colDataDT
     x
 })
