@@ -40,9 +40,7 @@ Accessing and modifying information in \code{CoreSet}
 Documentation for the various setters and getters which allow manipulation
 of data in the slots of a \code{CoreSet} object.
 
-\itemize{
-\item annotation: getter method for annotation slot.
-}
+annotation: getter method for annotation slot.
 
 annotation<-: setter method for the annotation slot.
 \itemize{

@@ -2,12 +2,6 @@
 # Utilty functions for message, warnings, errors and cat
 # ------------------------------------------------------
 
-#' @name utils-messages
-#'
-#'
-#' 
-NULL
-
 #' @title .formatMessage
 #'
 #' @description Format one or more strings to fit nicely displayed in the
@@ -29,13 +23,64 @@ NULL
 #' @title .message
 #'
 #' @description Alternative to message which respects the local package
-#' settings for verbosity in `options()`.
+#' settings for verbosity in `options()`. The message is displayed if either
+#' the general R option 'verbose' is TRUE, or if '<packageName()>.verbose'
+#' is TRUE.
+#'
+#' @details
+#' Defaults for package verbosity are determined in zzz.R via the .onAttach
+#' function. When loading the package, if the session is interactive the
+#' default verbosity is TRUE, otherwise it is FALSE.
 #'
 #' @md
+#' @importFrom crayon blue
 #' @keywords internal
 #' @export
 #' @noRd
 .message <- function(...) {
-    paste0(strwrap(paste0(..., collapse=collapse)), collapse='\n')
+    optionName <- paste0(packageName(), '.verbose')
+    optionIsTRUE <- !is.null(getOption(optionName)) && getOption(optionName)
+    verboseIsTRUE <- getOption('verbose')
+    if (optionIsTRUE || verboseIsTRUE)
+        message(blue$bold(.formatMessage(...)))
 }
 
+#' @title .warning
+#'
+#' @description Alternative to message which respects the local package
+#' settings for verbosity in `options()`. The message is displayed if either
+#' the general R option 'verbose' is TRUE, or if '<packageName()>.verbose'
+#' is TRUE.
+#'
+#' @details
+#' Defaults for package verbosity are determined in zzz.R via the .onAttach
+#' function. When loading the package, if the session is interactive the
+#' default verbosity is TRUE, otherwise it is FALSE.
+#'
+#' @md
+#' @importFrom crayon cyan
+#' @keywords internal
+#' @export
+#' @noRd
+.warning <- function(...) {
+    return(warning(cyan$bold(.formatMessage(...)), call.=FALSE))
+}
+
+#' @title .error
+#'
+#' @description Alternative to error which formats the error to fit the 
+#' console and prints it in magenta.
+#'
+#' @details
+#' Defaults for package verbosity are determined in zzz.R via the .onAttach
+#' function. When loading the package, if the session is interactive the
+#' default verbosity is TRUE, otherwise it is FALSE.
+#'
+#' @md
+#' @importFrom crayon magenta
+#' @keywords internal
+#' @export
+#' @noRd
+.error <- function(...) {
+    return(stop(magenta$bold(.formatMessage(...)), call.=FALSE))
+}

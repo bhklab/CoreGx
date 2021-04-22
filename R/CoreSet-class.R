@@ -24,12 +24,12 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' packages to apply the correct model for the given data.
 #' 
 #' @section Slots:
-#' - annotation: A `list` of annotation data about the `r .local_class`,
+#' - annotation: A `list` of annotation data about the ``r .local_class``,
 #'   including the `$name` and the session information for how the object
 #'   was created, detailing the exact versions of R and all the packages used.
 #' - molecularProfiles: A `list` or `MultiAssayExperiment` containing 
 #    a set of `SummarizedExperiment`s with molecular profile data for a given
-#'   `r .local_class` object.
+#'   ``r .local_class`` object.
 #' - cell: A `data.frame` containg the annotations for all the cell 
 #'   lines profiled in the data set, across all molecular data types and
 #'   treatment response experiments.
@@ -44,7 +44,7 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #'   being deprecated.
 #' - curation: `list` containing mappings for
 #'   `cell`, `tissue` names used in the data set to universal 
-#'   identifiers used between different CoreSet objects
+#'   identifiers used between different ``r .local_class`` objects
 #' - datasetType: `character` string of 'sensitivity', 
 #'   'perturbation', or both detailing what type of data can be found in the 
 #'   CoreSet, for proper processing of the data
