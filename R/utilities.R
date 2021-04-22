@@ -1042,6 +1042,12 @@
 #' @noRd
 .warnMsg <- function(..., collapse=', ') cyan$bold(paste0(..., collapse=collapse))
 
+#'
+#'
+#'
+#'
+#'
+
 #' Get the types of all items in a list
 #'
 #' @examples

@@ -6,11 +6,17 @@
 \alias{annotation}
 \alias{annotation<-,CoreSet,list-method}
 \alias{annotation<-}
+\alias{cellInfo,CoreSet-method}
+\alias{cellInfo<-,CoreSet,data.frame-method}
 \title{Accessing and modifying information in \code{CoreSet}}
 \usage{
 \S4method{annotation}{CoreSet}(object)
 
 \S4method{annotation}{CoreSet,list}(object) <- value
+
+\S4method{cellInfo}{CoreSet}(object)
+
+\S4method{cellInfo}{CoreSet,data.frame}(object) <- value
 }
 \arguments{
 \item{object}{A \code{CoreSet} object.}
@@ -38,12 +44,18 @@ of data in the slots of a \code{CoreSet} object.
 \item annotation: getter method for annotation slot.
 }
 
+annotation<-: setter method for the annotation slot.
 \itemize{
-\item annotation<-: setter method for the annotation slot.
+\item parameters:
 \itemize{
 \item value: a \code{list} of annotations to update the \code{CoreSet} with.
 }
 }
+
+
+
+cellInfo<-: assign updated cell-line annotations to the `r .local_class` object
+- parameters:
 }
 \seealso{
 \code{\linkS4class{CoreSet}}

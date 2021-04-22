@@ -1,8 +1,16 @@
+#' @include CoreSet-class.R class-LongTable.R
+NULL
+
 #' @importFrom MultiAssayExperiment MultiAssayExperiment
 setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 
-#' A Superclass to Contain Data for Genetic Profiling and Viability Screens of Cancer Cell Lines
+.local_class <- 'CoreSet'
+
+#' @title
+#' CoreSet - generic data container for molecular profiles and treatment 
+#' response data
 #' 
+#' @details  
 #' The CoreSet (CSet) class was developed as a superclass for pSets in the 
 #' PharmacoGx and RadioGx packages to contain the data generated in screens 
 #' of cancer cell lines for their genetic profile and sensitivities to therapy
@@ -15,35 +23,37 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' different, and extension of the cSet class allows the
 #' packages to apply the correct model for the given data.
 #' 
-#' @slot annotation A \code{list} of annotation data about the CoreSet,
-#'    including the \code{$name} and the session information for how the object
-#'    was created, detailing the exact versions of R and all the packages used
-#' @slot molecularProfiles A \code{list} containing \code{SummarizedExperiment}s 
-#'   type object for holding data for RNA, DNA, SNP and Copy Number Variation 
-#'   measurements respectively, with associated \code{rowData} and \code{colData} 
-#'   containing the row and column metadata
-#' @slot cell A \code{data.frame} containg the annotations for all the cell 
-#'   lines profiled in the data set, across all data types
-#' @slot sensitivity A \code{list} containing all the data for the sensitivity 
-#'   experiments, including \code{$info}, a \code{data.frame} containing the 
-#'   experimental info,\code{$raw} a 3D \code{array} containing raw data, 
-#'   \code{$profiles}, a \code{data.frame} containing sensitivity profiles 
-#'   statistics, and \code{$n}, a \code{data.frame} detailing the number of 
+#' @section Slots:
+#' - annotation: A `list` of annotation data about the `r .local_class`,
+#'   including the `$name` and the session information for how the object
+#'   was created, detailing the exact versions of R and all the packages used.
+#' - molecularProfiles: A `list` or `MultiAssayExperiment` containing 
+#    a set of `SummarizedExperiment`s with molecular profile data for a given
+#'   `r .local_class` object.
+#' - cell: A `data.frame` containg the annotations for all the cell 
+#'   lines profiled in the data set, across all molecular data types and
+#'   treatment response experiments.
+#' - sensitivity: A `list` or `LongTable` containing all the data for the 
+#'   sensitivity experiments, including `$info`, a `data.frame` containing the 
+#'   experimental info, `$raw` a 3D `array` containing raw data,
+#'   `$profiles`, a `data.frame` containing sensitivity profiles 
+#'   statistics, and `$n`, a `data.frame` detailing the number of 
 #'   experiments for each cell-drug/radiationInfo pair
-#' @slot perturbation A \code{list} containting \code{$n}, a \code{data.frame} 
-#'   summarizing the available perturbation data,
-#' @slot curation A \code{list} containing mappings for
-#'   \code{cell}, \code{tissue} names  used in the data set to universal 
+#' - perturbation: `list` containing `$n`, a `data.frame` 
+#'   summarizing the available perturbation data. This slot is currently
+#'   being deprecated.
+#' - curation: `list` containing mappings for
+#'   `cell`, `tissue` names used in the data set to universal 
 #'   identifiers used between different CoreSet objects
-#' @slot datasetType A \code{character} string of 'sensitivity', 
+#' - datasetType: `character` string of 'sensitivity', 
 #'   'perturbation', or both detailing what type of data can be found in the 
 #'   CoreSet, for proper processing of the data
-#' 
-#' @return An object of the CoreSet class
-#' 
+#'
+#' @seealso [`CoreSet-accessors`]
+#'
+#' @md
+#' @aliases CoreSet-class
 #' @export CoreSet
-#' @include class-LongTable.R
-#' @export
 .CoreSet <- setClass("CoreSet",
     slots = list(sensitivity="list_or_LongTable",
                  annotation = "list",
