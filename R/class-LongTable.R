@@ -194,6 +194,9 @@ setClassUnion('list_or_LongTable', c('list', 'LongTable'))
 
 # ---- LongTable Class Methods
 
+#' @include allGenerics.R
+NULL
+
 ## NOTE:: Issues printing are caused by ggplot::%+% over riding crayon::%+%
 #' Show method for the LongTable class
 #'

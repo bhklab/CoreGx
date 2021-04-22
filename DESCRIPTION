@@ -55,11 +55,12 @@ Suggests:
 License: GPL-3
 RoxygenNote: 7.1.1.9001
 Collate: 
-    'adaptiveMatthewCor.R'
     'allGenerics.R'
-    'callingWaterfall.R'
     'class-LongTable.R'
     'class-CoreSet.R'
+    'CoreSet-accessors.R'
+    'adaptiveMatthewCor.R'
+    'callingWaterfall.R'
     'class-DataMapper.R'
     'connectivityScore.R'
     'cosinePerm.R'
