@@ -7,9 +7,9 @@
 getIntern(object, x, ...)
 }
 \arguments{
-\item{object}{[`S4`] An object with an @.itern slot containing an environment.}
+\item{object}{\code{\link{S4}} An object with an @.itern slot containing an environment.}
 
-\item{x}{[`character`] One or more symbol names to retrieve from the
+\item{x}{\code{\link{character}} One or more symbol names to retrieve from the
 object@.intern environment.}
 
 \item{...}{Allow new parmeters to be defined for this generic.}
@@ -19,11 +19,11 @@ Depends on the implemented method
 }
 \description{
 Internal slot for storing metadata relevant to the internal operation of an
-    S4 object.
+S4 object.
 }
 \details{
 Warning: This method is intended for developer use and can be ignored by
-  users.
+users.
 }
 \examples{
 print("Generics shouldn't need examples?")

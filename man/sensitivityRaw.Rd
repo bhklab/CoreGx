@@ -7,17 +7,17 @@
 sensitivityRaw(object, ...)
 }
 \arguments{
-\item{object}{An [`S4`] object to extract the raw sensitivity experiment
+\item{object}{An \code{\link{S4}} object to extract the raw sensitivity experiment
 data from.}
 
-\item{...}{[`pairlist`]  Allow new parameters to be defined for this generic.}
+\item{...}{\code{\link{pairlist}}  Allow new parameters to be defined for this generic.}
 }
 \value{
 Depends on the implemented method
 }
 \description{
 Generic function to get the raw data array for a treatment response experiment
-  from an S4 class.
+from an S4 class.
 }
 \examples{
 print("Generics shouldn't need examples?")

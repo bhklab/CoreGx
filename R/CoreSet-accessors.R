@@ -8,27 +8,26 @@ data('clevelandSmall_cSet')
 # Accessor Method Documentation Object
 # ---------------------------------------
 
-#' @usage NULL
-.doc_str <-
-"
-#' @name CoreSet-accessors
+#' @noRd
+#' @keywords internal
+.docs_CoreSet_accessors <- function() {
+    paste0(c("",
+"@details",
+"Documentation for the various setters and getters which allow manipulation",
+"of data in the slots of a ``r .local_class`` object:",
+"@param object A ``r .local_class`` object.",
+"@param value See details.",
+"@param ... See details.",
+"@return Accessors: See details.",
+"",
+"@return Setters: An updated ``r .local_class`` object, returned invisibly.",
+"@md\n"), collapse="\n#' ")}
+
 #' @title Accessing and modifying information in a ``r .local_class``
-#' @details
-#' Documentation for the various setters and getters which allow manipulation
-#' of data in the slots of a ``r .local_class`` object:
-#' @param object A ``r .local_class`` object.
-#' @param value See details.
-#' @param ... See details.
-#' @return Accessors: See details.
-#' 
-#' @return Setters: An updated ``r .local_class`` object, returned invisibly.
+#' @name CoreSet-accessors
 #' @md
-#' @seealso [`CoreSet-class`]
-"
-
-
-cat(.doc_str)
-"CoreSet-accessors"
+cat(.docs_CoreSet_accessors())
+`CoreSet-accessors` <- NULL
 
 
 # ======================================
@@ -157,7 +156,7 @@ setGeneric("cellInfo<-", function(object, value) standardGeneric("cellInfo<-"))
 #  - value: a `data.frame` object.
 #'
 #' @examples
-#' cellInfo <- 
+#' cellInfo <- cellInfo(clevelandSmall_cSet)
 #'
 #' @md
 #' @aliases cellInfo<-,CoreSet,data.frame-method cellInfo<-
@@ -237,11 +236,8 @@ setGeneric("curation<-", function(object, ..., value) standardGeneric("curation<
 
 #' @rdname CoreSet-accessors
 #' @details
-#' __curation<-__: Update the `curation` slot of a ``r .local_class`` object. 
-#' Arugments:
-#' - value: A `list` of `data.frame`s, one for each type of curated identifier.
-#' For a ``r .local_class`` object the slot should contain tissue and cell-line
-#' id `data.frame`s.
+#' __curation<-__: Update the `curation` slot of a ``r .local_class`` object. Arugments:
+#' - value: A `list` of `data.frame`s, one for each type of curated identifier. For a ``r .local_class`` object the slot should contain tissue and cell-line id `data.frame`s.
 #'
 #' @examples
 #' curation(clevelandSmall_cSet) <- curation(clevelandSmall_cSet)

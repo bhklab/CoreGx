@@ -7,7 +7,7 @@
 sensitivityMeasures(object, ...) <- value
 }
 \arguments{
-\item{object}{An [`S4`] object to update.}
+\item{object}{An \code{\link{S4}} object to update.}
 
 \item{...}{Allow new methods to be defined for this generic.}
 
@@ -19,7 +19,7 @@ Depends on the implemented method
 }
 \description{
 Set the names of the sensitivity summary metrics available in an S4
-  object.
+object.
 }
 \examples{
 print("Generics shouldn't need examples?")

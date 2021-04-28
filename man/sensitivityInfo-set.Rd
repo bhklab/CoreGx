@@ -7,7 +7,7 @@
 sensitivityInfo(object, ...) <- value
 }
 \arguments{
-\item{object}{An [`S4`] object to set treatment response experiment
+\item{object}{An \code{\link{S4}} object to set treatment response experiment
 annotations for.}
 
 \item{...}{Allow new arguments to be defined for this generic.}
@@ -19,7 +19,7 @@ Depends on the implemented method
 }
 \description{
 Generic function to get the annotations for a treatment response experiment
-  from an S4 class.
+from an S4 class.
 }
 \examples{
 print("Generics shouldn't need examples?")

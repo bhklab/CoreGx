@@ -7,7 +7,7 @@
 sensitivityMeasures(object, ...)
 }
 \arguments{
-\item{object}{An [`S4`] object to retrieve the names of sensitivty summary
+\item{object}{An \code{\link{S4}} object to retrieve the names of sensitivty summary
 measurements for.}
 
 \item{...}{Fallthrough arguements for defining new methods}
@@ -17,7 +17,7 @@ Depends on the implemented method
 }
 \description{
 Get the names of the sensitivity summary metrics available in an S4
-  object.
+object.
 }
 \examples{
 sensitivityMeasures(clevelandSmall_cSet)

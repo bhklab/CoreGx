@@ -2,17 +2,17 @@
 % Please edit documentation in R/methods-metadata.R
 \name{metadata,LongTable-method}
 \alias{metadata,LongTable-method}
-\title{Getter method for the metadata slot of a `LongTable` object}
+\title{Getter method for the metadata slot of a \code{LongTable} object}
 \usage{
 \S4method{metadata}{LongTable}(x)
 }
 \arguments{
-\item{x}{The [`LongTable`] object from which to retrieve the metadata list.}
+\item{x}{The \code{\link{LongTable}} object from which to retrieve the metadata list.}
 }
 \value{
-[`list`] The contents of the `metadata` slot of the `LongTable`
-  object.
+\code{\link{list}} The contents of the \code{metadata} slot of the \code{LongTable}
+object.
 }
 \description{
-Getter method for the metadata slot of a `LongTable` object
+Getter method for the metadata slot of a \code{LongTable} object
 }

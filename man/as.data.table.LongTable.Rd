@@ -2,17 +2,17 @@
 % Please edit documentation in R/methods-coerce.R
 \name{as.data.table.LongTable}
 \alias{as.data.table.LongTable}
-\title{Coerce a LongTable into a `data.table`}
+\title{Coerce a LongTable into a \code{data.table}}
 \usage{
 as.data.table.LongTable(x)
 }
 \arguments{
-\item{x}{[`LongTable`] to coerce to a `data.table`}
+\item{x}{\code{\link{LongTable}} to coerce to a \code{data.table}}
 }
 \value{
-A [`data.table`] containing the data from the LongTable, as well
-  as the `LongTable.config' attribute which contains the data needed to
-  reverse the coercion.
+A \code{\link{data.table}} containing the data from the LongTable, as well
+as the `LongTable.config' attribute which contains the data needed to
+reverse the coercion.
 }
 \description{
 S3 version of coerce method for convenience.

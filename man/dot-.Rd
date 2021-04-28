@@ -7,14 +7,14 @@
 .(...)
 }
 \arguments{
-\item{...}{[`parilist`] One or more R expressions to convert to calls.}
+\item{...}{\code{\link{parilist}} One or more R expressions to convert to calls.}
 }
 \value{
-[`call`] An R call object containing the quoted expression.
+\code{\link{call}} An R call object containing the quoted expression.
 }
 \description{
 This is used to pass through unevaluated R expressions into subset and
-  `[`, where they will be evaluated in the correct context.
+\code{[}, where they will be evaluated in the correct context.
 }
 \examples{
 .(cell_line1 == 'A2058')

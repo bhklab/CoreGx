@@ -7,12 +7,12 @@
 \S4method{$}{LongTable}(x, name)
 }
 \arguments{
-\item{x}{A [`LongTable`] object to retrieve an assay from}
+\item{x}{A \code{\link{LongTable}} object to retrieve an assay from}
 
-\item{name}{[`character`] The name of the assay to get.}
+\item{name}{\code{\link{character}} The name of the assay to get.}
 }
 \value{
-[`data.frame`] The assay object.
+\code{\link{data.frame}} The assay object.
 }
 \description{
 Select an assay from a LongTable object

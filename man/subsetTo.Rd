@@ -7,12 +7,12 @@
 subsetTo(object, ...)
 }
 \arguments{
-\item{object}{An object inheriting from the `CoreGx::CoreSet` class}
+\item{object}{An object inheriting from the \code{CoreGx::CoreSet} class}
 
 \item{...}{Allow definition of new arguments to this generic}
 }
 \value{
-A subsetted version of the original `object`
+A subsetted version of the original \code{object}
 }
 \description{
 Subset a CoreSet object based on various parameters, such as cell lines, molecular features

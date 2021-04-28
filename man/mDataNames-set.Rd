@@ -11,7 +11,7 @@ mDataNames(object, ...) <- value
 
 \item{...}{Fallthrough arguements for defining new methods}
 
-\item{value}{A \code{character} vector with names to be assigned to each list item in the `molecularProfiles` slot}
+\item{value}{A \code{character} vector with names to be assigned to each list item in the \code{molecularProfiles} slot}
 }
 \value{
 An updated copy of the CoreSet object

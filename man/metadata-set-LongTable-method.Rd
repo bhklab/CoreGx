@@ -2,20 +2,20 @@
 % Please edit documentation in R/methods-metadata.R
 \name{metadata<-,LongTable-method}
 \alias{metadata<-,LongTable-method}
-\title{Setter method for the metadata slot of a `LongTable` object}
+\title{Setter method for the metadata slot of a \code{LongTable} object}
 \usage{
 \S4method{metadata}{LongTable}(x) <- value
 }
 \arguments{
-\item{x}{[`LongTable`] The LongTable to update}
+\item{x}{\code{\link{LongTable}} The LongTable to update}
 
-\item{value}{[`list`] A list of new metadata associated with a `LongTable`
+\item{value}{\code{\link{list}} A list of new metadata associated with a \code{LongTable}
 object.}
 }
 \value{
-[`LongTable`] A copy of the `LongTable` object with the `value` in
-  the metadata slot.
+\code{\link{LongTable}} A copy of the \code{LongTable} object with the \code{value} in
+the metadata slot.
 }
 \description{
-Setter method for the metadata slot of a `LongTable` object
+Setter method for the metadata slot of a \code{LongTable} object
 }

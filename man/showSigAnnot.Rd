@@ -2,14 +2,14 @@
 % Please edit documentation in R/allGenerics.R
 \name{showSigAnnot}
 \alias{showSigAnnot}
-\title{Get the annotations for a `Signature` class object, as returned by
-  `drugSensitivitysig` or `radSensitivtySig` functions available in
-  `PharmacoGx` and `RadioGx`, respectively.}
+\title{Get the annotations for a \code{Signature} class object, as returned by
+\code{drugSensitivitysig} or \code{radSensitivtySig} functions available in
+\code{PharmacoGx} and \code{RadioGx}, respectively.}
 \usage{
 showSigAnnot(object, ...)
 }
 \arguments{
-\item{object}{A `Signature` class object}
+\item{object}{A \code{Signature} class object}
 
 \item{...}{Allow definition of new arguments to this generic}
 }
@@ -17,9 +17,9 @@ showSigAnnot(object, ...)
 NULL Prints the signature annotations to console
 }
 \description{
-Get the annotations for a `Signature` class object, as returned by
-  `drugSensitivitysig` or `radSensitivtySig` functions available in
-  `PharmacoGx` and `RadioGx`, respectively.
+Get the annotations for a \code{Signature} class object, as returned by
+\code{drugSensitivitysig} or \code{radSensitivtySig} functions available in
+\code{PharmacoGx} and \code{RadioGx}, respectively.
 }
 \examples{
 print("Generics shouldn't need examples?")

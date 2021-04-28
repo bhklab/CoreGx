@@ -7,9 +7,9 @@
 sensitivityRaw(object, ...) <- value
 }
 \arguments{
-\item{object}{An [`S4`] object to extract the raw sensitivity data from.}
+\item{object}{An \code{\link{S4}} object to extract the raw sensitivity data from.}
 
-\item{...}{[`pairlist`] Allow new parameters to be defined for this generic.}
+\item{...}{\code{\link{pairlist}} Allow new parameters to be defined for this generic.}
 
 \item{value}{An object containing dose and viability metrics to update
 the object with.}
@@ -19,5 +19,5 @@ Depends on the implemented method
 }
 \description{
 Generic function to set the raw data array for a treatment response experiment
-  in an S4 class.
+in an S4 class.
 }

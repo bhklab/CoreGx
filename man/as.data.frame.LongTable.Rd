@@ -7,22 +7,22 @@
 \method{as.data.frame}{LongTable}(x, row.names, optional = TRUE, ...)
 }
 \arguments{
-\item{x}{[`LongTable`] to coerce to `data.frame`.}
+\item{x}{\code{\link{LongTable}} to coerce to \code{data.frame}.}
 
-\item{row.names}{An optional [`character`] vector of rownames. We do not
+\item{row.names}{An optional \code{\link{character}} vector of rownames. We do not
 recommend using this parameter, it is included for S3 method consistency
-with `as.data.frame`.}
+with \code{as.data.frame}.}
 
-\item{optional}{[`logical`] Is it optional for row and column names to be
+\item{optional}{\code{\link{logical}} Is it optional for row and column names to be
 valid R names? If FALSE will use the make.names function to ensure the
 row and column names are valid R names. Defaults to TRUE.}
 
 \item{...}{Does nothing.}
 }
 \value{
-[`data.frame`] containing the data from the LongTable, with the
-  `LongTable.config' attribute containg the metadata needed to reverse
-  the coercion operation.
+\code{\link{data.frame}} containing the data from the LongTable, with the
+`LongTable.config' attribute containg the metadata needed to reverse
+the coercion operation.
 }
 \description{
 S3 version of coerce method fro convenience.

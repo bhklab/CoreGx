@@ -103,11 +103,11 @@ treatment response data}
 \S4method{sensitivitySlot}{CoreSet,list}(object) <- value
 }
 \arguments{
-\item{object}{An [`CoreSet`] to extract the raw sensitivity data from.}
+\item{object}{An \code{\link{CoreSet}} to extract the raw sensitivity data from.}
 
 \item{mDataType}{\code{character} The type of molecular data}
 
-\item{value}{A 3D [`array`] containing the raw dose and viability
+\item{value}{A 3D \code{\link{array}} containing the raw dose and viability
 measurements to update the object with.}
 
 \item{assay}{\code{character} Name of the desired assay; if excluded
@@ -115,32 +115,32 @@ defaults to first assay in the SummarizedExperiment for the given
 mDataType. Use \code{assayNames(molecularProfiles(object, dataType)}
 to check which assays are available for a given molecular datatype.}
 
-\item{dimension}{[`character`] Optional name of the dimension to extract,
+\item{dimension}{\code{\link{character}} Optional name of the dimension to extract,
 either 'cells' or 'drugs'. Only used if the sensitivity slot contains a
-`LongTable` object instead of a `list`.}
+\code{LongTable} object instead of a \code{list}.}
 
 \item{...}{Additional arguments to the rowData or colData
-`LongTable` methods. Only used if the sensitivity slot contains a
-`LongTable` object instead of a `list`.}
+\code{LongTable} methods. Only used if the sensitivity slot contains a
+\code{LongTable} object instead of a \code{list}.}
 }
 \value{
-a [`DataFrame`] with the experiment info
+a \code{\link{DataFrame}} with the experiment info
 
 Updated \code{CoreSet}
 
-A [`character`] vector of all the available sensitivity measures.
+A \code{\link{character}} vector of all the available sensitivity measures.
 
 A update \code{CoreSet} object with the new sensitivity measures
 
-a [`data.frame`] with sensitivity profile summaries for CoreSet
+a \code{\link{data.frame}} with sensitivity profile summaries for CoreSet
 
 Updated \code{CoreSet}
 
-A [`array`] containing the raw sensitivity data as experiment by
-    dose level by metric.
+A \code{\link{array}} containing the raw sensitivity data as experiment by
+dose level by metric.
 
-A 3D [`array`] containing the raw sensitivity data as experiment by
-   dose level by metric.
+A 3D \code{\link{array}} containing the raw sensitivity data as experiment by
+dose level by metric.
 }
 \description{
 Get the senstivity information DataFrame from a CoreSet object
@@ -213,7 +213,7 @@ experiments in the sensitivity slot.
 \item \code{sensitivityMeasures}: Returns the available sensitivity profile
 summaries, for example, whether there are IC50 values available
 
-\item \code{sensitivityMeasures<-}: Updates the sensitivity measures in a `CoreSet` object
+\item \code{sensitivityMeasures<-}: Updates the sensitivity measures in a \code{CoreSet} object
 and returns the updated object
 
 \item \code{sensitivityProfiles}: Return the sensitivity profile summaries from the

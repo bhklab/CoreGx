@@ -15,51 +15,51 @@ LongTable(
 )
 }
 \arguments{
-\item{rowData}{[`data.table`, `data.frame`, `matrix`] A table like object
-coercible to a `data.table` containing the a unique `rowID` column which
+\item{rowData}{\link[=`data.table`, `data.frame`, `matrix`]{\code{data.table}, \code{data.frame}, \code{matrix}} A table like object
+coercible to a \code{data.table} containing the a unique \code{rowID} column which
 is used to key assays, as well as additional row metadata to subset on.}
 
-\item{rowIDs}{[`character`, `integer`] A vector specifying
+\item{rowIDs}{\link[=`character`, `integer`]{\code{character}, \code{integer}} A vector specifying
 the names or integer indexes of the row data identifier columns. These
 columns will be pasted together to make up the row.names of the
-`LongTable` object.}
+\code{LongTable} object.}
 
-\item{colData}{[`data.table`, `data.frame`, `matrix`] A table like object
-coercible to a `data.table` containing the a unique `colID` column which
+\item{colData}{\link[=`data.table`, `data.frame`, `matrix`]{\code{data.table}, \code{data.frame}, \code{matrix}} A table like object
+coercible to a \code{data.table} containing the a unique \code{colID} column which
 is used to key assays, as well as additional column metadata to subset on.}
 
-\item{colIDs}{[`character`, `integer`] A vector specifying
+\item{colIDs}{\link[=`character`, `integer`]{\code{character}, \code{integer}} A vector specifying
 the names or integer indexes of the col data identifier columns. These
 columns will be pasted together to make up the col.names of the
-`LongTable` object.}
+\code{LongTable} object.}
 
-\item{assays}{A [`list`] containing one or more objects coercible to a
-`data.table`, and keyed by rowID and colID corresponding to the rowID and
+\item{assays}{A \code{\link{list}} containing one or more objects coercible to a
+\code{data.table}, and keyed by rowID and colID corresponding to the rowID and
 colID columns in colData and rowData.}
 
-\item{metadata}{A [`list`] of metadata associated with the `LongTable`
+\item{metadata}{A \code{\link{list}} of metadata associated with the \code{LongTable}
 object being constructed}
 
-\item{keep.rownames}{[`logical` or `character`] Logical: whether rownames
-should be added as a column if coercing to a `data.table`, default is FALSE.
+\item{keep.rownames}{\link[=`logical` or `character`]{\code{logical} or \code{character}} Logical: whether rownames
+should be added as a column if coercing to a \code{data.table}, default is FALSE.
 If TRUE, rownames are added to the column 'rn'. Character: specify a custom
 column name to store the rownames in.}
 }
 \value{
-A [`LongTable`] object containing the data for a treatment response
-  experiment and configured according to the rowIDs and colIDs arguments.
+A \code{\link{LongTable}} object containing the data for a treatment response
+experiment and configured according to the rowIDs and colIDs arguments.
 }
 \description{
-Builds a `LongTable` object from rectangular objects. The
-`rowData` argument should contain row level metadata, while the `colData`
+Builds a \code{LongTable} object from rectangular objects. The
+\code{rowData} argument should contain row level metadata, while the \code{colData}
 argument should contain column level metadata, for the experimental assays
-in the `assays` list. The `rowIDs` and `colIDs` lists are used to configure
+in the \code{assays} list. The \code{rowIDs} and \code{colIDs} lists are used to configure
 the internal keys mapping rows or columns to rows in the assays. Each list
 should contain at minimum one character vector, specifying which columns
-in `rowData` or `colData` are required to uniquely identify each row. An
+in \code{rowData} or \code{colData} are required to uniquely identify each row. An
 optional second character vector can be included, specifying any metadata
 columns for either dimension. These should contain information about each
-row but NOT be required to uniquely identify a row in the `colData` or
-`rowData` objects. Additional metadata can be attached to a `LongTable` by
+row but NOT be required to uniquely identify a row in the \code{colData} or
+\code{rowData} objects. Additional metadata can be attached to a \code{LongTable} by
 passing a list to the metadata argument.
 }

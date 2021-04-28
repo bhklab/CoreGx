@@ -3,12 +3,12 @@
 \name{summarizeMolecularProfiles}
 \alias{summarizeMolecularProfiles}
 \title{Summarize molecular profile data such that there is a single entry for each
-  cell line/treatment combination}
+cell line/treatment combination}
 \usage{
 summarizeMolecularProfiles(object, ...)
 }
 \arguments{
-\item{object}{An [`S4`] object to summarize the molecular profiles for.}
+\item{object}{An \code{\link{S4}} object to summarize the molecular profiles for.}
 
 \item{...}{Allow definition of new arguments to this generic}
 }
@@ -17,7 +17,7 @@ Depends on the implemented method
 }
 \description{
 Summarize molecular profile data such that there is a single entry for each
-  cell line/treatment combination
+cell line/treatment combination
 }
 \examples{
 print("Generics shouldn't need examples?")

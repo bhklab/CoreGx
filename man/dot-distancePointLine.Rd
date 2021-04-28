@@ -21,8 +21,8 @@
 \code{numeric} The shortest distance between a point and a line
 }
 \description{
-This function calculates the shortest distance between a point 
-  and a line in 2D space.
+This function calculates the shortest distance between a point
+and a line in 2D space.
 }
 \examples{
 .distancePointLine(0, 0, 1, -1, 1)

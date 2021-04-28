@@ -12,7 +12,7 @@ data(merckLongTable)
 }
 \description{
 This is a LongTable object created from some drug combination data provided
-  to our lab by Merck.
+to our lab by Merck.
 }
 \references{
 TODO:: Include a reference

@@ -7,43 +7,43 @@
 \S4method{subset}{LongTable}(x, i, j, assays, reindex = TRUE)
 }
 \arguments{
-\item{x}{[`LongTable`] The object to subset.}
+\item{x}{\code{\link{LongTable}} The object to subset.}
 
-\item{i}{[`character`], [`numeric`], [`logical`] or [`expression`]
+\item{i}{\code{\link{character}}, \code{\link{numeric}}, \code{\link{logical}} or \code{\link{expression}}
 Character: pass in a character vector of drug names, which will subset the
-  object on all row id columns matching the vector.
-Numeric or Logical: these select based on the rowKey from the `rowData`
-  method for the `LongTable`.
-Call: Accepts valid query statements to the `data.table` i parameter,
-  this can be used to make complex queries using the `data.table` API
-  for the `rowData` data.table.}
+object on all row id columns matching the vector.
+Numeric or Logical: these select based on the rowKey from the \code{rowData}
+method for the \code{LongTable}.
+Call: Accepts valid query statements to the \code{data.table} i parameter,
+this can be used to make complex queries using the \code{data.table} API
+for the \code{rowData} data.table.}
 
-\item{j}{[`character`], [`numeric`], [`logical`] or [`expression`]
+\item{j}{\code{\link{character}}, \code{\link{numeric}}, \code{\link{logical}} or \code{\link{expression}}
 Character: pass in a character vector of drug names, which will subset the
-  object on all drug id columns matching the vector.
-Numeric or Logical: these select based on the rowID from the `rowData`
-  method for the `LongTable`.
-Call: Accepts valid query statements to the `data.table` i parameter,
-  this can be used to make complex queries using the `data.table` API
-  for the `colData` data.table.}
+object on all drug id columns matching the vector.
+Numeric or Logical: these select based on the rowID from the \code{rowData}
+method for the \code{LongTable}.
+Call: Accepts valid query statements to the \code{data.table} i parameter,
+this can be used to make complex queries using the \code{data.table} API
+for the \code{colData} data.table.}
 
-\item{assays}{[`character`, `numeric` or `logical`] Optional list of assay
+\item{assays}{\link[=`character`, `numeric` or `logical`]{\code{character}, \code{numeric} or \code{logical}} Optional list of assay
 names to subset. Can be used to subset the assays list further,
 returning only the selected items in the new LongTable.}
 
-\item{reindex}{[`logical`] Should the col/rowKeys be remapped after subsetting.
+\item{reindex}{\code{\link{logical}} Should the col/rowKeys be remapped after subsetting.
 defaults to TRUE. For chained subsetting you may be able to get performance
 gains by setting to FALSE and calling reindex() manually after subsetting
 is finished.}
 }
 \value{
-[`LongTable`] A new `LongTable` object subset based on the specified
-     parameters.
+\code{\link{LongTable}} A new \code{LongTable} object subset based on the specified
+parameters.
 }
 \description{
-Allows use of the colData and rowData `data.table` objects to query based on
- rowID and colID, which is then used to subset all value data.tables stored
- in the dataList slot.
+Allows use of the colData and rowData \code{data.table} objects to query based on
+rowID and colID, which is then used to subset all value data.tables stored
+in the dataList slot.
 This function is endomorphic, it always returns a LongTable object.
 }
 \examples{

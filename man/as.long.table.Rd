@@ -7,16 +7,16 @@
 as.long.table(x)
 }
 \arguments{
-\item{x}{A [`data.frame`] with the 'LongTable.config' attribute, containing
+\item{x}{A \code{\link{data.frame}} with the 'LongTable.config' attribute, containing
 three lists named assayCols, rowDataCols and colDataCols. This attribute is
 automatically created when coercing from a LongTable to a data.table.}
 }
 \value{
-[`LongTable`] object configured with the LongTable.config
+\code{\link{LongTable}} object configured with the LongTable.config
 }
 \description{
 Coerce a data.table with the proper configuration attributes
-  back to a LongTable
+back to a LongTable
 }
 \examples{
 dataTable <- as(merckLongTable, 'data.table')

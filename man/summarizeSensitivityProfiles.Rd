@@ -7,7 +7,7 @@
 summarizeSensitivityProfiles(object, ...)
 }
 \arguments{
-\item{object}{An [`S4`] object to summarize sensitivity profiles for.}
+\item{object}{An \code{\link{S4}} object to summarize sensitivity profiles for.}
 
 \item{...}{Allow definition of new arguments to this generic}
 }

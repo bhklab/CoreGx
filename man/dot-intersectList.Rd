@@ -12,12 +12,12 @@ which could also be operated on by the native R set operations}
 }
 \value{
 A vector like object of the same mode as the first argument,
-  containing only the intersection common to all arguments to the function
+containing only the intersection common to all arguments to the function
 }
 \description{
 Utility to find the intersection between a list of more than two vectors or
-  lists This function extends the native intersect function to work on two 
-  or more arguments.
+lists This function extends the native intersect function to work on two
+or more arguments.
 }
 \examples{
 list1 <- list('a', 'b', 'c')

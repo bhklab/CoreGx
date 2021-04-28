@@ -7,10 +7,10 @@
 sensitivityProfiles(object, ...)
 }
 \arguments{
-\item{object}{The [`S4`] object to retrieve sensitivity profile summaries
+\item{object}{The \code{\link{S4}} object to retrieve sensitivity profile summaries
 from.}
 
-\item{...}{[`pairlist`] Allow defining new arguments for this generic.}
+\item{...}{\code{\link{pairlist}} Allow defining new arguments for this generic.}
 }
 \value{
 Depends on the implemented method

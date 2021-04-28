@@ -7,42 +7,42 @@
 \S4method{[}{LongTable,ANY,ANY,ANY}(x, i, j, assays, ..., drop = FALSE)
 }
 \arguments{
-\item{x}{[`LongTable`] The object to subset.}
+\item{x}{\code{\link{LongTable}} The object to subset.}
 
-\item{i}{[`character`], [`numeric`], [`logical`] or [`call`]
+\item{i}{\code{\link{character}}, \code{\link{numeric}}, \code{\link{logical}} or \code{\link{call}}
 Character: pass in a character vector of drug names, which will subset the
-  object on all row id columns matching the vector. This parameter also
-  supports valid R regex query strings which will match on the colnames
-  of `x`. For convenience, * is converted to .* automatically. Colon
-  can be to denote a specific part of the colnames string to query.
-Numeric or Logical: these select based on the rowKey from the `rowData`
-  method for the `LongTable`.
-Call: Accepts valid query statements to the `data.table` i parameter as
-  a call object. We have provided the function .() to conveniently
-  convert raw R statements into a call for use in this function.}
+object on all row id columns matching the vector. This parameter also
+supports valid R regex query strings which will match on the colnames
+of \code{x}. For convenience, * is converted to .* automatically. Colon
+can be to denote a specific part of the colnames string to query.
+Numeric or Logical: these select based on the rowKey from the \code{rowData}
+method for the \code{LongTable}.
+Call: Accepts valid query statements to the \code{data.table} i parameter as
+a call object. We have provided the function .() to conveniently
+convert raw R statements into a call for use in this function.}
 
-\item{j}{[`character`], [`numeric`], [`logical`] or [`call`]
+\item{j}{\code{\link{character}}, \code{\link{numeric}}, \code{\link{logical}} or \code{\link{call}}
 Character: pass in a character vector of drug names, which will subset the
-    object on all drug id columns matching the vector. This parameter also
-    supports regex queries. Colon can be to denote a specific part of the
-    colnames string to query.
-Numeric or Logical: these select based on the rowID from the `rowData`
-    method for the `LongTable`.
-Call: Accepts valid query statements to the `data.table` i parameter as
-    a call object. We have provided the function .() to conveniently
-    convert raw R statements into a call for use in this function.}
+object on all drug id columns matching the vector. This parameter also
+supports regex queries. Colon can be to denote a specific part of the
+colnames string to query.
+Numeric or Logical: these select based on the rowID from the \code{rowData}
+method for the \code{LongTable}.
+Call: Accepts valid query statements to the \code{data.table} i parameter as
+a call object. We have provided the function .() to conveniently
+convert raw R statements into a call for use in this function.}
 
-\item{assays}{[`character`] Names of assays which should be kept in the
-`LongTable` after subsetting.}
+\item{assays}{\code{\link{character}} Names of assays which should be kept in the
+\code{LongTable} after subsetting.}
 
 \item{...}{Included to ensure drop can only be set by name.}
 
-\item{drop}{[`logical`] Included for compatibility with the '[' primitive,
+\item{drop}{\code{\link{logical}} Included for compatibility with the '[' primitive,
 it defaults to FALSE and changing it does nothing.}
 }
 \value{
-A [`LongTable`] containing only the data specified in the function
-  parameters.
+A \code{\link{LongTable}} containing only the data specified in the function
+parameters.
 }
 \description{
 Single bracket subsetting for a LongTable object. See subset for more details.

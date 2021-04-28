@@ -3,20 +3,20 @@
 \name{idCols,LongTable-method}
 \alias{idCols,LongTable-method}
 \title{Retrieve the unique identifier columns used for primary keys in rowData and
-   colData.}
+colData.}
 \usage{
 \S4method{idCols}{LongTable}(object)
 }
 \arguments{
-\item{object}{[`LongTable`]}
+\item{object}{\code{\link{LongTable}}}
 }
 \value{
-[`character`] A character vector containing the unique rowIDs and
-  colIDs in a LongTable object.
+\code{\link{character}} A character vector containing the unique rowIDs and
+colIDs in a LongTable object.
 }
 \description{
 Retrieve the unique identifier columns used for primary keys in rowData and
-   colData.
+colData.
 }
 \examples{
 idCols(merckLongTable)

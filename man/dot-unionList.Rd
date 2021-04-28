@@ -13,7 +13,7 @@ which could also be operated on by the native R set operations}
 }
 \value{
 A vector like object of the same mode as the first argument,
-  containing all the elements of all arguments passed to the function
+containing all the elements of all arguments passed to the function
 }
 \description{
 This function extends the native union function to work on two or more

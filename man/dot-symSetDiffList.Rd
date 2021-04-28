@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{.symSetDiffList}
 \alias{.symSetDiffList}
-\title{Utility to find the symmetric set difference of a list of two or more 
+\title{Utility to find the symmetric set difference of a list of two or more
 vectors or lists}
 \usage{
 .symSetDiffList(...)
@@ -13,10 +13,10 @@ which could also be operated on by the native R set operations}
 }
 \value{
 A vector like object of the same mode as the first argument,
-  containing only the symmetric set difference
+containing only the symmetric set difference
 }
 \description{
-The function finds the symmetric set differnces between all the arguments, 
+The function finds the symmetric set differnces between all the arguments,
 defined as Union(args)-Intersection(args)
 }
 \examples{

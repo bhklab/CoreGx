@@ -7,7 +7,7 @@
 drugSensitivitySig(object, ...)
 }
 \arguments{
-\item{object}{An object inheriting form the `CoreGx::CoreSet` class}
+\item{object}{An object inheriting form the \code{CoreGx::CoreSet} class}
 
 \item{...}{Allow definition of new arguments to this generic}
 }

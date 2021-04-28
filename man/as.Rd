@@ -4,29 +4,29 @@
 \alias{as}
 \title{LongTable to data.table conversion}
 \arguments{
-\item{to}{[`character`] Class name to coerce to, currently only 'data.table'
+\item{to}{\code{\link{character}} Class name to coerce to, currently only 'data.table'
 and 'data.frame' are supported}
 
-\item{from}{A [`data.table`] with the 'LongTable.config' attribute, containing
+\item{from}{A \code{\link{data.table}} with the 'LongTable.config' attribute, containing
 three lists named assayCols, rowDataCols and colDataCols. This attribute is
-automatically created when coercing from a `LongTable` to a `data.table`.}
+automatically created when coercing from a \code{LongTable} to a \code{data.table}.}
 }
 \value{
-A [`data.table`] with the data from a LongTable.
+A \code{\link{data.table}} with the data from a LongTable.
 
-[`data.table`] containing the data from the LongTable, with the
-  `LongTable.config' attribute containg the metadata needed to reverse
-  the coercing operation.
+\code{\link{data.table}} containing the data from the LongTable, with the
+`LongTable.config' attribute containg the metadata needed to reverse
+the coercing operation.
 
-[`LongTable`] object configured with the LongTable.config
+\code{\link{LongTable}} object configured with the LongTable.config
 }
 \description{
-Coerce a LongTable into a `data.table`.
+Coerce a LongTable into a \code{data.table}.
 
 Currently only supports coercing to data.table or data.frame
 
 Coerce a data.table with the proper configuration attributes
-  back to a LongTable
+back to a LongTable
 }
 \examples{
 as(merckLongTable, 'data.table')

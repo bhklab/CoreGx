@@ -76,12 +76,12 @@
 \S4method{rowData}{LongTable}(x) <- value
 }
 \arguments{
-\item{object}{[`LongTable`]}
+\item{object}{\code{\link{LongTable}}}
 
-\item{data}{[`logical`] Should the colData for the metadata columns be returned
+\item{data}{\code{\link{logical}} Should the colData for the metadata columns be returned
 instead of the column names? Default is FALSE.}
 
-\item{key}{[`logical`] Should the rowKey column also be returned? Defaults
+\item{key}{\code{\link{logical}} Should the rowKey column also be returned? Defaults
 to FALSE.}
 
 \item{i}{\code{integer} or \code{character} vector containing the index or name
@@ -89,14 +89,14 @@ of the assay to update.}
 
 \item{x}{A \code{\link{LongTable}} object to modify.}
 
-\item{withDimnames}{[`logical`] Should the returned assays be joined to
+\item{withDimnames}{\code{\link{logical}} Should the returned assays be joined to
 the row and column identifiers (i.e., the pseudo dimnames of the object).}
 
-\item{metadata}{[`logical`] Should row and column metadata also be joined
+\item{metadata}{\code{\link{logical}} Should row and column metadata also be joined
 to the returned assays. This is useful for modifying assays before
 reconstructing a new LongTable.}
 
-\item{keys}{[`logical`] Should the row and column keys also be returned?
+\item{keys}{\code{\link{logical}} Should the row and column keys also be returned?
 Defaults to !withDimnames.}
 
 \item{join}{\code{logical} If \code{TRUE} this function will try to left inner join
@@ -106,28 +106,28 @@ existing assay in \code{x}, this parameter will be ignored with a warning.}
 \item{value}{A \code{\link{data.table}} or \code{\link{data.frame}} to update the \code{rowData} of
 \code{x} with.}
 
-\item{from}{[`character`] Path to the .csv file containing the data and
-metadata from which to build the `LongTable`.}
+\item{from}{\code{\link{character}} Path to the .csv file containing the data and
+metadata from which to build the \code{LongTable}.}
 
-\item{rowDataCols}{[`list`] List with two `character` vectors, the first
+\item{rowDataCols}{\code{\link{list}} List with two \code{character} vectors, the first
 specifying one or more columns to be used as cell identifiers (e.g.,
 cell-line name columns) and the second containing any additional metadata
 columns related to the cell identifiers.}
 
-\item{colDataCols}{[`list`] List with two `character` vectors, the first
+\item{colDataCols}{\code{\link{list}} List with two \code{character} vectors, the first
 specifying one or more columns to be used as column identifiers (e.g.,
 drug name columns) and the second containing any additional metadata
 columns related to the column identifiers.}
 
-\item{assayCols}{[`list`] A named list of character vectors specifying how to
-parse assay columns into a list of `data.table`s. Each list data.table
+\item{assayCols}{\code{\link{list}} A named list of character vectors specifying how to
+parse assay columns into a list of \code{data.table}s. Each list data.table
 will be named for the name of corresponding list item and contain the columns
 specified in the character vector of column names in each list item.}
 
-\item{...}{[`pairlist`] Addtional arguments to get or mget inside of the
+\item{...}{\code{\link{pairlist}} Addtional arguments to get or mget inside of the
 function.}
 
-\item{use.names}{[`logical`] This parameter is just here to stop matching
+\item{use.names}{\code{\link{logical}} This parameter is just here to stop matching
 the key argument to use.names from the rowData generic. It doesn't do
 anything at this time and can be ignored.}
 }
@@ -135,54 +135,54 @@ anything at this time and can be ignored.}
 \code{LongTable} object containing the assay data from a treatment
 response experiment
 
-A [`character`] vector of rowData column names if data is FALSE,
-otherwise a [`data.table`] with the data from the rowData id columns.
+A \code{\link{character}} vector of rowData column names if data is FALSE,
+otherwise a \code{\link{data.table}} with the data from the rowData id columns.
 
-A [`character`] vector of rowData column names if data is FALSE,
-otherwise a [`data.table`] with the data from the rowData metadta columns.
+A \code{\link{character}} vector of rowData column names if data is FALSE,
+otherwise a \code{\link{data.table}} with the data from the rowData metadta columns.
 
-A [`character`] vector of colData column names if data is FALSE,
-otherwise a [`data.table`] with the data from the colData id columns.
+A \code{\link{character}} vector of colData column names if data is FALSE,
+otherwise a \code{\link{data.table}} with the data from the colData id columns.
 
-A [`character`] vector of colData column names if data is FALSE,
-  otherwise a [`data.table`] with the data from the colData metadta columns.
+A \code{\link{character}} vector of colData column names if data is FALSE,
+otherwise a \code{\link{data.table}} with the data from the colData metadta columns.
 
-A [`list`] of `character` vectors containing the value column names for
-each assay if i is missing, otherwise a `character` vector of value column
+A \code{\link{list}} of \code{character} vectors containing the value column names for
+each assay if i is missing, otherwise a \code{character} vector of value column
 names for the selected assay.
 
 \code{LongTable} With updated assays slot.
 
-[`character`] Names of the assays contained in the `LongTable`.
+\code{\link{character}} Names of the assays contained in the \code{LongTable}.
 
-A [`list`] of `data.table` objects, one per assay in the object.
+A \code{\link{list}} of \code{data.table} objects, one per assay in the object.
 
-A copy of the [`LongTable`] with the assays modified.
+A copy of the \code{\link{LongTable}} with the assays modified.
 
-A [`LongTable`] object containing one or more assays, indexed by
-  rowID and colID.
+A \code{\link{LongTable}} object containing one or more assays, indexed by
+rowID and colID.
 
-A [`LongTable`] object containing one or more assays, indexed by
-  rowID and colID.
+A \code{\link{LongTable}} object containing one or more assays, indexed by
+rowID and colID.
 
-A [`data.table`] containing row identifiers and metadata.
+A \code{\link{data.table}} containing row identifiers and metadata.
 
-A copy of the [`LongTable`] object with the `colData`
-  slot updated.
+A copy of the \code{\link{LongTable}} object with the \code{colData}
+slot updated.
 
-[`numeric`] Vector of object dimensions.
+\code{\link{numeric}} Vector of object dimensions.
 
-[`character`] Vector of column names.
+\code{\link{character}} Vector of column names.
 
-[`character`] Vector of row names.
+\code{\link{character}} Vector of row names.
 
-[`list`] List with two character vectors, one for row and one for
-    column names.
+\code{\link{list}} List with two character vectors, one for row and one for
+column names.
 
 value of x if length(x) == 1 else named list of values for all
-    symbols in x
+symbols in x
 
-A [`data.table`] containing rowID, row identifiers, and row metadata.
+A \code{\link{data.table}} containing rowID, row identifiers, and row metadata.
 
 A copy of the \code{\link{LongTable}} object with the \code{rowData}
 slot updated.
@@ -209,29 +209,29 @@ metadata of S4 objects.
 uniquely identify each row.
 
 \item \code{colMeta}: Get the names of the non-id columns in the colData
-`data.table`.
+\code{data.table}.
 
 \item \code{assayCols}: Get a list of column names for each assay in a
-`LongTable`.
+\code{LongTable}.
 
 \item \code{[[}: Get an assay from a LongTable object. This method
 returns the row and column annotations by default to make assignment
 and aggregate operations easiers.
 
-\item \code{assay}: Retrieve an assay `data.table` object from the
-`assays` slot of a `LongTable` object.
+\item \code{assay}: Retrieve an assay \code{data.table} object from the
+\code{assays} slot of a \code{LongTable} object.
 
 \item \code{assay<-}: 
 
 \item \code{assayNames}: Return the names of the assays contained in a
-`LongTable`
+\code{LongTable}
 
-\item \code{assays}: Get a list containing all the assays in a `LongTable`.
+\item \code{assays}: Get a list containing all the assays in a \code{LongTable}.
 
 \item \code{assays<-}: Update the assays in a LongTable object. The rowIDs
 and colIDs must be present in all assays to allow successfully remapping
 the keys. We recommend modifying the list returned by
-assays(longTable, withDimnames=TRUE) and the reassigning to the `LongTable`.
+assays(longTable, withDimnames=TRUE) and the reassigning to the \code{LongTable}.
 
 \item \code{buildLongTable}: Create a LongTable object from a single data.table or
 data.frame object.
@@ -263,7 +263,7 @@ colnames and rownames for more information.
 \item \code{getIntern}: Access structural metadata present within a
 LongTable object. This is mostly for developmer use.
 
-\item \code{rowData}: Get the row level annotations for a `LongTable` object.
+\item \code{rowData}: Get the row level annotations for a \code{LongTable} object.
 
 \item \code{rowData<-}: Update the row annotations for a \code{LongTable} object.
 Currently requires that all columns in rowIDs(longTable) be present in

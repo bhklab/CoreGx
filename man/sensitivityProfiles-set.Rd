@@ -7,7 +7,7 @@
 sensitivityProfiles(object, ...) <- value
 }
 \arguments{
-\item{object}{An [`S4`] object to update the sensitivity profile summaries
+\item{object}{An \code{\link{S4}} object to update the sensitivity profile summaries
 for.}
 
 \item{...}{Fallthrough arguments for defining new methods}

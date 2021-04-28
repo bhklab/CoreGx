@@ -7,7 +7,7 @@
 rowIDs(object, ...)
 }
 \arguments{
-\item{object}{[`S4`] An object to get row id columns from.}
+\item{object}{\code{\link{S4}} An object to get row id columns from.}
 
 \item{...}{Allow new arguments to this generic.}
 }

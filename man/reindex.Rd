@@ -7,19 +7,19 @@
 reindex(object, ...)
 }
 \arguments{
-\item{object}{[`S4`] An object to redo indexing for}
+\item{object}{\code{\link{S4}} An object to redo indexing for}
 
-\item{...}{[`pairlist`] Allow definition of new parameters to this generic.}
+\item{...}{\code{\link{pairlist}} Allow definition of new parameters to this generic.}
 }
 \value{
 Depends on the implemented method
 }
 \description{
 This method allows integer indexes used to maintain referential integrity
-  internal to an S4 object to be reset. This is useful particularly after
-  subsetting an object, as certain indexes may no longer be present in the
-  object data. Reindexing removes gaps integer indexes and ensures that the
-  smallest contiguous integer values are used in an objects indexes.
+internal to an S4 object to be reset. This is useful particularly after
+subsetting an object, as certain indexes may no longer be present in the
+object data. Reindexing removes gaps integer indexes and ensures that the
+smallest contiguous integer values are used in an objects indexes.
 }
 \examples{
 print("Generics shouldn't need examples?")
