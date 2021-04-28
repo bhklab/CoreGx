@@ -8,26 +8,27 @@ data('clevelandSmall_cSet')
 # Accessor Method Documentation Object
 # ---------------------------------------
 
-#' @noRd
-#' @keywords internal
-.docs_CoreSet_accessors <- function() {
-    paste0(c("",
-"@details",
-"Documentation for the various setters and getters which allow manipulation",
-"of data in the slots of a ``r .local_class`` object:",
-"@param object A ``r .local_class`` object.",
-"@param value See details.",
-"@param ... See details.",
-"@return Accessors: See details.",
-"",
-"@return Setters: An updated ``r .local_class`` object, returned invisibly.",
-"@md\n"), collapse="\n#' ")}
+.docs_CoreSet_accessors <- function(name_='CoreSet-accessors', class_) {
+    unlist(strsplit(
+        glue::glue(
+            "
+            @name {name_}
+            @title Accessing and modifying information in a `{class_}`
+            @details
+            Documentation for the various setters and getters which allow manipulation
+            of data in the slots of a `{class_}` object:
+            @param object A `{class_}` object.
+            @param value See details.
+            @param ... See details.
+            @return Accessors: See details.
+            @return Setters: An updated `{class_}` object, returned invisibly.
+            "
+        ), 
+    '\n'))
+}
 
-#' @title Accessing and modifying information in a ``r .local_class``
-#' @name CoreSet-accessors
-#' @md
-cat(.docs_CoreSet_accessors())
-`CoreSet-accessors` <- NULL
+#' @eval .docs_CoreSet_accessors(class_='CoreSet')
+NULL
 
 
 # ======================================

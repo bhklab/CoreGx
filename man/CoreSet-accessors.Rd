@@ -54,10 +54,25 @@
 
 \S4method{datasetType}{CoreSet,character}(object) <- value
 }
+\arguments{
+\item{object}{A \code{CoreSet} object.}
+
+\item{value}{See details.}
+
+\item{...}{See details.}
+}
+\value{
+Accessors: See details.
+
+Setters: An updated \code{CoreSet} object, returned invisibly.
+}
 \description{
 Accessing and modifying information in a \code{CoreSet}
 }
 \details{
+Documentation for the various setters and getters which allow manipulation
+of data in the slots of a \code{CoreSet} object:
+
 \strong{annotation}: A \code{list} of \code{CoreSet} annotations with items: 'name',
 the name of the object; dateCreated, date the object was created; 'sessionInfo',
 the \code{sessionInfo()} when the object was created; 'call', the R constructor call;
