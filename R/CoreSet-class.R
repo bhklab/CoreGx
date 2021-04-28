@@ -1,14 +1,14 @@
 #' @include CoreSet-class.R class-LongTable.R
 NULL
 
-#' @importFrom MultiAssayExperiment MultiAssayExperiment
+#' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
 setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 
 .local_class <- 'CoreSet'
 
 #' @title
-#' CoreSet - generic data container for molecular profiles and treatment 
-#' response data
+#' CoreSet - A generic data container for molecular profiles and 
+#'   treatment response data
 #' 
 #' @details  
 #' The CoreSet (CSet) class was developed as a superclass for pSets in the 
@@ -53,7 +53,7 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #'
 #' @md
 #' @aliases CoreSet-class
-#' @export CoreSet
+#' @exportClass CoreSet
 .CoreSet <- setClass("CoreSet",
     slots = list(sensitivity="list_or_LongTable",
                  annotation = "list",
@@ -100,7 +100,9 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #'   CoreSet, for proper processing of the data
 #' @param verify \code{boolean} Should the function verify the CoreSet and
 #'   print out any errors it finds after construction?
+#'
 #' @return An object of class CoreSet
+#'
 #' @export
 #'
 #' @include class-LongTable.R

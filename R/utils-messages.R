@@ -63,7 +63,7 @@
 #' @export
 #' @noRd
 .warning <- function(...) {
-    return(warning(cyan$bold(.formatMessage(...)), call.=FALSE))
+    warning(cyan$bold(.formatMessage(...)), call.=FALSE)
 }
 
 #' @title .error
@@ -82,5 +82,20 @@
 #' @export
 #' @noRd
 .error <- function(...) {
-    return(stop(magenta$bold(.formatMessage(...)), call.=FALSE))
+    stop(magenta$bold(.formatMessage(...)), call.=FALSE)
 }
+
+#' @title .funContext
+#'
+#' @description Build a string with the package and function name for a current
+#'   function. Prepended to error message to make it easier to determine where
+#'   the error or warning came from.
+#'
+#' @param funName `character(1)` A string with the function name, prepended
+#'   with the correct connection to the package NAMESPACE. For exported functions
+#'   use '::', for non-exported functions use ':::'.
+#' 
+#' @keywords internal
+#' @export
+#' @noRd
+.funContext <- function(funName) paste0('[', packageName(), funName, ']\n')
