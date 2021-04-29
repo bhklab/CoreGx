@@ -74,7 +74,7 @@ Documentation for the various setters and getters which allow manipulation
 of data in the slots of a \code{CoreSet} object:
 
 \strong{annotation}: A \code{list} of CoreSet annotations with items: 'name',
-the name of the object; dateCreated, date the object was created; 'sessionInfo',
+the name of the object; 'dateCreated', date the object was created; 'sessionInfo',
 the \code{sessionInfo()} when the object was created; 'call', the R constructor call;
 and 'version', the object version.
 
@@ -95,17 +95,21 @@ a \code{CoreSet} object. Arguments:
 \strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{CoreSet} object.
 
 \strong{cellInfo<-}: assign updated cell-line annotations to the \code{CoreSet} object. Arguments:
-
-\strong{cellNames}: \code{character} Retrieve the rownames of the cellInfo slot from a \code{CoreSet} object.
-
-\strong{cellNames<-}: assign new rownames to the cellInfo slot \code{data.frame} for a \code{CoreSet} object. Arguments:
 \itemize{
-\item value:
+\item value: a \code{data.frame} object.
+}
+
+\strong{cellNames}: \code{character} Retrieve the rownames of the cellInfo slot from a CoreSet object.
+
+\strong{cellNames<-}: assign new rownames to the cellInfo slot \code{data.frame} for
+a CoreSet object. Arguments:
+\itemize{
+\item value: \code{character} vector of rownames for the \code{cellInfo(object)} \code{data.frame}.
 }
 
 \strong{curation}: A \code{list} of curated mappings between identifiers in the
-\code{CoreSet} object and the original data publication. Contains two
-\code{data.frame}s, 'cell' with cell-line ids and 'tissue' with tissue ids.
+CoreSet object and the original data publication. Contains two \code{data.frame}s, 'cell' with cell-line ids and
+'tissue' with tissue ids.
 
 \strong{curation<-}: Update the \code{curation} slot of a \code{CoreSet} object. Arugments:
 \itemize{
@@ -123,9 +127,9 @@ a \code{CoreSet} object. Arguments:
 \examples{
 dateCreated(clevelandSmall_cSet)
 
-dateCreated(clevelandSmall_cSet)
+dateCreated(clevelandSmall_cSet) <- date()
 
-cellInfo <- cellInfo(clevelandSmall_cSet)
+cellInfo(clevelandSmall_cSet) <- cellInfo(clevelandSmall_cSet)
 
 cellNames(clevelandSmall_cSet)
 

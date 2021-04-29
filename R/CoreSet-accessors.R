@@ -2,6 +2,7 @@
 NULL
 
 .local_class <- 'CoreSet'
+.local_data <- 'clevelandSmall_cSet'
 data('clevelandSmall_cSet')
 
 # =======================================
@@ -9,21 +10,21 @@ data('clevelandSmall_cSet')
 # ---------------------------------------
 
 #' @noRd
-.docs_CoreSet_accessors <- function(...) {
-    .parseToRoxygen(
-        "
-        @title Accessing and modifying information in a `{class_}`
-        @details
-        Documentation for the various setters and getters which allow manipulation
-        of data in the slots of a `{class_}` object:
-        @param object A `{class_}` object.
-        @param value See details.
-        @param ... See details.
-        @return Accessors: See details.
-        @return Setters: An updated `{class_}` object, returned invisibly.
-        ",
-        ...)
-}
+.docs_CoreSet_accessors <- function(...) .parseToRoxygen(
+    "
+    @title Accessing and modifying information in a `{class_}`
+    @details
+    Documentation for the various setters and getters which allow manipulation
+    of data in the slots of a `{class_}` object:
+    @param object A `{class_}` object.
+    @param value See details.
+    @param ... See details.
+    @return Accessors: See details.
+    @return Setters: An updated `{class_}` object, returned invisibly.
+    ",
+    ...
+)
+
 
 #' @name CoreSet-accessors
 #' @eval .docs_CoreSet_accessors(class_='CoreSet')
@@ -35,8 +36,11 @@ NULL
 # --------------------------------------
 
 
-## --------------------
+## ====================
 ## ---- annotation slot
+
+##
+## -- annotation
 
 #' @noRd
 .docs_CoreSet_get_annotation <- function(...) .parseToRoxygen(
@@ -54,9 +58,8 @@ NULL
     ...
 )
 
-
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_get_annotation(class_='CoreSet')
+#' @eval .docs_CoreSet_get_annotation(class_=.local_class)
 setMethod('annotation', signature("CoreSet"), function(object) {
     object@annotation
 })
@@ -77,7 +80,7 @@ setMethod('annotation', signature("CoreSet"), function(object) {
 )
 
 #' @rdname CoreSet-accessors 
-#' @eval .docs_CoreSet_set_annotation(class_='CoreSet')
+#' @eval .docs_CoreSet_set_annotation(class_=.local_class)
 setReplaceMethod("annotation", signature("CoreSet", "list"), 
     function(object, value) 
 {
@@ -85,40 +88,55 @@ setReplaceMethod("annotation", signature("CoreSet", "list"),
     object
 })
 
+##
+## -- dateCreated
 
 #' @export
 setGeneric("dateCreated", function(object, ...) standardGeneric("dateCreated"))
 
+.docs_CoreSet_get_dateCreated <- function(...) .parseToRoxygen(
+    "
+    @details
+    __dateCreated__: `character(1)` The date the `{class_}` object was
+    created, as returned by the `date()` function.
+    @examples
+    dateCreated({data_})
+
+    @md
+    @aliases dateCreated,{class_}-method dateCreated
+    @exportMethod dateCreated
+    ",
+    ...
+)
+
 #' @rdname CoreSet-accessors
-#' @details
-#' __dateCreated__: `character(1)` The date the ``r .local_class`` object was
-#' created, as returned by the `date()` function.
-#'
-#' @examples
-#' dateCreated(clevelandSmall_cSet)
-#'
-#' @md
-#' @aliases dateCreated,CoreSet-method dateCreated
-#' @exportMethod dateCreated
+#' @eval .docs_CoreSet_get_dateCreated(class_=.local_class, data_=.local_data)
 setMethod('dateCreated', signature("CoreSet"), function(object) {
   object@annotation$dateCreated
 })
 
+
 #' @export
 setGeneric("dateCreated<-", function(object, ..., value) standardGeneric("dateCreated<-"))
 
+.docs_CoreSet_set_dateCreated <- function(...) .parseToRoxygen(
+    "
+    @details
+    __dateCreated<-__: Update the 'dateCreated' item in the `annotation` slot of
+    a `{class_}` object. Arguments:
+    - value: A `character(1)` vector, as returned by the `date()` function.
+    @examples
+    dateCreated({data_}) <- date()
+
+    @md
+    @aliases dateCreated<-,{class_}-method dateCreated<-
+    @exportMethod dateCreated<-
+    ",
+    ...
+)
+
 #' @rdname CoreSet-accessors
-#' @details
-#' __dateCreated<-__: Update the 'dateCreated' item in the `annotation` slot of
-#' a ``r .local_class`` object. Arguments:
-#' - value: A `character(1)` vector, as returned by the `date()` function.
-#'
-#' @examples
-#' dateCreated(clevelandSmall_cSet)
-#'
-#' @md
-#' @aliases dateCreated<-,CoreSet-method dateCreated<-
-#' @exportMethod dateCreated<-
+#' @eval .docs_CoreSet_set_dateCreated(class_=.local_class, data_=.local_data)
 setReplaceMethod('dateCreated', signature(object="CoreSet", value="character"), 
     function(object, value) 
 {
@@ -130,52 +148,58 @@ setReplaceMethod('dateCreated', signature(object="CoreSet", value="character"),
   return(object)
 })
 
-#' dateCreated<- Generic
-#'
-#' A generic for the dateCreated method
-#'
-#' @examples
-#' dateCreated(clevelandSmall_cSet) <- date()
-#'
-#' @param object A \code{CoreSet}
-#' @param ... Fallthrough arguements for defining new methods
-#' @param value A \code{datetime} object to update the cSet with
-#'
-#' @return The date the CoreSet was created
 
-## ------------------
-## ---- cellInfo slot
+## ==============
+## ---- cell slot
+
+
+##
+## -- cellInfo
 
 
 #' @export
 setGeneric("cellInfo", function(object, ...) standardGeneric("cellInfo"))
 
+#' @noRd
+.docs_CoreSet_get_cellInfo <- function(...) .parseToRoxygen(
+    "
+    @details
+    __cellInfo__: `data.frame` Metadata for all cell-lines in a `{class_}` object.
+
+    @md
+    @aliases cellInfo,{class_}-method cellInfo
+    @exportMethod cellInfo
+    ",
+    ...
+)
+
 #' @rdname CoreSet-accessors
-#' @details
-#' __cellInfo__: `data.frame` Metadata for all cell-lines in a ``r .local_class`` object.
-#' 
-#' @md
-#' @aliases cellInfo,CoreSet-method cellInfo
-#' @exportMethod cellInfo
+#' @eval .docs_CoreSet_get_cellInfo(class_=.local_class)
 setMethod(cellInfo, "CoreSet", function(object){
   object@cell
 })
 
-
 #' @export
 setGeneric("cellInfo<-", function(object, value) standardGeneric("cellInfo<-"))
 
+#' @noRd
+.docs_CoreSet_set_cellInfo <- function(...) .parseToRoxygen(
+    "
+    @details
+    __cellInfo<-__: assign updated cell-line annotations to the `{class_}` object. Arguments:
+    - value: a `data.frame` object.
+    @examples
+    cellInfo({data_}) <- cellInfo({data_})
+
+    @md
+    @aliases cellInfo<-,{class_},data.frame-method cellInfo<-
+    @exportMethod cellInfo<-
+    ",
+    ...
+)
+
 #' @rdname CoreSet-accessors
-#' @details
-#' __cellInfo<-__: assign updated cell-line annotations to the ``r .local_class`` object. Arguments:
-#  - value: a `data.frame` object.
-#'
-#' @examples
-#' cellInfo <- cellInfo(clevelandSmall_cSet)
-#'
-#' @md
-#' @aliases cellInfo<-,CoreSet,data.frame-method cellInfo<-
-#' @exportMethod cellInfo<-
+#' @eval .docs_CoreSet_set_cellInfo(class_=.local_class, data_=.local_data)
 setReplaceMethod("cellInfo", signature(object="CoreSet", value="data.frame"), 
     function(object, value)
 {
@@ -185,39 +209,61 @@ setReplaceMethod("cellInfo", signature(object="CoreSet", value="data.frame"),
   object
 })
 
+
+##
+## -- cellNames
+
+
 #' @export
 setGeneric("cellNames", function(object, ...) standardGeneric("cellNames"))
 
+#' @noRd
+.docs_CoreSet_get_cellNames <- function(...) .parseToRoxygen(
+    "
+    @details
+    __cellNames__: `character` Retrieve the rownames of the cellInfo slot from a {class_} object.
+    @examples
+    cellNames({data_})
+
+    @md
+    @aliases cellName,{class_}-method cellName
+    @exportMethod cellNames
+    ",
+    ...
+)
+
 #' @rdname CoreSet-accessors
-#' @details
-#' __cellNames__: `character` Retrieve the rownames of the cellInfo slot from a ``r .local_class`` object.
-#'
-#' @examples
-#' cellNames(clevelandSmall_cSet)
-#' 
-#' @md
-#' @aliases cellName,CoreSet-method cellName
-#' @exportMethod cellNames
+#' @eval .docs_CoreSet_get_cellNames(class_=.local_class, data_=.local_data)
 setMethod(cellNames, signature("CoreSet"), function(object){
   rownames(cellInfo(object))
 })
 
+
 #' @export
 setGeneric("cellNames<-", function(object, ..., value) standardGeneric("cellNames<-"))
 
+#' @noRd
+.docs_CoreSet_set_cellNames <- function(...) .parseToRoxygen(
+    "
+    @details
+    __cellNames<-__: assign new rownames to the cellInfo slot `data.frame` for 
+    a {class_} object. Arguments:
+    - value: `character` vector of rownames for the `cellInfo(object)` `data.frame`.
+    @examples
+    cellNames({data_}) <- cellNames({data_})
+
+    @md
+    @aliases cellNames<-,{class_},list-method cellNames<- 
+    @exportMethod cellNames<-
+    ",
+    ...
+)
+
 #' @rdname CoreSet-accessors
-#' @details
-#' __cellNames<-__: assign new rownames to the cellInfo slot `data.frame` for a ``r .local_class`` object. Arguments:
-#' - value: 
-#'
-#' @examples
-#' cellNames(clevelandSmall_cSet) <- cellNames(clevelandSmall_cSet)
-#'
-#' @md
-#' @aliases cellNames<-,CoreSet,list-method cellNames<- 
-#' @exportMethod cellNames<-
+#' @eval .docs_CoreSet_set_cellNames(class_=.local_class, data_=.local_data)
 setReplaceMethod("cellNames", signature(object="CoreSet",value="character"), 
 function(object, value){
+    ## TODO: does updateCellId also update slots other than cell?
     object <- updateCellId(object, value)
     return(object)
 })
@@ -227,21 +273,31 @@ function(object, value){
 ## ---- curation slot
 
 
+##
+## -- curation
+
 #' @export
 setGeneric("curation", function(object, ...) standardGeneric("curation"))
 
+.docs_CoreSet_get_curation <- function(...) .parseToRoxygen(
+    "
+    @details
+    __curation__: A `list` of curated mappings between identifiers in the 
+    {class_} object and the original data publication. {details_}
+    @examples
+    curation({data_})
+
+    @md
+    @aliases curation,{class_}-method curation
+    @exportMethod curation
+    ",
+    ...
+)
+
 #' @rdname CoreSet-accessors
-#' @details
-#' __curation__: A `list` of curated mappings between identifiers in the 
-#' ``r .local_class`` object and the original data publication. Contains two
-#' `data.frame`s, 'cell' with cell-line ids and 'tissue' with tissue ids.
-#'
-#' @examples
-#' curation(clevelandSmall_cSet)
-#'
-#' @md
-#' @aliases curation,CoreSet-method curation
-#' @exportMethod curation
+#' @eval .docs_CoreSet_get_curation(class_=.local_class, data_=.local_data, 
+#' details_="Contains two `data.frame`s, 'cell' with cell-line ids and 
+#' 'tissue' with tissue ids.")
 setMethod('curation', signature(object="CoreSet"), function(object) {
     object@curation
 })
@@ -266,6 +322,8 @@ setReplaceMethod("curation", signature(object="CoreSet", value="list"),
     object@curation <- value
     object
 })
+
+
 
 # ----------------------
 ## ---- datasetType slot

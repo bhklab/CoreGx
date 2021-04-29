@@ -4,7 +4,7 @@
 \alias{as.data.table.LongTable}
 \title{Coerce a LongTable into a \code{data.table}}
 \usage{
-as.data.table.LongTable(x)
+\method{as.data.table}{LongTable}(x)
 }
 \arguments{
 \item{x}{\code{\link{LongTable}} to coerce to a \code{data.table}}
