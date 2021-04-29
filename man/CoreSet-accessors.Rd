@@ -111,9 +111,10 @@ a CoreSet object. Arguments:
 CoreSet object and the original data publication. Contains two \code{data.frame}s, 'cell' with cell-line ids and
 'tissue' with tissue ids.
 
-\strong{curation<-}: Update the \code{curation} slot of a \code{CoreSet} object. Arugments:
+\strong{curation<-}: Update the \code{curation} slot of a CoreSet object. Arugments:
 \itemize{
-\item value: A \code{list} of \code{data.frame}s, one for each type of curated identifier. For a \code{CoreSet} object the slot should contain tissue and cell-line id \code{data.frame}s.
+\item value: A \code{list} of \code{data.frame}s, one for each type of curated identifier. For a \code{CoreSet} object the slot should contain tissue and
+cell-line id \code{data.frame}s.
 }
 
 \strong{datasetType}: \code{character(1)} The type treatment response in the

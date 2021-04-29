@@ -305,17 +305,26 @@ setMethod('curation', signature(object="CoreSet"), function(object) {
 #' @export
 setGeneric("curation<-", function(object, ..., value) standardGeneric("curation<-"))
 
+#' @noRd
+.docs_CoreSet_set_curation <- function(...) .parseToRoxygen(
+    "
+    @details
+    __curation<-__: Update the `curation` slot of a {class_} object. Arugments:
+    - value: A `list` of `data.frame`s, one for each type of curated identifier. {details_}
+    @examples
+    curation({data_}) <- curation({data_})
+
+    @md
+    @aliases curation<-,{class_},list-method curation<-
+    @exportMethod curation<-
+    ",
+    ...
+)
+
 #' @rdname CoreSet-accessors
-#' @details
-#' __curation<-__: Update the `curation` slot of a ``r .local_class`` object. Arugments:
-#' - value: A `list` of `data.frame`s, one for each type of curated identifier. For a ``r .local_class`` object the slot should contain tissue and cell-line id `data.frame`s.
-#'
-#' @examples
-#' curation(clevelandSmall_cSet) <- curation(clevelandSmall_cSet)
-#'
-#' @md
-#' @aliases curation<-,CoreSet,list-method curation<-
-#' @exportMethod curation<-
+#' @eval .docs_CoreSet_set_curation(class_=.local_class, data_=.local_data, 
+#' details_="For a `CoreSet` object the slot should contain tissue and 
+#' cell-line id `data.frame`s.")
 setReplaceMethod("curation", signature(object="CoreSet", value="list"), 
     function(object, value)
 {
