@@ -28,6 +28,20 @@
 \alias{datasetType,CoreSet-method}
 \alias{datasetType}
 \alias{datasetType<-,CoreSet,character-method}
+\alias{molecularProfiles,CoreSet-method}
+\alias{molecularProfiles}
+\alias{molecularProfiles<-,CoreSet,character,character,matrix-method}
+\alias{molecularProfiles<-,CoreSet,character,missing,matrix-method}
+\alias{molecularProfiles<-}
+\alias{featureInfo,CoreSet-method}
+\alias{featureInfo}
+\alias{featureInfo<-,CoreSet,character,data.frame-method}
+\alias{featureInfo<-,CoreSet,character,DataFrame-method}
+\alias{featureInfo<-}
+\alias{mDataNames,CoreSet-method}
+\alias{mDataNames<-,CoreSet-method}
+\alias{mDataNames<-,CoreSet,ANY-method}
+\alias{mDataNames}
 \title{Accessing and modifying information in a \code{CoreSet}}
 \usage{
 \S4method{annotation}{CoreSet}(object)
@@ -53,11 +67,28 @@
 \S4method{datasetType}{CoreSet}(object)
 
 \S4method{datasetType}{CoreSet,character}(object) <- value
+
+\S4method{molecularProfiles}{CoreSet}(object, mDataType, assay)
+
+\S4method{molecularProfiles}{CoreSet,character,character,matrix}(object, mDataType, assay) <- value
+
+\S4method{featureInfo}{CoreSet}(object, mDataType)
+
+\S4method{featureInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
+
+\S4method{mDataNames}{CoreSet}(object)
+
+\S4method{mDataNames}{CoreSet}(object) <- value
 }
 \arguments{
 \item{object}{A \code{CoreSet} object.}
 
 \item{value}{See details.}
+
+\item{mDataType}{\code{character(1)} The name of a molecular datatype to access
+from the \code{molecularProfiles} of a \code{CoreSet} object.}
+
+\item{assay}{See details.}
 
 \item{...}{See details.}
 }
@@ -67,24 +98,28 @@ Accessors: See details.
 Setters: An updated \code{CoreSet} object, returned invisibly.
 }
 \description{
-Accessing and modifying information in a \code{CoreSet}
+Documentation for the various setters and getters which allow manipulation
+of data in the slots of a \code{CoreSet} object.
 }
 \details{
-Documentation for the various setters and getters which allow manipulation
-of data in the slots of a \code{CoreSet} object:
+\subsection{annotation slot}{
 
 \strong{annotation}: A \code{list} of CoreSet annotations with items: 'name',
 the name of the object; 'dateCreated', date the object was created; 'sessionInfo',
 the \code{sessionInfo()} when the object was created; 'call', the R constructor call;
 and 'version', the object version.
+}
 
 \strong{annotation<-}: Setter method for the annotation slot. Arguments:
 \itemize{
 \item value: a \code{list} of annotations to update the CoreSet with.
 }
 
+\subsection{dateCreated slot}{
+
 \strong{dateCreated}: \code{character(1)} The date the \code{CoreSet} object was
 created, as returned by the \code{date()} function.
+}
 
 \strong{dateCreated<-}: Update the 'dateCreated' item in the \code{annotation} slot of
 a \code{CoreSet} object. Arguments:
@@ -99,7 +134,8 @@ a \code{CoreSet} object. Arguments:
 \item value: a \code{data.frame} object.
 }
 
-\strong{cellNames}: \code{character} Retrieve the rownames of the cellInfo slot from a CoreSet object.
+\strong{cellNames}: \code{character} Retrieve the rownames of the \code{data.frame} in
+the \code{cell} slot from a CoreSet object.
 
 \strong{cellNames<-}: assign new rownames to the cellInfo slot \code{data.frame} for
 a CoreSet object. Arguments:
@@ -107,22 +143,74 @@ a CoreSet object. Arguments:
 \item value: \code{character} vector of rownames for the \code{cellInfo(object)} \code{data.frame}.
 }
 
+\subsection{curation slot}{
+
 \strong{curation}: A \code{list} of curated mappings between identifiers in the
 CoreSet object and the original data publication. Contains two \code{data.frame}s, 'cell' with cell-line ids and
 'tissue' with tissue ids.
+}
 
 \strong{curation<-}: Update the \code{curation} slot of a CoreSet object. Arugments:
 \itemize{
-\item value: A \code{list} of \code{data.frame}s, one for each type of curated identifier. For a \code{CoreSet} object the slot should contain tissue and
+\item value: A \code{list} of \code{data.frame}s, one for each type of curated
+identifier. For a \code{CoreSet} object the slot should contain tissue and
 cell-line id \code{data.frame}s.
 }
 
+\subsection{datasetType slot}{
+
 \strong{datasetType}: \code{character(1)} The type treatment response in the
 \code{sensitivity} slot. Valid values are 'sensitivity', 'perturbation' or 'both'.
+}
 
-\strong{datasetType<-}: Update the datasetType slot of a \code{CoreSet} object. Arguments:
+\strong{datasetType<-}: Update the datasetType slot of a CoreSet object.
+Arguments:
 \itemize{
-\item value: A \code{character(1)} vector with
+\item value: A \code{character(1)} vector with one of 'sensitivity', 'perturbation'
+or 'both'
+}
+
+\subsection{molecularProfiles slot}{
+
+\strong{molecularProfiles}: Retrieve
+}
+
+\strong{molecularProfiles<-}: Update an assay in a \code{SummarizedExperiment} from
+the \code{molecularProfiles} slot of a CoreSet object with the specified
+\code{mDataType}. Valid \code{mDataType} arguments can be found with
+\code{mDataNames(object)}.
+\itemize{
+\item assay: Optional \code{character(1)} vector specifying an assay in the
+\code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
+\code{CoreSet} object for the specified \code{mDataType}. If excluded,
+defaults to modifying the first assay in the \code{SummarizedExperiment} for
+the given \code{mDataType}.
+\item value: A \code{matrix} of values to assign to the \code{assay} slot of the
+\code{SummarizedExperiment} for the selected \code{mDataType}. The rownames and
+column names must match the associated \code{SummarizedExperiment}.
+}
+
+\strong{featureInfo}: Retrieve a \code{DataFrame} of feature metadata for the specified
+\code{mDataType} from the \code{molecularProfiles} slot of a CoreSet object.
+
+\strong{featureInfo<-}: Update the \code{featureInfo(object, mDataType)} \code{DataFrame}
+with new feature metadata. Arguments:
+\itemize{
+\item value: A \code{data.frame} or \code{DataFrame} with updated feature metadata for
+the specified molecular profile in the \code{molecularProfiles} slot of a
+\code{CoreSet} object.
+}
+
+\strong{mDataNames}: \code{character} Retrieve the names of the molecular data types
+available in the \code{molecularProfiles} slot of a \code{CoreSet} object. These
+are the options which can be used in the \code{mDataType} parameter of various
+\code{molecularProfiles} slot accessors methods.
+
+\strong{mDataNames}: Update the molecular data type names of the
+\code{molecularProfiles} slot of a CoreSet object. Arguments:
+\itemize{
+\item value: \code{character} vector of molecular datatype names, with length
+equal to \code{length(molecularProfilesSlot(object))}.
 }
 }
 \examples{
@@ -143,5 +231,19 @@ curation(clevelandSmall_cSet) <- curation(clevelandSmall_cSet)
 datasetType(clevelandSmall_cSet)
 
 datasetType(clevelandSmall_cSet) <- 'both'
+
+# No assay specified
+molecularProfiles(clevelandSmall_cSet, 'rna') <- molecularProfiles(clevelandSmall_cSet, 'rna')
+
+# Specific assay
+molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs') <- molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs')
+
+featureInfo(clevelandSmall_cSet, 'rna')
+
+featureInfo(clevelandSmall_cSet) <- featureInfo(clevelandSmall_cSet)
+
+mDataNames(clevelandSmall_cSet)
+
+mDataNames(clevelandSmall_cSet) <- mDataNames(clevelandSmall_cSet)
 
 }
