@@ -73,7 +73,7 @@ Accessing and modifying information in a \code{CoreSet}
 Documentation for the various setters and getters which allow manipulation
 of data in the slots of a \code{CoreSet} object:
 
-\strong{annotation}: A \code{list} of \code{CoreSet} annotations with items: 'name',
+\strong{annotation}: A \code{list} of CoreSet annotations with items: 'name',
 the name of the object; dateCreated, date the object was created; 'sessionInfo',
 the \code{sessionInfo()} when the object was created; 'call', the R constructor call;
 and 'version', the object version.

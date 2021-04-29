@@ -8,25 +8,24 @@ data('clevelandSmall_cSet')
 # Accessor Method Documentation Object
 # ---------------------------------------
 
-.docs_CoreSet_accessors <- function(name_='CoreSet-accessors', class_) {
-    unlist(strsplit(
-        glue::glue(
-            "
-            @name {name_}
-            @title Accessing and modifying information in a `{class_}`
-            @details
-            Documentation for the various setters and getters which allow manipulation
-            of data in the slots of a `{class_}` object:
-            @param object A `{class_}` object.
-            @param value See details.
-            @param ... See details.
-            @return Accessors: See details.
-            @return Setters: An updated `{class_}` object, returned invisibly.
-            "
-        ), 
-    '\n'))
+#' @noRd
+.docs_CoreSet_accessors <- function(...) {
+    .parseToRoxygen(
+        "
+        @title Accessing and modifying information in a `{class_}`
+        @details
+        Documentation for the various setters and getters which allow manipulation
+        of data in the slots of a `{class_}` object:
+        @param object A `{class_}` object.
+        @param value See details.
+        @param ... See details.
+        @return Accessors: See details.
+        @return Setters: An updated `{class_}` object, returned invisibly.
+        ",
+        ...)
 }
 
+#' @name CoreSet-accessors
 #' @eval .docs_CoreSet_accessors(class_='CoreSet')
 NULL
 
@@ -39,34 +38,49 @@ NULL
 ## --------------------
 ## ---- annotation slot
 
+#' @noRd
+.docs_CoreSet_get_annotation <- function(...) .parseToRoxygen(
+    "
+    @details 
+    __annotation__: A `list` of {class_} annotations with items: 'name', 
+    the name of the object; 'dateCreated', date the object was created; 'sessionInfo',
+    the `sessionInfo()` when the object was created; 'call', the R constructor call;
+    and 'version', the object version.
+    @aliases annotation
+    @md
+    @importMethodsFrom BiocGenerics annotation
+    @exportMethod annotation
+    ",
+    ...
+)
+
 
 #' @rdname CoreSet-accessors
-#' @details 
-#' __annotation__: A `list` of ``r .local_class`` annotations with items: 'name', 
-#' the name of the object; dateCreated, date the object was created; 'sessionInfo',
-#' the `sessionInfo()` when the object was created; 'call', the R constructor call;
-#' and 'version', the object version.
-#'
-#' @aliases annotation
-#'
-#' @md
-#' @importMethodsFrom BiocGenerics annotation
-#' @exportMethod annotation
+#' @eval .docs_CoreSet_get_annotation(class_='CoreSet')
 setMethod('annotation', signature("CoreSet"), function(object) {
     object@annotation
 })
 
+
+#' @noRd
+.docs_CoreSet_set_annotation <- function(...) .parseToRoxygen(
+    "
+    @details 
+    __annotation<-__: Setter method for the annotation slot. Arguments:
+    - value: a `list` of annotations to update the {class_} with.
+    @aliases annotation<-
+    @md
+    @importMethodsFrom BiocGenerics annotation<-
+    @exportMethod annotation<-
+    ",
+    ...
+)
+
 #' @rdname CoreSet-accessors 
-#' @details 
-#' __annotation<-__: Setter method for the annotation slot. Arguments:
-#' - value: a `list` of annotations to update the `r .local_class` with.
-#'
-#' @aliases annotation<-
-#'
-#' @md
-#' @importMethodsFrom BiocGenerics annotation<-
-#' @exportMethod annotation<-
-setReplaceMethod("annotation", signature("CoreSet", "list"), function(object, value) {
+#' @eval .docs_CoreSet_set_annotation(class_='CoreSet')
+setReplaceMethod("annotation", signature("CoreSet", "list"), 
+    function(object, value) 
+{
     object@annotation <- value
     object
 })

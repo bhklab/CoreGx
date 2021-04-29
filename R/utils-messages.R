@@ -99,3 +99,19 @@
 #' @export
 #' @noRd
 .funContext <- function(funName) paste0('[', packageName(), funName, ']\n')
+
+
+#' @title .parseToRoxygen
+#'
+#' @description Takes a string block of roxygen2 tags sepearated by new-line 
+#'   characteres and parses it to the appropriate format for the @eval tag,
+#'   subtituting any string in { } for the argument of the same name in `...`.
+#'
+#' @keywords internal
+#' @export
+#' @noRd
+.parseToRoxygen <- function(string, ...) {
+    unlist(strsplit(
+        with(list(...), glue::glue(string)),
+    '\n'))
+}
