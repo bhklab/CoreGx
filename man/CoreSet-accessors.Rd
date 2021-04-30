@@ -42,6 +42,14 @@
 \alias{mDataNames<-,CoreSet-method}
 \alias{mDataNames<-,CoreSet,ANY-method}
 \alias{mDataNames}
+\alias{sensitivityInfo,CoreSet-method}
+\alias{sensitivityInfo,CoreSet,missing-method}
+\alias{sensitivityInfo,CoreSet,character-method}
+\alias{sensitivityInfo}
+\alias{sensitivityInfo<-,CoreSet,data.frame-method}
+\alias{sensitivityInfo<-,CoreSet,missing,data.frame-method}
+\alias{sensitviityInfo<-,CoreSet,character,data.frame-method}
+\alias{sensitivityInfo<-}
 \title{Accessing and modifying information in a \code{CoreSet}}
 \usage{
 \S4method{annotation}{CoreSet}(object)
@@ -79,6 +87,10 @@
 \S4method{mDataNames}{CoreSet}(object)
 
 \S4method{mDataNames}{CoreSet}(object) <- value
+
+\S4method{sensitivityInfo}{CoreSet}(object, dimension, ...)
+
+\S4method{sensitivityInfo}{CoreSet,data.frame}(object, dimension, ...) <- value
 }
 \arguments{
 \item{object}{A \code{CoreSet} object.}
@@ -88,7 +100,8 @@
 \item{mDataType}{\code{character(1)} The name of a molecular datatype to access
 from the \code{molecularProfiles} of a \code{CoreSet} object.}
 
-\item{assay}{See details.}
+\item{assay}{\code{character(1)} A valid assay name in the \code{SummarizedExperiment}
+of \verb{@molecularProfiles} of a CoreSet object for data type \code{mDataType}.}
 
 \item{...}{See details.}
 }
@@ -102,7 +115,7 @@ Documentation for the various setters and getters which allow manipulation
 of data in the slots of a \code{CoreSet} object.
 }
 \details{
-\subsection{annotation slot}{
+\subsection{@annotation}{
 
 \strong{annotation}: A \code{list} of CoreSet annotations with items: 'name',
 the name of the object; 'dateCreated', date the object was created; 'sessionInfo',
@@ -115,7 +128,7 @@ and 'version', the object version.
 \item value: a \code{list} of annotations to update the CoreSet with.
 }
 
-\subsection{dateCreated slot}{
+\subsection{@dateCreated}{
 
 \strong{dateCreated}: \code{character(1)} The date the \code{CoreSet} object was
 created, as returned by the \code{date()} function.
@@ -143,7 +156,7 @@ a CoreSet object. Arguments:
 \item value: \code{character} vector of rownames for the \code{cellInfo(object)} \code{data.frame}.
 }
 
-\subsection{curation slot}{
+\subsection{@curation}{
 
 \strong{curation}: A \code{list} of curated mappings between identifiers in the
 CoreSet object and the original data publication. Contains two \code{data.frame}s, 'cell' with cell-line ids and
@@ -170,7 +183,7 @@ Arguments:
 or 'both'
 }
 
-\subsection{molecularProfiles slot}{
+\subsection{@molecularProfiles}{
 
 \strong{molecularProfiles}: Retrieve
 }
@@ -212,10 +225,47 @@ are the options which can be used in the \code{mDataType} parameter of various
 \item value: \code{character} vector of molecular datatype names, with length
 equal to \code{length(molecularProfilesSlot(object))}.
 }
+
+\subsection{@sensitivity}{
+
+Arguments:
+\itemize{
+\item \code{dimension}: Optional \code{character(1)} One of 'drug', 'cell' or 'assay' to
+retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from the
+\code{CoreSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
+warning if \verb{@sensitivity} is not a \code{LongTable} object.
+\item \code{...}: Additional arguments to the \code{rowData} or \code{colData}.
+\code{LongTable} methods. Only used if the sensitivity slot contains a
+\code{LongTable} object instead of a \code{list} and the \code{dimension} argument is
+specified.
+}
+
+\strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity drug combo
+by cell-line metadata for the \code{CoreSet} object. When the \code{dimension}
+parameter is used, it allows retrieval of the dimension specific metadata
+from the \code{LongTable} object in \verb{@sensitivity} of a CoreSet object.
+}
+
+\strong{sensitivityInfo}<-: Update the \verb{@sensitivity} slot metadata for a
+\code{CoreSet} object. When used without the \code{dimension} argument is behaves
+similar to the old CoreSet implementation, where the \verb{@sensitivity} slot
+contained a list with a \verb{$info} \code{data.frame} item. When the \code{dimension}
+arugment is used, more complicated assignments can occur where 'cell'
+modifies the \verb{@sensitvity} \code{LongTable} colData, 'drug' the rowData and
+'assay' the 'assay_metadata' assay.
+Arguments:
+\itemize{
+\item value: A \code{data.frame} of treatment response experiment metadata,
+documenting experiment level metadata (mapping to drugs and cells). If
+the \verb{@sensitivity} slot doesn't contain a \code{LongTable} and \code{dimension} is
+not specified, you can only modify existing columns as returned by
+\code{sensitivityInfo(object)}.
+}
 }
 \examples{
 dateCreated(clevelandSmall_cSet)
 
+## dateCreated
 dateCreated(clevelandSmall_cSet) <- date()
 
 cellInfo(clevelandSmall_cSet) <- cellInfo(clevelandSmall_cSet)
@@ -224,6 +274,7 @@ cellNames(clevelandSmall_cSet)
 
 cellNames(clevelandSmall_cSet) <- cellNames(clevelandSmall_cSet)
 
+## curation
 curation(clevelandSmall_cSet)
 
 curation(clevelandSmall_cSet) <- curation(clevelandSmall_cSet)
@@ -245,5 +296,9 @@ featureInfo(clevelandSmall_cSet) <- featureInfo(clevelandSmall_cSet)
 mDataNames(clevelandSmall_cSet)
 
 mDataNames(clevelandSmall_cSet) <- mDataNames(clevelandSmall_cSet)
+
+sensitivityInfo(clevelandSmall_cSet)
+
+sensitivityInfo(clevelandSmall_cSet) <- sensitivityInfo(clevelandSmall_cSet)
 
 }

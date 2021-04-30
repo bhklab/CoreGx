@@ -1,4 +1,4 @@
-#' @include CoreSet-class.R
+#' @include CoreSet-class.R allGenerics.R
 NULL
 
 .local_class <- 'CoreSet'
@@ -13,15 +13,19 @@ data('clevelandSmall_cSet')
 .docs_CoreSet_accessors <- function(...) .parseToRoxygen(
     "
     @title Accessing and modifying information in a `{class_}`
+
     @description
     Documentation for the various setters and getters which allow manipulation
     of data in the slots of a `{class_}` object.
+
     @param object A `{class_}` object.
     @param value See details.
     @param mDataType `character(1)` The name of a molecular datatype to access
     from the `molecularProfiles` of a `{class_}` object.
-    @param assay See details.
+    @param assay `character(1)` A valid assay name in the `SummarizedExperiment`
+    of `@molecularProfiles` of a {class_} object for data type `mDataType`.
     @param ... See details.
+
     @return Accessors: See details.
     @return Setters: An updated `{class_}` object, returned invisibly.
     ",
@@ -48,7 +52,7 @@ NULL
 .docs_CoreSet_get_annotation <- function(...) .parseToRoxygen(
     "
     @details 
-    ## annotation slot
+    ## @annotation
     __annotation__: A `list` of {class_} annotations with items: 'name', 
     the name of the object; 'dateCreated', date the object was created; 'sessionInfo',
     the `sessionInfo()` when the object was created; 'call', the R constructor call;
@@ -100,7 +104,7 @@ setGeneric("dateCreated", function(object, ...) standardGeneric("dateCreated"))
 .docs_CoreSet_get_dateCreated <- function(...) .parseToRoxygen(
     "
     @details
-    ## dateCreated slot
+    ## @dateCreated
     __dateCreated__: `character(1)` The date the `{class_}` object was
     created, as returned by the `date()` function.
     @examples
@@ -168,7 +172,7 @@ setGeneric("cellInfo", function(object, ...) standardGeneric("cellInfo"))
 #' @noRd
 .docs_CoreSet_get_cellInfo <- function(...) .parseToRoxygen(
     "
-    ## cell slot
+    ## @cell
     @details
     __cellInfo__: `data.frame` Metadata for all cell-lines in a `{class_}` object.
 
@@ -290,10 +294,11 @@ setGeneric("curation", function(object, ...) standardGeneric("curation"))
 .docs_CoreSet_get_curation <- function(...) .parseToRoxygen(
     "
     @details
-    ## curation slot
+    ## @curation
     __curation__: A `list` of curated mappings between identifiers in the 
     {class_} object and the original data publication. {details_}
     @examples
+    ## curation
     curation({data_})
 
     @md
@@ -433,7 +438,7 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
 .docs_CoreSet_get_molecularProfiles <- function(...) .parseToRoxygen(
     "
     @details
-    ## molecularProfiles slot
+    ## @molecularProfiles
     __molecularProfiles__: Retrieve 
 
     @md
@@ -666,3 +671,419 @@ setReplaceMethod("mDataNames", "CoreSet", function(object, value){
 
 ## ---------------------
 ## ---- sensitivity slot
+
+
+
+
+#
+# -- sensitivityInfo
+
+#' @noRd
+.docs_CoreSet_get_sensitivityInfo <- function(...) .parseToRoxygen(
+    "
+    @details
+    ## @sensitivity
+
+    Arguments:
+    - `dimension`: Optional `character(1)` One of 'drug', 'cell' or 'assay' to
+    retrieve `rowData`, `colData` or the 'assay_metadata' assay from the 
+    `{class_}` `@sensitvity` `LongTable` object, respectively. Ignored with 
+    warning if `@sensitivity` is not a `LongTable` object.
+    -  `...`: Additional arguments to the `rowData` or `colData`.
+    `LongTable` methods. Only used if the sensitivity slot contains a
+    `LongTable` object instead of a `list` and the `dimension` argument is 
+    specified.
+
+    __sensitivityInfo__: `DataFrame` or `data.frame` of sensitivity drug combo
+    by cell-line metadata for the `{class_}` object. When the `dimension` 
+    parameter is used, it allows retrieval of the dimension specific metadata 
+    from the `LongTable` object in `@sensitivity` of a {class_} object.
+
+    @examples
+    sensitivityInfo({data_})
+
+    @md
+    @aliases sensitivityInfo,{class_},missing-method 
+    sensitivityInfo,{class_},character-method sensitivityInfo
+    @exportMethod sensitivityInfo
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_get_sensitivityInfo(class_=.local_class, data_=.local_data)
+setMethod(sensitivityInfo, signature("CoreSet"),
+    function(object, dimension, ...) 
+{
+    funContext <- .funContext('::sensitivityInfo')
+    # case where sensitivity slot is a LongTable
+    if (is(sensitivitySlot(object), 'LongTable')) {
+        if (!missing(dimension)) {
+            switch(dimension,
+                cell={ return(colData(sensitivitySlot(object), ...)) },
+                drug={ return(rowData(sensitivitySlot(object), ...)) },
+                assay={ return(assay(sensitivitySlot(object), 'assay_metadata')) },
+                .error(funContext, 'Invalid value for the dimension argument. 
+                    Please select on of "cells", "drugs" or "assays'))
+        } else {
+            return(.rebuildInfo(sensitivitySlot(object)))
+        }
+    # sensitivity is a list
+    } else {
+        if (!missing(dimension))
+            .warning(funContext,' The dimension argument is only valid if the 
+                sensitivity slot contains a LongTable object. Ignoring the 
+                dimension and ... parameters.')
+        return(sensitivitySlot(object)$info)
+    }
+})
+
+
+#' Replicate the $info slot in the old sensitivity list from the new LongTable
+#'   object
+#'
+#' @param longTable [`LongTable`]
+#'
+#' @keywords internal
+#' @importFrom MatrixGenerics colAlls
+#' @importFrom data.table setkeyv merge.data.table `:=` setDF
+#' @noRd
+.rebuildInfo <- function(longTable) {
+
+    # Extract the information needed to reconstruct the sensitivityInfo data.frame
+    assayIndexDT <- assay(longTable, 1, key=TRUE)[, .(rowKey, colKey)]
+    setkeyv(assayIndexDT, c('rowKey', 'colKey'))
+    rowDataDT <- rowData(longTable, key=TRUE)
+    setkeyv(rowDataDT, 'rowKey')
+    colDataDT <- colData(longTable, key=TRUE)
+    setkeyv(colDataDT, 'colKey')
+
+    rowIDcols <- rowIDs(longTable)[!grepl('dose', rowIDs(longTable))]
+    colIDcols <- colIDs(longTable)
+    rownameCols <- c(rowIDcols, colIDcols)
+
+    # join the tables into the original data
+    infoDT <- merge.data.table(assayIndexDT, rowDataDT, all=TRUE)
+    setkeyv(infoDT, 'colKey')
+    infoDT <- merge.data.table(infoDT, colDataDT, all=TRUE)[, -c('rowKey', 'colKey')]
+
+    # determine which columns map 1:1 with new identifiers and subset to those
+    infoDT_first <- infoDT[, head(.SD, 1), by=rownameCols]
+    infoDT_last <- infoDT[, tail(.SD, 1), by=rownameCols]
+    keepCols <- names(which(apply(infoDT_first == infoDT_last, MARGIN=2, 
+        FUN=all)))
+    infoDT_sub <- unique(infoDT[, ..keepCols])
+
+    # rebuld the rownames
+    .paste_ <- function(x, y) paste(x, y, sep='_')
+    .paste_colon <- function(x, y) paste(x, y, sep=':')
+    infoDT_sub[, drugid := Reduce(.paste_colon, mget(..rowIDcols))]
+    infoDT_sub[, cellid := Reduce(.paste_colon, mget(..colIDcols))]
+    infoDT_sub[, exp_id := Reduce(.paste_, .(drugid, cellid))]
+
+    # convert to data.frame
+    setDF(infoDT_sub, rownames=infoDT_sub$exp_id)
+    return(infoDT_sub)
+}
+
+#' @noRd
+.docs_CoreSet_set_sensitivityInfo <- function(...) .parseToRoxygen(
+    "
+    @details
+    __sensitivityInfo__<-: Update the `@sensitivity` slot metadata for a 
+    `{class_}` object. When used without the `dimension` argument is behaves
+    similar to the old {class_} implementation, where the `@sensitivity` slot
+    contained a list with a `$info` `data.frame` item. When the `dimension`
+    arugment is used, more complicated assignments can occur where 'cell' 
+    modifies the `@sensitvity` `LongTable` colData, 'drug' the rowData and
+    'assay' the 'assay_metadata' assay.
+    Arguments:
+    - value: A `data.frame` of treatment response experiment metadata, 
+    documenting experiment level metadata (mapping to drugs and cells). If
+    the `@sensitivity` slot doesn't contain a `LongTable` and `dimension` is
+    not specified, you can only modify existing columns as returned by 
+    `sensitivityInfo(object)`.
+    @examples
+    sensitivityInfo({data_}) <- sensitivityInfo({data_})
+
+    @md
+    @aliases sensitivityInfo<-,{class_},missing,data.frame-method 
+    sensitviityInfo<-,{class_},character,data.frame-method sensitivityInfo<-
+    @import data.table
+    @exportMethod sensitivityInfo<-
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_set_sensitivityInfo(class_=.local_class, data_=.local_data)
+setReplaceMethod("sensitivityInfo",
+                 signature(object="CoreSet", value="data.frame"),
+                 function(object, dimension, ..., value) {
+
+    if (is(sensitivitySlot(object), 'LongTable')) {
+        # coerce to data.table
+        if (!is.data.table(value)) value <- data.table(value, keep.rownames=TRUE)
+        if (missing(dimension)) {
+            valueCols <- colnames(value)
+            # get existing column names
+            rowDataCols <- colnames(rowData(object@sensitivity))
+            colDataCols <- colnames(colData(object@sensitivity))
+            # drop any value columns that don't already exist
+            hasValueCols <- valueCols %in% c(rowDataCols, colDataCols)
+            if (!all(hasValueCols))
+                warning(.warnMsg('\n[CoreGx::sensitivityInfo<-] Dropping ',
+                    'columns ', .collapse(valueCols[!hasValueCols]), ' from ',
+                    'value. Currently this setter only allows modifying ',
+                    'existing columns when @sensitivity is a LongTable. For ',
+                    'more fine grained updates please use the dimension ',
+                    'argument.',  collapse=', '))
+            # update the object
+            rowData(object@sensitivity, ...) <-
+                unique(value[, .SD, .SDcols=valueCols %in% rowDataCols])
+            colData(object@sensitivity, ...) <-
+                unique(value[, .SD, .SDcols=valueCols %in% colDataCols])
+        } else {
+            switch(dimension,
+                drug={ rowData(object@sensitivity, ...) <- value },
+                cell={ colData(object@sensitivity, ...) <- value },
+                assay={ assay(object@sensitivity, 'assay_metadata') <- value },
+                stop(.errorMsg('\n[CoreGx::sensitivityInfo<-] Invalid argument to',
+                    'dimension parameter. Please choose one of "cells" or "drugsA"')))
+        }
+    } else {
+        if (!missing(dimension))
+            warning(.warnMsg('\n[CoreGx::sensitivityInfo<-] The dimension argument ',
+                'is only valid if the sensitivity slot contains a LongTable object. ',
+                'Ignoring dimension and ... parameters.'))
+        object@sensitivity$info <- value
+    }
+    return(object)
+})
+
+#
+# -- sensitvityMeasures
+
+
+#' sensitivityMeasures CoreSet Getter Method
+#'
+#' @describeIn CoreSet Returns the available sensitivity profile
+#'   summaries, for example, whether there are IC50 values available
+#'
+#' @examples
+#' sensitivityMeasures(clevelandSmall_cSet)
+#'
+#' @param object A [`CoreSet`] object to retrieve the names of sensitivty
+#'    profile summary measurements for.
+#'
+#' @return A [`character`] vector of all the available sensitivity measures.
+
+#' @export
+setMethod(sensitivityMeasures, "CoreSet", function(object){
+    return(colnames(sensitivityProfiles(object)))
+})
+
+#' sensitivityMeasures<- CoreSet Setter Method
+#'
+#' @describeIn CoreSet Updates the sensitivity measures in a `CoreSet` object
+#'     and returns the updated object
+#'
+#' @examples
+#' data(clevelandSmall_cSet)
+#' sensitivityMeasures(clevelandSmall_cSet) <- sensitivityMeasures(clevelandSmall_cSet)
+#'
+#' @param object  The \code{CoreSet} object to update
+#' @param value A \code{character} vector of sensitivity measures to use to update the cSet object
+#'
+#' @return A update \code{CoreSet} object with the new sensitivity measures
+#'
+#' @export
+setReplaceMethod('sensitivityMeasures',
+    signature(object='CoreSet', value='character'),
+    function(object, value) {
+  colnames(sensitivityProfiles(object)) <- value
+  object
+})
+
+#
+# -- sensitivityProfiles
+
+#' sensitivityProfiles CoreSet Method
+#'
+#' @describeIn CoreSet Return the sensitivity profile summaries from the
+#'    sensitivity slot.
+#'
+#' @examples
+#' sensitivityProfiles(clevelandSmall_cSet)
+#'
+#' @param object The [`CoreSet`] to retrieve sensitivity profile summaries
+#'   from.
+#'
+#' @return a [`data.frame`] with sensitivity profile summaries for CoreSet
+#'
+#' @export
+setMethod(sensitivityProfiles, "CoreSet", function(object) {
+    funContext <- .funContext('::sensitivityProfiles')
+    if (is(sensitivitySlot(object), 'LongTable')) {
+        if (!('profiles' %in% assayNames(sensitivitySlot(object))))
+            .error(funContext, 'The LongTable onject in the sensivitiy slot
+                is not formatted correctly: it must contain and assay
+                named "profiles"!')
+    } else {
+        return(object@sensitivity$profiles)
+    }
+})
+
+#' sensitivityProfiles<- CoreSet Method
+#'
+#' @describeIn CoreSet Update the sensitivity profile summaries the sensitivity
+#'    slot.
+#'
+#' @examples
+#' sensitivityProfiles(clevelandSmall_cSet) <- sensitivityProfiles(clevelandSmall_cSet)
+#'
+#' @param object The \code{CoreSet} to update
+#' @param value A \code{data.frame} with the new sensitivity profiles. If a
+#'   matrix object is passed in, converted to data.frame before assignment
+#'
+#' @return Updated \code{CoreSet}
+#'
+#' @export
+setReplaceMethod("sensitivityProfiles",
+                 signature = signature(object="CoreSet",
+                                       value="data.frame"),
+                 function(object, value){
+    if (is(sensitivitySlot(object), 'LongTable'))
+        stop(.errorMsg('[CoreGx::sensitivityProfiles<-] No setter has been ',
+            'implemented for this method when the sensitivity slot in a CoreSet',
+            ' is a LongTable. Please define a method using setReplaceMethod() ',
+            'for the subclass of CoreSet in your current package!'))
+    else
+        object@sensitivity$profiles <- value
+    return(object)
+})
+#' @describeIn CoreSet Update the phenotypic data for the drug dose
+#'   sensitivity
+#'
+#' @export
+setReplaceMethod("sensitivityProfiles",
+                 signature = signature(object="CoreSet",
+                                       value="matrix"),
+                function(object, value) {
+    if (is(sensitivitySlot(object), 'LongTable'))
+        stop(.errorMsg('[CoreGx::sensitivityProfiles<-] No setter has been ',
+            'implemented for this method when the sensitivity slot in a CoreSet',
+            ' is a LongTable. Please define a method using setReplaceMethod() ',
+            'for the subclass of CoreSet in your current package!'))
+    else
+        object@sensitivity$profiles <- as.data.frame(value)
+    return(object)
+})
+
+
+#
+# -- sensitivityRaw
+
+#' sensitivityRaw CoreSet Getter Method
+#'
+#' @describeIn CoreSet Get the raw dose and vaibility data from a CoreSet object.
+#'
+#' @examples
+#' data(clevelandSmall_cSet)
+#' sensRaw <- sensitivityRaw(clevelandSmall_cSet)
+#' head(sensRaw)
+#'
+#' @param object A [`CoreSet`] to extract the raw sensitivity data from
+#'
+#' @return A [`array`] containing the raw sensitivity data as experiment by
+#'     dose level by metric.
+#'
+#' @export
+setMethod('sensitivityRaw', signature("CoreSet"), function(object){
+
+  if (is(sensitivitySlot(object), 'LongTable'))
+      stop(.errorMsg('\n[CoreGx::sensitivityRaw] This getter has not been
+          implemented for a CoreSet. Please define a method using setMethod()
+          on the subclass of CoreSet in your current package!'))
+
+  object@sensitivity$raw
+})
+
+#' sensitivityRaw<- CoreSet Setter Method
+#'
+#' @describeIn CoreSet Set the raw dose and viability data for a cSet and return
+#'   and updated copty
+#'
+#' @examples
+#' data(clevelandSmall_cSet)
+#' sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
+#'
+#' @param object An [`CoreSet`] to extract the raw sensitivity data from.
+#' @param value A 3D [`array`] containing the raw dose and viability
+#'    measurements to update the object with.
+#'
+#' @return A 3D [`array`] containing the raw sensitivity data as experiment by
+#'    dose level by metric.
+#'
+#' @export
+setReplaceMethod("sensitivityRaw", signature("CoreSet", "array"),
+                 function(object, value) {
+
+  if (is(sensitivitySlot(object), 'LongTable'))
+      stop(.errorMsg('\n[CoreGx::sensitivityRaw<-] This setter has not been ',
+          'implemented for a CoreSet. Please define a method using ',
+          'setReplaceMethod() on the subclass of CoreSet in your current ',
+          'package!'))
+
+  object@sensitivity$raw <- value
+  object
+})
+
+#
+# -- sensitivitySlot
+
+#' sensitivitySlot Generic
+#'
+#' @examples
+#' data(clevelandSmall_cSet)
+#' sensitivitySlot(clevelandSmall_cSet)
+#'
+#' @param object A \code{CoreSet} to extract the raw sensitivity data from
+#' @param ... A \code{list} to allow new parameters in specific methods
+#'
+#' @return A \code{list} of the sensitivity slot contents
+#'
+#' @export
+setGeneric("sensitivitySlot", function(object, ...) standardGeneric("sensitivitySlot"))
+#' @describeIn CoreSet Retrieve the contents of the sensitivity slot
+#' @inheritParams sensitivitySlot
+#' @export
+setMethod("sensitivitySlot", signature("CoreSet"), function(object) {
+  object@sensitivity
+})
+
+##TODO:: Migrate this to CoreGx
+#' sensitivitySlot<- Replacement Generic
+#'
+#' @examples
+#' data(clevelandSmall_cSet)
+#' sensitivitySlot(clevelandSmall_cSet) <- sensitivitySlot(clevelandSmall_cSet)
+#'
+#' @param object A \code{CoreSet} to extract the raw sensitivity data from
+#' @param ... A \code{list} to allow new parameters in specific methods
+#' @param value A \code{list} of new sensitivity slot data for the rSet
+#'
+#' @return A copy of the \code{CoreSet} containing the updated sensitivty slot
+#'
+#' @export
+setGeneric("sensitivitySlot<-", function(object, ..., value) standardGeneric("sensitivitySlot<-"))
+#' @describeIn CoreSet Set the raw dose and viability data for a cSet and return
+#'   and updated copty
+#' @inheritParams sensitivitySlot<-
+#' @export
+setReplaceMethod("sensitivitySlot", signature("CoreSet", "list"),
+                 function(object, value) {
+                   ##TODO:: Implement error handling for this slot
+                   object@sensitivity <- value
+                   object
+                 })
