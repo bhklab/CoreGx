@@ -6,10 +6,6 @@
 \name{CoreSet-class}
 \alias{CoreSet-class}
 \alias{.CoreSet}
-\alias{sensitivityMeasures,CoreSet-method}
-\alias{sensitivityMeasures<-,CoreSet,character-method}
-\alias{sensitivityProfiles,CoreSet-method}
-\alias{sensitivityProfiles<-,CoreSet,data.frame-method}
 \alias{sensitivityProfiles<-,CoreSet,matrix-method}
 \alias{sensitivityRaw,CoreSet-method}
 \alias{sensitivityRaw<-,CoreSet,array-method}
@@ -29,14 +25,6 @@
 \title{CoreSet - A generic data container for molecular profiles and
 treatment response data}
 \usage{
-\S4method{sensitivityMeasures}{CoreSet}(object)
-
-\S4method{sensitivityMeasures}{CoreSet,character}(object) <- value
-
-\S4method{sensitivityProfiles}{CoreSet}(object)
-
-\S4method{sensitivityProfiles}{CoreSet,data.frame}(object) <- value
-
 \S4method{sensitivityProfiles}{CoreSet,matrix}(object) <- value
 
 \S4method{sensitivityRaw}{CoreSet}(object)
@@ -76,14 +64,6 @@ treatment response data}
 measurements to update the object with.}
 }
 \value{
-A \code{\link{character}} vector of all the available sensitivity measures.
-
-A update \code{CoreSet} object with the new sensitivity measures
-
-a \code{\link{data.frame}} with sensitivity profile summaries for CoreSet
-
-Updated \code{CoreSet}
-
 A \code{\link{array}} containing the raw sensitivity data as experiment by
 dose level by metric.
 
@@ -93,14 +73,6 @@ dose level by metric.
 \description{
 CoreSet - A generic data container for molecular profiles and
 treatment response data
-
-sensitivityMeasures CoreSet Getter Method
-
-sensitivityMeasures<- CoreSet Setter Method
-
-sensitivityProfiles CoreSet Method
-
-sensitivityProfiles<- CoreSet Method
 
 sensitivityRaw CoreSet Getter Method
 
@@ -121,18 +93,6 @@ packages to apply the correct model for the given data.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{sensitivityMeasures}: Returns the available sensitivity profile
-summaries, for example, whether there are IC50 values available
-
-\item \code{sensitivityMeasures<-}: Updates the sensitivity measures in a \code{CoreSet} object
-and returns the updated object
-
-\item \code{sensitivityProfiles}: Return the sensitivity profile summaries from the
-sensitivity slot.
-
-\item \code{sensitivityProfiles<-}: Update the sensitivity profile summaries the sensitivity
-slot.
-
 \item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
 sensitivity
 
@@ -204,15 +164,6 @@ CoreSet, for proper processing of the data
 }
 
 \examples{
-sensitivityMeasures(clevelandSmall_cSet)
-
-data(clevelandSmall_cSet)
-sensitivityMeasures(clevelandSmall_cSet) <- sensitivityMeasures(clevelandSmall_cSet)
-
-sensitivityProfiles(clevelandSmall_cSet)
-
-sensitivityProfiles(clevelandSmall_cSet) <- sensitivityProfiles(clevelandSmall_cSet)
-
 data(clevelandSmall_cSet)
 sensRaw <- sensitivityRaw(clevelandSmall_cSet)
 head(sensRaw)

@@ -43,13 +43,14 @@
 \alias{mDataNames<-,CoreSet,ANY-method}
 \alias{mDataNames}
 \alias{sensitivityInfo,CoreSet-method}
-\alias{sensitivityInfo,CoreSet,missing-method}
-\alias{sensitivityInfo,CoreSet,character-method}
-\alias{sensitivityInfo}
 \alias{sensitivityInfo<-,CoreSet,data.frame-method}
 \alias{sensitivityInfo<-,CoreSet,missing,data.frame-method}
 \alias{sensitviityInfo<-,CoreSet,character,data.frame-method}
 \alias{sensitivityInfo<-}
+\alias{sensitivityMeasures,CoreSet-method}
+\alias{sensitivityMeasures<-,CoreSet,character-method}
+\alias{sensitivityProfiles,CoreSet-method}
+\alias{sensitivityProfiles<-,CoreSet,data.frame-method}
 \title{Accessing and modifying information in a \code{CoreSet}}
 \usage{
 \S4method{annotation}{CoreSet}(object)
@@ -91,6 +92,14 @@
 \S4method{sensitivityInfo}{CoreSet}(object, dimension, ...)
 
 \S4method{sensitivityInfo}{CoreSet,data.frame}(object, dimension, ...) <- value
+
+\S4method{sensitivityMeasures}{CoreSet}(object)
+
+\S4method{sensitivityMeasures}{CoreSet,character}(object) <- value
+
+\S4method{sensitivityProfiles}{CoreSet}(object)
+
+\S4method{sensitivityProfiles}{CoreSet,data.frame}(object) <- value
 }
 \arguments{
 \item{object}{A \code{CoreSet} object.}
@@ -226,25 +235,10 @@ are the options which can be used in the \code{mDataType} parameter of various
 equal to \code{length(molecularProfilesSlot(object))}.
 }
 
-\subsection{@sensitivity}{
-
-Arguments:
-\itemize{
-\item \code{dimension}: Optional \code{character(1)} One of 'drug', 'cell' or 'assay' to
-retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from the
-\code{CoreSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
-warning if \verb{@sensitivity} is not a \code{LongTable} object.
-\item \code{...}: Additional arguments to the \code{rowData} or \code{colData}.
-\code{LongTable} methods. Only used if the sensitivity slot contains a
-\code{LongTable} object instead of a \code{list} and the \code{dimension} argument is
-specified.
-}
-
-\strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity drug combo
-by cell-line metadata for the \code{CoreSet} object. When the \code{dimension}
-parameter is used, it allows retrieval of the dimension specific metadata
-from the \code{LongTable} object in \verb{@sensitivity} of a CoreSet object.
-}
+\strong{sensitivityProfiles}: Return the sensitivity profile summaries from the
+sensitivity slot. This data.frame cotanins vaarious sensitivity summary
+metrics, such as ic50, amax, EC50, aac, HS, etc as columns, with rows as
+drug by sample experiments.
 
 \strong{sensitivityInfo}<-: Update the \verb{@sensitivity} slot metadata for a
 \code{CoreSet} object. When used without the \code{dimension} argument is behaves
@@ -261,6 +255,11 @@ the \verb{@sensitivity} slot doesn't contain a \code{LongTable} and \code{dimens
 not specified, you can only modify existing columns as returned by
 \code{sensitivityInfo(object)}.
 }
+
+\strong{sensitivityMeaures}: Get the 'sensitivityMeasures' available in a \code{CoreSet}
+object. Each measure reprents some summary of cell-line sensitivity to a given
+dryuh, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
+\code{character} vector with all available metrics for the PSet object.
 }
 \examples{
 dateCreated(clevelandSmall_cSet)
@@ -297,7 +296,7 @@ mDataNames(clevelandSmall_cSet)
 
 mDataNames(clevelandSmall_cSet) <- mDataNames(clevelandSmall_cSet)
 
-sensitivityInfo(clevelandSmall_cSet)
+sensitivityProfiles(clevelandSmall_cSet)
 
 sensitivityInfo(clevelandSmall_cSet) <- sensitivityInfo(clevelandSmall_cSet)
 
