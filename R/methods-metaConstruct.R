@@ -55,6 +55,10 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         assayDT <- merge(assayDT, colDataDT[, c('colKey', ..colIDs)], by=colIDs)
         assayDT[, c(rowIDs, colIDs) := NULL]
         setkeyv(assayDT, c('rowKey', 'colKey'))
+        notMissingNames <- names(assayColumns[[i]]) != ""
+        if (sum(notMissingNames) > 0)
+            setnames(assayDT, names(assayDT)[notMissingNames], 
+                names(assayColumns[[i]][notMissingNames]))
         assayDtL[[i]] <- assayDT
     }
 

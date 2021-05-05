@@ -56,12 +56,13 @@ Suggests:
     testthat
 License: GPL-3
 Roxygen: list(markdown = TRUE, r6=FALSE)
-RoxygenNote: 7.1.1.9001
+RoxygenNote: 7.1.1
 Collate: 
     'allGenerics.R'
-    'class-LongTable.R'
+    'LongTable-class.R'
     'CoreSet-class.R'
     'CoreSet-accessors.R'
+    'LongTable-accessors.R'
     'adaptiveMatthewCor.R'
     'callingWaterfall.R'
     'class-DataMapper.R'

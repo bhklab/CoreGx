@@ -7,8 +7,6 @@
 \alias{CoreSet-class}
 \alias{.CoreSet}
 \alias{sensitivityProfiles<-,CoreSet,matrix-method}
-\alias{sensitivityRaw,CoreSet-method}
-\alias{sensitivityRaw<-,CoreSet,array-method}
 \alias{sensitivitySlot,CoreSet-method}
 \alias{sensitivitySlot<-,CoreSet,list-method}
 \alias{molecularProfilesSlot,CoreSet-method}
@@ -26,10 +24,6 @@
 treatment response data}
 \usage{
 \S4method{sensitivityProfiles}{CoreSet,matrix}(object) <- value
-
-\S4method{sensitivityRaw}{CoreSet}(object)
-
-\S4method{sensitivityRaw}{CoreSet,array}(object) <- value
 
 \S4method{sensitivitySlot}{CoreSet}(object)
 
@@ -58,25 +52,13 @@ treatment response data}
 \S4method{sensNumber}{CoreSet,matrix}(object) <- value
 }
 \arguments{
-\item{object}{An \code{\link{CoreSet}} to extract the raw sensitivity data from.}
+\item{object}{A \code{CoreSet} to extract the raw sensitivity data from}
 
-\item{value}{A 3D \code{\link{array}} containing the raw dose and viability
-measurements to update the object with.}
-}
-\value{
-A \code{\link{array}} containing the raw sensitivity data as experiment by
-dose level by metric.
-
-A 3D \code{\link{array}} containing the raw sensitivity data as experiment by
-dose level by metric.
+\item{value}{A \code{list} of new sensitivity slot data for the rSet}
 }
 \description{
 CoreSet - A generic data container for molecular profiles and
 treatment response data
-
-sensitivityRaw CoreSet Getter Method
-
-sensitivityRaw<- CoreSet Setter Method
 }
 \details{
 The CoreSet (CSet) class was developed as a superclass for pSets in the
@@ -95,11 +77,6 @@ packages to apply the correct model for the given data.
 \itemize{
 \item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
 sensitivity
-
-\item \code{sensitivityRaw}: Get the raw dose and vaibility data from a CoreSet object.
-
-\item \code{sensitivityRaw<-}: Set the raw dose and viability data for a cSet and return
-and updated copty
 
 \item \code{sensitivitySlot}: Retrieve the contents of the sensitivity slot
 
@@ -163,15 +140,6 @@ CoreSet, for proper processing of the data
 }
 }
 
-\examples{
-data(clevelandSmall_cSet)
-sensRaw <- sensitivityRaw(clevelandSmall_cSet)
-head(sensRaw)
-
-data(clevelandSmall_cSet)
-sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
-
-}
 \seealso{
 \code{\link{CoreSet-accessors}}
 }

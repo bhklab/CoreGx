@@ -1,4 +1,4 @@
-#' @include CoreSet-class.R class-LongTable.R
+#' @include CoreSet-class.R LongTable-class.R
 NULL
 
 #' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
@@ -105,7 +105,7 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #'
 #' @export
 #'
-#' @include class-LongTable.R
+#' @include LongTable-class.R
 #' @import methods
 #' @importFrom utils sessionInfo
 #' @importFrom stats na.omit

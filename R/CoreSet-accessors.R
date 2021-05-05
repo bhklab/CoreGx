@@ -870,6 +870,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
 #
 # -- sensitvityMeasures
 
+#' @noRd
 .docs_CoreSet_get_sensitivityMeasures <- function(...) .parseToRoxygen(
     "
     @details
@@ -877,7 +878,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
     object. Each measure reprents some summary of cell-line sensitivity to a given
     dryuh, such as ic50, ec50, AUC, AAC, etc. The results are returned as a 
     `character` vector with all available metrics for the PSet object.
-    @exaples
+    @examples
     sensitivityMeasures({data_}) <- sensitivityMeasures({data_})
 
     @md
@@ -892,10 +893,10 @@ setMethod(sensitivityMeasures, "CoreSet", function(object){
     return(colnames(sensitivityProfiles(object)))
 })
 
-
+#' @noRd
 .docs_CoreSet_set_sensitityMeasures <- function(...) .parseToRoxygen(
     "
-    @datails
+    @details
     __sensitivityMeaures__: Update the sensitivity meaure in a `{class_}`
     object. Thesee values are the column names of the 'profiles' assay and 
     represent various compued sensitviity metrics such as ic50, ec50, AUC, AAC,
@@ -913,7 +914,7 @@ setMethod(sensitivityMeasures, "CoreSet", function(object){
 )
 
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_set_sensitityMeasures(class_=.local_class, data_.local_data) 
+#' @eval .docs_CoreSet_set_sensitityMeasures(class_=.local_class, data_=.local_data) 
 setReplaceMethod('sensitivityMeasures',
     signature(object='CoreSet', value='character'),
     function(object, value) {
@@ -924,7 +925,8 @@ setReplaceMethod('sensitivityMeasures',
 #
 # -- sensitivityProfiles
 
-.docs_CoreSet_get_sensitivityInfo <- function(...) .parseToRoxygen(
+#' @noRd
+.docs_CoreSet_get_sensitivityProfiles <- function(...) .parseToRoxygen(
     "
     @details
     __sensitivityProfiles__: Return the sensitivity profile summaries from the
@@ -942,7 +944,7 @@ setReplaceMethod('sensitivityMeasures',
 
 
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_get_sensitivityProfliles(class_=.local_class, data_=.local_data)
+#' @eval .docs_CoreSet_get_sensitivityProfiles(class_=.local_class, data_=.local_data)
 setMethod(sensitivityProfiles, "CoreSet", function(object) {
     funContext <- .funContext('::sensitivityProfiles')
     if (is(sensitivitySlot(object), 'LongTable')) {
@@ -955,6 +957,7 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
     }
 })
 
+#' @noRd
 .docs_CoreSet_set_sensitivityProfiles <- function(...) .parseToRoxygen(
     "
     @details
@@ -973,11 +976,11 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
 )
 
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_set_senstitiityProfiles(class_=.local_class, data_=.local_data)
+#' @eval .docs_CoreSet_set_sensitivityProfiles(class_=.local_class, data_=.local_data)
 setReplaceMethod("sensitivityProfiles",
                  signature = signature(object="CoreSet",
                                        value="data.frame"),
-                 function(object, value){
+                 function(object, value) {
     if (is(sensitivitySlot(object), 'LongTable'))
         stop(.errorMsg('[CoreGx::sensitivityProfiles<-] No setter has been ',
             'implemented for this method when the sensitivity slot in a CoreSet',
@@ -1015,8 +1018,7 @@ setReplaceMethod("sensitivityProfiles",
 #'
 #' @examples
 #' data(clevelandSmall_cSet)
-#' sensRaw <- sensitivityRaw(clevelandSmall_cSet)
-#' head(sensRaw)
+
 #'
 #' @param object A [`CoreSet`] to extract the raw sensitivity data from
 #'
@@ -1024,41 +1026,26 @@ setReplaceMethod("sensitivityProfiles",
 #'     dose level by metric.
 #'
 #' @export
-
 #' @noRd
-.docs_CoreSet_get_sensitivityRaw() <- function(...) .parseToRoxygen(
+.docs_CoreSet_get_sensitivityRaw <- function(...) .parseToRoxygen(
     "
     @details
-    __sensitivityRaw__: Access the raw sensitiity measumrents for a PSet. Returns
-    a 3D array
+    __sensitivityRaw__: Access the raw sensitiity measumrents for a {class_}. 
+    Returns a 3D array
+    @examples
+    head(sensitivityRaw(clevelandSmall_cSet{data_}))
     ",
     ...
 )
 
-#' sensitivityRaw Getter
-#'
-#' @describeIn PharmacoSet Retrive the raw dose and viability data from a pSet
-#'
-#' @examples
-#' data(CCLEsmall)
-#' sensitivityRaw(CCLEsmall)
-#'
-#' @param object A \code{PharmacoSet} to extract the raw sensitivity data from
-#' @return A \code{array} containing the raw sensitivity data
-#'
-#' @importMethodsFrom CoreGx sensitivityRaw
-#' @import CoreGx
-#' @export
-setMethod("sensitivityRaw", signature("PharmacoSet"), function(object) {
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_get_sensitivityRaw(class_=.local_class, data_=.local_data)
+#' @exportMethod sensitivityRaw
+setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     if (is(sensitivitySlot(object), 'LongTable'))
         return(.rebuildRaw(sensitivitySlot(object)))
     else
-        if (is(sensitivitySlot(object), 'LongTable'))
-        stop(.errorMsg('\n[CoreGx::sensitivityRaw] This getter has not been
-            implemented for a CoreSet. Please define a method using setMethod()
-            on the subclass of CoreSet in your current package!'))
-
-  object@sensitivity$raw
+        return(object@sensitivity$raw)
 })
 
 #' Replicate the $raw slot in the old @sensitivity list from a LongTable
@@ -1072,12 +1059,11 @@ setMethod("sensitivityRaw", signature("PharmacoSet"), function(object) {
 .rebuildRaw <- function(longTable) {
 
     # Extract the information needed to reconstruct the sensitivityRaw array
-    meta <- longTable$experiment_metadata[, .(rn, colKey, rowKey)]
-    setkeyv(meta, c('rowKey', 'colKey'))
-    dose <- assay(longTable, 'dose')
-    setkeyv(dose, c('rowKey', 'colKey'))
-    viab <- assay(longTable, 'viability')
-    setkeyv(viab, c('rowKey', 'colKey'))
+    viability <- longTable$sensitivity
+    viability[, rownames := paste0(
+        paste0(mget(rowIDs(longTable)), collapse=':'), '_',
+        paste0(mget(colIDs(longTable)), collapse=':'))]
+
 
     # Join to a single wide data.table
     arrayData <- meta[dose][viab][, -c('rowKey', 'colKey')]
@@ -1096,10 +1082,22 @@ setMethod("sensitivityRaw", signature("PharmacoSet"), function(object) {
 ## TODO:: Make this a unit test
 ## TEST: all.equal(raw[dimnames(SR)[[1]],,], SR)
 
+.docs_CoreSet_set_sensitivityRaw <- function(...) .paresToRoxygen(
+    "
+    @details
+    __sensitviityRaw<-__: Update the raw dose and viability data in a pSet object.
+    - value: 
+
+    @md
+    @exportMethod sensitivityRaw<-
+    "
+    ,
+    ...
+)
 
 #' sensitivityRaw<- Setter
 #'
-#' @describeIn PharmacoSet Update the raw dose and viability data in a pSet object
+#' @describeIn PharmacoSet
 #'
 #' @examples
 #' data(CCLEsmall)
@@ -1111,12 +1109,12 @@ setMethod("sensitivityRaw", signature("PharmacoSet"), function(object) {
 #'
 #' @return A copy of the \code{PharmacoSet} containing the updated sensitivty data
 #'
-#' @importMethodsFrom CoreGx sensitivityRaw<-
-#' @import CoreGx
 #' @import data.table
 #'
 #' @export
-setReplaceMethod('sensitivityRaw', signature("PharmacoSet", "array"), function(object, value) {
+setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"), 
+    function(object, value) 
+{
     if (is(sensitivitySlot(object), 'LongTable')) {
 
         ## TODO:: validate value
@@ -1151,15 +1149,11 @@ setReplaceMethod('sensitivityRaw', signature("PharmacoSet", "array"), function(o
         object@sensitivity <- longTable
 
     } else {
-        if (is(sensitivitySlot(object), 'LongTable'))
-        stop(.errorMsg('\n[CoreGx::sensitivityRaw<-] This setter has not been ',
-            'implemented for a CoreSet. Please define a method using ',
-            'setReplaceMethod() on the subclass of CoreSet in your current ',
-            'package!'))
-
-  object@sensitivity$raw <- value
-  object
-        object <- callNextMethod(object, value=value)
+        funContext <- funContext("::sensitivityRaw<-")
+        if (!is.array(value)) .error(funContexnt, "Values assigned to the
+            sensitivityRaw must be a matrix of experiment by dose by value!")
+        object@sensitivity$raw <- value
+        object
     }
     return(object)
 })
