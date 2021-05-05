@@ -1058,24 +1058,33 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 #' @noRd
 .rebuildRaw <- function(longTable) {
 
+    ## FIXME:: This function currently assumes there will only be one valid
+    ## dose per drug combination, which may not be true.
+
+    funContext <- .funContext(':::.rebuildRaw')
+    if (!('sensitivity' %in% assayNames(longTable)))
+        .error(funContext, 'There is no assay named sensitivity. Not sure
+            how to retrieve sensitivityRaw without a sensitivity assay. Try
+            renaming your assays in the @sensitivity LongTable object?')
+
     # Extract the information needed to reconstruct the sensitivityRaw array
     viability <- longTable$sensitivity
-    viability[, rownames := paste0(
-        paste0(mget(rowIDs(longTable)), collapse=':'), '_',
-        paste0(mget(colIDs(longTable)), collapse=':'))]
+
+    # Build the rownames
+    .paste_colons <- function(...) paste(..., sep=':')
+    viability[, row_ids := Reduce(.paste_colons, mget(rowIDs(longTable)))]
+    viability[, col_ids := Reduce(.paste_colons, mget(colIDs(longTable)))]
+    viability[, rownames := paste0(row_ids, '_', col_ids)]
+    viability[, c('row_ids', 'col_ids') := NULL]
+
+    # Merge the doses into vectors in a list column
+    viability[, dose := Reduce(.paste_colons, mget(colnames(.SD))), 
+        .SDcols=patterns('^.*dose$')] 
+
+    doseMat <- viability[, as.matrix(.SD), .SDcols=c('rownames', 'dose')]
+    viabMat <- viability[, as.matrix(.SD), .SDcols=c('rownames', 'viability')]
 
 
-    # Join to a single wide data.table
-    arrayData <- meta[dose][viab][, -c('rowKey', 'colKey')]
-
-    # Get the data matrices
-    Dose <- as.matrix(arrayData[, grep('Dose', colnames(arrayData), value=TRUE), with=FALSE])
-    Viability <- as.matrix(arrayData[, grep('Viability', colnames(arrayData), value=TRUE), with=FALSE])
-
-    array <- simplify2array(list(Dose, Viability))
-    dimnames(array) <- list(arrayData$rn,
-                            paste0('doses', seq_len(ncol(Dose))),
-                            c('Dose', 'Viability'))
     return(array)
 }
 
