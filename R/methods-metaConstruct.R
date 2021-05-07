@@ -31,19 +31,32 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
 {
     funContext <- paste0('[', .S4MethodContext('metaConstruct', class(mapper)[1]))
     
+    # -- get the rawdata
     DT <- rawdata(mapper)
 
+    # -- preprocess the row identifiers and metadata
     rowDataDT <- unique(DT[, unlist(rowDataMap(mapper)), with=FALSE])
     rowIDs <- rowDataMap(mapper)[[1]]
     rowDataDT[, c('rowKey') := .GRP, by=rowIDs]
+    renameRowCols <- names(rowIDs) != ""
+    setnames(rowDataDT, rowIDs[renameRowCols], names(rowIDs)[renameRowCols])
+    setnames(DT, rowIDs[renameRowCols], names(rowIDs)[renameRowCols])
+    rowIDs <- c(rowIDs[!renameRowCols], names(rowIDs)[renameRowCols])
 
+    # -- preprocess the col identifiers and metadata
     colDataDT <- unique(DT[, unlist(colDataMap(mapper)), with=FALSE])
     colIDs <- colDataMap(mapper)[[1]]
     colDataDT[, c('colKey') := .GRP, by=colIDs]
+    renameColCols <- names(colIDs) != ""
+    setnames(colDataDT, colIDs[renameColCols], names(colIDs)[renameColCols])
+    setnames(DT, colIDs[renameColCols], names(colIDs)[renameColCols])
+    colIDs <- c(colIDs[!renameColCols], names(colIDs)[renameColCols])
 
+    # -- extract LongTable level metadata
     metadataL <- lapply(metadataMap(mapper), 
         function(j, x) as.list(unique(x[, j, with=FALSE])), x=DT)
 
+    # -- 
     assayIDs <- c(rowIDs, colIDs)
     assayColumns <- lapply(assayMap(mapper), FUN=c, assayIDs)
     assayDtL <- lapply(assayColumns, FUN=subset, x=DT, subset=TRUE)
@@ -57,8 +70,8 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         setkeyv(assayDT, c('rowKey', 'colKey'))
         notMissingNames <- names(assayColumns[[i]]) != ""
         if (sum(notMissingNames) > 0)
-            setnames(assayDT, assayColumns[[i]][notMissingNames], 
-                names(assayColumns[[i]])[notMissingNames])
+            setnames(assayDT, old=assayColumns[[i]][notMissingNames], 
+                new=names(assayColumns[[i]])[notMissingNames])
         assayDtL[[i]] <- assayDT
     }
 

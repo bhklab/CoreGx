@@ -1074,11 +1074,21 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     viability[, dose := Reduce(.paste_colons, mget(colnames(.SD))), 
         .SDcols=patterns('^.*dose$')]
 
-    sensRaw <- viability[, 
-        array(c(dose, viability), 
-            dim=c(length(dose), 1, 2), 
-            dimnames=list(rownames, 'doses1', c('Dose', 'Viability')))
-        ]
+    # Repeat the dose values if there are more viabilities
+    numReplicates <- viability[, ncol(.SD), .SDcols=patterns('^viability.*')]
+    if (numReplicates > 1) {
+        viability[, paste0('dose', seq_len(numReplicates)) := dose]
+        viability[, dose := NULL]
+    }
+
+    # Build the array
+    sensRaw <- array(dim=list(nrow(viability), numReplicates, 2),
+        dimnames=list(viability$rownames, paste('dose', seq_len(numReplicates)),
+            c('Dose', 'Viability')))
+    sensRaw[, , 'Dose'] <- as.matrix(viability[, .SD, 
+        .SDcols=patterns('^dose.*')])
+    sensRaw[, , 'Viability'] <- as.matrix(viability[, .SD, 
+        .SDcols=patterns('^viability.*')])
 
     return(sensRaw)
 }
