@@ -990,50 +990,41 @@ setReplaceMethod("sensitivityProfiles",
         object@sensitivity$profiles <- value
     return(object)
 })
-#' @describeIn CoreSet Update the phenotypic data for the drug dose
-#'   sensitivity
-#'
-#' @export
-setReplaceMethod("sensitivityProfiles",
-                 signature = signature(object="CoreSet",
-                                       value="matrix"),
-                function(object, value) {
-    if (is(sensitivitySlot(object), 'LongTable'))
-        stop(.errorMsg('[CoreGx::sensitivityProfiles<-] No setter has been ',
-            'implemented for this method when the sensitivity slot in a CoreSet',
-            ' is a LongTable. Please define a method using setReplaceMethod() ',
-            'for the subclass of CoreSet in your current package!'))
-    else
-        object@sensitivity$profiles <- as.data.frame(value)
-    return(object)
-})
+
+
+# setReplaceMethod("sensitivityProfiles",
+#                  signature = signature(object="CoreSet",
+#                                        value="matrix"),
+#                 function(object, value) {
+#     if (is(sensitivitySlot(object), 'LongTable'))
+#         stop(.errorMsg('[CoreGx::sensitivityProfiles<-] No setter has been ',
+#             'implemented for this method when the sensitivity slot in a CoreSet',
+#             ' is a LongTable. Please define a method using setReplaceMethod() ',
+#             'for the subclass of CoreSet in your current package!'))
+#     else
+#         object@sensitivity$profiles <- as.data.frame(value)
+#     return(object)
+# })
 
 
 #
 # -- sensitivityRaw
 
-#' sensitivityRaw CoreSet Getter Method
-#'
-#' @describeIn CoreSet Get the raw dose and vaibility data from a CoreSet object.
-#'
-#' @examples
-#' data(clevelandSmall_cSet)
 
-#'
-#' @param object A [`CoreSet`] to extract the raw sensitivity data from
-#'
-#' @return A [`array`] containing the raw sensitivity data as experiment by
-#'     dose level by metric.
-#'
-#' @export
+
 #' @noRd
 .docs_CoreSet_get_sensitivityRaw <- function(...) .parseToRoxygen(
     "
     @details
-    __sensitivityRaw__: Access the raw sensitiity measumrents for a {class_}. 
-    Returns a 3D array
+    __sensitivityRaw__: Access the raw sensitiity measurents for a {class_} 
+    object. A 3D `array` where rows are experiment_ids, columns are doses
+    and the third dimension is metric, either 'Dose' for the doses used or 
+    'Viability' for the cell-line viability at that dose.
     @examples
-    head(sensitivityRaw(clevelandSmall_cSet{data_}))
+    head(sensitivityRaw({data_})
+
+    @md
+    @exportMethod sensitivityRaw
     ",
     ...
 )
@@ -1052,13 +1043,15 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 #'
 #' @param longTable [`LongTable`]
 #'
-#' @return A 3D [`array`]
+#' @return A 3D [`array`] where rows are experiment_ids, columns are doses
+#' and the third dimension is metric, either 'Dose' for the doses used or 
+#' 'Viability' for the cell-line viability at that dose.
 #'
 #' @keywords internal
 #' @noRd
 .rebuildRaw <- function(longTable) {
 
-    ## FIXME:: This function currently assumes there will only be one valid
+    ## TODO:: This function currently assumes there will only be one valid
     ## dose per drug combination, which may not be true.
 
     funContext <- .funContext(':::.rebuildRaw')
@@ -1079,13 +1072,15 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 
     # Merge the doses into vectors in a list column
     viability[, dose := Reduce(.paste_colons, mget(colnames(.SD))), 
-        .SDcols=patterns('^.*dose$')] 
+        .SDcols=patterns('^.*dose$')]
 
-    doseMat <- viability[, as.matrix(.SD), .SDcols=c('rownames', 'dose')]
-    viabMat <- viability[, as.matrix(.SD), .SDcols=c('rownames', 'viability')]
+    sensRaw <- viability[, 
+        array(c(dose, viability), 
+            dim=c(length(dose), 1, 2), 
+            dimnames=list(rownames, 'doses1', c('Dose', 'Viability')))
+        ]
 
-
-    return(array)
+    return(sensRaw)
 }
 
 ## TODO:: Make this a unit test
@@ -1095,7 +1090,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     "
     @details
     __sensitviityRaw<-__: Update the raw dose and viability data in a pSet object.
-    - value: 
+    - value:
 
     @md
     @exportMethod sensitivityRaw<-
@@ -1124,6 +1119,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"), 
     function(object, value) 
 {
+    funContext <- funContext("::sensitivityRaw<-")
     if (is(sensitivitySlot(object), 'LongTable')) {
 
         ## TODO:: validate value
@@ -1158,7 +1154,6 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
         object@sensitivity <- longTable
 
     } else {
-        funContext <- funContext("::sensitivityRaw<-")
         if (!is.array(value)) .error(funContexnt, "Values assigned to the
             sensitivityRaw must be a matrix of experiment by dose by value!")
         object@sensitivity$raw <- value

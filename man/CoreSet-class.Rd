@@ -6,7 +6,6 @@
 \name{CoreSet-class}
 \alias{CoreSet-class}
 \alias{.CoreSet}
-\alias{sensitivityProfiles<-,CoreSet,matrix-method}
 \alias{sensitivitySlot,CoreSet-method}
 \alias{sensitivitySlot<-,CoreSet,list-method}
 \alias{molecularProfilesSlot,CoreSet-method}
@@ -23,8 +22,6 @@
 \title{CoreSet - A generic data container for molecular profiles and
 treatment response data}
 \usage{
-\S4method{sensitivityProfiles}{CoreSet,matrix}(object) <- value
-
 \S4method{sensitivitySlot}{CoreSet}(object)
 
 \S4method{sensitivitySlot}{CoreSet,list}(object) <- value
@@ -75,9 +72,6 @@ packages to apply the correct model for the given data.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{sensitivityProfiles<-}: Update the phenotypic data for the drug dose
-sensitivity
-
 \item \code{sensitivitySlot}: Retrieve the contents of the sensitivity slot
 
 \item \code{sensitivitySlot<-}: Set the raw dose and viability data for a cSet and return

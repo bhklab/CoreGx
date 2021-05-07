@@ -303,8 +303,10 @@ sensitivity slot. Arguments:
 \code{sensitivityInfo(object)}, but potentially modified columns, such as the
 computation of additional summary metrics.
 
-\strong{sensitivityRaw}: Access the raw sensitiity measumrents for a CoreSet.
-Returns a 3D array
+\strong{sensitivityRaw}: Access the raw sensitiity measurents for a CoreSet
+object. A 3D \code{array} where rows are experiment_ids, columns are doses
+and the third dimension is metric, either 'Dose' for the doses used or
+'Viability' for the cell-line viability at that dose.
 }
 \examples{
 dateCreated(clevelandSmall_cSet)
@@ -353,5 +355,6 @@ sensitivityProfiles(clevelandSmall_cSet)
 
 sensitivityInfo(clevelandSmall_cSet <- sensitivityInfo(clevelandSmall_cSet)
 
-head(sensitivityRaw(clevelandSmall_cSetclevelandSmall_cSet))
+head(sensitivityRaw(clevelandSmall_cSet)
+
 }
