@@ -95,9 +95,6 @@ setMethod('assay',
 #' @param x A `LongTable` to update.
 #' @param i `integer` or `character` vector containing the index or name
 #'   of the assay to update.
-#' @param join `logical` If `TRUE` this function will try to left inner join
-#'   the `value` data.frame to the existing assay `i`. If `i` is not an
-#'   existing assay in `x`, this parameter will be ignored with a warning.
 #' @param value 
 #' A `data.frame` or `data.table` to update the assay data
 #'   with. This must at minumum contain the row and column data identifier
@@ -118,20 +115,21 @@ setMethod('assay',
 #' @import data.table
 #' @export
 setReplaceMethod('assay', signature(x='LongTable', i='character'),
-    function(x, i, join=FALSE, value) 
+    function(x, i, value) 
 {
 
-    if (!is.data.frame(value)) stop(.errorMsg('\n[CoreGx::assay<-] Only a ',
-        'data.frame or data.table can be assiged to the assay slot!'))
+    funContext <- CoreGx:::.S4MethodContext('assay', class(x), class(i))
+    if (!is.data.frame(value)) .error(funContext, 'Only a data.frame or 
+        data.table can be assiged to the assay slot!')
 
-    if (length(i) > 1) stop(.errorMsg('\n[CoreGx::assay<-] Only a single assay ',
-        'name can be assiged with assay(x, i) <- value.'))
+    if (length(i) > 1) .error(funContext, 'Only a single assay ',
+        'name can be assiged with assay(x, i) <- value.')
 
     whichAssay <- which(i %in% assayNames(x))
 
     assayData <- assays(x, withDimnames=TRUE, metadata=TRUE)
 
-    if (!is.data.table(value)) value <- data.table(value)
+    if (!is.data.table(value)) setDT(value)
 
     # extract the row and column values
     rowIDCols <- rowIDs(x, key=FALSE)
@@ -139,24 +137,40 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     rowMetaCols <- rowMeta(x, key=FALSE)
     colMetaCols <- colMeta(x, key=FALSE)
 
-    # check that all the id columns are present
-    idCols <- c(rowIDCols, colIDCols)
+    # check that all the id columns are present, if not try to join them
+    idCols <- unique(c(rowIDCols, colIDCols))
     hasIDCols <- idCols %in% colnames(value)
-    if (!all(hasIDCols)) {
-        if (join && !missing(i))
+    if (!all(hasIDCols) && sum(hasIDCols >= 2)) {
             tryCatch({
                 value <- merge.data.table(
                     assay(x, i, withDimnames=TRUE, metadata=FALSE), 
                     value, 
                     on=intersect(idCols, colnames(value)), 
                     all.x=TRUE)
-            }, error=function(e) stop(.errorMsg('\n[CoreGx::`assay<-`] ',
-                'Join failed with error: ', e)))
-    } else {
-        stop(.errorMsg('\n[CoreGx::assay<-] Missing required id columns from',
-            'value: ', .collapse(idCols[!hasIDCols]), '. Please ensure you modify assay ',
-            'as returned by assay(longTable, "assayName", withDimnames=TRUE, ',
-            'metadata=TRUE).', collapse=', '))
+            }, error=function(e) .error(funContext, 'Join failed for ID columns 
+                with error: ', e))
+    } else if (!all(hasIDCols)) {
+        .error(funContext, 'Missing required id columns from value: ', 
+            idCols[!hasIDCols], '. Please ensure you modify assay as returned 
+            by assay(longTable, "<assayName>", withDimnames=TRUE, 
+            metadata=TRUE).')
+    }
+
+    # check that all the metadata columns are present, if not try to join them
+    metaCols <- unique(c(rowMetaCols, colMetaCols))
+    hasMetaCols <- metaCols %in% colnames(value)
+    if (!all(hasMetaCols)) {
+        missingMetaCols <- metaCols[!hasMetaCols]
+        tryCatch({
+            value <- merge.data.table(
+                assay(x, i, withDimnames=TRUE, metadata=TRUE)[, .SD, 
+                    .SDcols=c(idCols, missingMetaCols)],
+                value,
+                on=idCols,
+                all.x=TRUE
+            )
+        }, error=function(e) .error(funContext, 'Join failed for metadata 
+            columns with error: ', e))
     }
 
     if (length(whichAssay) > 0) {

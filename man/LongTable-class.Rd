@@ -45,7 +45,7 @@
 
 \S4method{assay}{LongTable,ANY}(x, i, withDimnames = FALSE, metadata = withDimnames, key = !withDimnames)
 
-\S4method{assay}{LongTable,character}(x, i, join = FALSE) <- value
+\S4method{assay}{LongTable,character}(x, i) <- value
 
 \S4method{assayNames}{LongTable}(x)
 
@@ -98,10 +98,6 @@ reconstructing a new LongTable.}
 
 \item{keys}{\code{\link{logical}} Should the row and column keys also be returned?
 Defaults to !withDimnames.}
-
-\item{join}{\code{logical} If \code{TRUE} this function will try to left inner join
-the \code{value} data.frame to the existing assay \code{i}. If \code{i} is not an
-existing assay in \code{x}, this parameter will be ignored with a warning.}
 
 \item{value}{A \code{\link{data.table}} or \code{\link{data.frame}} to update the \code{rowData} of
 \code{x} with.}

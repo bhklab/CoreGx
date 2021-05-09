@@ -37,7 +37,7 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
     # -- preprocess the row identifiers and metadata
     rowDataDT <- unique(DT[, unlist(rowDataMap(mapper)), with=FALSE])
     rowIDs <- rowDataMap(mapper)[[1]]
-    rowDataDT[, c('rowKey') := .GRP, by=rowIDs]
+    rowDataDT[, c('rowKey') := .GRP, keyby=rowIDs]
     renameRowCols <- names(rowIDs) != ""
     setnames(rowDataDT, rowIDs[renameRowCols], names(rowIDs)[renameRowCols])
     setnames(DT, rowIDs[renameRowCols], names(rowIDs)[renameRowCols])
@@ -46,7 +46,7 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
     # -- preprocess the col identifiers and metadata
     colDataDT <- unique(DT[, unlist(colDataMap(mapper)), with=FALSE])
     colIDs <- colDataMap(mapper)[[1]]
-    colDataDT[, c('colKey') := .GRP, by=colIDs]
+    colDataDT[, c('colKey') := .GRP, keyby=colIDs]
     renameColCols <- names(colIDs) != ""
     setnames(colDataDT, colIDs[renameColCols], names(colIDs)[renameColCols])
     setnames(DT, colIDs[renameColCols], names(colIDs)[renameColCols])

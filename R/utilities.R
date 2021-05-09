@@ -1150,10 +1150,9 @@ is.items <- function(list, ..., FUN=is)
 #' @export
 .S4MethodContext <- function(generic, ...) {
     dots <- as.list(...)
-    .firstClass <- function(x) class(x)[1]
     formals <- getMethod(generic, signature=dots)
     context <- paste0(
-        formals@target@package, '::`', # what package is the method from
+        formals@target@package[1], '::`', # what package is the method from
         formals@generic, ',',  # what is the name of the generic
         paste0(formals@target@.Data, collapse=','), '-method`') # what is the method signature
     return(context)

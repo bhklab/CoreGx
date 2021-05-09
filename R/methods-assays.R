@@ -51,7 +51,9 @@ setMethod('assays', signature(x='LongTable'),
 #' @importMethodsFrom SummarizedExperiment assays<-
 #' @import data.table
 #' @export
-setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, value) {
+setReplaceMethod('assays', signature(x='LongTable', value='list'), 
+    function(x, value) 
+{
 
     # check input is correct
     isDF <- is.items(value, 'data.frame')
@@ -97,21 +99,28 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'), function(x, v
     # Need to drop the keys because buildLongTable redoes indexing
     .drop_in <- function(x, y) x[!(x %in% y)]
     assayCols <- lapply(assayCols, .drop_in, y=c('colKey', 'rowKey'))
+    nonAssayCols <- c(idCols, rowMetaCols, colMetaCols)
+    assayCols <- lapply(assayCols, setdiff, nonAssayCols)
 
     # get the rowData and colData column mappings
-    rowDataCols <- if (length(rowMetaCols) > 0)
-        list(rowIDCols, rowMetaCols) else list(rowIDCols)
-    colDataCols <- if (length(colMetaCols) > 0)
-        list(colIDCols, colMetaCols) else list(colIDCols)
-
-    # TODO:: Join metadata cols if they are excluded?
+    rowDataCols <- list(rowIDCols, rowMetaCols)
+    colDataCols <- list(colIDCols, colMetaCols)
 
     # get assay column names
     allCols <- c(unlist(rowDataCols), unlist(colDataCols))
     assayCols <- lapply(assayCols, setdiff, y=allCols)
     names(assayCols) <- names(value)
 
-    # reconstruct a new LongTable
-    buildLongTable(from=value, rowDataCols, colDataCols, assayCols)
+    # rebuild the 
+    .mergeOnNonAssayCols <- function(x, y) merge.data.table(x, y, by=nonAssayCols)
+    valueDT <- Reduce(.mergeOnNonAssayCols, value)
 
+    # reconstruct a new LongTable with the updated assay
+    LTdataMapper <- LongTableDataMapper(rawdata=valueDT, 
+        rowDataMap=rowDataCols, colDataMap=colDataCols, assayMap=assayCols)
+    LT <- metaConstruct(LTdataMapper)
+
+    # keep the metadata
+    metadata(LT) <- metadata(x)
+    return(LT)
 })

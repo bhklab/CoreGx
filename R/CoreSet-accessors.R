@@ -1083,7 +1083,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 
     # Build the array
     sensRaw <- array(dim=list(nrow(viability), numReplicates, 2),
-        dimnames=list(viability$rownames, paste('dose', seq_len(numReplicates)),
+        dimnames=list(viability$rownames, paste0('dose', seq_len(numReplicates)),
             c('Dose', 'Viability')))
     sensRaw[, , 'Dose'] <- as.matrix(viability[, .SD, 
         .SDcols=patterns('^dose.*')])
@@ -1129,43 +1129,29 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"), 
     function(object, value) 
 {
-    funContext <- funContext("::sensitivityRaw<-")
+    funContext <- .funContext("::sensitivityRaw<-")
     if (is(sensitivitySlot(object), 'LongTable')) {
-
         ## TODO:: validate value
-
         longTable <- sensitivitySlot(object)
 
-        raw <- as.data.table(value, keep.rownames=TRUE, na.rm=FALSE)
+        # Process into a the proper format for the sensitivity assay
+        raw <- as.data.table(value[, , 'Viability'], keep.rownames=TRUE, 
+            na.rm=FALSE)
+        coerceCols <- colnames(raw)[-1]
+        raw[, (coerceCols) := lapply(.SD, as.numeric), .SDcols=!'rn']
+        raw[, c('row_id', 'col_id') := tstrsplit(rn, '_')]
+        raw[, (rowIDs(longTable)) := tstrsplit(row_id, ':', type.convert=TRUE)]
+        raw[, (colIDs(longTable)) := tstrsplit(col_id, ':', type.convert=TRUE)]
+        raw[, c('row_id', 'col_id', 'rn') := NULL]
+        colnames(raw) <- gsub('^dose', 'viability', colnames(raw))
 
-        # preprocess raw array
-        ## FIXME:: refactor this into a helper, it is repeated in sensitivtySlotToLongTable
-        setnames(raw, seq_len(3), c('rn', 'replicate', 'assay'))
-        assayIDs <- unique(raw$assay)
-        raw[, value := as.numeric(value)]
-        raw[, replicate := as.integer(gsub('\\D*', '', replicate))]
-        # Split value into one column for each assay (long -> wide)
-        longRaw <- dcast(raw, rn + replicate ~ ..., value.var=c('value'))
-        # Split assay columns into assay per replicate (wide -> wider)
-        longRaw <- dcast(longRaw, rn ~ replicate, value.var=assayIDs)
-
-        assayData <- assays(longTable, withDimnames=TRUE, key=FALSE)
-        expMetadata <- assayData$experiment_metadata[, c(idCols(longTable), 'rn'), with=FALSE]
-        rawData <- merge.data.table(longRaw, expMetadata, by='rn')
-
-        doseCols <- grep('Dose_\\d+', colnames(rawData), value=TRUE)
-        assayData$dose <-
-            rawData[, c(idCols(longTable), doseCols), with=FALSE]
-        viabilityCols <- grep('Viability_\\d+', colnames(rawData), value=TRUE)
-        assayData$viability <-
-            rawData[, c(idCols(longTable), viabilityCols), with=FALSE]
-
-        assays(longTable) <- assayData
-        object@sensitivity <- longTable
+        # Update the assay
+        assay(longTable, i='sensitivity') <- raw
 
     } else {
-        if (!is.array(value)) .error(funContexnt, "Values assigned to the
-            sensitivityRaw must be a matrix of experiment by dose by value!")
+        if (!is.array(value)) .error(funContext, "Values assigned to the
+            sensitivityRaw slot must be an array of experiment by dose by 
+            value!")
         object@sensitivity$raw <- value
         object
     }
@@ -1196,7 +1182,6 @@ setMethod("sensitivitySlot", signature("CoreSet"), function(object) {
   object@sensitivity
 })
 
-##TODO:: Migrate this to CoreGx
 #' sensitivitySlot<- Replacement Generic
 #'
 #' @examples
