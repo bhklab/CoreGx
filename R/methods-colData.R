@@ -12,7 +12,7 @@
 #'   object.
 #'
 #' @param x A [`LongTable`] to retrieve column metadata from.
-#' @param key [`logical`] She the colKey column also be returned? Defaults to
+#' @param key `logical` She the colKey column also be returned? Defaults to
 #'     FALSE.
 #'
 #' @return A [`data.table`] containing row identifiers and metadata.

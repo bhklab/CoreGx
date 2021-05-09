@@ -30,7 +30,7 @@ VignetteEngine: knitr::rmarkdown
 biocViews: Software, Pharmacogenomics, Classification, Survival
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 4.0), BiocGenerics, SummarizedExperiment
+Depends: R (>= 4.1), BiocGenerics, SummarizedExperiment
 Imports: 
     Biobase,
     S4Vectors,
@@ -45,7 +45,8 @@ Imports:
     lsa,
     data.table,
     crayon,
-    glue
+    glue,
+    rlang
 Suggests: 
     pander,
     markdown,
@@ -95,7 +96,6 @@ Collate:
     'methods-phenoInfo.R'
     'methods-reindex.R'
     'methods-rowData.R'
-    'methods-sensNumber.R'
     'methods-subset.R'
     'methods-subsetTo.R'
     'utilities.R'

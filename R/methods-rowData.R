@@ -8,9 +8,9 @@
 #' @describeIn LongTable Get the row level annotations for a `LongTable` object.
 #'
 #' @param x A [`LongTable`] object to retrieve the row metadata from.
-#' @param key [`logical`] Should the rowKey column also be returned? Defaults
+#' @param key `logical` Should the rowKey column also be returned? Defaults
 #'     to FALSE.
-#' @param use.names [`logical`] This parameter is just here to stop matching
+#' @param use.names `logical` This parameter is just here to stop matching
 #'     the key argument to use.names from the rowData generic. It doesn't do
 #'     anything at this time and can be ignored.
 #'

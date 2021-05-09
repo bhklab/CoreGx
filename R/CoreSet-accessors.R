@@ -688,9 +688,10 @@ setReplaceMethod("mDataNames", "CoreSet", function(object, value){
 .docs_CoreSet_get_sensitivityInfo <- function(...) .parseToRoxygen(
     "
     @details
+
     ## @sensitivity
 
-    Arguments:
+    ### Arguments:
     - `dimension`: Optional `character(1)` One of 'drug', 'cell' or 'assay' to
     retrieve `rowData`, `colData` or the 'assay_metadata' assay from the 
     `{class_}` `@sensitvity` `LongTable` object, respectively. Ignored with 
@@ -699,6 +700,8 @@ setReplaceMethod("mDataNames", "CoreSet", function(object, value){
     `LongTable` methods. Only used if the sensitivity slot contains a
     `LongTable` object instead of a `list` and the `dimension` argument is 
     specified.
+
+    ### Methods:
 
     __sensitivityInfo__: `DataFrame` or `data.frame` of sensitivity drug combo
     by cell-line metadata for the `{class_}` object. When the `dimension` 
@@ -751,7 +754,6 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 #' @param longTable [`LongTable`]
 #'
 #' @keywords internal
-#' @importFrom MatrixGenerics colAlls
 #' @importFrom data.table setkeyv merge.data.table `:=` setDF
 #' @noRd
 .rebuildInfo <- function(longTable) {
@@ -796,6 +798,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 .docs_CoreSet_set_sensitivityInfo <- function(...) .parseToRoxygen(
     "
     @details
+
     __sensitivityInfo__<-: Update the `@sensitivity` slot metadata for a 
     `{class_}` object. When used without the `dimension` argument is behaves
     similar to the old {class_} implementation, where the `@sensitivity` slot
@@ -827,7 +830,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
                 
                 function(object, dimension, ..., value) {
 
-    funContext <- funContext('::sensitivityInfo<-')
+    funContext <- .funContext('::sensitivityInfo<-')
     if (is(sensitivitySlot(object), 'LongTable')) {
         # coerce to data.table
         if (!is.data.table(value)) value <- data.table(value, keep.rownames=TRUE)
@@ -992,24 +995,8 @@ setReplaceMethod("sensitivityProfiles",
 })
 
 
-# setReplaceMethod("sensitivityProfiles",
-#                  signature = signature(object="CoreSet",
-#                                        value="matrix"),
-#                 function(object, value) {
-#     if (is(sensitivitySlot(object), 'LongTable'))
-#         stop(.errorMsg('[CoreGx::sensitivityProfiles<-] No setter has been ',
-#             'implemented for this method when the sensitivity slot in a CoreSet',
-#             ' is a LongTable. Please define a method using setReplaceMethod() ',
-#             'for the subclass of CoreSet in your current package!'))
-#     else
-#         object@sensitivity$profiles <- as.data.frame(value)
-#     return(object)
-# })
-
-
 #
 # -- sensitivityRaw
-
 
 
 #' @noRd
@@ -1093,45 +1080,36 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     return(sensRaw)
 }
 
-## TODO:: Make this a unit test
-## TEST: all.equal(raw[dimnames(SR)[[1]],,], SR)
-
-.docs_CoreSet_set_sensitivityRaw <- function(...) .paresToRoxygen(
+.docs_CoreSet_set_sensitivityRaw <- function(...) .parseToRoxygen(
     "
     @details
-    __sensitviityRaw<-__: Update the raw dose and viability data in a pSet object.
-    - value:
+
+    __sensitvityRaw<-__: Update the raw dose and viability data in a {class_}.
+    - value: A 3D `array` object where rows are experiment_ids, columns are
+    replicates and pages are c('Dose', 'Viability'), with the corresponding
+    dose or viability measurement for that experiment_id and replicate.
+
+    @examples
+    sensitivityRaw({data_}) <- sensitivityRaw({data_})
 
     @md
+    @importFrom data.table data.table as.data.table := merge.data.table tstrsplit
     @exportMethod sensitivityRaw<-
     "
     ,
     ...
 )
 
-#' sensitivityRaw<- Setter
-#'
-#' @describeIn PharmacoSet
-#'
-#' @examples
-#' data(CCLEsmall)
-#' sensitivityRaw(CCLEsmall) <- sensitivityRaw(CCLEsmall)
-#'
-#' @param object A \code{PharmacoSet} to extract the raw sensitivity data from
-#' @param value A \code{array} containing the raw dose and viability data for the
-#'   pSet
-#'
-#' @return A copy of the \code{PharmacoSet} containing the updated sensitivty data
-#'
-#' @import data.table
-#'
-#' @export
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_set_sensitivityRaw(class_=.local_class, data_=.local_data)
 setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"), 
     function(object, value) 
 {
     funContext <- .funContext("::sensitivityRaw<-")
     if (is(sensitivitySlot(object), 'LongTable')) {
+        
         ## TODO:: validate value
+        
         longTable <- sensitivitySlot(object)
 
         # Process into a the proper format for the sensitivity assay
@@ -1206,3 +1184,47 @@ setReplaceMethod("sensitivitySlot", signature("CoreSet", "list"),
                    object@sensitivity <- value
                    object
                  })
+
+
+
+#' sensNumber Generic
+#'
+#' A generic for the sensNumber method
+#'
+#' @examples
+#' sensNumber(clevelandSmall_cSet)
+#'
+#' @param object A \code{CoreSet}
+#' @param ... Fallthrough arguements for defining new methods
+#'
+#' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
+#' @export
+setGeneric("sensNumber", function(object, ...) standardGeneric("sensNumber"))
+#' @describeIn CoreSet Return the summary of available sensitivity
+#'   experiments
+#' @export
+setMethod(sensNumber, "CoreSet", function(object){
+  return(object@sensitivity$n)
+})
+
+#' sensNumber<- Generic
+#'
+#' A generic for the sensNumber method
+#'
+#' @examples
+#' sensNumber(clevelandSmall_cSet) <- sensNumber(clevelandSmall_cSet)
+#'
+#' @param object A \code{CoreSet}
+#' @param value A new \code{data.frame} with the number of sensitivity experiments per drug and cell line
+#'
+#' @return The updated \code{CoreSet}
+#'
+#' @export
+setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-"))
+#' @describeIn CoreSet Update the summary of available sensitivity
+#'   experiments
+#' @export
+setReplaceMethod('sensNumber', signature = signature(object="CoreSet", value="matrix"), function(object, value){
+  object@sensitivity$n <- value
+  object
+})

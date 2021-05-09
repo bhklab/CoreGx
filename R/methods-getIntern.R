@@ -13,9 +13,9 @@
 #'   LongTable object. This is mostly for developmer use.
 #'
 #' @param object [`LongTable`]
-#' @param x [`character`] One or more symbol name strings to retrieve from
+#' @param x `character` One or more symbol name strings to retrieve from
 #'     the object@.intern environment.
-#' @param ... [`pairlist`] Addtional arguments to get or mget inside of the
+#' @param ... `pairlist` Addtional arguments to get or mget inside of the
 #'     function.
 #'
 #' @return value of x if length(x) == 1 else named list of values for all

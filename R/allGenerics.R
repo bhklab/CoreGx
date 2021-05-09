@@ -5,7 +5,7 @@
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object An [`S4`] object to summarize sensitivity profiles for.
+#' @param object An `S4` object to summarize sensitivity profiles for.
 #' @param ... Allow definition of new arguments to this generic
 #'
 #' @return Depends on the implemented method
@@ -21,7 +21,7 @@ setGeneric("summarizeSensitivityProfiles",
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object An [`S4`] object to summarize the molecular profiles for.
+#' @param object An `S4` object to summarize the molecular profiles for.
 #' @param ... Allow definition of new arguments to this generic
 #'
 #' @return Depends on the implemented method
@@ -54,7 +54,7 @@ setGeneric("showSigAnnot",
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object An [`S4`] object to get treatment response experiment
+#' @param object An `S4` object to get treatment response experiment
 #'    annotations from.
 #' @param ... Allow new arguments to be defined for this generic.
 #'
@@ -73,7 +73,7 @@ setGeneric("sensitivityInfo",
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object An [`S4`] object to set treatment response experiment
+#' @param object An `S4` object to set treatment response experiment
 #'    annotations for.
 #' @param ... Allow new arguments to be defined for this generic.
 #' @param value The new treatment response experiment annotations.
@@ -94,9 +94,9 @@ setGeneric("sensitivityInfo<-",
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object An [`S4`] object to extract the raw sensitivity experiment
+#' @param object An `S4` object to extract the raw sensitivity experiment
 #'     data from.
-#' @param ... [`pairlist`]  Allow new parameters to be defined for this generic.
+#' @param ... `pairlist`  Allow new parameters to be defined for this generic.
 #'
 #' @return Depends on the implemented method
 #'
@@ -109,8 +109,8 @@ setGeneric("sensitivityRaw",
 #' Generic function to set the raw data array for a treatment response experiment
 #'   in an S4 class.
 #'
-#' @param object An [`S4`] object to extract the raw sensitivity data from.
-#' @param ... [`pairlist`] Allow new parameters to be defined for this generic.
+#' @param object An `S4` object to extract the raw sensitivity data from.
+#' @param ... `pairlist` Allow new parameters to be defined for this generic.
 #' @param value An object containing dose and viability metrics to update
 #'   the object with.
 #'
@@ -127,9 +127,9 @@ setGeneric("sensitivityRaw<-",
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object The [`S4`] object to retrieve sensitivity profile summaries
+#' @param object The `S4` object to retrieve sensitivity profile summaries
 #'   from.
-#' @param ... [`pairlist`] Allow defining new arguments for this generic.
+#' @param ... `pairlist` Allow defining new arguments for this generic.
 #'
 #' @return Depends on the implemented method
 #'
@@ -140,7 +140,7 @@ setGeneric("sensitivityProfiles", function(object, ...) standardGeneric("sensiti
 #'
 #' A generic for the sensitivityProfiles replacement method
 #'
-#' @param object An [`S4`] object to update the sensitivity profile summaries
+#' @param object An `S4` object to update the sensitivity profile summaries
 #'    for.
 #' @param ... Fallthrough arguments for defining new methods
 #' @param value An object with the new sensitivity profiles. If a
@@ -160,7 +160,7 @@ setGeneric("sensitivityProfiles<-",
 #' @examples
 #' sensitivityMeasures(clevelandSmall_cSet)
 #'
-#' @param object An [`S4`] object to retrieve the names of sensitivty summary
+#' @param object An `S4` object to retrieve the names of sensitivty summary
 #'    measurements for.
 #' @param ... Fallthrough arguements for defining new methods
 #'
@@ -178,7 +178,7 @@ setGeneric("sensitivityMeasures",
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object An [`S4`] object to update.
+#' @param object An `S4` object to update.
 #' @param ... Allow new methods to be defined for this generic.
 #' @param value A set of names for sensitivity measures to use to
 #'   update the object with.
@@ -219,8 +219,8 @@ setGeneric('sensitivitySlotToLongTable',
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object [`S4`] An object to redo indexing for
-#' @param ... [`pairlist`] Allow definition of new parameters to this generic.
+#' @param object `S4` An object to redo indexing for
+#' @param ... `pairlist` Allow definition of new parameters to this generic.
 #'
 #' @return Depends on the implemented method
 #'
@@ -233,7 +233,7 @@ setGeneric('reindex', function(object, ...) standardGeneric('reindex'))
 #' print("Generics shouldn't need examples?")
 #'
 #' @param from What to build the LongTable from?
-#' @param ... [`pairlist`] Allow definition of new parameters for
+#' @param ... `pairlist` Allow definition of new parameters for
 #'     implementations of this generic.
 #'
 #' @return Depends on the implemented method
@@ -256,8 +256,8 @@ setGeneric('buildLongTable',
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object [`S4`] An object with an @.itern slot containing an environment.
-#' @param x [`character`] One or more symbol names to retrieve from the
+#' @param object `S4` An object with an @.itern slot containing an environment.
+#' @param x `character` One or more symbol names to retrieve from the
 #'    object@.intern environment.
 #' @param ... Allow new parmeters to be defined for this generic.
 #'
@@ -273,7 +273,7 @@ setGeneric('getIntern',
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object [`S4`] An object to get row id columns from.
+#' @param object `S4` An object to get row id columns from.
 #' @param ... Allow new arguments to this generic.
 #'
 #' @return Depends on the implemented method.
@@ -287,7 +287,7 @@ setGeneric('rowIDs', function(object, ...) standardGeneric('rowIDs'))
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object [`S4`] An object to get row metadata columns from.
+#' @param object `S4` An object to get row metadata columns from.
 #' @param ... Allow new arguments to this generic.
 #'
 #' @return Depends on the implemented method.
@@ -301,7 +301,7 @@ setGeneric('rowMeta', function(object, ...) standardGeneric('rowMeta'))
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object [`S4`] An object to get column id columns from.
+#' @param object `S4` An object to get column id columns from.
 #' @param ... ALlow new arguments to this generic
 #'
 #' @return Depends on the implemented method.
@@ -315,7 +315,7 @@ setGeneric('colIDs', function(object, ...) standardGeneric('colIDs'))
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object [`S4`] An object to get column metadata columns from.
+#' @param object `S4` An object to get column metadata columns from.
 #' @param ... ALlow new arguments to this generic
 #'
 #' @return Depends on impemented method.
@@ -329,7 +329,7 @@ setGeneric('colMeta', function(object, ...) standardGeneric('colMeta'))
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object [`S4`] An object to get assay ids from.
+#' @param object `S4` An object to get assay ids from.
 #' @param ... Allow new arguments to this generic.
 #'
 #' @return Depends on the implemented method.
@@ -344,7 +344,7 @@ setGeneric('assayCols',
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object An [`S4`] object to get id columns from.
+#' @param object An `S4` object to get id columns from.
 #' @param ... Allow new arguments to this generic.
 #'
 #' @return Depends on the implemented method
@@ -355,7 +355,7 @@ setGeneric('idCols',
 
 ##' Generic to access the build configuration for an S4 object.
 ##'
-##' @param object [`S4`] The object to retireve the configuration from.
+##' @param object `S4` The object to retireve the configuration from.
 ##'
 ##'
 #setGeneric('getConfig', function(object, ...) standardGeneric(''))

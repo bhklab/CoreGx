@@ -9,7 +9,7 @@
 #' @description Coerce a LongTable into a `data.table`.
 #'
 #' @param from [`LongTable`] Object to coerce.
-#' @param to [`character`] Class name to coerce to, currently only 'data.table'
+#' @param to `character` Class name to coerce to, currently only 'data.table'
 #'   and 'data.frame' are supported
 #'
 #' @return A [`data.table`] with the data from a LongTable.
@@ -88,7 +88,7 @@ as.data.table.LongTable <- function(x) as(x, 'data.table')
 #' @description Currently only supports coercing to data.table or data.frame
 #'
 #' @param from [`LongTable`] Object to coerce.
-#' @param to [`character`] Class name to coerce to, currently only 'data.table'
+#' @param to `character` Class name to coerce to, currently only 'data.table'
 #'   and 'data.frame' are supported
 #'
 #' @return [`data.table`] containing the data from the LongTable, with the
@@ -111,10 +111,10 @@ setAs('LongTable', 'data.frame', def=function(from) {
 #' @description S3 version of coerce method fro convenience.
 #'
 #' @param x [`LongTable`] to coerce to `data.frame`.
-#' @param row.names An optional [`character`] vector of rownames. We do not
+#' @param row.names An optional `character` vector of rownames. We do not
 #'   recommend using this parameter, it is included for S3 method consistency
 #'   with `as.data.frame`.
-#' @param optional [`logical`] Is it optional for row and column names to be
+#' @param optional `logical` Is it optional for row and column names to be
 #'   valid R names? If FALSE will use the make.names function to ensure the
 #'   row and column names are valid R names. Defaults to TRUE.
 #' @param ... Does nothing.

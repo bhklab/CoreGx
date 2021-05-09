@@ -15,7 +15,7 @@
 #'
 #' @param x A [`LongTable`] object to retrieve dimensions for.
 #'
-#' @return [`numeric`] Vector of object dimensions.
+#' @return `numeric` Vector of object dimensions.
 #'
 #' @importMethodsFrom SummarizedExperiment dim
 #' @export

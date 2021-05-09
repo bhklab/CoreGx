@@ -15,15 +15,15 @@
 #' assay(merckLongTable, 'viability_summary', withDimnames=TRUE, metadata=TRUE)
 #'
 #' @param x [`LongTable`] The `LongTable` object to get the assay from.
-#' @param i [`integer`] or [`character`] vector containing the index or name
+#' @param i `integer` or `character` vector containing the index or name
 #'   of the assay, respectively.
-#' @param withDimnames [`logical`] Should the dimension names be returned
+#' @param withDimnames `logical` Should the dimension names be returned
 #'   joined to the assay. This retrieves both the row and column identifiers
 #'   and returns them attached to the
-#' @param metadata [`logical`] Should all of the metadata also be joined to
+#' @param metadata `logical` Should all of the metadata also be joined to
 #'   the assay. This is useful when modifying assays as the resulting list
 #'   has all the information needed to recreated the LongTable object.
-#' @param key [`logical`] Should the key columns also be returned? Defaults to
+#' @param key `logical` Should the key columns also be returned? Defaults to
 #'   !withDimnames.
 #'
 #' @importMethodsFrom SummarizedExperiment assay

@@ -6,7 +6,7 @@
 #' merckLongTable$viability
 #'
 #' @param x A [`LongTable`] object to retrieve an assay from
-#' @param name [`character`] The name of the assay to get.
+#' @param name `character` The name of the assay to get.
 #'
 #' @return [`data.frame`] The assay object.
 #'

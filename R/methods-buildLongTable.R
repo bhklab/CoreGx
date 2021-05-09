@@ -5,7 +5,7 @@
 #' @describeIn LongTable Create a LongTable object from a single data.table or
 #'   data.frame object.
 #'
-#' @param from [`character`] Path to the .csv file containing the data and
+#' @param from `character` Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.
 #' @param colDataCols [`list`] List with two `character` vectors, the first
 #'   specifying one or more columns to be used as column identifiers (e.g.,
@@ -111,7 +111,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
 #'
 #' @describeIn LongTable Create a LongTable object from a single .csv file
 #'
-#' @param from [`character`] Path to the .csv file containing the data and
+#' @param from `character` Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.
 #' @param colDataCols [`list`] List with two `character` vectors, the first
 #'   specifying one or more columns to be used as column identifiers (e.g.,
@@ -186,6 +186,8 @@ setMethod('buildLongTable', signature(from='list'),
     from <- copy(from)
 
     # local helpers
+    ##FIXME:: This is exactly what the Map function is (an alias for mapply with 
+    ##   SIMPLIFY=FALSE)
     .mapply <- function(...) mapply(..., SIMPLIFY=FALSE)
 
     # preprocess from list
@@ -263,7 +265,7 @@ setMethod('buildLongTable', signature(from='list'),
 #' Select a set of column names from a data.table, returning a copy of the
 #'   data.table with duplicate rows removed
 #'
-#' @param colNames [`character`] The column names to select from the data.table
+#' @param colNames `character` The column names to select from the data.table
 #' @param DT [`data.table`, `data.frame`, `matrix`] An object coercible to a `data.table`.
 #'   Please note rownames will be dropped by default.
 #' @param keep.rownames [`logical` or `character`] Passed through to the data.table coercing if DT is not a

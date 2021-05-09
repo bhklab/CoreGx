@@ -18,7 +18,7 @@
 #'   .(drug1 == 'Dasatinib' & drug2 != '5-FU')]
 #'
 #' @param x [`LongTable`] The object to subset.
-#' @param i [`character`], [`numeric`], [`logical`] or [`call`]
+#' @param i `character`, `numeric`, `logical` or [`call`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'    object on all row id columns matching the vector. This parameter also
 #'    supports valid R regex query strings which will match on the colnames
@@ -29,7 +29,7 @@
 #'  Call: Accepts valid query statements to the `data.table` i parameter as
 #'    a call object. We have provided the function .() to conveniently
 #'    convert raw R statements into a call for use in this function.
-#' @param j [`character`], [`numeric`], [`logical`] or [`call`]
+#' @param j `character`, `numeric`, `logical` or [`call`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'      object on all drug id columns matching the vector. This parameter also
 #'      supports regex queries. Colon can be to denote a specific part of the
@@ -39,10 +39,10 @@
 #'  Call: Accepts valid query statements to the `data.table` i parameter as
 #'      a call object. We have provided the function .() to conveniently
 #'      convert raw R statements into a call for use in this function.
-#' @param assays [`character`] Names of assays which should be kept in the
+#' @param assays `character` Names of assays which should be kept in the
 #'   `LongTable` after subsetting.
 #' @param ... Included to ensure drop can only be set by name.
-#' @param drop [`logical`] Included for compatibility with the '[' primitive,
+#' @param drop `logical` Included for compatibility with the '[' primitive,
 #'   it defaults to FALSE and changing it does nothing.
 #'
 #' @return A [`LongTable`] containing only the data specified in the function

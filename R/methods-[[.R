@@ -12,13 +12,13 @@
 #' merckLongTable[['viability']]
 #'
 #' @param x [`LongTable`] object to retrieve assays from
-#' @param i [`character`] name or [`integer`] index of the desired assay.
-#' @param withDimnames [`logical`] Should the row and column IDs be joined to
+#' @param i `character` name or `integer` index of the desired assay.
+#' @param withDimnames `logical` Should the row and column IDs be joined to
 #'    the assay. Default is TRUE to allow easy use of group by arguments when
 #'    performing data aggregation using the `data.table` API.
-#' @param metadata [`logical`] Should the row and column metadata also
+#' @param metadata `logical` Should the row and column metadata also
 #'    be joined to the to the returned assay. Default is withDimnames.
-#' @param keys [`logical`] Should the row and column keys also be returned?
+#' @param keys `logical` Should the row and column keys also be returned?
 #'    Defaults to !withDimnames.
 #'
 #' @importFrom crayon cyan magenta

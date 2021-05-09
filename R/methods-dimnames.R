@@ -11,7 +11,7 @@
 #'
 #' @param x A [`LongTable`] object to get the column names from
 #'
-#' @return [`character`] Vector of column names.
+#' @return `character` Vector of column names.
 #'
 #' @export
 setMethod('colnames', signature(x='LongTable'), function(x) {
@@ -29,7 +29,7 @@ setMethod('colnames', signature(x='LongTable'), function(x) {
 #'
 #' @param x A [`LongTable`] object to get the row names from
 #'
-#' @return [`character`] Vector of row names.
+#' @return `character` Vector of row names.
 #'
 #' @export
 setMethod('rownames', signature(x='LongTable'), function(x) {

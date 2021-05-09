@@ -7,12 +7,12 @@
 #' @describeIn LongTable Get a list containing all the assays in a `LongTable`.
 #'
 #' @param x [`LongTable`] What to extract the assay data from.
-#' @param withDimnames [`logical`] Should the returned assays be joined to
+#' @param withDimnames `logical` Should the returned assays be joined to
 #'   the row and column identifiers (i.e., the pseudo dimnames of the object).
-#' @param metadata [`logical`] Should row and column metadata also be joined
+#' @param metadata `logical` Should row and column metadata also be joined
 #'   to the returned assays. This is useful for modifying assays before
 #'   reconstructing a new LongTable.
-#' @param key [`logical`] Should the key columns also be returned? Defaults
+#' @param key `logical` Should the key columns also be returned? Defaults
 #'   to !withDimnames.
 #'
 #' @return A [`list`] of `data.table` objects, one per assay in the object.

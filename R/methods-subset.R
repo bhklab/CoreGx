@@ -19,7 +19,7 @@
 #'   drug1 == 'Dasatinib' & drug2 != '5-FU')
 #'
 #' @param x [`LongTable`] The object to subset.
-#' @param i [`character`], [`numeric`], [`logical`] or [`expression`]
+#' @param i `character`, `numeric`, `logical` or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'    object on all row id columns matching the vector.
 #'  Numeric or Logical: these select based on the rowKey from the `rowData`
@@ -27,7 +27,7 @@
 #'  Call: Accepts valid query statements to the `data.table` i parameter,
 #'    this can be used to make complex queries using the `data.table` API
 #'    for the `rowData` data.table.
-#' @param j [`character`], [`numeric`], [`logical`] or [`expression`]
+#' @param j `character`, `numeric`, `logical` or [`expression`]
 #'  Character: pass in a character vector of drug names, which will subset the
 #'    object on all drug id columns matching the vector.
 #'  Numeric or Logical: these select based on the rowID from the `rowData`
@@ -38,7 +38,7 @@
 #' @param assays [`character`, `numeric` or `logical`] Optional list of assay
 #'   names to subset. Can be used to subset the assays list further,
 #'   returning only the selected items in the new LongTable.
-#' @param reindex [`logical`] Should the col/rowKeys be remapped after subsetting.
+#' @param reindex `logical` Should the col/rowKeys be remapped after subsetting.
 #'   defaults to TRUE. For chained subsetting you may be able to get performance
 #'   gains by setting to FALSE and calling reindex() manually after subsetting
 #'   is finished.
@@ -159,9 +159,9 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 
 #' Collapse vector of regex queries with | and replace * with .*
 #'
-#' @param queryString [`character`] Raw regex queries.
+#' @param queryString `character` Raw regex queries.
 #'
-#' @return [`character`] Formatted regex query.
+#' @return `character` Formatted regex query.
 #'
 #' @keywords internal
 #' @noRd

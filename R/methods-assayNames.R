@@ -8,7 +8,7 @@
 #'
 #' @param x A [`LongTable`] object to retrieve the assay names from.
 #'
-#' @return [`character`] Names of the assays contained in the `LongTable`.
+#' @return `character` Names of the assays contained in the `LongTable`.
 #'
 #' @importMethodsFrom SummarizedExperiment assayNames
 #' @export

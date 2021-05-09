@@ -303,11 +303,11 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #' rowIDs(merckLongTable)
 #'
 #' @param object A [`LongTable`] to get the rowData id columns for.
-#' @param data [`logical`] Should the rowData for the id columns be returned
+#' @param data `logical` Should the rowData for the id columns be returned
 #' instead of the column names? Default is FALSE.
-#' @param key [`logical`] Should the key column also be returned?
+#' @param key `logical` Should the key column also be returned?
 #'
-#' @return A [`character`] vector of rowData column names if data is FALSE,
+#' @return A `character` vector of rowData column names if data is FALSE,
 #' otherwise a [`data.table`] with the data from the rowData id columns.
 #'
 #' @rdname LongTable-class
@@ -332,11 +332,11 @@ setMethod('rowIDs', signature(object='LongTable'),
 #' @describeIn LongTable Get the names of the non-id columns from rowData.
 #'
 #' @param object A [`LongTable`] to get the rowData metadata columns for.
-#' @param data [`logical`] Should the rowData for the metadata columns be returned
+#' @param data `logical` Should the rowData for the metadata columns be returned
 #' instead of the column names? Default is FALSE.
-#' @param key [`logical`] Should the key column also be returned? Default is FALSE
+#' @param key `logical` Should the key column also be returned? Default is FALSE
 #'
-#' @return A [`character`] vector of rowData column names if data is FALSE,
+#' @return A `character` vector of rowData column names if data is FALSE,
 #' otherwise a [`data.table`] with the data from the rowData metadta columns.
 #'
 #' @import data.table
@@ -359,11 +359,11 @@ setMethod('rowMeta', signature(object='LongTable'),
 #' uniquely identify each row.
 #'
 #' @param object A [`LongTable`] to get the colData id columns for.
-#' @param data [`logical`] Should the colData for the id columns be returned
+#' @param data `logical` Should the colData for the id columns be returned
 #' instead of the column names? Default is FALSE.
-#' @param key [`logical`] Should the key column also be returned? Default is FALSE.
+#' @param key `logical` Should the key column also be returned? Default is FALSE.
 #'
-#' @return A [`character`] vector of colData column names if data is FALSE,
+#' @return A `character` vector of colData column names if data is FALSE,
 #' otherwise a [`data.table`] with the data from the colData id columns.
 #'
 #' @import data.table
@@ -386,11 +386,11 @@ setMethod('colIDs', signature(object='LongTable'),
 #'   `data.table`.
 #'
 #' @param object A [`LongTable`] to get the colData metadata columns for.
-#' @param data [`logical`] Should the colData for the metadata columns be returned
+#' @param data `logical` Should the colData for the metadata columns be returned
 #'   instead of the column names? Default is FALSE.
-#' @param key [`logical`] Should the key column also be returned?
+#' @param key `logical` Should the key column also be returned?
 #'
-#' @return A [`character`] vector of colData column names if data is FALSE,
+#' @return A `character` vector of colData column names if data is FALSE,
 #'   otherwise a [`data.table`] with the data from the colData metadta columns.
 #'
 #' @import data.table
@@ -412,7 +412,7 @@ setMethod('colMeta', signature(object='LongTable'),
 #'   `LongTable`.
 #'
 #' @param object [`LongTable`]
-#' @param i Optional parameter specifying the [`character`] name or [`interger`]
+#' @param i Optional parameter specifying the `character` name or [`interger`]
 #' index of the assay to get the column names for. If missing, returns a
 #' list of value column names for all the assays.
 #'
@@ -448,7 +448,7 @@ setMethod('assayCols', signature(object='LongTable'),
 #'
 #' @param object [`LongTable`]
 #'
-#' @return [`character`] A character vector containing the unique rowIDs and
+#' @return `character` A character vector containing the unique rowIDs and
 #'   colIDs in a LongTable object.
 #'
 #' @export

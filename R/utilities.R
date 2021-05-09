@@ -646,23 +646,23 @@
 #' Curve optimization from 1 variable to 1 variable, using L-BFSG-B from optim, 
 #' with fallback to pattern search if optimization fails to converge. 
 #' 
-#' @param x [`numeric`] input/x values for function
-#' @param y [`numeric`] output/y values for function
+#' @param x `numeric` input/x values for function
+#' @param y `numeric` output/y values for function
 #' @param f [`function`] function f, parameterized by parameters to optimize 
-#' @param density [`numeric`] how many points in the dimension of each parameter should 
+#' @param density `numeric` how many points in the dimension of each parameter should 
 #'   be evaluated (density of the grid)
 #' @param step initial step size for pattern search.
-#' @param precision [`numeric`] smallest step size used in pattern search, once step size drops below this value,
+#' @param precision `numeric` smallest step size used in pattern search, once step size drops below this value,
 #'   the search terminates.  
-#' @param lower_bounds [`numeric`] lower bounds for the paramater search space
-#' @param upper_bounds [`numeric`] upper bounds for the parameter search space
-#' @param median_n [`integer`] number of technical replicates per measured point in x. Used to 
+#' @param lower_bounds `numeric` lower bounds for the paramater search space
+#' @param upper_bounds `numeric` upper bounds for the parameter search space
+#' @param median_n `integer` number of technical replicates per measured point in x. Used to 
 #'   evaluate the proper median distribution for the normal and cauchy error models
-#' @param scale [`numeric`] scale on which to measure probability for the error model (roughly SD of error)
-#' @param family [`character`] which error family to use. Currently, `normal` and `cauchy` are implemented
-#' @param trunc [`logical`] Whether or not to truncate the values at 100% (1.0)
-#' @param verbose [`logical`] should diagnostic messages be printed?
-#' @param gritty_guess [`numeric`] intitial, uninformed guess on parameter values (usually heuristic)
+#' @param scale `numeric` scale on which to measure probability for the error model (roughly SD of error)
+#' @param family `character` which error family to use. Currently, `normal` and `cauchy` are implemented
+#' @param trunc `logical` Whether or not to truncate the values at 100% (1.0)
+#' @param verbose `logical` should diagnostic messages be printed?
+#' @param gritty_guess `numeric` intitial, uninformed guess on parameter values (usually heuristic)
 #' @param span ['numeric'] can be safely kept at 1, multiplicative ratio for initial step size in pattern search. 
 #'   Must be larger than precision. 
 #' @importFrom stats optim var
@@ -1001,10 +1001,10 @@
 #' @examples
 #' .collapse(c("Vector", "of", "words")
 #'
-#' @param ... [`pairlist`] One or more character vectors
-#' @param collapse [`character`] Argument to collapse of paste0, default is ' '.
+#' @param ... `pairlist` One or more character vectors
+#' @param collapse `character` Argument to collapse of paste0, default is ' '.
 #'
-#' @return [`character`] A single character vector.
+#' @return `character` A single character vector.
 #'
 #' @keywords internal
 #' @export
@@ -1017,10 +1017,10 @@
 #' @examples
 #' cat(.errorMsg('This ', 'is ', 'an ', 'error ', 'message'))
 #'
-#' @param ... [`pairlist`] One or more strings or character vectors, also
+#' @param ... `pairlist` One or more strings or character vectors, also
 #'   accepts any params to paste0.
 #'
-#' @return [`character`] Colorized string with results from paste0(...)
+#' @return `character` Colorized string with results from paste0(...)
 #'
 #' @keywords internal
 #' @export
@@ -1032,10 +1032,10 @@
 #' @examples
 #' cat(.warnMsg('This ', 'is ', 'a ', 'warning ', 'message'))
 #'
-#' @param ... [`pairlist`] One or more strings or character vectors, also
+#' @param ... `pairlist` One or more strings or character vectors, also
 #'   accepts any params to paste0.
 #'
-#' @return [`character`] Colorized string with results from paste0(...)
+#' @return `character` Colorized string with results from paste0(...)
 #'
 #' @keywords internal
 #' @export
@@ -1055,13 +1055,13 @@
 #' is.items(list, 'character')
 #'
 #' @param list A [`list`] to get the types from
-#' @param ... [`pairlist`] Additional arguments to FUN
-#' @param FUN [`function`] or [`character`] Either a function, or the name
+#' @param ... `pairlist` Additional arguments to FUN
+#' @param FUN [`function`] or `character` Either a function, or the name
 #'   of a function which returns a single logical value. The default function
 #'   uses `is`, specify the desired type in `...`. You can also use other
 #'   type checking functions such as is.character, is.numeric, or is.data.frame.
 #'
-#' @return [`logical`] A vector indicating if the list item is the specified
+#' @return `logical` A vector indicating if the list item is the specified
 #'   type.
 #'
 #' @export

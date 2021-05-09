@@ -55,6 +55,7 @@
 \alias{sensitivityProfiles,CoreSet-method}
 \alias{sensitivityProfiles<-,CoreSet,data.frame-method}
 \alias{sensitivityRaw,CoreSet-method}
+\alias{sensitivityRaw<-,CoreSet,array-method}
 \title{Accessing and modifying information in a \code{CoreSet}}
 \usage{
 \S4method{annotation}{CoreSet}(object)
@@ -106,6 +107,8 @@
 \S4method{sensitivityProfiles}{CoreSet,data.frame}(object) <- value
 
 \S4method{sensitivityRaw}{CoreSet}(object)
+
+\S4method{sensitivityRaw}{CoreSet,array}(object) <- value
 }
 \arguments{
 \item{object}{A \code{CoreSet} object.}
@@ -242,8 +245,7 @@ equal to \code{length(molecularProfilesSlot(object))}.
 }
 
 \subsection{@sensitivity}{
-
-Arguments:
+\subsection{Arguments:}{
 \itemize{
 \item \code{dimension}: Optional \code{character(1)} One of 'drug', 'cell' or 'assay' to
 retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from the
@@ -254,11 +256,16 @@ warning if \verb{@sensitivity} is not a \code{LongTable} object.
 \code{LongTable} object instead of a \code{list} and the \code{dimension} argument is
 specified.
 }
+}
+
+\subsection{Methods:}{
 
 \strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity drug combo
 by cell-line metadata for the \code{CoreSet} object. When the \code{dimension}
 parameter is used, it allows retrieval of the dimension specific metadata
 from the \code{LongTable} object in \verb{@sensitivity} of a CoreSet object.
+}
+
 }
 
 \strong{sensitivityInfo}<-: Update the \verb{@sensitivity} slot metadata for a
@@ -307,6 +314,13 @@ computation of additional summary metrics.
 object. A 3D \code{array} where rows are experiment_ids, columns are doses
 and the third dimension is metric, either 'Dose' for the doses used or
 'Viability' for the cell-line viability at that dose.
+
+\strong{sensitvityRaw<-}: Update the raw dose and viability data in a CoreSet.
+\itemize{
+\item value: A 3D \code{array} object where rows are experiment_ids, columns are
+replicates and pages are c('Dose', 'Viability'), with the corresponding
+dose or viability measurement for that experiment_id and replicate.
+}
 }
 \examples{
 dateCreated(clevelandSmall_cSet)
@@ -356,5 +370,7 @@ sensitivityProfiles(clevelandSmall_cSet)
 sensitivityInfo(clevelandSmall_cSet <- sensitivityInfo(clevelandSmall_cSet)
 
 head(sensitivityRaw(clevelandSmall_cSet)
+
+sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
 
 }

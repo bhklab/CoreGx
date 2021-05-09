@@ -15,7 +15,9 @@ assayCols <- list(viability=paste0('viability', seq_len(4)),
 
 context('Checking LongTable Class Methods.')
 
-# ---- 1. buildLongTable
+# ---- 1. buildLongTable 
+##FIXME:: This function is being deprecated, write tests for metaConstruct
+##  and LongTableDataMapper instead
 context('Testing buildLongTable function...')
 
 context('Testing buildLongTable from a single table or file')
@@ -34,7 +36,7 @@ test_that('Can build longTable from a data.table', {
     expect_equal_to_reference(longTable1, 'merckLongTable.rds')
 })
 
-test_that('   from a data.frame', {
+test_that('Can build longTable from a data.frame', {
     longTable2 <- buildLongTable(from=setDF(merckDT),
         rowDataCols, colDataCols, assayCols)
     expect_s4_class(longTable2, 'LongTable')
