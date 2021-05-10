@@ -35,9 +35,22 @@ treatment response data}
 
 \S4method{phenoInfo}{CoreSet,character,DataFrame}(object, mDataType) <- value
 }
+\arguments{
+\item{object}{A \code{CoreSet}}
+
+\item{value}{A new \code{data.frame} with the number of sensitivity experiments per drug and cell line}
+
+\item{...}{Fallthrough arguements for defining new methods}
+}
+\value{
+A \code{data.frame} with the number of sensitivity experiments per drug and cell line
+
+The updated \code{CoreSet}
+}
 \description{
-CoreSet - A generic data container for molecular profiles and
-treatment response data
+A generic for the sensNumber method
+
+A generic for the sensNumber method
 }
 \details{
 The CoreSet (CSet) class was developed as a superclass for pSets in the
@@ -106,6 +119,12 @@ CoreSet, for proper processing of the data
 }
 }
 
+\examples{
+sensNumber(clevelandSmall_cSet)
+
+sensNumber(clevelandSmall_cSet) <- sensNumber(clevelandSmall_cSet)
+
+}
 \seealso{
 \code{\link{CoreSet-accessors}}
 }
