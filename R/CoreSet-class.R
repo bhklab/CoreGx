@@ -52,6 +52,7 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' @seealso [`CoreSet-accessors`]
 #'
 #' @md
+#' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
 #' @aliases CoreSet-class
 #' @exportClass CoreSet
 .CoreSet <- setClass("CoreSet",

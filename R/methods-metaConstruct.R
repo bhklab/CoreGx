@@ -22,7 +22,8 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 
 
 #' 
-#'
+#' @param mapper An `LongTableDataMapper` object abstracting arguments to an 
+#'  the `LongTable` constructor.
 #' 
 #' @md
 #' @export

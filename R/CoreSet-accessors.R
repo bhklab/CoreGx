@@ -637,6 +637,7 @@ setGeneric("mDataNames", function(object, ...) standardGeneric("mDataNames"))
     mDataNames({data_})
 
     @md
+    @aliases mDataNames,{class_}-method mDataNames
     @exportMethod mDataNames
     ",
     ...
@@ -1154,6 +1155,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     return(sensRaw)
 }
 
+#' @noRd
 .docs_CoreSet_set_sensitivityRaw <- function(...) .parseToRoxygen(
     "
     @details
@@ -1226,6 +1228,7 @@ setGeneric("sensitivitySlot", function(object, ...) standardGeneric("sensitivity
     sensitivitySlot({data_})
 
     @md
+    @aliases sensitivitySlot,{class_}-method sensitivitySlot
     @exportMethod sensitivitySlot
     ", 
     ...
@@ -1286,23 +1289,25 @@ setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_or_L
 #' @export
 setGeneric("sensNumber", function(object, ...) standardGeneric("sensNumber"))
 
+#' @noRd
 .docs_CoreSet_get_sensNumber <- function(...) .parseToRoxygen(
     "
     @details
     __sensNumber__: Return a count of viability observations in a `{class_}`
     object for each drug-combo by cell-line combination.
+
+    @examples
+    sensNumber({data_})
+
+    @md
+    @aliases sensNumber
+    @exportMethod sensNumber
     ",
     ...
 )
 
-#' @examples
-#' sensNumber(clevelandSmall_cSet)
-#'
-#' @param object A \code{CoreSet}
-#' @param ... Fallthrough arguements for defining new methods
-#'
-#' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
-#' @export
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_get_sensNumber(class_=.local_class, data_=.local_data)
 setMethod(sensNumber, "CoreSet", function(object){
     return(
         if (is(object@sensitivity, 'LongTable')) 
@@ -1337,7 +1342,7 @@ setMethod(sensNumber, "CoreSet", function(object){
 
     return(sensNumber)
 
-    ## TODO::  Pad for any missing drugs or cells
+    ## TODO:: Pad for any missing drugs or cells
     allDrugCombos <- rowData(object)[, Reduce(.paste_colon, mget(drugidCols))]
     allCellCombos <- colData(object)[, Reduce(.paste_colon, mget(cellidCols))]
 
@@ -1346,25 +1351,29 @@ setMethod(sensNumber, "CoreSet", function(object){
 #' @export
 setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-"))
 
+#' @noRd
 .docs_CoreSet_set_sensNumber <- function(...) .parseToRoxygen(
     "
+    @details
+    __sensNumber<-__: Update the 'n' item, which holds a matrix with a count
+    of drug by cell-line experiment counts, in the `list` in `@sensitivity`
+    slot of a `{class_}` object. Will error when `@sensitviity` contains
+    a `LongTable` object, since the counts are computed on the fly. Arguments:
+    - value: A `matrix` where rows are cells and columns are drugs, with a
+    count of the number of experiments for each combination as the values.
+
+    @examples
+    sensNumber({data_}) <- sensNumber({data_})
+
+    @md
+    @aliases sensNumber<-
+    @export sensNumber<-
     ",
     ...
 )
 
-#' sensNumber<- Generic
-#'
-#' A generic for the sensNumber method
-#'
-#' @examples
-#' sensNumber(clevelandSmall_cSet) <- sensNumber(clevelandSmall_cSet)
-#'
-#' @param object A \code{CoreSet}
-#' @param value A new \code{data.frame} with the number of sensitivity experiments per drug and cell line
-#'
-#' @return The updated \code{CoreSet}
-#'
-#' @export
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_set_sensNumber(class_=.local_class, data_=.local_data)
 setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"), 
     function(object, value)
 {

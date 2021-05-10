@@ -40,6 +40,7 @@
 \alias{featureInfo<-,CoreSet,character,DataFrame-method}
 \alias{featureInfo<-}
 \alias{mDataNames,CoreSet-method}
+\alias{mDataNames}
 \alias{mDataNames<-,CoreSet-method}
 \alias{mDataNames<-,CoreSet,ANY-method}
 \alias{mDataNames<-}
@@ -63,10 +64,15 @@
 \alias{sensitivityRaw,CoreSet-method}
 \alias{sensitivityRaw<-,CoreSet,array-method}
 \alias{sensitivitySlot,CoreSet-method}
+\alias{sensitivitySlot}
 \alias{sensitivitySlot<-,CoreSet,list_or_LongTable-method}
 \alias{sensitivitySlot<-}
 \alias{sensitivitySlot<-,CoreSet,list-method}
 \alias{sensitivitySlot<-,CoreSet,LongTable-method}
+\alias{sensNumber,CoreSet-method}
+\alias{sensNumber}
+\alias{sensNumber<-,CoreSet,matrix-method}
+\alias{sensNumber<-}
 \title{Accessing and modifying information in a \code{CoreSet}}
 \usage{
 \S4method{annotation}{CoreSet}(object)
@@ -128,6 +134,10 @@
 \S4method{sensitivitySlot}{CoreSet}(object)
 
 \S4method{sensitivitySlot}{CoreSet,list_or_LongTable}(object) <- value
+
+\S4method{sensNumber}{CoreSet}(object)
+
+\S4method{sensNumber}{CoreSet,matrix}(object) <- value
 }
 \arguments{
 \item{object}{A \code{CoreSet} object.}
@@ -354,6 +364,18 @@ and the third dimension is metric, either 'Dose' for the doses used or
 replicates and pages are c('Dose', 'Viability'), with the corresponding
 dose or viability measurement for that experiment_id and replicate.
 }
+
+\strong{sensNumber}: Return a count of viability observations in a \code{CoreSet}
+object for each drug-combo by cell-line combination.
+
+\strong{sensNumber<-}: Update the 'n' item, which holds a matrix with a count
+of drug by cell-line experiment counts, in the \code{list} in \verb{@sensitivity}
+slot of a \code{CoreSet} object. Will error when \verb{@sensitviity} contains
+a \code{LongTable} object, since the counts are computed on the fly. Arguments:
+\itemize{
+\item value: A \code{matrix} where rows are cells and columns are drugs, with a
+count of the number of experiments for each combination as the values.
+}
 }
 \examples{
 dateCreated(clevelandSmall_cSet)
@@ -413,5 +435,9 @@ sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
 sensitivitySlot(clevelandSmall_cSet)
 
 sensitivitySlot(clevelandSmall_cSet) <- sensitivitySlot(clevelandSmall_cSet)
+
+sensNumber(clevelandSmall_cSet)
+
+sensNumber(clevelandSmall_cSet) <- sensNumber(clevelandSmall_cSet)
 
 }

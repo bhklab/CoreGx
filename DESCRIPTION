@@ -35,6 +35,7 @@ Imports:
     Biobase,
     S4Vectors,
     MultiAssayExperiment,
+    MatrixGenerics,
     piano,
     BiocParallel,
     methods,
