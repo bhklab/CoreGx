@@ -7,7 +7,7 @@
 sensitivityMeasures(object, ...)
 }
 \arguments{
-\item{object}{An \code{\link{S4}} object to retrieve the names of sensitivty summary
+\item{object}{An \code{S4} object to retrieve the names of sensitivty summary
 measurements for.}
 
 \item{...}{Fallthrough arguements for defining new methods}

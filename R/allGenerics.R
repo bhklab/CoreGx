@@ -197,10 +197,10 @@ setGeneric('sensitivityMeasures<-',
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
-#' @param object [`CoreSet`] Object inheriting from CoreSet.
+#' @param object `CoreSet` Object inheriting from CoreSet.
 #' @param ... Allow new arguments to be defined on this generic.
 #'
-#' @return A [`LongTable`] object containing the data in the sensitivity slot.
+#' @return A `LongTable` object containing the data in the sensitivity slot.
 #'
 #' @export
 setGeneric('sensitivitySlotToLongTable',

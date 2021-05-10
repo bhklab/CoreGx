@@ -7,7 +7,7 @@
 sensitivityInfo(object, ...) <- value
 }
 \arguments{
-\item{object}{An \code{\link{S4}} object to set treatment response experiment
+\item{object}{An \code{S4} object to set treatment response experiment
 annotations for.}
 
 \item{...}{Allow new arguments to be defined for this generic.}

@@ -8,10 +8,10 @@ colData.}
 \S4method{idCols}{LongTable}(object)
 }
 \arguments{
-\item{object}{\code{\link{LongTable}}}
+\item{object}{\code{LongTable}}
 }
 \value{
-\code{\link{character}} A character vector containing the unique rowIDs and
+\code{character} A character vector containing the unique rowIDs and
 colIDs in a LongTable object.
 }
 \description{

@@ -42,13 +42,15 @@
 \alias{mDataNames<-,CoreSet-method}
 \alias{mDataNames<-,CoreSet,ANY-method}
 \alias{mDataNames}
+\alias{molecularProfilesSlot,CoreSet-method}
+\alias{molecularProfilesSlot<-,CoreSet,list_or_MAE-method}
 \alias{sensitivityInfo,CoreSet-method}
 \alias{sensitivityInfo,CoreSet,missing-method}
 \alias{sensitivityInfo,CoreSet,character-method}
 \alias{sensitivityInfo}
 \alias{sensitivityInfo<-,CoreSet,data.frame-method}
 \alias{sensitivityInfo<-,CoreSet,missing,data.frame-method}
-\alias{sensitviityInfo<-,CoreSet,character,data.frame-method}
+\alias{sensitvityInfo<-,CoreSet,character,data.frame-method}
 \alias{sensitivityInfo<-}
 \alias{sensitivityMeasures,CoreSet-method}
 \alias{sensitivityMeasures<-,CoreSet,character-method}
@@ -56,6 +58,11 @@
 \alias{sensitivityProfiles<-,CoreSet,data.frame-method}
 \alias{sensitivityRaw,CoreSet-method}
 \alias{sensitivityRaw<-,CoreSet,array-method}
+\alias{sensitivitySlot,CoreSet-method}
+\alias{sensitivitySlot<-,CoreSet,list_or_LongTable-method}
+\alias{sensitivitySlot<-}
+\alias{sensitivitySlot<-,CoreSet,list-method}
+\alias{sensitivitySlot<-,CoreSet,LongTable-method}
 \title{Accessing and modifying information in a \code{CoreSet}}
 \usage{
 \S4method{annotation}{CoreSet}(object)
@@ -94,6 +101,10 @@
 
 \S4method{mDataNames}{CoreSet}(object) <- value
 
+\S4method{molecularProfilesSlot}{CoreSet}(object)
+
+\S4method{molecularProfilesSlot}{CoreSet,list_or_MAE}(object) <- value
+
 \S4method{sensitivityInfo}{CoreSet}(object, dimension, ...)
 
 \S4method{sensitivityInfo}{CoreSet,data.frame}(object, dimension, ...) <- value
@@ -109,6 +120,10 @@
 \S4method{sensitivityRaw}{CoreSet}(object)
 
 \S4method{sensitivityRaw}{CoreSet,array}(object) <- value
+
+\S4method{sensitivitySlot}{CoreSet}(object)
+
+\S4method{sensitivitySlot}{CoreSet,list_or_LongTable}(object) <- value
 }
 \arguments{
 \item{object}{A \code{CoreSet} object.}
@@ -120,6 +135,8 @@ from the \code{molecularProfiles} of a \code{CoreSet} object.}
 
 \item{assay}{\code{character(1)} A valid assay name in the \code{SummarizedExperiment}
 of \verb{@molecularProfiles} of a CoreSet object for data type \code{mDataType}.}
+
+\item{dimension}{See details.}
 
 \item{...}{See details.}
 }
@@ -244,6 +261,18 @@ are the options which can be used in the \code{mDataType} parameter of various
 equal to \code{length(molecularProfilesSlot(object))}.
 }
 
+\strong{molecularProfilesSlot}: Return the contents of the \verb{@molecularProfiles}
+slot of a \code{CoreSet} object. This will either be a \code{list} or
+\code{MultiAssayExperiment} of \code{SummarizedExperiment}s.
+
+\strong{molecularProfilesSlot<-}: Update the contents of the \verb{@molecularProfiles}
+slot of a \code{CoreSet} object. Arguemnts:
+\itemize{
+\item value: A \code{list} or \code{MultiAssayExperiment} of \code{SummarizedExperiment}s. The
+\code{list} and \code{assays} should be named for the molecular datatype in each
+\code{SummarizedExperiment}.
+}
+
 \subsection{@sensitivity}{
 \subsection{Arguments:}{
 \itemize{
@@ -307,7 +336,7 @@ drug by sample experiments.
 \strong{sensitivityProfiles<-}: Update the sensitivity profile summaries the
 sensitivity slot. Arguments:
 -value: A \code{data.frame} the the same number of rows as as returned by
-\code{sensitivityInfo(object)}, but potentially modified columns, such as the
+\code{sensitivityProfiles(object)}, but potentially modified columns, such as the
 computation of additional summary metrics.
 
 \strong{sensitivityRaw}: Access the raw sensitiity measurents for a CoreSet
@@ -351,11 +380,15 @@ molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs') <- molecularProfiles(clev
 
 featureInfo(clevelandSmall_cSet, 'rna')
 
-featureInfo(clevelandSmall_cSet) <- featureInfo(clevelandSmall_cSet)
+featureInfo(clevelandSmall_cSet, 'rna') <- featureInfo(clevelandSmall_cSet, 'rna')
 
 mDataNames(clevelandSmall_cSet)
 
 mDataNames(clevelandSmall_cSet) <- mDataNames(clevelandSmall_cSet)
+
+molecularProfilesSlot(clevelandSmall_cSet)
+
+molecularProfilesSlot(clevelandSmall_cSet) <- molecularProfilesSlot(clevelandSmall_cSet)
 
 sensitivityInfo(clevelandSmall_cSet)
 
@@ -367,10 +400,14 @@ sensitivityMeasures(clevelandSmall_cSet) <- sensitivityMeasures(clevelandSmall_c
 
 sensitivityProfiles(clevelandSmall_cSet)
 
-sensitivityInfo(clevelandSmall_cSet <- sensitivityInfo(clevelandSmall_cSet)
+sensitivityProfiles(clevelandSmall_cSet) <- sensitivityProfiles(clevelandSmall_cSet)
 
-head(sensitivityRaw(clevelandSmall_cSet)
+head(sensitivityRaw(clevelandSmall_cSet))
 
 sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
+
+sensitivitySlot(clevelandSmall_cSet)
+
+sensitivitySlot(clevelandSmall_cSet) <- sensitivitySlot(clevelandSmall_cSet)
 
 }

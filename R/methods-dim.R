@@ -13,7 +13,7 @@
 #' @examples
 #' dim(merckLongTable)
 #'
-#' @param x A [`LongTable`] object to retrieve dimensions for.
+#' @param x A `LongTable` object to retrieve dimensions for.
 #'
 #' @return `numeric` Vector of object dimensions.
 #'

@@ -14,7 +14,7 @@
 #' # With identifiers and metadata
 #' assay(merckLongTable, 'viability_summary', withDimnames=TRUE, metadata=TRUE)
 #'
-#' @param x [`LongTable`] The `LongTable` object to get the assay from.
+#' @param x `LongTable` The `LongTable` object to get the assay from.
 #' @param i `integer` or `character` vector containing the index or name
 #'   of the assay, respectively.
 #' @param withDimnames `logical` Should the dimension names be returned

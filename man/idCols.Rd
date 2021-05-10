@@ -7,7 +7,7 @@
 idCols(object, ...)
 }
 \arguments{
-\item{object}{An \code{\link{S4}} object to get id columns from.}
+\item{object}{An \code{S4} object to get id columns from.}
 
 \item{...}{Allow new arguments to this generic.}
 }

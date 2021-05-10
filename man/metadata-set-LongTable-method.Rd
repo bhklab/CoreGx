@@ -7,13 +7,13 @@
 \S4method{metadata}{LongTable}(x) <- value
 }
 \arguments{
-\item{x}{\code{\link{LongTable}} The LongTable to update}
+\item{x}{\code{LongTable} The LongTable to update}
 
-\item{value}{\code{\link{list}} A list of new metadata associated with a \code{LongTable}
+\item{value}{\code{list} A list of new metadata associated with a \code{LongTable}
 object.}
 }
 \value{
-\code{\link{LongTable}} A copy of the \code{LongTable} object with the \code{value} in
+\code{LongTable} A copy of the \code{LongTable} object with the \code{value} in
 the metadata slot.
 }
 \description{

@@ -648,7 +648,7 @@
 #' 
 #' @param x `numeric` input/x values for function
 #' @param y `numeric` output/y values for function
-#' @param f [`function`] function f, parameterized by parameters to optimize 
+#' @param f `function` function f, parameterized by parameters to optimize 
 #' @param density `numeric` how many points in the dimension of each parameter should 
 #'   be evaluated (density of the grid)
 #' @param step initial step size for pattern search.
@@ -1042,11 +1042,6 @@
 #' @noRd
 .warnMsg <- function(..., collapse=', ') cyan$bold(paste0(..., collapse=collapse))
 
-#'
-#'
-#'
-#'
-#'
 
 #' Get the types of all items in a list
 #'
@@ -1054,9 +1049,9 @@
 #' list <- list(c(1,2,3), c('a','b','c'))
 #' is.items(list, 'character')
 #'
-#' @param list A [`list`] to get the types from
+#' @param list A `list` to get the types from
 #' @param ... `pairlist` Additional arguments to FUN
-#' @param FUN [`function`] or `character` Either a function, or the name
+#' @param FUN `function` or `character` Either a function, or the name
 #'   of a function which returns a single logical value. The default function
 #'   uses `is`, specify the desired type in `...`. You can also use other
 #'   type checking functions such as is.character, is.numeric, or is.data.frame.
@@ -1150,7 +1145,7 @@ is.items <- function(list, ..., FUN=is)
 #' @export
 .S4MethodContext <- function(generic, ...) {
     dots <- as.list(...)
-    formals <- getMethod(generic, signature=dots)
+    formals <- selectMethod(generic, signature=dots)
     context <- paste0(
         formals@target@package[1], '::`', # what package is the method from
         formals@generic, ',',  # what is the name of the generic

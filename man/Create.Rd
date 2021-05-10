@@ -7,26 +7,26 @@
 \S4method{buildLongTable}{list}(from, rowDataCols, colDataCols, assayCols)
 }
 \arguments{
-\item{from}{\code{\link{list}} A list containing any combination of character file paths,
+\item{from}{\code{list} A list containing any combination of character file paths,
 data.tables and data.frames which will be used to construct the LongTable.}
 
-\item{rowDataCols}{\code{\link{list}} List with two \code{character} vectors, the first
+\item{rowDataCols}{\code{list} List with two \code{character} vectors, the first
 specifying one or more columns to be used as cell identifiers (e.g.,
 cell-line name columns) and the second containing any additional metadata
 columns related to the cell identifiers.}
 
-\item{colDataCols}{\code{\link{list}} List with two \code{character} vectors, the first
+\item{colDataCols}{\code{list} List with two \code{character} vectors, the first
 specifying one or more columns to be used as column identifiers (e.g.,
 drug name columns) and the second containing any additional metadata
 columns related to the column identifiers.}
 
-\item{assayCols}{\code{\link{list}} A named list of character vectors specifying how to
+\item{assayCols}{\code{list} A named list of character vectors specifying how to
 parse assay columns into a list of \code{data.table}s. Each list data.table
 will be named for the name of corresponding list item and contain the columns
 specified in the character vector of column names in each list item.}
 }
 \value{
-A \code{\link{LongTable}} object constructed with the data in \code{from}.
+A \code{LongTable} object constructed with the data in \code{from}.
 }
 \description{
 LongTable build method from list

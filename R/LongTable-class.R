@@ -4,11 +4,11 @@
 #'   `LongTable` object.
 #'
 #' @section Slots:
-#' - *rowData*: A [`data.table`] containing the metadata associated with the
+#' - *rowData*: A `data.table` containing the metadata associated with the
 #'   row dimension of a `LongTable`.
-#' - *colData*: A [`data.table`] containing the metadata associated with the
+#' - *colData*: A `data.table` containing the metadata associated with the
 #'   column dimension of a `LongTable`.
-#' - *assays*: A [`list`] of [`data.table`s], one for each assay in a
+#' - *assays*: A `list` of `data.table`s, one for each assay in a
 #'   `LongTable`.
 #' - *metadata*: An optional `list` of additional metadata for a `LongTable`
 #'   which doesn't map to one of the dimensions.
@@ -55,31 +55,31 @@ setOldClass('long.table', S4Class='LongTable')
 #' `rowData` objects. Additional metadata can be attached to a `LongTable` by
 #' passing a list to the metadata argument.
 #'
-#' @param rowData [`data.table`, `data.frame`, `matrix`] A table like object
+#' @param rowData `data.table`, `data.frame`, `matrix` A table like object
 #'   coercible to a `data.table` containing the a unique `rowID` column which
 #'   is used to key assays, as well as additional row metadata to subset on.
-#' @param rowIDs [`character`, `integer`] A vector specifying
+#' @param rowIDs `character`, `integer` A vector specifying
 #'   the names or integer indexes of the row data identifier columns. These
 #'   columns will be pasted together to make up the row.names of the
 #'   `LongTable` object.
-#' @param colData [`data.table`, `data.frame`, `matrix`] A table like object
+#' @param colData `data.table`, `data.frame`, `matrix` A table like object
 #'   coercible to a `data.table` containing the a unique `colID` column which
 #'   is used to key assays, as well as additional column metadata to subset on.
-#' @param colIDs [`character`, `integer`] A vector specifying
+#' @param colIDs `character`, `integer` A vector specifying
 #'   the names or integer indexes of the col data identifier columns. These
 #'   columns will be pasted together to make up the col.names of the
 #'   `LongTable` object.
-#' @param assays A [`list`] containing one or more objects coercible to a
+#' @param assays A `list` containing one or more objects coercible to a
 #'   `data.table`, and keyed by rowID and colID corresponding to the rowID and
 #'   colID columns in colData and rowData.
-#' @param metadata A [`list`] of metadata associated with the `LongTable`
+#' @param metadata A `list` of metadata associated with the `LongTable`
 #'   object being constructed
-#' @param keep.rownames [`logical` or `character`] Logical: whether rownames
+#' @param keep.rownames `logical` or `character` Logical: whether rownames
 #'   should be added as a column if coercing to a `data.table`, default is FALSE.
 #'   If TRUE, rownames are added to the column 'rn'. Character: specify a custom
 #'   column name to store the rownames in.
 #'
-#' @return A [`LongTable`] object containing the data for a treatment response
+#' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
 #' @import data.table
@@ -176,10 +176,10 @@ setClassUnion('list_or_LongTable', c('list', 'LongTable'))
 
 # #' Ensure that all rowID and colID keys are valid
 # #'
-# #' @param rowData A [`data.table`] containing row level annotations.
-# #' @param colData A [`data.table`] containing column level annotations for a
+# #' @param rowData A `data.table` containing row level annotations.
+# #' @param colData A `data.table` containing column level annotations for a
 # #'   `LongTable`.
-# #' @param assays A [`list`] of `data.table`s, one for each assay in an
+# #' @param assays A `list` of `data.table`s, one for each assay in an
 # #'   `LongTable`.
 # #'
 # #' @keywords internal
@@ -203,9 +203,9 @@ NULL
 #' @examples
 #' show(merckLongTable)
 #'
-#' @param object A [`LongTable`] object to print the results for.
+#' @param object A `LongTable` object to print the results for.
 #'
-#' @return [`invisible`] Prints to console.
+#' @return `invisible` Prints to console.
 #'
 #' @importFrom crayon %+% yellow red green blue cyan magenta
 #' @import data.table
@@ -302,13 +302,13 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #' @examples
 #' rowIDs(merckLongTable)
 #'
-#' @param object A [`LongTable`] to get the rowData id columns for.
+#' @param object A `LongTable` to get the rowData id columns for.
 #' @param data `logical` Should the rowData for the id columns be returned
 #' instead of the column names? Default is FALSE.
 #' @param key `logical` Should the key column also be returned?
 #'
 #' @return A `character` vector of rowData column names if data is FALSE,
-#' otherwise a [`data.table`] with the data from the rowData id columns.
+#' otherwise a `data.table` with the data from the rowData id columns.
 #'
 #' @rdname LongTable-class
 #' @family LongTable-class
@@ -331,13 +331,13 @@ setMethod('rowIDs', signature(object='LongTable'),
 #'
 #' @describeIn LongTable Get the names of the non-id columns from rowData.
 #'
-#' @param object A [`LongTable`] to get the rowData metadata columns for.
+#' @param object A `LongTable` to get the rowData metadata columns for.
 #' @param data `logical` Should the rowData for the metadata columns be returned
 #' instead of the column names? Default is FALSE.
 #' @param key `logical` Should the key column also be returned? Default is FALSE
 #'
 #' @return A `character` vector of rowData column names if data is FALSE,
-#' otherwise a [`data.table`] with the data from the rowData metadta columns.
+#' otherwise a `data.table` with the data from the rowData metadta columns.
 #'
 #' @import data.table
 #' @export
@@ -358,13 +358,13 @@ setMethod('rowMeta', signature(object='LongTable'),
 #' @describeIn LongTable Get the names of the columns in colData required to
 #' uniquely identify each row.
 #'
-#' @param object A [`LongTable`] to get the colData id columns for.
+#' @param object A `LongTable` to get the colData id columns for.
 #' @param data `logical` Should the colData for the id columns be returned
 #' instead of the column names? Default is FALSE.
 #' @param key `logical` Should the key column also be returned? Default is FALSE.
 #'
 #' @return A `character` vector of colData column names if data is FALSE,
-#' otherwise a [`data.table`] with the data from the colData id columns.
+#' otherwise a `data.table` with the data from the colData id columns.
 #'
 #' @import data.table
 #' @export
@@ -385,13 +385,13 @@ setMethod('colIDs', signature(object='LongTable'),
 #' @describeIn LongTable Get the names of the non-id columns in the colData
 #'   `data.table`.
 #'
-#' @param object A [`LongTable`] to get the colData metadata columns for.
+#' @param object A `LongTable` to get the colData metadata columns for.
 #' @param data `logical` Should the colData for the metadata columns be returned
 #'   instead of the column names? Default is FALSE.
 #' @param key `logical` Should the key column also be returned?
 #'
 #' @return A `character` vector of colData column names if data is FALSE,
-#'   otherwise a [`data.table`] with the data from the colData metadta columns.
+#'   otherwise a `data.table` with the data from the colData metadta columns.
 #'
 #' @import data.table
 #' @export
@@ -411,12 +411,12 @@ setMethod('colMeta', signature(object='LongTable'),
 #' @describeIn LongTable Get a list of column names for each assay in a
 #'   `LongTable`.
 #'
-#' @param object [`LongTable`]
-#' @param i Optional parameter specifying the `character` name or [`interger`]
+#' @param object `LongTable`
+#' @param i Optional parameter specifying the `character` name or `integer`
 #' index of the assay to get the column names for. If missing, returns a
 #' list of value column names for all the assays.
 #'
-#' @return A [`list`] of `character` vectors containing the value column names for
+#' @return A `list` of `character` vectors containing the value column names for
 #' each assay if i is missing, otherwise a `character` vector of value column
 #' names for the selected assay.
 #'
@@ -446,7 +446,7 @@ setMethod('assayCols', signature(object='LongTable'),
 #' @examples
 #' idCols(merckLongTable)
 #'
-#' @param object [`LongTable`]
+#' @param object `LongTable`
 #'
 #' @return `character` A character vector containing the unique rowIDs and
 #'   colIDs in a LongTable object.

@@ -7,12 +7,12 @@
 as.long.table(x)
 }
 \arguments{
-\item{x}{A \code{\link{data.frame}} with the 'LongTable.config' attribute, containing
+\item{x}{A \code{data.frame} with the 'LongTable.config' attribute, containing
 three lists named assayCols, rowDataCols and colDataCols. This attribute is
 automatically created when coercing from a LongTable to a data.table.}
 }
 \value{
-\code{\link{LongTable}} object configured with the LongTable.config
+\code{LongTable} object configured with the LongTable.config
 }
 \description{
 Coerce a data.table with the proper configuration attributes

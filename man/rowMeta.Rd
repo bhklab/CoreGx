@@ -7,7 +7,7 @@
 rowMeta(object, ...)
 }
 \arguments{
-\item{object}{\code{\link{S4}} An object to get row metadata columns from.}
+\item{object}{\code{S4} An object to get row metadata columns from.}
 
 \item{...}{Allow new arguments to this generic.}
 }

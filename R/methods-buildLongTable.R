@@ -7,23 +7,23 @@
 #'
 #' @param from `character` Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.
-#' @param colDataCols [`list`] List with two `character` vectors, the first
+#' @param colDataCols `list` List with two `character` vectors, the first
 #'   specifying one or more columns to be used as column identifiers (e.g.,
 #'   drug name columns) and the second containing any additional metadata
 #'   columns related to the column identifiers. If you wish to rename any of
 #'   these columns, assign the new names to their respective character vectors.
-#' @param rowDataCols [`list`] List with two `character` vectors, the first
+#' @param rowDataCols `list` List with two `character` vectors, the first
 #'   specifying one or more columns to be used as cell identifiers (e.g.,
 #'   cell-line name columns) and the second containing any additional metadata
 #'   columns related to the cell identifiers. If you wish to rename any of
 #'   these columns, assign the new names to their respective character vectors.
-#' @param assayCols [`list`] A named list of character vectors specifying how to
+#' @param assayCols `list` A named list of character vectors specifying how to
 #'   parse assay columns into a list of `data.table`s. Each list data.table
 #'   will be named for the name of corresponding list item and contain the columns
 #'   specified in the character vector of column names in each list item. If
 #'   there are no names for assayCols, the assays will be numbered by instead.
 #'
-#' @return A [`LongTable`] object containing one or more assays, indexed by
+#' @return A `LongTable` object containing one or more assays, indexed by
 #'   rowID and colID.
 #'
 #' @import data.table
@@ -113,20 +113,20 @@ setMethod('buildLongTable', signature(from='data.frame'),
 #'
 #' @param from `character` Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.
-#' @param colDataCols [`list`] List with two `character` vectors, the first
+#' @param colDataCols `list` List with two `character` vectors, the first
 #'   specifying one or more columns to be used as column identifiers (e.g.,
 #'   drug name columns) and the second containing any additional metadata
 #'   columns related to the column identifiers.
-#' @param rowDataCols [`list`] List with two `character` vectors, the first
+#' @param rowDataCols `list` List with two `character` vectors, the first
 #'   specifying one or more columns to be used as cell identifiers (e.g.,
 #'   cell-line name columns) and the second containing any additional metadata
 #'   columns related to the cell identifiers.
-#' @param assayCols [`list`] A named list of character vectors specifying how to
+#' @param assayCols `list` A named list of character vectors specifying how to
 #'   parse assay columns into a list of `data.table`s. Each list data.table
 #'   will be named for the name of corresponding list item and contain the columns
 #'   specified in the character vector of column names in each list item.
 #'
-#' @return A [`LongTable`] object containing one or more assays, indexed by
+#' @return A `LongTable` object containing one or more assays, indexed by
 #'   rowID and colID.
 #'
 #' @import data.table
@@ -159,22 +159,22 @@ setMethod('buildLongTable', signature(from='character'),
 #' assayCols <- assayCols(merckLongTable)
 #' longTable <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)
 #'
-#' @param from [`list`] A list containing any combination of character file paths,
+#' @param from `list` A list containing any combination of character file paths,
 #'  data.tables and data.frames which will be used to construct the LongTable.
-#' @param colDataCols [`list`] List with two `character` vectors, the first
+#' @param colDataCols `list` List with two `character` vectors, the first
 #'   specifying one or more columns to be used as column identifiers (e.g.,
 #'   drug name columns) and the second containing any additional metadata
 #'   columns related to the column identifiers.
-#' @param rowDataCols [`list`] List with two `character` vectors, the first
+#' @param rowDataCols `list` List with two `character` vectors, the first
 #'   specifying one or more columns to be used as cell identifiers (e.g.,
 #'   cell-line name columns) and the second containing any additional metadata
 #'   columns related to the cell identifiers.
-#' @param assayCols [`list`] A named list of character vectors specifying how to
+#' @param assayCols `list` A named list of character vectors specifying how to
 #'   parse assay columns into a list of `data.table`s. Each list data.table
 #'   will be named for the name of corresponding list item and contain the columns
 #'   specified in the character vector of column names in each list item.
 #'
-#' @return A [`LongTable`] object constructed with the data in `from`.
+#' @return A `LongTable` object constructed with the data in `from`.
 #'
 #' @import data.table
 #' @importFrom crayon magenta cyan
@@ -266,13 +266,13 @@ setMethod('buildLongTable', signature(from='list'),
 #'   data.table with duplicate rows removed
 #'
 #' @param colNames `character` The column names to select from the data.table
-#' @param DT [`data.table`, `data.frame`, `matrix`] An object coercible to a `data.table`.
+#' @param DT `data.table`, `data.frame`, `matrix` An object coercible to a `data.table`.
 #'   Please note rownames will be dropped by default.
-#' @param keep.rownames [`logical` or `character`] Passed through to the data.table coercing if DT is not a
+#' @param keep.rownames `logical` or `character` Passed through to the data.table coercing if DT is not a
 #'   `data.table`. If TRUE, rownames will be caputured in the `rn` column; if FALSE (default) rownames will
 #'   be dropped; if `character`, rownames will be captured in a column with the same name.
 #'
-#' @return [`data.table`] Copy of `DT` containing only the specified columns, with duplicate rows removed.
+#' @return `data.table` Copy of `DT` containing only the specified columns, with duplicate rows removed.
 #'
 #' @import data.table
 #' @keywords internal

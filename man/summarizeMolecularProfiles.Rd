@@ -8,7 +8,7 @@ cell line/treatment combination}
 summarizeMolecularProfiles(object, ...)
 }
 \arguments{
-\item{object}{An \code{\link{S4}} object to summarize the molecular profiles for.}
+\item{object}{An \code{S4} object to summarize the molecular profiles for.}
 
 \item{...}{Allow definition of new arguments to this generic}
 }

@@ -7,10 +7,10 @@
 \method{as.data.table}{LongTable}(x)
 }
 \arguments{
-\item{x}{\code{\link{LongTable}} to coerce to a \code{data.table}}
+\item{x}{\code{LongTable} to coerce to a \code{data.table}}
 }
 \value{
-A \code{\link{data.table}} containing the data from the LongTable, as well
+A \code{data.table} containing the data from the LongTable, as well
 as the `LongTable.config' attribute which contains the data needed to
 reverse the coercion.
 }

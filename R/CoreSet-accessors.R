@@ -1,4 +1,4 @@
-#' @include CoreSet-class.R allGenerics.R
+#' @include CoreSet-class.R allGenerics.R LongTable-class.R
 NULL
 
 .local_class <- 'CoreSet'
@@ -24,6 +24,7 @@ data('clevelandSmall_cSet')
     from the `molecularProfiles` of a `{class_}` object.
     @param assay `character(1)` A valid assay name in the `SummarizedExperiment`
     of `@molecularProfiles` of a {class_} object for data type `mDataType`.
+    @param dimension See details.
     @param ... See details.
 
     @return Accessors: See details.
@@ -431,8 +432,8 @@ setReplaceMethod("datasetType", signature(object="CoreSet", value='character'),
 ## ---- molecularProfiles slot
 
 
-#
-# -- molecularProfiles
+##
+## -- molecularProfiles
 
 
 #' @export
@@ -525,16 +526,16 @@ setReplaceMethod("molecularProfiles", signature(object="CoreSet",
   object
 })
 setReplaceMethod("molecularProfiles",
-                 signature(object="CoreSet", mDataType ="character",
-                           assay="missing", value="matrix"),
-                 function(object, mDataType, assay, value) {
+    signature(object="CoreSet", mDataType ="character", assay="missing", 
+        value="matrix"), function(object, mDataType, assay, value) 
+{
   if (mDataType %in% names(object@molecularProfiles)) {
     SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1) <- value
   }
   object
 })
 
-
+##
 ## -- featureInfo
 
 #' @export
@@ -578,7 +579,7 @@ setMethod(featureInfo, "CoreSet", function(object, mDataType) {
     the specified molecular profile in the `molecularProfiles` slot of a 
     `{class_}` object.
     @examples
-    featureInfo({data_}) <- featureInfo({data_})
+    featureInfo({data_}, '{mDataType_}') <- featureInfo({data_}, '{mDataType_}')
     
     @aliases featureInfo<-,{class_},character,data.frame-method 
     featureInfo<-,{class_},character,DataFrame-method featureInfo<-
@@ -594,7 +595,8 @@ setGeneric("featureInfo<-", function(object, mDataType, value)
     standardGeneric("featureInfo<-"))
 
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_set_featureInfo(class_=.local_class, data_=.local_data)
+#' @eval .docs_CoreSet_set_featureInfo(class_=.local_class, data_=.local_data, 
+#'   mDataType_='rna')
 setReplaceMethod("featureInfo", signature(object="CoreSet", 
     mDataType ="character",value="data.frame"), 
     function(object, mDataType, value)
@@ -617,6 +619,7 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
   object
 })
 
+##
 ## -- mDataNames
 
 #' @export
@@ -674,11 +677,77 @@ setReplaceMethod("mDataNames", "CoreSet", function(object, value){
   return(object)
 })
 
+##
+## -- molecularProfilesSlot
+
+
+#' @export
+setGeneric("molecularProfilesSlot", function(object, ...) 
+    standardGeneric("molecularProfilesSlot"))
+
+#' @noRd
+.docs_CoreSet_get_molecularProfilesSlot <- function(...) .parseToRoxygen(
+    "
+    @details
+    __molecularProfilesSlot__: Return the contents of the `@molecularProfiles`
+    slot of a `{class_}` object. This will either be a `list` or 
+    `MultiAssayExperiment` of `SummarizedExperiment`s.
+
+    @examples
+    molecularProfilesSlot({data_})
+
+    @md
+    @exportMethod molecularProfilesSlot
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_get_molecularProfilesSlot(class_=.local_class, data_=.local_data)
+setMethod("molecularProfilesSlot", signature("CoreSet"), function(object) {
+  object@molecularProfiles
+})
+
+
+#' @export
+setGeneric("molecularProfilesSlot<-",
+           function(object, value) standardGeneric("molecularProfilesSlot<-"))
+
+#' @noRd
+.docs_CoreSet_set_molecularProfilesSlot <- function(...) .parseToRoxygen(
+    "
+    @details
+    __molecularProfilesSlot<-__: Update the contents of the `@molecularProfiles`
+    slot of a `{class_}` object. Arguemnts:
+    - value: A `list` or `MultiAssayExperiment` of `SummarizedExperiment`s. The
+    `list` and `assays` should be named for the molecular datatype in each
+    `SummarizedExperiment`.
+
+    @examples
+    molecularProfilesSlot({data_}) <- molecularProfilesSlot({data_})
+
+    @md
+    @exportMethod molecularProfilesSlot<-
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_set_molecularProfilesSlot(class_=.local_class, data_=.local_data)
+setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_or_MAE"),
+                 function(object, value) 
+{
+    # funContext <- .S4MethodContext('molecularProfilesSlot<-', class(object), 
+    #     class(value))
+    # if (!is(value, class(object@molecularProfiles)[1])) .error(funContext, 
+    #     'The class of value must be the same as the current @molecularProfiles!')
+    object@molecularProfiles <- value
+    object
+})
+
 
 ## ---------------------
 ## ---- sensitivity slot
-
-
 
 
 #
@@ -751,7 +820,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 #' Replicate the $info slot in the old sensitivity list from the new LongTable
 #'   object
 #'
-#' @param longTable [`LongTable`]
+#' @param longTable `LongTable`
 #'
 #' @keywords internal
 #' @importFrom data.table setkeyv merge.data.table `:=` setDF
@@ -817,7 +886,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 
     @md
     @aliases sensitivityInfo<-,{class_},missing,data.frame-method 
-    sensitviityInfo<-,{class_},character,data.frame-method sensitivityInfo<-
+    sensitvityInfo<-,{class_},character,data.frame-method sensitivityInfo<-
     @import data.table
     @exportMethod sensitivityInfo<-
     ",
@@ -967,10 +1036,10 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
     __sensitivityProfiles<-__: Update the sensitivity profile summaries the 
     sensitivity slot. Arguments:
     -value: A `data.frame` the the same number of rows as as returned by
-    `sensitivityInfo(object)`, but potentially modified columns, such as the 
+    `sensitivityProfiles(object)`, but potentially modified columns, such as the 
     computation of additional summary metrics.
     @examples
-    sensitivityInfo({data_} <- sensitivityInfo({data_})
+    sensitivityProfiles({data_}) <- sensitivityProfiles({data_})
 
     @md
     @exportMethod sensitivityProfiles<-
@@ -981,9 +1050,9 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_sensitivityProfiles(class_=.local_class, data_=.local_data)
 setReplaceMethod("sensitivityProfiles",
-                 signature = signature(object="CoreSet",
-                                       value="data.frame"),
-                 function(object, value) {
+    signature(object="CoreSet", value="data.frame"),
+    function(object, value) 
+{
     if (is(sensitivitySlot(object), 'LongTable'))
         stop(.errorMsg('[CoreGx::sensitivityProfiles<-] No setter has been ',
             'implemented for this method when the sensitivity slot in a CoreSet',
@@ -1008,7 +1077,7 @@ setReplaceMethod("sensitivityProfiles",
     and the third dimension is metric, either 'Dose' for the doses used or 
     'Viability' for the cell-line viability at that dose.
     @examples
-    head(sensitivityRaw({data_})
+    head(sensitivityRaw({data_}))
 
     @md
     @exportMethod sensitivityRaw
@@ -1028,9 +1097,9 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 
 #' Replicate the $raw slot in the old @sensitivity list from a LongTable
 #'
-#' @param longTable [`LongTable`]
+#' @param longTable `LongTable`
 #'
-#' @return A 3D [`array`] where rows are experiment_ids, columns are doses
+#' @return A 3D  where rows are experiment_ids, columns are doses
 #' and the third dimension is metric, either 'Dose' for the doses used or 
 #' 'Viability' for the cell-line viability at that dose.
 #'
@@ -1109,7 +1178,6 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
     if (is(sensitivitySlot(object), 'LongTable')) {
         
         ## TODO:: validate value
-        
         longTable <- sensitivitySlot(object)
 
         # Process into a the proper format for the sensitivity assay
@@ -1140,52 +1208,78 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
 #
 # -- sensitivitySlot
 
-#' sensitivitySlot Generic
-#'
-#' @examples
-#' data(clevelandSmall_cSet)
-#' sensitivitySlot(clevelandSmall_cSet)
-#'
-#' @param object A \code{CoreSet} to extract the raw sensitivity data from
-#' @param ... A \code{list} to allow new parameters in specific methods
-#'
-#' @return A \code{list} of the sensitivity slot contents
-#'
 #' @export
 setGeneric("sensitivitySlot", function(object, ...) standardGeneric("sensitivitySlot"))
-#' @describeIn CoreSet Retrieve the contents of the sensitivity slot
-#' @inheritParams sensitivitySlot
-#' @export
+
+#' @noRd
+.docs_CoreSet_get_sensitivitySlot <- function(...) .parseToRoxygen(
+    "
+    __sensitivitySlot__: Retrive the contents of `@sensitivity` from a `{class_}`
+    object.
+
+    @examples
+    sensitivitySlot({data_})
+
+    @md
+    @exportMethod sensitivitySlot
+    ", 
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_get_sensitivitySlot(class_=.local_class, 
+#'   data_=.local_data)
 setMethod("sensitivitySlot", signature("CoreSet"), function(object) {
-  object@sensitivity
+    object@sensitivity
 })
 
-#' sensitivitySlot<- Replacement Generic
-#'
-#' @examples
-#' data(clevelandSmall_cSet)
-#' sensitivitySlot(clevelandSmall_cSet) <- sensitivitySlot(clevelandSmall_cSet)
-#'
-#' @param object A \code{CoreSet} to extract the raw sensitivity data from
-#' @param ... A \code{list} to allow new parameters in specific methods
-#' @param value A \code{list} of new sensitivity slot data for the rSet
-#'
-#' @return A copy of the \code{CoreSet} containing the updated sensitivty slot
-#'
+
 #' @export
-setGeneric("sensitivitySlot<-", function(object, ..., value) standardGeneric("sensitivitySlot<-"))
-#' @describeIn CoreSet Set the raw dose and viability data for a cSet and return
-#'   and updated copty
-#' @inheritParams sensitivitySlot<-
-#' @export
-setReplaceMethod("sensitivitySlot", signature("CoreSet", "list"),
-                 function(object, value) {
-                   ##TODO:: Implement error handling for this slot
-                   object@sensitivity <- value
-                   object
-                 })
+setGeneric("sensitivitySlot<-", function(object, ..., value) 
+    standardGeneric("sensitivitySlot<-"))
+
+.docs_CoreSet_set_sensitivitySlot <- function(...) .parseToRoxygen(
+    "
+    __sensitivitySlot<-__: Assign data to the `@sensitivity` slot of a 
+    `{class_}` object.
+    - value: Either a `LongTable` class object, or a list with an 'info' 
+    `data.frame` of experiment metadata, 'profiles' `data.frame` with 
+    summary statistics from the sensitivity experiment and a 'raw' 3D array
+    where rows are experiments, columns are replicates and pages are 'Dose'
+    or 'Viability' containing their respective values for that drug by cell-line
+    experiment. The type of `value` must match type of the current `@sensitivity`
+    slot of the `{class_}` object.
+
+    @examples
+    sensitivitySlot({data_}) <- sensitivitySlot({data_})
+
+    @md
+    @aliases sensitivitySlot<- sensitivitySlot<-,{class_},list-method
+    sensitivitySlot<-,{class_},LongTable-method 
+    @exportMethod sensitivitySlot<-
+    ",
+    ...
+)
 
 
+#' @rdname CoreSet-accessors
+#' @include LongTable-class.R
+#' @eval .docs_CoreSet_set_sensitivitySlot(class_=.local_class, data_=.local_data)
+setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_or_LongTable"),
+    function(object, value) 
+{
+    # funContext <- .S4MethodContext('sensitivitySlot<-', class(object), class(value))
+    # ## TODO:: Maybe try coercing the list to a LongTable and vice versa?
+    if (!is(object@sensitivity, class(value)[1])) .error(funContext, 'The types
+        of the current and @sensitivity slot and the value parameter must be
+        the same!')
+    object@sensitivity <- value
+    object
+})
+
+
+#' @export
+setGeneric("sensNumber", function(object, ...) standardGeneric("sensNumber"))
 
 #' sensNumber Generic
 #'
@@ -1198,14 +1292,16 @@ setReplaceMethod("sensitivitySlot", signature("CoreSet", "list"),
 #' @param ... Fallthrough arguements for defining new methods
 #'
 #' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
-#' @export
-setGeneric("sensNumber", function(object, ...) standardGeneric("sensNumber"))
 #' @describeIn CoreSet Return the summary of available sensitivity
 #'   experiments
 #' @export
 setMethod(sensNumber, "CoreSet", function(object){
-  return(object@sensitivity$n)
+    if (is(object, 'LongTable')) return() else return(object@sensitivity$n)
 })
+
+
+#' @export
+setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-"))
 
 #' sensNumber<- Generic
 #'
@@ -1219,12 +1315,12 @@ setMethod(sensNumber, "CoreSet", function(object){
 #'
 #' @return The updated \code{CoreSet}
 #'
-#' @export
-setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-"))
 #' @describeIn CoreSet Update the summary of available sensitivity
 #'   experiments
 #' @export
-setReplaceMethod('sensNumber', signature = signature(object="CoreSet", value="matrix"), function(object, value){
-  object@sensitivity$n <- value
-  object
+setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"), 
+    function(object, value)
+{
+    object@sensitivity$n <- value
+    object
 })

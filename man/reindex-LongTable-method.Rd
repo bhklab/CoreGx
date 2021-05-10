@@ -7,11 +7,11 @@
 \S4method{reindex}{LongTable}(object)
 }
 \arguments{
-\item{object}{The \code{\link{LongTable}} object to recalcualte indexes (rowKey and
+\item{object}{The \code{LongTable} object to recalcualte indexes (rowKey and
 colKey values) for.}
 }
 \value{
-A copy of the \code{\link{LongTable}} with all keys as the smallest set of
+A copy of the \code{LongTable} with all keys as the smallest set of
 contiguous integers possible given the current data.
 }
 \description{

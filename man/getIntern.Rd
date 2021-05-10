@@ -7,9 +7,9 @@
 getIntern(object, x, ...)
 }
 \arguments{
-\item{object}{\code{\link{S4}} An object with an @.itern slot containing an environment.}
+\item{object}{\code{S4} An object with an @.itern slot containing an environment.}
 
-\item{x}{\code{\link{character}} One or more symbol names to retrieve from the
+\item{x}{\code{character} One or more symbol names to retrieve from the
 object@.intern environment.}
 
 \item{...}{Allow new parmeters to be defined for this generic.}

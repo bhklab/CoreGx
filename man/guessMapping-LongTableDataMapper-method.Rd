@@ -7,6 +7,8 @@
 \S4method{guessMapping}{LongTableDataMapper}(object, groups, subset, data = FALSE)
 }
 \arguments{
+\item{object}{A \code{LongTableDataMapper} object.}
+
 \item{groups}{A \code{list} containing one or more vector of column names
 to group-by. The function uses these to determine 1:1 mappings between
 the combination of columns in each vector and unique values in the raw
@@ -20,8 +22,6 @@ after each grouping.}
 \item{data}{A \code{logical} vector indicating whether you would like the data
 for mapped columns to be returned instead of their column names. Defaults
 to \code{FALSE} for easy use assigning mapped columns to a \code{DataMapper} object.}
-
-\item{mapper}{A \code{LongTableDataMapper} object.}
 }
 \value{
 

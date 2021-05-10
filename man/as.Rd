@@ -4,21 +4,21 @@
 \alias{as}
 \title{LongTable to data.table conversion}
 \arguments{
-\item{to}{\code{\link{character}} Class name to coerce to, currently only 'data.table'
+\item{to}{\code{character} Class name to coerce to, currently only 'data.table'
 and 'data.frame' are supported}
 
-\item{from}{A \code{\link{data.table}} with the 'LongTable.config' attribute, containing
+\item{from}{A \code{data.table} with the 'LongTable.config' attribute, containing
 three lists named assayCols, rowDataCols and colDataCols. This attribute is
 automatically created when coercing from a \code{LongTable} to a \code{data.table}.}
 }
 \value{
-A \code{\link{data.table}} with the data from a LongTable.
+A \code{data.table} with the data from a LongTable.
 
-\code{\link{data.table}} containing the data from the LongTable, with the
+\code{data.table} containing the data from the LongTable, with the
 `LongTable.config' attribute containg the metadata needed to reverse
 the coercing operation.
 
-\code{\link{LongTable}} object configured with the LongTable.config
+\code{LongTable} object configured with the LongTable.config
 }
 \description{
 Coerce a LongTable into a \code{data.table}.

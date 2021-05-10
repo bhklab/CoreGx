@@ -7,10 +7,10 @@
 .(...)
 }
 \arguments{
-\item{...}{\code{\link{parilist}} One or more R expressions to convert to calls.}
+\item{...}{\code{pairlist} One or more R expressions to convert to calls.}
 }
 \value{
-\code{\link{call}} An R call object containing the quoted expression.
+\code{call} An R call object containing the quoted expression.
 }
 \description{
 This is used to pass through unevaluated R expressions into subset and

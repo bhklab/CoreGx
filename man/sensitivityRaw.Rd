@@ -7,10 +7,10 @@
 sensitivityRaw(object, ...)
 }
 \arguments{
-\item{object}{An \code{\link{S4}} object to extract the raw sensitivity experiment
+\item{object}{An \code{S4} object to extract the raw sensitivity experiment
 data from.}
 
-\item{...}{\code{\link{pairlist}}  Allow new parameters to be defined for this generic.}
+\item{...}{\code{pairlist}  Allow new parameters to be defined for this generic.}
 }
 \value{
 Depends on the implemented method

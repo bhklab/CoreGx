@@ -7,7 +7,7 @@
 sensitivityMeasures(object, ...) <- value
 }
 \arguments{
-\item{object}{An \code{\link{S4}} object to update.}
+\item{object}{An \code{S4} object to update.}
 
 \item{...}{Allow new methods to be defined for this generic.}
 

@@ -15,38 +15,38 @@ LongTable(
 )
 }
 \arguments{
-\item{rowData}{\link[=`data.table`, `data.frame`, `matrix`]{\code{data.table}, \code{data.frame}, \code{matrix}} A table like object
+\item{rowData}{\code{data.table}, \code{data.frame}, \code{matrix} A table like object
 coercible to a \code{data.table} containing the a unique \code{rowID} column which
 is used to key assays, as well as additional row metadata to subset on.}
 
-\item{rowIDs}{\link[=`character`, `integer`]{\code{character}, \code{integer}} A vector specifying
+\item{rowIDs}{\code{character}, \code{integer} A vector specifying
 the names or integer indexes of the row data identifier columns. These
 columns will be pasted together to make up the row.names of the
 \code{LongTable} object.}
 
-\item{colData}{\link[=`data.table`, `data.frame`, `matrix`]{\code{data.table}, \code{data.frame}, \code{matrix}} A table like object
+\item{colData}{\code{data.table}, \code{data.frame}, \code{matrix} A table like object
 coercible to a \code{data.table} containing the a unique \code{colID} column which
 is used to key assays, as well as additional column metadata to subset on.}
 
-\item{colIDs}{\link[=`character`, `integer`]{\code{character}, \code{integer}} A vector specifying
+\item{colIDs}{\code{character}, \code{integer} A vector specifying
 the names or integer indexes of the col data identifier columns. These
 columns will be pasted together to make up the col.names of the
 \code{LongTable} object.}
 
-\item{assays}{A \code{\link{list}} containing one or more objects coercible to a
+\item{assays}{A \code{list} containing one or more objects coercible to a
 \code{data.table}, and keyed by rowID and colID corresponding to the rowID and
 colID columns in colData and rowData.}
 
-\item{metadata}{A \code{\link{list}} of metadata associated with the \code{LongTable}
+\item{metadata}{A \code{list} of metadata associated with the \code{LongTable}
 object being constructed}
 
-\item{keep.rownames}{\link[=`logical` or `character`]{\code{logical} or \code{character}} Logical: whether rownames
+\item{keep.rownames}{\code{logical} or \code{character} Logical: whether rownames
 should be added as a column if coercing to a \code{data.table}, default is FALSE.
 If TRUE, rownames are added to the column 'rn'. Character: specify a custom
 column name to store the rownames in.}
 }
 \value{
-A \code{\link{LongTable}} object containing the data for a treatment response
+A \code{LongTable} object containing the data for a treatment response
 experiment and configured according to the rowIDs and colIDs arguments.
 }
 \description{

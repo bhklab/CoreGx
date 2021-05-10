@@ -7,10 +7,10 @@
 \S4method{metadata}{LongTable}(x)
 }
 \arguments{
-\item{x}{The \code{\link{LongTable}} object from which to retrieve the metadata list.}
+\item{x}{The \code{LongTable} object from which to retrieve the metadata list.}
 }
 \value{
-\code{\link{list}} The contents of the \code{metadata} slot of the \code{LongTable}
+\code{list} The contents of the \code{metadata} slot of the \code{LongTable}
 object.
 }
 \description{

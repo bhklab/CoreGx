@@ -8,7 +8,7 @@ from an S4 class}
 sensitivityInfo(object, ...)
 }
 \arguments{
-\item{object}{An \code{\link{S4}} object to get treatment response experiment
+\item{object}{An \code{S4} object to get treatment response experiment
 annotations from.}
 
 \item{...}{Allow new arguments to be defined for this generic.}

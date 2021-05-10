@@ -7,9 +7,9 @@
 reindex(object, ...)
 }
 \arguments{
-\item{object}{\code{\link{S4}} An object to redo indexing for}
+\item{object}{\code{S4} An object to redo indexing for}
 
-\item{...}{\code{\link{pairlist}} Allow definition of new parameters to this generic.}
+\item{...}{\code{pairlist} Allow definition of new parameters to this generic.}
 }
 \value{
 Depends on the implemented method

@@ -14,7 +14,7 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 #' 
 #' Checks for columns which are uniquely identified 
 #' 
-#' @param mapper A `LongTableDataMapper` object.
+#' @param object A `LongTableDataMapper` object.
 #' @param groups A `list` containing one or more vector of column names
 #'   to group-by. The function uses these to determine 1:1 mappings between
 #'   the combination of columns in each vector and unique values in the raw

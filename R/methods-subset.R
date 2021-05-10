@@ -18,8 +18,8 @@
 #' subset(merckLongTable, cell_line1 == 'A2058',
 #'   drug1 == 'Dasatinib' & drug2 != '5-FU')
 #'
-#' @param x [`LongTable`] The object to subset.
-#' @param i `character`, `numeric`, `logical` or [`expression`]
+#' @param x `LongTable` The object to subset.
+#' @param i `character`, `numeric`, `logical` or `expression`
 #'  Character: pass in a character vector of drug names, which will subset the
 #'    object on all row id columns matching the vector.
 #'  Numeric or Logical: these select based on the rowKey from the `rowData`
@@ -27,7 +27,7 @@
 #'  Call: Accepts valid query statements to the `data.table` i parameter,
 #'    this can be used to make complex queries using the `data.table` API
 #'    for the `rowData` data.table.
-#' @param j `character`, `numeric`, `logical` or [`expression`]
+#' @param j `character`, `numeric`, `logical` or `expression`
 #'  Character: pass in a character vector of drug names, which will subset the
 #'    object on all drug id columns matching the vector.
 #'  Numeric or Logical: these select based on the rowID from the `rowData`
@@ -35,7 +35,7 @@
 #'  Call: Accepts valid query statements to the `data.table` i parameter,
 #'    this can be used to make complex queries using the `data.table` API
 #'    for the `colData` data.table.
-#' @param assays [`character`, `numeric` or `logical`] Optional list of assay
+#' @param assays `character`, `numeric` or `logical` Optional list of assay
 #'   names to subset. Can be used to subset the assays list further,
 #'   returning only the selected items in the new LongTable.
 #' @param reindex `logical` Should the col/rowKeys be remapped after subsetting.
@@ -43,7 +43,7 @@
 #'   gains by setting to FALSE and calling reindex() manually after subsetting
 #'   is finished.
 #'
-#' @return [`LongTable`] A new `LongTable` object subset based on the specified
+#' @return `LongTable` A new `LongTable` object subset based on the specified
 #'      parameters.
 #'
 #' @importMethodsFrom BiocGenerics subset
@@ -148,9 +148,9 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #' @examples
 #' .(cell_line1 == 'A2058')
 #'
-#' @param ... [`parilist`] One or more R expressions to convert to calls.
+#' @param ... `pairlist` One or more R expressions to convert to calls.
 #'
-#' @return [`call`] An R call object containing the quoted expression.
+#' @return `call` An R call object containing the quoted expression.
 #'
 #' @export
 . <- function(...) substitute(...)
@@ -183,9 +183,9 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #' Convert an R object in a variable into a string of the code necessary to
 #'   create that object
 #'
-#' @param variable [`Symbol`] A symbol containing an R variable
+#' @param variable `symbol` A symbol containing an R variable
 #'
-#' @return [`string`] A string representation of the code necessary to
+#' @return `character(1)` A string representation of the code necessary to
 #'   reconstruct the variable.
 #'
 #' @keywords internal
@@ -198,12 +198,12 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 
 #' Filter a data.table object based on the rowID and colID columns
 #'
-#' @param DT [`data.table`] Object with the columns rowID and colID, preferably
+#' @param DT `data.table` Object with the columns rowID and colID, preferably
 #'  as the key columns.
-#' @param indexList [`list`] Two integer vectors, one indicating the rowIDs and
+#' @param indexList `list` Two integer vectors, one indicating the rowIDs and
 #'  one indicating the colIDs to filter the `data.table` on.
 #'
-#' @return [`data.table`] A copy of `DT` subset on the row and column IDs specified
+#' @return `data.table` A copy of `DT` subset on the row and column IDs specified
 #'  in `indexList`.
 #'
 #' @import data.table

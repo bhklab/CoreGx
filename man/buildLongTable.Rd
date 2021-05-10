@@ -9,7 +9,7 @@ buildLongTable(from, ...)
 \arguments{
 \item{from}{What to build the LongTable from?}
 
-\item{...}{\code{\link{pairlist}} Allow definition of new parameters for
+\item{...}{\code{pairlist} Allow definition of new parameters for
 implementations of this generic.}
 }
 \value{

@@ -7,9 +7,9 @@
 \S4method{[}{LongTable,ANY,ANY,ANY}(x, i, j, assays, ..., drop = FALSE)
 }
 \arguments{
-\item{x}{\code{\link{LongTable}} The object to subset.}
+\item{x}{\code{LongTable} The object to subset.}
 
-\item{i}{\code{\link{character}}, \code{\link{numeric}}, \code{\link{logical}} or \code{\link{call}}
+\item{i}{\code{character}, \code{numeric}, \code{logical} or \code{call}
 Character: pass in a character vector of drug names, which will subset the
 object on all row id columns matching the vector. This parameter also
 supports valid R regex query strings which will match on the colnames
@@ -21,7 +21,7 @@ Call: Accepts valid query statements to the \code{data.table} i parameter as
 a call object. We have provided the function .() to conveniently
 convert raw R statements into a call for use in this function.}
 
-\item{j}{\code{\link{character}}, \code{\link{numeric}}, \code{\link{logical}} or \code{\link{call}}
+\item{j}{\code{character}, \code{numeric}, \code{logical} or \code{call}
 Character: pass in a character vector of drug names, which will subset the
 object on all drug id columns matching the vector. This parameter also
 supports regex queries. Colon can be to denote a specific part of the
@@ -32,16 +32,16 @@ Call: Accepts valid query statements to the \code{data.table} i parameter as
 a call object. We have provided the function .() to conveniently
 convert raw R statements into a call for use in this function.}
 
-\item{assays}{\code{\link{character}} Names of assays which should be kept in the
+\item{assays}{\code{character} Names of assays which should be kept in the
 \code{LongTable} after subsetting.}
 
 \item{...}{Included to ensure drop can only be set by name.}
 
-\item{drop}{\code{\link{logical}} Included for compatibility with the '[' primitive,
+\item{drop}{\code{logical} Included for compatibility with the '[' primitive,
 it defaults to FALSE and changing it does nothing.}
 }
 \value{
-A \code{\link{LongTable}} containing only the data specified in the function
+A \code{LongTable} containing only the data specified in the function
 parameters.
 }
 \description{

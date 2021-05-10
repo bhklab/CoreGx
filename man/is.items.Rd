@@ -7,17 +7,17 @@
 is.items(list, ..., FUN = is)
 }
 \arguments{
-\item{list}{A \code{\link{list}} to get the types from}
+\item{list}{A \code{list} to get the types from}
 
-\item{...}{\code{\link{pairlist}} Additional arguments to FUN}
+\item{...}{\code{pairlist} Additional arguments to FUN}
 
-\item{FUN}{\code{\link{function}} or \code{\link{character}} Either a function, or the name
+\item{FUN}{\code{function} or \code{character} Either a function, or the name
 of a function which returns a single logical value. The default function
 uses \code{is}, specify the desired type in \code{...}. You can also use other
 type checking functions such as is.character, is.numeric, or is.data.frame.}
 }
 \value{
-\code{\link{logical}} A vector indicating if the list item is the specified
+\code{logical} A vector indicating if the list item is the specified
 type.
 }
 \description{

@@ -8,10 +8,10 @@
 #'   set of rowKey and colKey values such that integer indexes are the smallest
 #'   set of contiguous integers possible for the data.
 #'
-#' @param object The [`LongTable`] object to recalcualte indexes (rowKey and
+#' @param object The `LongTable` object to recalcualte indexes (rowKey and
 #'     colKey values) for.
 #'
-#' @return A copy of the [`LongTable`] with all keys as the smallest set of
+#' @return A copy of the `LongTable` with all keys as the smallest set of
 #'     contiguous integers possible given the current data.
 #'
 #' @export

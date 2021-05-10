@@ -7,12 +7,12 @@
 sensitivitySlotToLongTable(object, ...)
 }
 \arguments{
-\item{object}{\code{\link{CoreSet}} Object inheriting from CoreSet.}
+\item{object}{\code{CoreSet} Object inheriting from CoreSet.}
 
 \item{...}{Allow new arguments to be defined on this generic.}
 }
 \value{
-A \code{\link{LongTable}} object containing the data in the sensitivity slot.
+A \code{LongTable} object containing the data in the sensitivity slot.
 }
 \description{
 Convert the sensitivity slot in an object inheriting from a CoreSet from a

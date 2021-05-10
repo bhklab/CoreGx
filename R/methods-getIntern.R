@@ -12,7 +12,7 @@
 #' @describeIn LongTable Access structural metadata present within a
 #'   LongTable object. This is mostly for developmer use.
 #'
-#' @param object [`LongTable`]
+#' @param object `LongTable`
 #' @param x `character` One or more symbol name strings to retrieve from
 #'     the object@.intern environment.
 #' @param ... `pairlist` Addtional arguments to get or mget inside of the

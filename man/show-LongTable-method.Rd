@@ -7,10 +7,10 @@
 \S4method{show}{LongTable}(object)
 }
 \arguments{
-\item{object}{A \code{\link{LongTable}} object to print the results for.}
+\item{object}{A \code{LongTable} object to print the results for.}
 }
 \value{
-\code{\link{invisible}} Prints to console.
+\code{invisible} Prints to console.
 }
 \description{
 Show method for the LongTable class

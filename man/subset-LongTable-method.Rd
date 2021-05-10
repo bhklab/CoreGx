@@ -7,9 +7,9 @@
 \S4method{subset}{LongTable}(x, i, j, assays, reindex = TRUE)
 }
 \arguments{
-\item{x}{\code{\link{LongTable}} The object to subset.}
+\item{x}{\code{LongTable} The object to subset.}
 
-\item{i}{\code{\link{character}}, \code{\link{numeric}}, \code{\link{logical}} or \code{\link{expression}}
+\item{i}{\code{character}, \code{numeric}, \code{logical} or \code{expression}
 Character: pass in a character vector of drug names, which will subset the
 object on all row id columns matching the vector.
 Numeric or Logical: these select based on the rowKey from the \code{rowData}
@@ -18,7 +18,7 @@ Call: Accepts valid query statements to the \code{data.table} i parameter,
 this can be used to make complex queries using the \code{data.table} API
 for the \code{rowData} data.table.}
 
-\item{j}{\code{\link{character}}, \code{\link{numeric}}, \code{\link{logical}} or \code{\link{expression}}
+\item{j}{\code{character}, \code{numeric}, \code{logical} or \code{expression}
 Character: pass in a character vector of drug names, which will subset the
 object on all drug id columns matching the vector.
 Numeric or Logical: these select based on the rowID from the \code{rowData}
@@ -27,17 +27,17 @@ Call: Accepts valid query statements to the \code{data.table} i parameter,
 this can be used to make complex queries using the \code{data.table} API
 for the \code{colData} data.table.}
 
-\item{assays}{\link[=`character`, `numeric` or `logical`]{\code{character}, \code{numeric} or \code{logical}} Optional list of assay
+\item{assays}{\code{character}, \code{numeric} or \code{logical} Optional list of assay
 names to subset. Can be used to subset the assays list further,
 returning only the selected items in the new LongTable.}
 
-\item{reindex}{\code{\link{logical}} Should the col/rowKeys be remapped after subsetting.
+\item{reindex}{\code{logical} Should the col/rowKeys be remapped after subsetting.
 defaults to TRUE. For chained subsetting you may be able to get performance
 gains by setting to FALSE and calling reindex() manually after subsetting
 is finished.}
 }
 \value{
-\code{\link{LongTable}} A new \code{LongTable} object subset based on the specified
+\code{LongTable} A new \code{LongTable} object subset based on the specified
 parameters.
 }
 \description{

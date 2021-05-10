@@ -9,7 +9,7 @@
 #'   these are constructed by pasting together the colIDs(longTable) and
 #'   can be used in the subset method for regex based queries.
 #'
-#' @param x A [`LongTable`] object to get the column names from
+#' @param x A `LongTable` object to get the column names from
 #'
 #' @return `character` Vector of column names.
 #'
@@ -27,7 +27,7 @@ setMethod('colnames', signature(x='LongTable'), function(x) {
 #'   these are constructed by pasting together the rowIDs(longTable) and
 #'   can be used in the subset method for regex based queries.
 #'
-#' @param x A [`LongTable`] object to get the row names from
+#' @param x A `LongTable` object to get the row names from
 #'
 #' @return `character` Vector of row names.
 #'
@@ -44,9 +44,9 @@ setMethod('rownames', signature(x='LongTable'), function(x) {
 #' @describeIn LongTable Get the pseudo-dimnames for a LongTable object. See
 #'   colnames and rownames for more information.
 #'
-#' @param x The [`LongTable`] object to retrieve the dimnames for.
+#' @param x The `LongTable` object to retrieve the dimnames for.
 #'
-#' @return [`list`] List with two character vectors, one for row and one for
+#' @return `list` List with two character vectors, one for row and one for
 #'     column names.
 #'
 #' @importMethodsFrom Biobase dimnames

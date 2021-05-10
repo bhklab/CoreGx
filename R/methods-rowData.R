@@ -7,14 +7,14 @@
 #'
 #' @describeIn LongTable Get the row level annotations for a `LongTable` object.
 #'
-#' @param x A [`LongTable`] object to retrieve the row metadata from.
+#' @param x A `LongTable` object to retrieve the row metadata from.
 #' @param key `logical` Should the rowKey column also be returned? Defaults
 #'     to FALSE.
 #' @param use.names `logical` This parameter is just here to stop matching
 #'     the key argument to use.names from the rowData generic. It doesn't do
 #'     anything at this time and can be ignored.
 #'
-#' @return A [`data.table`] containing rowID, row identifiers, and row metadata.
+#' @return A `data.table` containing rowID, row identifiers, and row metadata.
 #'
 #' @import data.table
 #' @export
@@ -32,14 +32,14 @@ setMethod('rowData', signature(x='LongTable'), function(x, key=FALSE, use.names=
 #'   Currently requires that all columns in rowIDs(longTable) be present in
 #'   value.
 #'
-#' @param x A [`LongTable`] object to modify.
+#' @param x A `LongTable` object to modify.
 # ' @param join A `logical` vector. If `TRUE` and not all existing rowIDs are
 # '   in the  `value` object, the function will attempt to a left join with
 # '   the existing `rowData` in `x`.
-#' @param value A [`data.table`] or [`data.frame`] to update the `rowData` of
+#' @param value A `data.table` or `data.frame` to update the `rowData` of
 #'   `x` with.
 #'
-#' @return A copy of the [`LongTable`] object with the `rowData`
+#' @return A copy of the `LongTable` object with the `rowData`
 #'   slot updated.
 #'
 #' @md
