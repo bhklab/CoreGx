@@ -13,6 +13,7 @@ This object will be used as a way to abstract away data preprocessing.
 \itemize{
 \item rawdata: A list-like object containing one or more pieces of raw data
 that will be processed and mapped to the slots of an \code{S4} object.
+\item metadata: A \code{List} of object level metadata.
 }
 }
 

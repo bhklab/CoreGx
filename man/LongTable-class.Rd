@@ -268,6 +268,20 @@ value.
 
 \section{Slots}{
 
+\describe{
+\item{\code{rowData}}{See Slots section.}
+
+\item{\code{colData}}{See Slots section.}
+
+\item{\code{assays}}{See Slots section.}
+
+\item{\code{metadata}}{See Slots section.}
+
+\item{\code{.intern}}{See Slots section.}
+}}
+
+\section{Slots}{
+
 \itemize{
 \item \emph{rowData}: A \code{data.table} containing the metadata associated with the
 row dimension of a \code{LongTable}.

@@ -91,7 +91,6 @@ Collate:
     'methods-intersect.R'
     'methods-metaConstruct.R'
     'methods-metadata.R'
-    'methods-name.R'
     'methods-pertNumber.R'
     'methods-phenoInfo.R'
     'methods-reindex.R'

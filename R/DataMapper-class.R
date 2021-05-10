@@ -8,6 +8,7 @@ setClassUnion("list_or_List", c('list', 'List'))
 #' @section Slots:
 #' * rawdata: A list-like object containing one or more pieces of raw data
 #'   that will be processed and mapped to the slots of an `S4` object.
+#' * metadata: A `List` of object level metadata.
 #' 
 #' @md
 #' @aliases DataMapper-class
@@ -43,14 +44,19 @@ setMethod('rawdata', signature(object='DataMapper'), function(object) {
 
 #' A Class for Mapping Between Raw Data and an `LongTable` Object
 #'
+#' @slot rowDataMap See Slots section.
+#' @slot colDataMap See Slots section.
+#' @slot assayMap See Slots section.
+#' @slot metadataMap See Slots section.
+#'
+#' @inheritSection DataMapper-class Slots
+#'
 #' @section Slots:
 #' * rowDataMap: A list of mappings from.
 #' * colDataMap: A list of mappings from.
 #' * assayMap: A list of mappings from .
 #' * metadataMap: A list of mappings from.
-#' * metadata: A list of mappings from.
 #' 
-#' @inheritSection DataMapper-class Slots
 #'
 #' @md
 #' @aliases LongTableDataMapper-class

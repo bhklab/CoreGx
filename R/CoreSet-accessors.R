@@ -159,6 +159,61 @@ setReplaceMethod('dateCreated', signature(object="CoreSet", value="character"),
   return(object)
 })
 
+##
+## -- name
+
+#' @export
+setGeneric("name", function(object, ...) standardGeneric("name"))
+
+.docs_CoreSet_get_name <- function(...) .parseToRoxygen(
+    "
+    @details
+    __name__: `character(1)` The name of the `{class_}`, retreived from
+    the `@annotation` slot.
+
+    @examples
+    name({data_})
+
+    @md
+    @aliases name,{class_}-method name
+    @exportMethod name
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_get_name(class_=.local_class, data_=.local_data)
+setMethod('name', signature("CoreSet"), function(object){
+    return(object@annotation$name)
+})
+
+#' @export
+setGeneric("name<-", function(object, ..., value) standardGeneric("name<-"))
+
+#' @noRd
+.docs_CoreSet_set_name <- function(...) .parseToRoxygen(
+    "
+    @details
+    __name<-__: Update the `@annotation$name` value in a `{class_}`  object.
+    - value: `character(1)` The name of the `{class_}` object.
+
+    @examples
+    name({data_}) <- 'new_name'
+
+    @md
+    @aliases name<-,{class_},character-method name<-
+    @exportMethod name<-
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_set_name(class_=.local_class, data_=.local_data)
+setReplaceMethod('name', signature("CoreSet"), function(object, value){
+    object@annotation$name <- value
+    return(object)
+})
+
 
 ## ==============
 ## ---- cell slot

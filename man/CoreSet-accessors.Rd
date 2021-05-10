@@ -11,6 +11,11 @@
 \alias{dateCreated<-,CoreSet,character-method}
 \alias{dateCreated<-,CoreSet-method}
 \alias{dateCreated<-}
+\alias{name,CoreSet-method}
+\alias{name}
+\alias{name<-,CoreSet-method}
+\alias{name<-,CoreSet,character-method}
+\alias{name<-}
 \alias{cellInfo,CoreSet-method}
 \alias{cellInfo}
 \alias{cellInfo<-,CoreSet,data.frame-method}
@@ -82,6 +87,10 @@
 \S4method{dateCreated}{CoreSet}(object)
 
 \S4method{dateCreated}{CoreSet,character}(object) <- value
+
+\S4method{name}{CoreSet}(object)
+
+\S4method{name}{CoreSet}(object) <- value
 
 \S4method{cellInfo}{CoreSet}(object)
 
@@ -187,6 +196,14 @@ created, as returned by the \code{date()} function.
 a \code{CoreSet} object. Arguments:
 \itemize{
 \item value: A \code{character(1)} vector, as returned by the \code{date()} function.
+}
+
+\strong{name}: \code{character(1)} The name of the \code{CoreSet}, retreived from
+the \verb{@annotation} slot.
+
+\strong{name<-}: Update the \verb{@annotation$name} value in a \code{CoreSet}  object.
+\itemize{
+\item value: \code{character(1)} The name of the \code{CoreSet} object.
 }
 
 \strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{CoreSet} object.
@@ -382,6 +399,10 @@ dateCreated(clevelandSmall_cSet)
 
 ## dateCreated
 dateCreated(clevelandSmall_cSet) <- date()
+
+name(clevelandSmall_cSet)
+
+name(clevelandSmall_cSet) <- 'new_name'
 
 cellInfo(clevelandSmall_cSet) <- cellInfo(clevelandSmall_cSet)
 

@@ -10,6 +10,15 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' CoreSet - A generic data container for molecular profiles and 
 #'   treatment response data
 #' 
+#' @slot annotation See Slots section.
+#' @slot molecularProfiles See Slots section.
+#' @slot cell See Slots section.
+#' @slot curation See Slots section.
+#' @slot sensitivity See Slots section.
+#' @slot perturbation See Slots section.
+#' @slot curation See Slots section.
+#' @slot datasetType See Slots section.
+#'
 #' @details  
 #' The CoreSet (CSet) class was developed as a superclass for pSets in the 
 #' PharmacoGx and RadioGx packages to contain the data generated in screens 
@@ -24,28 +33,28 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' packages to apply the correct model for the given data.
 #' 
 #' @section Slots:
-#' - annotation: A `list` of annotation data about the ``r .local_class``,
+#' * annotation: A `list` of annotation data about the ``r .local_class``,
 #'   including the `$name` and the session information for how the object
 #'   was created, detailing the exact versions of R and all the packages used.
-#' - molecularProfiles: A `list` or `MultiAssayExperiment` containing 
+#' * molecularProfiles: A `list` or `MultiAssayExperiment` containing 
 #    a set of `SummarizedExperiment`s with molecular profile data for a given
 #'   ``r .local_class`` object.
-#' - cell: A `data.frame` containg the annotations for all the cell 
+#' * cell: A `data.frame` containg the annotations for all the cell 
 #'   lines profiled in the data set, across all molecular data types and
 #'   treatment response experiments.
-#' - sensitivity: A `list` or `LongTable` containing all the data for the 
+#' * sensitivity: A `list` or `LongTable` containing all the data for the 
 #'   sensitivity experiments, including `$info`, a `data.frame` containing the 
 #'   experimental info, `$raw` a 3D `array` containing raw data,
 #'   `$profiles`, a `data.frame` containing sensitivity profiles 
 #'   statistics, and `$n`, a `data.frame` detailing the number of 
 #'   experiments for each cell-drug/radiationInfo pair
-#' - perturbation: `list` containing `$n`, a `data.frame` 
+#' * perturbation: `list` containing `$n`, a `data.frame` 
 #'   summarizing the available perturbation data. This slot is currently
 #'   being deprecated.
-#' - curation: `list` containing mappings for
+#' * curation: `list` containing mappings for
 #'   `cell`, `tissue` names used in the data set to universal 
 #'   identifiers used between different ``r .local_class`` objects
-#' - datasetType: `character` string of 'sensitivity', 
+#' * datasetType: `character` string of 'sensitivity', 
 #'   'perturbation', or both detailing what type of data can be found in the 
 #'   CoreSet, for proper processing of the data
 #'

@@ -3,6 +3,12 @@
 #' @description Define a private constructor method to be used to build a
 #'   `LongTable` object.
 #'
+#' @slot rowData See Slots section.
+#' @slot colData See Slots section.
+#' @slot assays See Slots section.
+#' @slot metadata See Slots section.
+#' @slot .intern See Slots section.
+#' 
 #' @section Slots:
 #' - *rowData*: A `data.table` containing the metadata associated with the
 #'   row dimension of a `LongTable`.
