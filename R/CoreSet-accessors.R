@@ -241,7 +241,7 @@ setGeneric("cellNames", function(object, ...) standardGeneric("cellNames"))
     cellNames({data_})
 
     @md
-    @aliases cellName,{class_}-method cellName
+    @aliases cellName,{class_}-method cellNames
     @exportMethod cellNames
     ",
     ...
@@ -269,7 +269,7 @@ setGeneric("cellNames<-", function(object, ..., value)
     cellNames({data_}) <- cellNames({data_})
 
     @md
-    @aliases cellNames<-,{class_},list-method cellNames<- 
+    @aliases cellNames<-,{class_},list-method cellNames<-
     @exportMethod cellNames<-
     ",
     ...
@@ -405,7 +405,7 @@ setGeneric("datasetType<-",  function(object, value)
     datasetType({data_}) <- 'both'
 
     @md
-    @aliases datasetType<-,{class_},character-method
+    @aliases datasetType<-,{class_},character-method datasetType<-
     @export
     ",
     ...
@@ -416,7 +416,7 @@ setGeneric("datasetType<-",  function(object, value)
 setReplaceMethod("datasetType", signature(object="CoreSet", value='character'), 
     function(object, value) 
 {
-    funContext <- .funContext('datasetType,CoreSet,character-method')
+    funContext <- .funContext('::datasetType,CoreSet,character-method')
     if (length(value) > 1) .error(funContext, 
         'datasetType must be a character vector of length 1.')
     if (!is.element(value, c('sensitivity', 'perturbation', 'both')))
@@ -664,7 +664,7 @@ setGeneric("mDataNames<-", function(object, ..., value) standardGeneric("mDataNa
     mDataNames({data_}) <- mDataNames({data_})
 
     @md
-    @aliases mDataNames<-,{class_},ANY-method mDataNames
+    @aliases mDataNames<-,{class_},ANY-method mDataNames<-
     @exportMethod mDataNames<-
     ",
     ...
@@ -697,6 +697,7 @@ setGeneric("molecularProfilesSlot", function(object, ...)
     molecularProfilesSlot({data_})
 
     @md
+    @aliases moleculerProfilesSlot,{class_}-method molecularProfilesSlot
     @exportMethod molecularProfilesSlot
     ",
     ...
@@ -727,6 +728,9 @@ setGeneric("molecularProfilesSlot<-",
     molecularProfilesSlot({data_}) <- molecularProfilesSlot({data_})
 
     @md
+    @aliases molecularProfilesSlot<-,{class_},list-method 
+    molecularProfilesSlot<-{class_},MultiAssayExperiment-method
+    molecularProfilesSlot<-
     @exportMethod molecularProfilesSlot<-
     ",
     ...
@@ -782,7 +786,7 @@ setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_or_MAE"),
 
     @md
     @aliases sensitivityInfo,{class_},missing-method 
-    sensitivityInfo,{class_},character-method sensitivityInfo
+    sensitivityInfo,{class_},character-method
     @exportMethod sensitivityInfo
     ",
     ...
@@ -823,6 +827,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 #' @param longTable `LongTable`
 #'
 #' @keywords internal
+#' @importFrom MatrixGenerics colAlls
 #' @importFrom data.table setkeyv merge.data.table `:=` setDF
 #' @noRd
 .rebuildInfo <- function(longTable) {
@@ -843,12 +848,12 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     infoDT <- merge.data.table(assayIndexDT, rowDataDT, all=TRUE)
     setkeyv(infoDT, 'colKey')
     infoDT <- merge.data.table(infoDT, colDataDT, all=TRUE)[, -c('rowKey', 'colKey')]
+    infoDT <- infoDT[, .SD, .SDcols=!patterns('drug.*dose$')]
 
     # determine which columns map 1:1 with new identifiers and subset to those
     infoDT_first <- infoDT[, head(.SD, 1), by=rownameCols]
     infoDT_last <- infoDT[, tail(.SD, 1), by=rownameCols]
-    keepCols <- names(which(apply(infoDT_first == infoDT_last, MARGIN=2, 
-        FUN=all)))
+    keepCols <- colAlls(infoDT_first == infoDT_last, na.rm=TRUE)
     infoDT_sub <- unique(infoDT[, ..keepCols])
 
     # rebuld the rownames
@@ -886,7 +891,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 
     @md
     @aliases sensitivityInfo<-,{class_},missing,data.frame-method 
-    sensitvityInfo<-,{class_},character,data.frame-method sensitivityInfo<-
+    sensitvityInfo<-,{class_},character,data.frame-method
     @import data.table
     @exportMethod sensitivityInfo<-
     ",
@@ -989,9 +994,10 @@ setMethod(sensitivityMeasures, "CoreSet", function(object){
 #' @eval .docs_CoreSet_set_sensitityMeasures(class_=.local_class, data_=.local_data) 
 setReplaceMethod('sensitivityMeasures',
     signature(object='CoreSet', value='character'),
-    function(object, value) {
-  colnames(sensitivityProfiles(object)) <- value
-  object
+    function(object, value) 
+{
+    colnames(sensitivityProfiles(object)) <- value
+    object
 })
 
 #
@@ -1087,7 +1093,6 @@ setReplaceMethod("sensitivityProfiles",
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_sensitivityRaw(class_=.local_class, data_=.local_data)
-#' @exportMethod sensitivityRaw
 setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     if (is(sensitivitySlot(object), 'LongTable'))
         return(.rebuildRaw(sensitivitySlot(object)))
@@ -1281,10 +1286,15 @@ setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_or_L
 #' @export
 setGeneric("sensNumber", function(object, ...) standardGeneric("sensNumber"))
 
-#' sensNumber Generic
-#'
-#' A generic for the sensNumber method
-#'
+.docs_CoreSet_get_sensNumber <- function(...) .parseToRoxygen(
+    "
+    @details
+    __sensNumber__: Return a count of viability observations in a `{class_}`
+    object for each drug-combo by cell-line combination.
+    ",
+    ...
+)
+
 #' @examples
 #' sensNumber(clevelandSmall_cSet)
 #'
@@ -1292,16 +1302,55 @@ setGeneric("sensNumber", function(object, ...) standardGeneric("sensNumber"))
 #' @param ... Fallthrough arguements for defining new methods
 #'
 #' @return A \code{data.frame} with the number of sensitivity experiments per drug and cell line
-#' @describeIn CoreSet Return the summary of available sensitivity
-#'   experiments
 #' @export
 setMethod(sensNumber, "CoreSet", function(object){
-    if (is(object, 'LongTable')) return() else return(object@sensitivity$n)
+    return(
+        if (is(object@sensitivity, 'LongTable')) 
+            .rebuildSensNumber(object@sensitivity) 
+        else 
+            object@sensitivity$n
+    )
 })
 
+.rebuildSensNumber <- function(object) {
+    sensitivityDT <- object$sensitivity
+    # Melt replicates so they get counted
+    sensitivityDT_melted <- melt(sensitivityDT, 
+        measure=patterns('^viability'), variable.name='replicate',
+        value.name='viability')
+    
+    # Determine the drug and cell combos, ignoring other identifiers
+    .paste_colon <- function(x, y) paste(x, y, sep=':')
+    drugidCols <- sensitivityDT[, colnames(.SD), .SDcols=patterns('drug.*id')]
+    cellidCols <- sensitivityDT[, colnames(.SD), .SDcols=patterns('cell.*id')]
+
+    # Parse the columns to dcast by to get the counts
+    sensitivityDT_melted[, .drugCombo := Reduce(.paste_colon, mget(drugidCols))]
+    sensitivityDT_melted[, .cellCombo := Reduce(.paste_colon, mget(cellidCols))]
+
+    # Count existing sensitivity measurements
+    .count_not_NA <- function(x) sum(!is.na(x))
+    sensNumbDT <- dcast(sensitivityDT_melted, .drugCombo ~ .cellCombo,
+        value.var='viability', fun.aggregate=.count_not_NA)
+    sensNumber <- as.matrix(sensNumbDT[, !'.drugCombo'], 
+        rownames=sensNumbDT$`.drugCombo`)
+
+    return(sensNumber)
+
+    ## TODO::  Pad for any missing drugs or cells
+    allDrugCombos <- rowData(object)[, Reduce(.paste_colon, mget(drugidCols))]
+    allCellCombos <- colData(object)[, Reduce(.paste_colon, mget(cellidCols))]
+
+}
 
 #' @export
 setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-"))
+
+.docs_CoreSet_set_sensNumber <- function(...) .parseToRoxygen(
+    "
+    ",
+    ...
+)
 
 #' sensNumber<- Generic
 #'
@@ -1315,8 +1364,6 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
 #'
 #' @return The updated \code{CoreSet}
 #'
-#' @describeIn CoreSet Update the summary of available sensitivity
-#'   experiments
 #' @export
 setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"), 
     function(object, value)

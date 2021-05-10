@@ -21,8 +21,6 @@
 #' @return `LongTable` object containing the assay data from a treatment
 #'   response experiment
 #'
-#' @inherit rowIDs.Rd
-#'
 #' @md
 #' @import data.table
 #' @keywords internal
@@ -312,7 +310,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #'
 #' @rdname LongTable-class
 #' @family LongTable-class
-#' @family LongTable-accessorsR
+#' @family LongTable-accessors
 #'
 #' @import data.table
 #' @export

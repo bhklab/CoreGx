@@ -342,6 +342,6 @@ rowData(merckLongTable)
 rowData(merckLongTable) <- rowData(merckLongTable)
 
 }
-\concept{LongTable-accessorsR}
+\concept{LongTable-accessors}
 \concept{LongTable-class}
 \keyword{internal}
