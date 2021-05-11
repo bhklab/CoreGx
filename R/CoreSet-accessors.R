@@ -624,6 +624,11 @@ setMethod(featureInfo, "CoreSet", function(object, mDataType) {
   }
 })
 
+
+#' @export
+setGeneric("featureInfo<-", function(object, mDataType, value) 
+    standardGeneric("featureInfo<-"))
+
 #' @noRd
 .docs_CoreSet_set_featureInfo <- function(...) .parseToRoxygen(
     "
@@ -645,10 +650,6 @@ setMethod(featureInfo, "CoreSet", function(object, mDataType) {
     ...
 )
 
-#' @export
-setGeneric("featureInfo<-", function(object, mDataType, value) 
-    standardGeneric("featureInfo<-"))
-
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_featureInfo(class_=.local_class, data_=.local_data, 
 #'   mDataType_='rna')
@@ -668,7 +669,7 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
 {
   if(mDataType %in% names(object@molecularProfiles)){
     rowData(object@molecularProfiles[[mDataType]]) <-
-      S4Vectors::DataFrame(value, rownames = rownames(value))
+        S4Vectors::DataFrame(value, rownames = rownames(value))
   }
   object
 })

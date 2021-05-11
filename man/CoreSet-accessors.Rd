@@ -7,66 +7,80 @@
 \alias{annotation<-,CoreSet,list-method}
 \alias{annotation<-}
 \alias{dateCreated,CoreSet-method}
+\alias{dateCreated,LongTableDataMapper-method}
 \alias{dateCreated}
 \alias{dateCreated<-,CoreSet,character-method}
-\alias{dateCreated<-,CoreSet-method}
+\alias{dateCreated<-,LongTableDataMapper-method}
 \alias{dateCreated<-}
 \alias{name,CoreSet-method}
+\alias{name,LongTableDataMapper-method}
 \alias{name}
 \alias{name<-,CoreSet-method}
-\alias{name<-,CoreSet,character-method}
+\alias{name<-,LongTableDataMapper,character-method}
 \alias{name<-}
 \alias{cellInfo,CoreSet-method}
+\alias{cellInfo,LongTableDataMapper-method}
 \alias{cellInfo}
 \alias{cellInfo<-,CoreSet,data.frame-method}
+\alias{cellInfo<-,LongTableDataMapper,data.frame-method}
 \alias{cellInfo<-}
 \alias{cellNames,CoreSet-method}
-\alias{cellName,CoreSet-method}
+\alias{cellName,LongTableDataMapper-method}
 \alias{cellNames}
 \alias{cellNames<-,CoreSet,character-method}
-\alias{cellNames<-,CoreSet,list-method}
+\alias{cellNames<-,LongTableDataMapper,list-method}
 \alias{cellNames<-}
 \alias{curation,CoreSet-method}
+\alias{curation,LongTableDataMapper-method}
 \alias{curation}
 \alias{curation<-,CoreSet,list-method}
+\alias{curation<-,LongTableDataMapper,list-method}
 \alias{curation<-}
 \alias{datasetType,CoreSet-method}
+\alias{datasetType,LongTableDataMapper-method}
 \alias{datasetType}
 \alias{datasetType<-,CoreSet,character-method}
+\alias{datasetType<-,LongTableDataMapper,character-method}
 \alias{datasetType<-}
 \alias{molecularProfiles,CoreSet-method}
+\alias{molecularProfiles,LongTableDataMapper-method}
 \alias{molecularProfiles}
 \alias{molecularProfiles<-,CoreSet,character,character,matrix-method}
-\alias{molecularProfiles<-,CoreSet,character,missing,matrix-method}
+\alias{molecularProfiles<-,LongTableDataMapper,character,character,matrix-method}
+\alias{molecularProfiles<-,LongTableDataMapper,character,missing,matrix-method}
 \alias{molecularProfiles<-}
 \alias{featureInfo,CoreSet-method}
+\alias{featureInfo,LongTableDataMapper-method}
 \alias{featureInfo}
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
-\alias{featureInfo<-,CoreSet,character,DataFrame-method}
+\alias{featureInfo<-,LongTableDataMapper,character,data.frame-method}
+\alias{featureInfo<-,LongTableDataMapper,character,DataFrame-method}
 \alias{featureInfo<-}
 \alias{phenoInfo,CoreSet-method}
 \alias{phenoInfo}
 \alias{phenoInfo<-,CoreSet,character,data.frame-method}
-\alias{phenoInfo<-,CoreSet,character,DataFrame-method}
+\alias{phenoInfo<-,LongTableDataMapper,character,data.frame-method}
+\alias{phenoInfo<-,LongTableDataMapper,character,DataFrame-method}
 \alias{phenoInfo<-}
 \alias{mDataNames,CoreSet-method}
+\alias{mDataNames,LongTableDataMapper-method}
 \alias{mDataNames}
 \alias{mDataNames<-,CoreSet-method}
-\alias{mDataNames<-,CoreSet,ANY-method}
+\alias{mDataNames<-,LongTableDataMapper,ANY-method}
 \alias{mDataNames<-}
 \alias{molecularProfilesSlot,CoreSet-method}
-\alias{moleculerProfilesSlot,CoreSet-method}
+\alias{moleculerProfilesSlot,LongTableDataMapper-method}
 \alias{molecularProfilesSlot}
 \alias{molecularProfilesSlot<-,CoreSet,list_or_MAE-method}
-\alias{molecularProfilesSlot<-,CoreSet,list-method}
-\alias{molecularProfilesSlot<-CoreSet,MultiAssayExperiment-method}
+\alias{molecularProfilesSlot<-,LongTableDataMapper,list-method}
+\alias{molecularProfilesSlot<-LongTableDataMapper,MultiAssayExperiment-method}
 \alias{molecularProfilesSlot<-}
 \alias{sensitivityInfo,CoreSet-method}
-\alias{sensitivityInfo,CoreSet,missing-method}
-\alias{sensitivityInfo,CoreSet,character-method}
+\alias{sensitivityInfo,LongTableDataMapper,missing-method}
+\alias{sensitivityInfo,LongTableDataMapper,character-method}
 \alias{sensitivityInfo<-,CoreSet,data.frame-method}
-\alias{sensitivityInfo<-,CoreSet,missing,data.frame-method}
-\alias{sensitvityInfo<-,CoreSet,character,data.frame-method}
+\alias{sensitivityInfo<-,LongTableDataMapper,missing,data.frame-method}
+\alias{sensitvityInfo<-,LongTableDataMapper,character,data.frame-method}
 \alias{sensitivityMeasures,CoreSet-method}
 \alias{sensitivityMeasures<-,CoreSet,character-method}
 \alias{sensitivityProfiles,CoreSet-method}
@@ -74,11 +88,12 @@
 \alias{sensitivityRaw,CoreSet-method}
 \alias{sensitivityRaw<-,CoreSet,array-method}
 \alias{sensitivitySlot,CoreSet-method}
+\alias{sensitivitySlot,LongTableDataMapper-method}
 \alias{sensitivitySlot}
 \alias{sensitivitySlot<-,CoreSet,list_or_LongTable-method}
 \alias{sensitivitySlot<-}
-\alias{sensitivitySlot<-,CoreSet,list-method}
-\alias{sensitivitySlot<-,CoreSet,LongTable-method}
+\alias{sensitivitySlot<-,LongTableDataMapper,list-method}
+\alias{sensitivitySlot<-,LongTableDataMapper,LongTable-method}
 \alias{sensNumber,CoreSet-method}
 \alias{sensNumber}
 \alias{sensNumber<-,CoreSet,matrix-method}
@@ -192,7 +207,7 @@ of data in the slots of a \code{CoreSet} object.
 \details{
 \subsection{@annotation}{
 
-\strong{annotation}: A \code{list} of CoreSet annotations with items: 'name',
+\strong{annotation}: A \code{list} of LongTableDataMapper annotations with items: 'name',
 the name of the object; 'dateCreated', date the object was created; 'sessionInfo',
 the \code{sessionInfo()} when the object was created; 'call', the R constructor call;
 and 'version', the object version.
@@ -200,41 +215,41 @@ and 'version', the object version.
 
 \strong{annotation<-}: Setter method for the annotation slot. Arguments:
 \itemize{
-\item value: a \code{list} of annotations to update the CoreSet with.
+\item value: a \code{list} of annotations to update the LongTableDataMapper with.
 }
 
 \subsection{@dateCreated}{
 
-\strong{dateCreated}: \code{character(1)} The date the \code{CoreSet} object was
+\strong{dateCreated}: \code{character(1)} The date the \code{LongTableDataMapper} object was
 created, as returned by the \code{date()} function.
 }
 
 \strong{dateCreated<-}: Update the 'dateCreated' item in the \code{annotation} slot of
-a \code{CoreSet} object. Arguments:
+a \code{LongTableDataMapper} object. Arguments:
 \itemize{
 \item value: A \code{character(1)} vector, as returned by the \code{date()} function.
 }
 
-\strong{name}: \code{character(1)} The name of the \code{CoreSet}, retreived from
+\strong{name}: \code{character(1)} The name of the \code{LongTableDataMapper}, retreived from
 the \verb{@annotation} slot.
 
-\strong{name<-}: Update the \verb{@annotation$name} value in a \code{CoreSet}  object.
+\strong{name<-}: Update the \verb{@annotation$name} value in a \code{LongTableDataMapper}  object.
 \itemize{
-\item value: \code{character(1)} The name of the \code{CoreSet} object.
+\item value: \code{character(1)} The name of the \code{LongTableDataMapper} object.
 }
 
-\strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{CoreSet} object.
+\strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{LongTableDataMapper} object.
 
-\strong{cellInfo<-}: assign updated cell-line annotations to the \code{CoreSet} object. Arguments:
+\strong{cellInfo<-}: assign updated cell-line annotations to the \code{LongTableDataMapper} object. Arguments:
 \itemize{
 \item value: a \code{data.frame} object.
 }
 
 \strong{cellNames}: \code{character} Retrieve the rownames of the \code{data.frame} in
-the \code{cell} slot from a CoreSet object.
+the \code{cell} slot from a LongTableDataMapper object.
 
 \strong{cellNames<-}: assign new rownames to the cellInfo slot \code{data.frame} for
-a CoreSet object. Arguments:
+a LongTableDataMapper object. Arguments:
 \itemize{
 \item value: \code{character} vector of rownames for the \code{cellInfo(object)} \code{data.frame}.
 }
@@ -242,11 +257,11 @@ a CoreSet object. Arguments:
 \subsection{@curation}{
 
 \strong{curation}: A \code{list} of curated mappings between identifiers in the
-CoreSet object and the original data publication. Contains two \code{data.frame}s, 'cell' with cell-line ids and
+LongTableDataMapper object and the original data publication. Contains two \code{data.frame}s, 'cell' with cell-line ids and
 'tissue' with tissue ids.
 }
 
-\strong{curation<-}: Update the \code{curation} slot of a CoreSet object. Arugments:
+\strong{curation<-}: Update the \code{curation} slot of a LongTableDataMapper object. Arugments:
 \itemize{
 \item value: A \code{list} of \code{data.frame}s, one for each type of curated
 identifier. For a \code{CoreSet} object the slot should contain tissue and
@@ -259,7 +274,7 @@ cell-line id \code{data.frame}s.
 \code{sensitivity} slot. Valid values are 'sensitivity', 'perturbation' or 'both'.
 }
 
-\strong{datasetType<-}: Update the datasetType slot of a CoreSet object.
+\strong{datasetType<-}: Update the datasetType slot of a LongTableDataMapper object.
 Arguments:
 \itemize{
 \item value: A \code{character(1)} vector with one of 'sensitivity', 'perturbation'
@@ -272,13 +287,13 @@ or 'both'
 }
 
 \strong{molecularProfiles<-}: Update an assay in a \code{SummarizedExperiment} from
-the \code{molecularProfiles} slot of a CoreSet object with the specified
+the \code{molecularProfiles} slot of a LongTableDataMapper object with the specified
 \code{mDataType}. Valid \code{mDataType} arguments can be found with
 \code{mDataNames(object)}.
 \itemize{
 \item assay: Optional \code{character(1)} vector specifying an assay in the
 \code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
-\code{CoreSet} object for the specified \code{mDataType}. If excluded,
+\code{LongTableDataMapper} object for the specified \code{mDataType}. If excluded,
 defaults to modifying the first assay in the \code{SummarizedExperiment} for
 the given \code{mDataType}.
 \item value: A \code{matrix} of values to assign to the \code{assay} slot of the
@@ -287,21 +302,21 @@ column names must match the associated \code{SummarizedExperiment}.
 }
 
 \strong{featureInfo}: Retrieve a \code{DataFrame} of feature metadata for the specified
-\code{mDataType} from the \code{molecularProfiles} slot of a CoreSet object.
+\code{mDataType} from the \code{molecularProfiles} slot of a LongTableDataMapper object.
 
 \strong{featureInfo<-}: Update the \code{featureInfo(object, mDataType)} \code{DataFrame}
 with new feature metadata. Arguments:
 \itemize{
 \item value: A \code{data.frame} or \code{DataFrame} with updated feature metadata for
 the specified molecular profile in the \code{molecularProfiles} slot of a
-\code{CoreSet} object.
+\code{LongTableDataMapper} object.
 }
 
 \strong{phenoInfo}: Return the \verb{@colData} slot from the \code{SummarizedExperiment} of
-\code{mDataType}, containing sample-level metadata, from a \code{CoreSet} object.
+\code{mDataType}, containing sample-level metadata, from a \code{LongTableDataMapper} object.
 
 \strong{phenoInfo<-}: Update the \verb{@colData} slot of the \code{SummarizedExperiment}
-of \code{mDataType} in the \verb{@molecularProfiles} slot of a \code{CoreSet} object.
+of \code{mDataType} in the \verb{@molecularProfiles} slot of a \code{LongTableDataMapper} object.
 This updates the sample-level metadata in-place.
 \itemize{
 \item value: A \code{data.frame} or \code{DataFrame} object where rows are samples
@@ -309,23 +324,23 @@ and columns are sample metadata.
 }
 
 \strong{mDataNames}: \code{character} Retrieve the names of the molecular data types
-available in the \code{molecularProfiles} slot of a \code{CoreSet} object. These
+available in the \code{molecularProfiles} slot of a \code{LongTableDataMapper} object. These
 are the options which can be used in the \code{mDataType} parameter of various
 \code{molecularProfiles} slot accessors methods.
 
 \strong{mDataNames}: Update the molecular data type names of the
-\code{molecularProfiles} slot of a CoreSet object. Arguments:
+\code{molecularProfiles} slot of a LongTableDataMapper object. Arguments:
 \itemize{
 \item value: \code{character} vector of molecular datatype names, with length
 equal to \code{length(molecularProfilesSlot(object))}.
 }
 
 \strong{molecularProfilesSlot}: Return the contents of the \verb{@molecularProfiles}
-slot of a \code{CoreSet} object. This will either be a \code{list} or
+slot of a \code{LongTableDataMapper} object. This will either be a \code{list} or
 \code{MultiAssayExperiment} of \code{SummarizedExperiment}s.
 
 \strong{molecularProfilesSlot<-}: Update the contents of the \verb{@molecularProfiles}
-slot of a \code{CoreSet} object. Arguemnts:
+slot of a \code{LongTableDataMapper} object. Arguemnts:
 \itemize{
 \item value: A \code{list} or \code{MultiAssayExperiment} of \code{SummarizedExperiment}s. The
 \code{list} and \code{assays} should be named for the molecular datatype in each
@@ -337,7 +352,7 @@ slot of a \code{CoreSet} object. Arguemnts:
 \itemize{
 \item \code{dimension}: Optional \code{character(1)} One of 'drug', 'cell' or 'assay' to
 retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from the
-\code{CoreSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
+\code{LongTableDataMapper} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
 warning if \verb{@sensitivity} is not a \code{LongTable} object.
 \item \code{...}: Additional arguments to the \code{rowData} or \code{colData}.
 \code{LongTable} methods. Only used if the sensitivity slot contains a
@@ -349,16 +364,16 @@ specified.
 \subsection{Methods:}{
 
 \strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity drug combo
-by cell-line metadata for the \code{CoreSet} object. When the \code{dimension}
+by cell-line metadata for the \code{LongTableDataMapper} object. When the \code{dimension}
 parameter is used, it allows retrieval of the dimension specific metadata
-from the \code{LongTable} object in \verb{@sensitivity} of a CoreSet object.
+from the \code{LongTable} object in \verb{@sensitivity} of a LongTableDataMapper object.
 }
 
 }
 
 \strong{sensitivityInfo}<-: Update the \verb{@sensitivity} slot metadata for a
-\code{CoreSet} object. When used without the \code{dimension} argument is behaves
-similar to the old CoreSet implementation, where the \verb{@sensitivity} slot
+\code{LongTableDataMapper} object. When used without the \code{dimension} argument is behaves
+similar to the old LongTableDataMapper implementation, where the \verb{@sensitivity} slot
 contained a list with a \verb{$info} \code{data.frame} item. When the \code{dimension}
 arugment is used, more complicated assignments can occur where 'cell'
 modifies the \verb{@sensitvity} \code{LongTable} colData, 'drug' the rowData and
@@ -372,12 +387,12 @@ not specified, you can only modify existing columns as returned by
 \code{sensitivityInfo(object)}.
 }
 
-\strong{sensitivityMeaures}: Get the 'sensitivityMeasures' available in a \code{CoreSet}
+\strong{sensitivityMeaures}: Get the 'sensitivityMeasures' available in a \code{LongTableDataMapper}
 object. Each measure reprents some summary of cell-line sensitivity to a given
 dryuh, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
 \code{character} vector with all available metrics for the PSet object.
 
-\strong{sensitivityMeaures}: Update the sensitivity meaure in a \code{CoreSet}
+\strong{sensitivityMeaures}: Update the sensitivity meaure in a \code{LongTableDataMapper}
 object. Thesee values are the column names of the 'profiles' assay and
 represent various compued sensitviity metrics such as ic50, ec50, AUC, AAC,
 etc.
@@ -398,24 +413,24 @@ sensitivity slot. Arguments:
 \code{sensitivityProfiles(object)}, but potentially modified columns, such as the
 computation of additional summary metrics.
 
-\strong{sensitivityRaw}: Access the raw sensitiity measurents for a CoreSet
+\strong{sensitivityRaw}: Access the raw sensitiity measurents for a LongTableDataMapper
 object. A 3D \code{array} where rows are experiment_ids, columns are doses
 and the third dimension is metric, either 'Dose' for the doses used or
 'Viability' for the cell-line viability at that dose.
 
-\strong{sensitvityRaw<-}: Update the raw dose and viability data in a CoreSet.
+\strong{sensitvityRaw<-}: Update the raw dose and viability data in a LongTableDataMapper.
 \itemize{
 \item value: A 3D \code{array} object where rows are experiment_ids, columns are
 replicates and pages are c('Dose', 'Viability'), with the corresponding
 dose or viability measurement for that experiment_id and replicate.
 }
 
-\strong{sensNumber}: Return a count of viability observations in a \code{CoreSet}
+\strong{sensNumber}: Return a count of viability observations in a \code{LongTableDataMapper}
 object for each drug-combo by cell-line combination.
 
 \strong{sensNumber<-}: Update the 'n' item, which holds a matrix with a count
 of drug by cell-line experiment counts, in the \code{list} in \verb{@sensitivity}
-slot of a \code{CoreSet} object. Will error when \verb{@sensitviity} contains
+slot of a \code{LongTableDataMapper} object. Will error when \verb{@sensitviity} contains
 a \code{LongTable} object, since the counts are computed on the fly. Arguments:
 \itemize{
 \item value: A \code{matrix} where rows are cells and columns are drugs, with a
@@ -423,10 +438,10 @@ count of the number of experiments for each combination as the values.
 }
 
 \strong{pertNumber}: \code{array} Summary of available perturbation experiments
-from in a \code{CoreSet} object. Returns a 3D \code{array} with the number of
+from in a \code{LongTableDataMapper} object. Returns a 3D \code{array} with the number of
 perturbation experiments per drug and cell line, and data type.
 
-\strong{pertNumber<-}: Update the \verb{@perturbation$n} value in a \code{CoreSet} object,
+\strong{pertNumber<-}: Update the \verb{@perturbation$n} value in a \code{LongTableDataMapper} object,
 which stores a summary of the available perturbation experiments. Arguments:
 \itemize{
 \item value: A new 3D \code{array} with the number of perturbation experiments per

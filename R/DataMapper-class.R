@@ -15,32 +15,59 @@ setClassUnion("list_or_List", c('list', 'List'))
 .DataMapper <- setClass('DataMapper', 
     contains=c('VIRTUAL', 'Annotated'), slots=list(rawdata='list_or_List'))
 
-#' A generic function for extracting raw data from an `S4` object.
-#' 
-#' @param object An `S4` object to extract rawdata from.
-#' 
-#' @return The raw data object.
-#' 
-#' @describeIn DataMapper-methods
-#'
-#' @md
+.local_class <- 'DataMapper'
+
+.docs_DataMapper_accessors <- function(...) .parseToRoxygen(
+    "
+    @title Accessing and modifying data in a `{class_}` object.
+
+    @description
+    Documentation for the various setters and getters which allow manipulation
+    of data in the slots of a `{class_}` object.
+
+    @param object A `{class_}` object to get or set data from.
+    @param ... See details.
+
+    @return Accessors: See details
+    @return Setters: An update `{class_}` object, returned invisibly.
+    ",
+    ...
+)
+
+# ==================================
+# DataMapper Accessors Documentation
+# ----------------------------------
+
+#' @name DataMapper-accessors
+#' @eval .docs_DataMapper_accessors(class_=.local_class)
+NULL
+
 #' @export
 setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
-#'
-#' Get the raw data slot from a `DataMapper` object.
-#' 
-#' @param object A `DataMapper` object to extract raw data from.
-#' 
-#' @return A list-like containing one or more raw data inputs to the 
-#'   `DataMapper` object.
-#' 
-#' @describeIn DataMapper-methods
-#'
-#' @md
-#' @export
+
+.docs_DataMapper_get_rawdata <- function(...) .parseToRoxygen(
+    "
+    @details
+    __rawdata__: Get the raw data slot from a `{class_}` object. Returns
+    a list-like containing one or more raw data inputs to the 
+    `{class_}` object.
+
+    @md
+    @aliases rawdata,{class_}-method rawdata
+    @exportMethod rawdata
+    ",
+    ...
+)
+
+#' @rdname DataMapper-accessors
+#' @eval .docs_DataMapper_get_rawdata(class_=.local_class)
 setMethod('rawdata', signature(object='DataMapper'), function(object) {
     object@rawdata
 })
+
+## FIXME:: Currently can't make DataMapper without rawdata, this doesn't
+##   fit with the model where we preconfigure column maps to use with
+##   new instances of rawdata from the same experimental design.
 
 #' A Class for Mapping Between Raw Data and an `LongTable` Object
 #'
@@ -56,7 +83,6 @@ setMethod('rawdata', signature(object='DataMapper'), function(object) {
 #' * colDataMap: A list of mappings from.
 #' * assayMap: A list of mappings from .
 #' * metadataMap: A list of mappings from.
-#' 
 #'
 #' @md
 #' @aliases LongTableDataMapper-class
@@ -95,10 +121,22 @@ LongTableDataMapper <- function(rawdata, rowDataMap=list(),
 
 # ---- LongTableDataMapper Accessors
 
+## ===========================================
+## LongTableDataMapper Accessors Documentation
+## -------------------------------------------
+
+.local_class <- 'LongTableDataMapper'
+
+#' @name LongTableDataMapper-accessors
+#' @eval .docs_DataMapper_accessors(class_=.local_class)
+#' @eval .docs_DataMapper_get_rawdata(class_=.local_class) 
+NULL
+
 # -- rowDataMap
 
-#' @title rowDataMap
-#' 
+#' @rdname LongTableDataMapper-accessors
+#'  
+#'
 #' @param object An `S4` object to access the rowDataMap from.
 #' @param ... Allow new parameters to be defined for this generic.
 #'
@@ -229,7 +267,7 @@ setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object
 #'
 #' @param object An `S4` object to access the colDataMap from.
 #' @param ... Allow new parameters to be defined for this generic.
-#' @param value A like-like object containing the values to assign to the
+#' @param value A list-like object containing the values to assign to the
 #'   `colDataMap` slot of the `S4` object.
 #'
 #' @return None, modifies the object.

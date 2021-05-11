@@ -11,7 +11,7 @@ colDataMap(object, ...) <- value
 
 \item{...}{Allow new parameters to be defined for this generic.}
 
-\item{value}{A like-like object containing the values to assign to the
+\item{value}{A list-like object containing the values to assign to the
 \code{colDataMap} slot of the \code{S4} object.}
 }
 \value{
