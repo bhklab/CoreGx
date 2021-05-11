@@ -653,15 +653,14 @@ setGeneric("featureInfo<-", function(object, mDataType, value)
 #' @eval .docs_CoreSet_set_featureInfo(class_=.local_class, data_=.local_data, 
 #'   mDataType_='rna')
 setReplaceMethod("featureInfo", signature(object="CoreSet", 
-    mDataType ="character",value="data.frame"), 
+    mDataType ="character",value="data.frame"),
     function(object, mDataType, value)
 {
-
-  if(mDataType %in% names(object@molecularProfiles)){
-    rowData(object@molecularProfiles[[mDataType]]) <-
-      S4Vectors::DataFrame(value, rownames = rownames(value))
-  }
-  object
+    if(mDataType %in% names(object@molecularProfiles)){
+        rowData(object@molecularProfiles[[mDataType]]) <-
+            S4Vectors::DataFrame(value, rownames = rownames(value))
+    }
+    object
 })
 setReplaceMethod("featureInfo", signature(object="CoreSet", 
     mDataType ="character",value="DataFrame"), 
@@ -673,6 +672,89 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
   }
   object
 })
+
+##
+## -- phenoInfo
+
+#' @export
+setGeneric("phenoInfo", function(object, mDataType, ...) 
+    standardGeneric("phenoInfo"))
+
+.docs_CoreSet_get_phenoInfo <- function(...) .parseToRoxygen(
+    "
+    @details
+    __phenoInfo__: Return the `@colData` slot from the `SummarizedExperiment` of
+    `mDataType`, containing sample-level metadata, from a `{class_}` object.
+
+    @examples
+    phenoInfo({data_}, '{mDataType_}')
+
+    @md
+    @importFrom SummarizedExperiment colData
+    @aliases phenoInfo
+    @exportMethod phenoInfo
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_get_phenoInfo(class_=.local_class, data_=.local_data, mDataType_='rna')
+setMethod(phenoInfo, "CoreSet", function(object, mDataType){
+    if (mDataType %in% mDataNames(object)) { # Columns = Samples
+        return(colData(object@molecularProfiles[[mDataType]]))
+    }else{
+        ## FIXME:: Is there a reason we throw a NULL instead of an error?
+        return(NULL)
+    }
+})
+
+#' @export
+setGeneric("phenoInfo<-", function(object, mDataType, value) 
+    standardGeneric("phenoInfo<-"))
+
+.docs_CoreSet_set_phenoInfo <- function(...) .parseToRoxygen(
+    "
+    @details
+    __phenoInfo<-__: Update the `@colData` slot of the `SummarizedExperiment`
+    of `mDataType` in the `@molecularProfiles` slot of a `{class_}` object.
+    This updates the sample-level metadata in-place.
+    - value: A `data.frame` or `DataFrame` object where rows are samples
+    and columns are sample metadata.
+
+    @examples
+    phenoInfo({data_}, '{mDataType_}') <- phenoInfo({data_}, '{mDataType_}')
+
+    @md
+    @importFrom SummarizedExperiment colData colData<-
+    @importFrom S4Vectors DataFrame
+    @aliases phenoInfo<-,{class_},character,data.frame-method
+    phenoInfo<-,{class_},character,DataFrame-method phenoInfo<-
+    @exportMethod phenoInfo<-
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_set_phenoInfo(class_=.local_class, data_=.local_data, mDataType_='rna')
+setReplaceMethod("phenoInfo", signature(object="CoreSet", mDataType ="character", 
+    value="data.frame"), function(object, mDataType, value)
+{
+    if(mDataType %in% mDataNames(object)) {
+        colData(object@molecularProfiles[[mDataType]]) <- 
+            DataFrame(value, rownames = rownames(value))
+    }
+    object
+})
+setReplaceMethod("phenoInfo", signature(object="CoreSet", 
+    mDataType ="character", value="DataFrame"), 
+    function(object, mDataType, value)
+{
+    if (mDataType %in% mDataNames(object)) {
+        colData(object@molecularProfiles[[mDataType]]) <- value
+    }
+    object
+})
+
 
 ##
 ## -- mDataNames
@@ -1434,4 +1516,68 @@ setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"),
 {
     object@sensitivity$n <- value
     object
+})
+
+## ======================
+## ---- perturbation slot
+
+##
+## -- pertNumber 
+
+
+#' @export
+setGeneric("pertNumber", function(object, ...) standardGeneric("pertNumber"))
+
+#' @noRd
+.docs_CoreSet_get_pertNumber <- function(...) .parseToRoxygen(
+    "
+    @details
+    __pertNumber__: `array` Summary of available perturbation experiments 
+    from in a `{class_}` object. Returns a 3D `array` with the number of 
+    perturbation experiments per drug and cell line, and data type. 
+
+    @examples
+    pertNumber({data_})
+
+    @md
+    @aliases pertNumber
+    @exportMethod pertNumber
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_get_pertNumber(class_=.local_class, data_=.local_data)
+setMethod(pertNumber, "CoreSet", function(object){
+    return(object@perturbation$n)
+})
+
+#' @export
+setGeneric("pertNumber<-", function(object, value) standardGeneric("pertNumber<-"))
+
+.docs_CoreSet_set_pertNumber <- function(...) .parseToRoxygen(
+    "
+    @details
+    __pertNumber<-__: Update the `@perturbation$n` value in a `{class_}` object,
+    which stores a summary of the available perturbation experiments. Arguments: 
+    - value: A new 3D `array` with the number of perturbation experiments per 
+    drug and cell line, and data type
+
+    @examples
+    pertNumber({data_}) <- pertNumber({data_})
+
+    @md
+    @aliases pertNumber<-
+    @exportMethod pertNumber<-
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_set_pertNumber(class_=.local_class, data_=.local_data)
+setReplaceMethod('pertNumber', signature(object="CoreSet", value="array"), 
+    function(object, value)
+{
+  object@perturbation$n <- value
+  object
 })

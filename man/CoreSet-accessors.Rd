@@ -44,6 +44,11 @@
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
 \alias{featureInfo<-,CoreSet,character,DataFrame-method}
 \alias{featureInfo<-}
+\alias{phenoInfo,CoreSet-method}
+\alias{phenoInfo}
+\alias{phenoInfo<-,CoreSet,character,data.frame-method}
+\alias{phenoInfo<-,CoreSet,character,DataFrame-method}
+\alias{phenoInfo<-}
 \alias{mDataNames,CoreSet-method}
 \alias{mDataNames}
 \alias{mDataNames<-,CoreSet-method}
@@ -78,6 +83,10 @@
 \alias{sensNumber}
 \alias{sensNumber<-,CoreSet,matrix-method}
 \alias{sensNumber<-}
+\alias{pertNumber,CoreSet-method}
+\alias{pertNumber}
+\alias{pertNumber<-,CoreSet,array-method}
+\alias{pertNumber<-}
 \title{Accessing and modifying information in a \code{CoreSet}}
 \usage{
 \S4method{annotation}{CoreSet}(object)
@@ -116,6 +125,10 @@
 
 \S4method{featureInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
 
+\S4method{phenoInfo}{CoreSet}(object, mDataType)
+
+\S4method{phenoInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
+
 \S4method{mDataNames}{CoreSet}(object)
 
 \S4method{mDataNames}{CoreSet}(object) <- value
@@ -147,6 +160,10 @@
 \S4method{sensNumber}{CoreSet}(object)
 
 \S4method{sensNumber}{CoreSet,matrix}(object) <- value
+
+\S4method{pertNumber}{CoreSet}(object)
+
+\S4method{pertNumber}{CoreSet,array}(object) <- value
 }
 \arguments{
 \item{object}{A \code{CoreSet} object.}
@@ -280,6 +297,17 @@ the specified molecular profile in the \code{molecularProfiles} slot of a
 \code{CoreSet} object.
 }
 
+\strong{phenoInfo}: Return the \verb{@colData} slot from the \code{SummarizedExperiment} of
+\code{mDataType}, containing sample-level metadata, from a \code{CoreSet} object.
+
+\strong{phenoInfo<-}: Update the \verb{@colData} slot of the \code{SummarizedExperiment}
+of \code{mDataType} in the \verb{@molecularProfiles} slot of a \code{CoreSet} object.
+This updates the sample-level metadata in-place.
+\itemize{
+\item value: A \code{data.frame} or \code{DataFrame} object where rows are samples
+and columns are sample metadata.
+}
+
 \strong{mDataNames}: \code{character} Retrieve the names of the molecular data types
 available in the \code{molecularProfiles} slot of a \code{CoreSet} object. These
 are the options which can be used in the \code{mDataType} parameter of various
@@ -393,6 +421,17 @@ a \code{LongTable} object, since the counts are computed on the fly. Arguments:
 \item value: A \code{matrix} where rows are cells and columns are drugs, with a
 count of the number of experiments for each combination as the values.
 }
+
+\strong{pertNumber}: \code{array} Summary of available perturbation experiments
+from in a \code{CoreSet} object. Returns a 3D \code{array} with the number of
+perturbation experiments per drug and cell line, and data type.
+
+\strong{pertNumber<-}: Update the \verb{@perturbation$n} value in a \code{CoreSet} object,
+which stores a summary of the available perturbation experiments. Arguments:
+\itemize{
+\item value: A new 3D \code{array} with the number of perturbation experiments per
+drug and cell line, and data type
+}
 }
 \examples{
 dateCreated(clevelandSmall_cSet)
@@ -429,6 +468,10 @@ featureInfo(clevelandSmall_cSet, 'rna')
 
 featureInfo(clevelandSmall_cSet, 'rna') <- featureInfo(clevelandSmall_cSet, 'rna')
 
+phenoInfo(clevelandSmall_cSet, 'rna')
+
+phenoInfo(clevelandSmall_cSet, 'rna') <- phenoInfo(clevelandSmall_cSet, 'rna')
+
 mDataNames(clevelandSmall_cSet)
 
 mDataNames(clevelandSmall_cSet) <- mDataNames(clevelandSmall_cSet)
@@ -460,5 +503,9 @@ sensitivitySlot(clevelandSmall_cSet) <- sensitivitySlot(clevelandSmall_cSet)
 sensNumber(clevelandSmall_cSet)
 
 sensNumber(clevelandSmall_cSet) <- sensNumber(clevelandSmall_cSet)
+
+pertNumber(clevelandSmall_cSet)
+
+pertNumber(clevelandSmall_cSet) <- pertNumber(clevelandSmall_cSet)
 
 }
