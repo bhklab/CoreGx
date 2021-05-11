@@ -66,6 +66,7 @@ Collate:
     'CoreSet-accessors.R'
     'DataMapper-class.R'
     'LongTable-accessors.R'
+    'LongTableDataMapper-class.R'
     'adaptiveMatthewCor.R'
     'callingWaterfall.R'
     'connectivityScore.R'
