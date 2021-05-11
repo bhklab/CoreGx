@@ -449,78 +449,78 @@ drug and cell line, and data type
 }
 }
 \examples{
-dateCreated(clevelandSmall_cSet)
+dateCreated(exampleDataMapper)
 
 ## dateCreated
-dateCreated(clevelandSmall_cSet) <- date()
+dateCreated(exampleDataMapper) <- date()
 
-name(clevelandSmall_cSet)
+name(exampleDataMapper)
 
-name(clevelandSmall_cSet) <- 'new_name'
+name(exampleDataMapper) <- 'new_name'
 
-cellInfo(clevelandSmall_cSet) <- cellInfo(clevelandSmall_cSet)
+cellInfo(exampleDataMapper) <- cellInfo(exampleDataMapper)
 
-cellNames(clevelandSmall_cSet)
+cellNames(exampleDataMapper)
 
-cellNames(clevelandSmall_cSet) <- cellNames(clevelandSmall_cSet)
+cellNames(exampleDataMapper) <- cellNames(exampleDataMapper)
 
 ## curation
-curation(clevelandSmall_cSet)
+curation(exampleDataMapper)
 
-curation(clevelandSmall_cSet) <- curation(clevelandSmall_cSet)
+curation(exampleDataMapper) <- curation(exampleDataMapper)
 
-datasetType(clevelandSmall_cSet)
+datasetType(exampleDataMapper)
 
-datasetType(clevelandSmall_cSet) <- 'both'
+datasetType(exampleDataMapper) <- 'both'
 
 # No assay specified
-molecularProfiles(clevelandSmall_cSet, 'rna') <- molecularProfiles(clevelandSmall_cSet, 'rna')
+molecularProfiles(exampleDataMapper, 'rna') <- molecularProfiles(exampleDataMapper, 'rna')
 
 # Specific assay
-molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs') <- molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs')
+molecularProfiles(exampleDataMapper, 'rna', 'exprs') <- molecularProfiles(exampleDataMapper, 'rna', 'exprs')
 
-featureInfo(clevelandSmall_cSet, 'rna')
+featureInfo(exampleDataMapper, 'rna')
 
-featureInfo(clevelandSmall_cSet, 'rna') <- featureInfo(clevelandSmall_cSet, 'rna')
+featureInfo(exampleDataMapper, 'rna') <- featureInfo(exampleDataMapper, 'rna')
 
-phenoInfo(clevelandSmall_cSet, 'rna')
+phenoInfo(exampleDataMapper, 'rna')
 
-phenoInfo(clevelandSmall_cSet, 'rna') <- phenoInfo(clevelandSmall_cSet, 'rna')
+phenoInfo(exampleDataMapper, 'rna') <- phenoInfo(exampleDataMapper, 'rna')
 
-mDataNames(clevelandSmall_cSet)
+mDataNames(exampleDataMapper)
 
-mDataNames(clevelandSmall_cSet) <- mDataNames(clevelandSmall_cSet)
+mDataNames(exampleDataMapper) <- mDataNames(exampleDataMapper)
 
-molecularProfilesSlot(clevelandSmall_cSet)
+molecularProfilesSlot(exampleDataMapper)
 
-molecularProfilesSlot(clevelandSmall_cSet) <- molecularProfilesSlot(clevelandSmall_cSet)
+molecularProfilesSlot(exampleDataMapper) <- molecularProfilesSlot(exampleDataMapper)
 
-sensitivityInfo(clevelandSmall_cSet)
+sensitivityInfo(exampleDataMapper)
 
-sensitivityInfo(clevelandSmall_cSet) <- sensitivityInfo(clevelandSmall_cSet)
+sensitivityInfo(exampleDataMapper) <- sensitivityInfo(exampleDataMapper)
 
-sensitivityMeasures(clevelandSmall_cSet) <- sensitivityMeasures(clevelandSmall_cSet)
+sensitivityMeasures(exampleDataMapper) <- sensitivityMeasures(exampleDataMapper)
 
-sensitivityMeasures(clevelandSmall_cSet) <- sensitivityMeasures(clevelandSmall_cSet)
+sensitivityMeasures(exampleDataMapper) <- sensitivityMeasures(exampleDataMapper)
 
-sensitivityProfiles(clevelandSmall_cSet)
+sensitivityProfiles(exampleDataMapper)
 
-sensitivityProfiles(clevelandSmall_cSet) <- sensitivityProfiles(clevelandSmall_cSet)
+sensitivityProfiles(exampleDataMapper) <- sensitivityProfiles(exampleDataMapper)
 
-head(sensitivityRaw(clevelandSmall_cSet))
+head(sensitivityRaw(exampleDataMapper))
 
-sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
+sensitivityRaw(exampleDataMapper) <- sensitivityRaw(exampleDataMapper)
 
-sensitivitySlot(clevelandSmall_cSet)
+sensitivitySlot(exampleDataMapper)
 
-sensitivitySlot(clevelandSmall_cSet) <- sensitivitySlot(clevelandSmall_cSet)
+sensitivitySlot(exampleDataMapper) <- sensitivitySlot(exampleDataMapper)
 
-sensNumber(clevelandSmall_cSet)
+sensNumber(exampleDataMapper)
 
-sensNumber(clevelandSmall_cSet) <- sensNumber(clevelandSmall_cSet)
+sensNumber(exampleDataMapper) <- sensNumber(exampleDataMapper)
 
-pertNumber(clevelandSmall_cSet)
+pertNumber(exampleDataMapper)
 
-pertNumber(clevelandSmall_cSet) <- pertNumber(clevelandSmall_cSet)
+pertNumber(exampleDataMapper) <- pertNumber(exampleDataMapper)
 
 }

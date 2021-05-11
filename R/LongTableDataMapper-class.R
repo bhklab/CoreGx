@@ -56,10 +56,16 @@ LongTableDataMapper <- function(rawdata, rowDataMap=list(),
 ## -------------------------------------------
 
 .local_class <- 'LongTableDataMapper'
+exampleDataMapper <- LongTableDataMapper(rawdata=data.table(drug_id='drug1', 
+    cell_id='cell1', vaibility=c(0.75, 0.1, 0.9)))
+.local_data <- 'exampleDataMapper'
 
 #' @name LongTableDataMapper-accessors
+#'
 #' @eval .docs_DataMapper_accessors(class_=.local_class)
-#' @eval .docs_DataMapper_get_rawdata(class_=.local_class) 
+#' @eval .docs_DataMapper_get_rawdata(class_=.local_class)
+#' 
+#' @param value See details. 
 NULL
 
 ## =====================================
@@ -74,63 +80,67 @@ NULL
 ##
 ## -- rowDataMap
 
-#' @rdname LongTableDataMapper-accessors
-#'  
-#'
-#' @param object An `S4` object to access the rowDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#'
-#' @return `list` of two `character` vectors, the first are the columns required
-#'  to uniquely identify each row of a `LongTable` and the second any additional
-#'  row-level metadata.
-#'
-#' @md
+.docs_LongTableDataMapper_get_dimDataMap <- function(...) .parseToRoxygen(
+    "
+    @details
+    __{dim_}DataMap__: `list` of two `character` vectors, the first are the 
+    columns required to uniquely identify each row of a `{class_}` and the 
+    second any additional {dim_}-level metadata. If the character vectors
+    have names, the resulting columns are automatically renamed to the
+    item name of the specified column.
+
+    @examples
+    {dim_}DataMap({data_})
+
+    @md
+    @aliases {dim_}DataMap,{class_}-method {dim_}DataMap
+    @exportMethod {dim_}DataMap
+    ",
+    ...
+)
+
 #' @export
 setGeneric('rowDataMap', function(object, ...) standardGeneric('rowDataMap'))
-#'
-#' @title rowDataMap
-#'
-#' @param object An `S4` object to access the rowDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#'
-#' @return `list` of two `character` vectors, the first are the columns required
-#'  to uniquely identify each row of a `LongTable` and the second any additional
-#'  row-level metadata.
-#'
-#' @md
-#' @export
+
+#' @rdname LongTableDataMapper-accessors
+#' @eval 
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class, 
+#' data_=.local_data)
 setMethod('rowDataMap', signature(object='LongTableDataMapper'), function(object) 
 {
     object@rowDataMap
 })
 
-#' @title rowDataMap<-
-#' 
-#' @param object An `S4` object to access the colDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#' @param value A like-like object containing the values to assign to the
-#'   `rowDataMap` slot of the `S4` object.
-#'   
-#' @return `invisible` Update object in-place and returns and invisible NULL.
-#'
-#' @md
 #' @export
 setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowDataMap<-'))
-#'
-#' @title rowDataMap<-
-#' 
-#' @param object A `LongTableDataMapper` object to access the rowDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#' @param value A `list` or `List` where the first item is the names of the
-#'   identifier columns -- columns needed to uniquely identify each row in
-#'   rowData -- and the second item is the metadata associated with those
-#'   the identifier columns, but not required to uniquely identify rows in
-#'   the object rowData.
-#'
-#' @return `invisible` Updates object and returns an invisible NULL.
-#'
-#' @md
-#' @export
+
+.docs_LongTableDataMapper_set_dimDataMap <- function(...) .parseToRoxygen(
+    "
+    @details
+    __{dim_}DataMap<-__: Update the `@{dim_}DataMap` slot of a `{class_}` object,
+    returning an invisible NULL. Arguments:
+    - value: A `list` or `List` where the first item is the names of the
+   identifier columns -- columns needed to uniquely identify each row in
+   {dim_}Data -- and the second item is the metadata associated with those
+   the identifier columns, but not required to uniquely identify rows in
+   the object rowData.
+
+    @examples
+    {dim_}DataMap({data_}) <- list(c('{id_col_}'), c())
+
+    @md
+    @aliases rowDataMap<-,{class_},list-method {dim_}DataMap<-{class_},List-method
+    {dim_}DataMap<-
+    @exportMethod {dim_}DataMap<-
+    ",
+    ...
+)
+
+
+#' @rdname LongTableDataMapper-accessors
+#' @eval 
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class, 
+#' data_=.local_data, id_col_='drug_id')
 setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper', 
     value='list_or_List'), function(object, value) 
 {
@@ -179,59 +189,25 @@ setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
 ##
 ## -- colDataMap
 
-#' @title colDataMap
-#'
-#' @param object An `S4` object to access the colDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#'
-#' @return A `list` with two items, the first being all columns needed to
-#'   uniquely identify each column in a `S4` object and the second any
-#'   additional column-level metadata columns.
-#'
-#' @md
 #' @export
 setGeneric('colDataMap', function(object, ...) standardGeneric('colDataMap'))
-#' @title colDataMap
-#'
-#' @param object An `S4` object to access the rowDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#'
-#' @return A `list` with two items, the first being all columns needed to
-#'   uniquely identify each column in a `LongTable` and the second any
-#'   additional column-level metadata columns.
-#' 
-#' @md
-#' @export
+
+#' @rdname LongTableDataMapper-accessors
+#' @eval 
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='col', class_=.local_class, 
+#' data_=.local_data)
 setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object) 
 {
     object@colDataMap
 })
 
-#' @title colDataMap<-
-#'
-#' @param object An `S4` object to access the colDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#' @param value A list-like object containing the values to assign to the
-#'   `colDataMap` slot of the `S4` object.
-#'
-#' @return None, modifies the object.
-#'
-#' @md
 #' @export
 setGeneric('colDataMap<-', function(object, ..., value) standardGeneric('colDataMap<-'))
-#' @title colDataMap<-
-#'
-#' @param object A `LongTableDataMapper` object to assign a colDataMap to.
-#' @param value A `list` or `List` where the first item is the named of the
-#'   identifier columns -- columns needed to uniquely identify each row in
-#'   colData -- and the second item is the metadata associated with those
-#'   the identifier columns, but not required to uniquely identify rows in
-#'   the object colData.
-#'
-#' @return None, modifies the object.
-#' 
-#' @md
-#' @export
+
+#' @rdname LongTableDataMapper-accessors
+#' @eval 
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class, 
+#' data_=.local_data, id_col_='cell_id')
 setReplaceMethod('colDataMap', signature(object='LongTableDataMapper',
     value='list_or_List'), function(object, value) 
 {
@@ -277,60 +253,64 @@ setReplaceMethod('colDataMap', signature(object='LongTableDataMapper',
 ## ----------------
 ## ---- assayMap slot
 
-#' @title assayMap
-#'
-#' @param object An `LongTableDataMapper` object to access the assayMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#'
-#' @return A `list` of character vectors. The name of each list item will be
-#'   the assay in an `DataMapper` object that the columns in the `character` 
-#'   vector will be assigned to.
-#'
-#' @md
+
 #' @export
 setGeneric('assayMap', function(object, ...) standardGeneric('assayMap'))
-#' @title assayMap
-#'
-#' @param object An `LongTableDataMapper` object to access the rowDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#'
-#' @return A `list` of character vectors. The name of each list item will be
-#'   the assay in a `LongTableDataMapper` object that the columns in the 
-#'   `character` vector will be assigned to.
-#'
-#' @md
-#' @export
+
+.docs_LongTableDataMapper_get_assayMap <- function(...) .parseToRoxygen(
+    "
+    @details
+    __assayMap__:  A `list` of character vectors. The name of each list item 
+    will be the assay in a `LongTableDataMapper` object that the columns in the 
+    `character` vector will be assigned to. Column renaming occurs automatically
+    when the character vectors have names (from the value to the name).
+
+    @examples
+    assayMap({data_})
+
+    @md
+    @aliases assayMap,{class_},list-method assayMap,{class_},List-method 
+    assayMap
+    @exportMethod assayMap
+    ",
+    ...
+)
+
+#' @rdname LongTableDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_get_assayMap(class_=.local_class, data_=.local_data)
 setMethod('assayMap', signature(object='LongTableDataMapper'), function(object) 
 {
     object@assayMap
 })
 
-#' @title assayMap<-
-#' 
-#' @param object A `DataMapper`
-#' @param ... Allow new arguments to be defined on this generic.
-#' @param value A `list` of character vectors, where the name of each list
-#'   item is the name of an assay and the values of each character vector
-#'   specify the columns mapping to the assay in the `S4` object the 
-#'   `DataMapper` constructs.
-#'
-#' @return `invisible` Updates object in-place and returns and invisible NULL.
-#'
-#' @md
+
 #' @export
 setGeneric('assayMap<-', function(object, ..., value) standardGeneric('assayMap<-'))
-#' @title assayMap<-
-#'
-#' @param object A `LongTableDataMapper`
-#' @param value A `list` of character vectors, where the name of each list
-#'   item is the name of an assay and the values of each character vector
-#'   specify the columns mapping to the assay in the `S4` object the 
-#'   `LongTableDataMapper` constructs.
-#'
-#' @return `invisible` Updates object in-place and returns and invisible NULL.
-#'
-#' @md
-#' @export
+
+#' @noRd
+.docs_LongTableDataMapper_set_assayMap <- function(...) .parseToRoxygen(
+    "
+    @details
+    __assayMap<-__: Updates the `@assaMap` slot of a `{class_}` object,
+    returning an invisible NULL. Arguments:
+    - value:  A `list` of character vectors, where the name of each list
+    item is the name of an assay and the values of each character vector
+    specify the columns mapping to the assay in the `S4` object the 
+    `{class_}` constructs.
+
+    @examples
+    assayMap({data_}) <- list(sensitivity=c(viability1='vaibility'))
+
+    @md
+    @aliases assayMap<-,{class_},list-method assayMap<-,{class_},List-methhod
+    assayMap<-
+    @exportMethod assayMap<-
+    ",
+    ...
+)
+
+#' @rdname LongTableDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_set_assayMap(class_=.local_class, data_=.local_data)
 setReplaceMethod('assayMap', signature(object='LongTableDataMapper', 
     value='list_or_List'), function(object, value) 
 {
@@ -355,60 +335,62 @@ setReplaceMethod('assayMap', signature(object='LongTableDataMapper',
 
 # -- metadataMap
 
-#' @title metadataMap
-#' 
-#' @param object An `S4` object to access the metadataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#'
-#' @return A `list` where each the name of each item 
-#'
-#' @md
+
 #' @export
 setGeneric('metadataMap', function(object, ...) standardGeneric('metadataMap'))
-#' 
-#' @title metadataMap
-#'
-#' @param object A `LongTableDataMapper` object to access the rowDataMap from.
-#' @param ... Allow new parameters to be defined for this generic.
-#'
-#' @return A `list` of `character` vectors. Each item is an element of the
-#'   constructed objects `@metadata` slot
-#'
-#' @md
-#' @export
+
+#' @noRd
+.docs_LongTableDataMapper_get_metadataMap <- function(...) .parseToRoxygen(
+    "
+    @details
+    __metadataMap__:  A `list` of `character` vectors. Each item is an element 
+    of the constructed objects `@metadata` slot.
+
+    @examples
+    metadataMap({data_})
+
+    @md
+    @aliases metadataMap,{class_}-method metadataMap
+    @exportMethod metadataMap
+    ",
+    ...
+)
+
+#' @rdname LongTableDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class, data_=.local_data)
 setMethod('metadataMap', signature(object='LongTableDataMapper'), function(object) 
 {
     object@metadataMap
 })
 
-#' @title metadataMap<-
-#'
-#' @param object A `DataMapper` object.
-#' @param ... Allow new parameters for this generic.
-#' @param value A `list` of `character` vectors. The name of each list item
-#'   is the name of the item in the `@metadata` slot of the `S4` object created
-#'   when `metaConstruct` is called on the `DataMapper`, and the character
-#'   vector specifies the columns of `@rawdata` to assign the item.
-#'
-#' @return `invisible` Updates object in-place, then returns and 
-#'   `invisible(NULL)`.
-#'
-#' @md
+
 #' @export
-setGeneric('metadataMap<-', function(object, ..., value) standardGeneric('metadataMap<-'))
-#'
-#' @title metadataMap<-
-#'
-#' @param object A `DataMapper` object.
-#' @param ... Allow new parameters for this generic.
-#' @param value A `list` of `character` vectors. The name of each list item
-#'   is the name of 
-#'
-#' @return `invisible` Updates object in-place, then returns and 
-#'   `invisible(NULL)`.
-#'
-#' @md
-#' @export
+setGeneric('metadataMap<-', function(object, ..., value) 
+    standardGeneric('metadataMap<-'))
+
+#' @noRd
+.docs_LongTableDataMapper_set_metadataMap <- function(...) .parseToRoxygen(
+    "
+    @details
+    __metadataMap<-__: Updates `{class_}` object in-place, then returns and 
+   `invisible(NULL)`. Arguments:
+    - value:  A `list` of `character` vectors. The name of each list item
+    is the name of the item in the `@metadata` slot of the `{class_}` object 
+    created when `metaConstruct` is called on the `DataMapper`, and the 
+    character vector specifies the columns of `@rawdata` to assign the item.
+
+    @examples
+    metadataMap({data_})
+
+    @md
+    @aliases metadataMap,{class_}-method metadataMap
+    @exportMethod metadataMap
+    ",
+    ...
+)
+
+#' @rdname LongTableDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class, data_=.local_data)
 setReplaceMethod('metadataMap', signature(object='LongTableDataMapper', 
     value='list_or_List'), function(object, value) 
 {

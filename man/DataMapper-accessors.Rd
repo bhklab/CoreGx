@@ -28,3 +28,8 @@ of data in the slots of a \code{LongTableDataMapper} object.
 a list-like containing one or more raw data inputs to the
 \code{LongTableDataMapper} object.
 }
+\seealso{
+Other DataMapper-acessors: 
+\code{\link{LongTableDataMapper-accessors}}
+}
+\concept{DataMapper-acessors}
