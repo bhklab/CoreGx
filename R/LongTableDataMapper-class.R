@@ -11,10 +11,22 @@ NULL
 #' @inheritSection DataMapper-class Slots
 #'
 #' @section Slots:
-#' * rowDataMap: A list of mappings from.
-#' * colDataMap: A list of mappings from.
-#' * assayMap: A list of mappings from .
-#' * metadataMap: A list of mappings from.
+#' * rowDataMap: A list-like object containing two `character` vectors. 
+#' The first is column names in `rawdata` needed to uniquely identify each row, 
+#' the second is additional columns which map to rows, but are not required to
+#' uniquely identify them. Rows should be drugs.
+#' * colDataMap: A list-like object containing two `character` vectors. 
+#' The first is column names in `rawdata` needed to uniquely identify each 
+#' column, the second is additional columns which map to rows, but are not 
+#' required to uniquely identify them. Columns should be samples.
+#' * assayMap: A list-like where each item is a `character` vector of
+#' `rawdata` column names to assign to an assay, where the name of that assay 
+#' is the name of the list item. If names are omitted, assays will be numbered 
+#' by their index in the list.
+#' * metadataMap: A list-like where each item is a `character` vector of
+#' `rawdata` column names to assign to the `@metadata` of the `LongTable`, 
+#' where the name of that assay is the name of the list item. If names are 
+#' omitted, assays will be numbered by their index in the list.
 #'
 #' @md
 #' @aliases LongTableDataMapper-class
@@ -30,13 +42,44 @@ NULL
 #' Constructor for the `LongTableDataMapper` class, which maps from one or
 #'   more raw experimental data files to the slots of a `LongTable` object.
 #' 
-#' @param rawdata A list-like
-#' @param rowDataMap A list-like
-#' @param colDataMap A list-like
-#' @param assayMap A list-like
-#' @param metadataMap A list-like
+#' @details
+#' The `guessMapping` method can be used to test hypotheses about the 
+#' cardinality of one or more sets of identifier columns. This is helpful
+#' to determine the id columns for `rowDataMap` and `colDataMap`, as well
+#' as identify columns mapping to `assays` or `metadata`.
 #' 
+#' To attach metadata not associated with `rawdata`, please use the `metadata`
+#' assignment method on your `LongTableDataMapper`. This metadata will be 
+#' merge with any metadata from `metadataMap` and added to the `LongTable`
+#' which this object ultimately constructs.
+#'
+#' @param rawdata A `data.frame` of raw data from a treatment response 
+#' experiment. This will be coerced to a `data.table` internally. We recommend
+#' using joins to aggregate your raw data if it is not present in a single file.
+#' @param rowDataMap A list-like object containing two `character` vectors. 
+#' The first is column names in `rawdata` needed to uniquely identify each row, 
+#' the second is additional columns which map to rows, but are not required to
+#' uniquely identify them. Rows should be drugs.
+#' @param colDataMap A list-like object containing two `character` vectors. 
+#' The first is column names in `rawdata` needed to uniquely identify each 
+#' column, the second is additional columns which map to rows, but are not 
+#' required to uniquely identify them. Columns should be samples.
+#' @param assayMap A list-like where each item is a `character` vector of
+#' `rawdata` column names to assign to an assay, where the name of that assay 
+#' is the name of the list item. If names are omitted, assays will be numbered 
+#' by their index in the list
+#' @param metadataMap A list-like where each item is a `character` vector of
+#' `rawdata` column names to assign to the `@metadata` of the `LongTable`, 
+#' where the name of that assay is the name of the list item. If names are 
+#' omitted, assays will be numbered by their index in the list.
+#'
+#' @return A `LongTable` object, with columns mapped to it's slots according
+#' to the various maps in the `LongTableDataMapper` object.
+#'
+#' @seealso [`guessMapping`]
+#'
 #' @md
+#' @importFrom data.table setDT
 #' @export
 LongTableDataMapper <- function(rawdata, rowDataMap=list(), 
     colDataMap=list(), assayMap=list(), metadataMap=list())
@@ -45,6 +88,8 @@ LongTableDataMapper <- function(rawdata, rowDataMap=list(),
     if (missing(rawdata)) stop(.errorMsg(funContext, 'The rawdata parameter ',
         'is mandatory. Please provide a list of raw data to map from.'))
     
+    if (is(rawdata, 'data.frame') && !is(rawdata, 'data.table')) setDT(rawdata)
+
     .LongTableDataMapper(rawdata=rawdata, rowDataMap=rowDataMap, 
         colDataMap=colDataMap, assayMap=assayMap, metadataMap=metadataMap)
 }
@@ -376,7 +421,7 @@ setGeneric('metadataMap<-', function(object, ..., value)
     character vector specifies the columns of `@rawdata` to assign to each item.
 
     @examples
-    metadataMap({data_}) <- list(object_metadata=c('metadata))
+    metadataMap({data_}) <- list(object_metadata=c('metadata'))
 
     @md
     @aliases metadataMap<-,{class_}-method metadataMap<-

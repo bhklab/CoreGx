@@ -6,7 +6,8 @@
 #'   examples
 #' 
 #' @references
-#' Lamb et al. The Connectivity Map: using gene-expression signatures to connect small molecules, genes, and disease. Science, 2006.
+#' Lamb et al. The Connectivity Map: using gene-expression signatures to connect 
+#' small molecules, genes, and disease. Science, 2006.
 #' 
 #' @docType data
 #' @name clevelandSmall_cSet

@@ -4,7 +4,7 @@
 #'   object slot mappings for.
 #' @param ... Allow new arguments to be defined for this generic.
 #' 
-#' @return An `S4` object with mapping guesses in the appropriate slots.
+#' @return A `list` with mapping guesses as items.
 #' 
 #' @md
 #' @export
@@ -12,7 +12,17 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 
 #' Guess which columns in raw experiment data map to which dimensions.
 #' 
-#' Checks for columns which are uniquely identified 
+#' Checks for columns which are uniquely identified by a group of identifiers.
+#' This should be used to help identify the columns required to uniquely
+#' identify the rows, columns, assays and metadata of a `DataMapper` class
+#' object.
+#' 
+#' @details
+#' Any unmapped columns will be added to the end of the returned `list` in an
+#' item called unmapped.
+#'
+#' The function automatically guesses metadata by checking if any columns have
+#' only a single value. This is returned as an additional item in the list.
 #' 
 #' @param object A `LongTableDataMapper` object.
 #' @param groups A `list` containing one or more vector of column names
@@ -22,12 +32,19 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 #' @param subset A `logical` vector indicating whether to to subset out mapped
 #'   columns after each grouping. Must be a single `TRUE` or `FALSE` or have
 #'   the same length as groups, indicating whether to subset out mapped columns
-#'   after each grouping.
+#'   after each grouping. This will prevent mapping a column to two different
+#'   groups.
 #' @param data A `logical` vector indicating whether you would like the data
 #'   for mapped columns to be returned instead of their column names. Defaults
 #'   to `FALSE` for easy use assigning mapped columns to a `DataMapper` object.
 #' 
-#' @return
+#' @return A `list`, where each item is named for the associated `groups` item
+#' the guess is for. The character vector in each item are columns which are
+#' uniquely identified by the identifiers from that group.
+#'
+#' @examples
+#' guessMapping(exampleDataMapper, groups=list(rows='drug_id', cols='cell_id'), 
+#' subset=FALSE)
 #'
 #' @md
 #' @export
@@ -51,8 +68,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     metadataColumns <- names(which(vapply(mapData, FUN=.length_unique, 
         numeric(1)) == 1))
     metadata <- mapData[, .SD, .SDcols=metadataColumns]
-
-    DT <- mapData[, .SD, .SDcols=!metadataColumns]
+    DT <- if (any(subset)) mapData[, .SD, .SDcols=!metadataColumns] else mapData
 
     # Check the mappings for each group in groups
     for (i in seq_along(groups)) {
@@ -92,7 +108,11 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #'   operations.
 #' 
 #' @return A `character` vector with the names of the columns with
-#'    cardinality of 1:`cardinality` with the columns lised in `group`.
+#'    cardinality of 1:`cardinality` with the columns listed in `group`.
+#'
+#' @examples
+#' df <- rawdata(exampleDataMapper)
+#' checkColumnCardinality(df, group='drugid')
 #'
 #' @aliases cardinality
 #' 
@@ -100,6 +120,8 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #' @export
 checkColumnCardinality <- function(df, group, cardinality=1, ...) {
     
+    ## FIXME:: Make this faster using logical operators to get a `logical`
+    ##   matrix then using `colAlls` to check for the correct cardinality.
     funContext <- '[CoreGx::checkColumnCardinality]\n\t'
 
     # Copy to prevent accidental modify by references

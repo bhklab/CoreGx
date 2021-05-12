@@ -13,7 +13,7 @@ object slot mappings for.}
 \item{...}{Allow new arguments to be defined for this generic.}
 }
 \value{
-An \code{S4} object with mapping guesses in the appropriate slots.
+A \code{list} with mapping guesses as items.
 }
 \description{
 Generic for Guessing the Mapping Between Some Raw Data and an S4 Object

@@ -137,6 +137,8 @@ assayMap(exampleDataMapper) <- list(sensitivity=c(viability1='vaibility'))
 
 metadataMap(exampleDataMapper)
 
+metadataMap(exampleDataMapper) <- list(object_metadata=c('metadata'))
+
 }
 \seealso{
 Other DataMapper-accessors: 

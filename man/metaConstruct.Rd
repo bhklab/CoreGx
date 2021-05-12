@@ -2,20 +2,25 @@
 % Please edit documentation in R/methods-metaConstruct.R
 \name{metaConstruct}
 \alias{metaConstruct}
+\alias{metaConstruct,LongTableDataMapper-method}
 \title{Generic for preprocessing complex data before being used in the constructor
 of an \code{S4} container object.}
 \usage{
 metaConstruct(mapper, ...)
+
+\S4method{metaConstruct}{LongTableDataMapper}(mapper)
 }
 \arguments{
-\item{mapper}{An \code{S4} object abstracting arguments to an \code{S4} class
-constructor into a well documented \code{Mapper} object.}
+\item{mapper}{An \code{LongTableDataMapper} object abstracting arguments to an
+the \code{LongTable} constructor.}
 
 \item{...}{Allow new arguments to be defined for this generic.}
 }
 \value{
 An \code{S4} object for which the class corresponds to the type of
 the build configuration object passed to this method.
+
+A \code{LongTable} object, as specified in the mapper.
 }
 \description{
 This method is intended to abstract away complex constructor arguments
@@ -25,4 +30,14 @@ automate building of the appropriate \code{S4} container object. This is
 is intended to allow mapping between different experimental designs,
 in the form of an \code{S4} configuration object, and various S4 class
 containers in the Bioconductor community and beyond.
+}
+\examples{
+data(exampleDataMapper)
+rowDataMap(exampleDataMapper) <- list(c('drug_id'), c())
+colDataMap(exampleDataMapper) <- list(c('cell_id'), c())
+assayMap(exampleDataMapper) <- list(sensitivity=c('viability'))
+metadataMap(exampleDataMapper) <- list(study_metadata=c('metadata'))
+longTable <- metaConstruct(exampleDataMapper)
+longTable
+
 }

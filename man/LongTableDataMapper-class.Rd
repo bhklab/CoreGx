@@ -23,10 +23,22 @@ A Class for Mapping Between Raw Data and an \code{LongTable} Object
 \section{Slots}{
 
 \itemize{
-\item rowDataMap: A list of mappings from.
-\item colDataMap: A list of mappings from.
-\item assayMap: A list of mappings from .
-\item metadataMap: A list of mappings from.
+\item rowDataMap: A list-like object containing two \code{character} vectors.
+The first is column names in \code{rawdata} needed to uniquely identify each row,
+the second is additional columns which map to rows, but are not required to
+uniquely identify them. Rows should be drugs.
+\item colDataMap: A list-like object containing two \code{character} vectors.
+The first is column names in \code{rawdata} needed to uniquely identify each
+column, the second is additional columns which map to rows, but are not
+required to uniquely identify them. Columns should be samples.
+\item assayMap: A list-like where each item is a \code{character} vector of
+\code{rawdata} column names to assign to an assay, where the name of that assay
+is the name of the list item. If names are omitted, assays will be numbered
+by their index in the list.
+\item metadataMap: A list-like where each item is a \code{character} vector of
+\code{rawdata} column names to assign to the \verb{@metadata} of the \code{LongTable},
+where the name of that assay is the name of the list item. If names are
+omitted, assays will be numbered by their index in the list.
 }
 
 

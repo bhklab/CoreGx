@@ -25,9 +25,14 @@ operations.}
 }
 \value{
 A \code{character} vector with the names of the columns with
-cardinality of 1:\code{cardinality} with the columns lised in \code{group}.
+cardinality of 1:\code{cardinality} with the columns listed in \code{group}.
 }
 \description{
 Search a data.frame for 1:\code{cardinality} relationships between a group
 of columns (your identifiers) and all other columns.
+}
+\examples{
+df <- rawdata(exampleDataMapper)
+checkColumnCardinality(df, group='drugid')
+
 }
