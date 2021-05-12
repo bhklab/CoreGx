@@ -46,11 +46,11 @@ packages to apply the correct model for the given data.
 \section{Slots}{
 
 \itemize{
-\item annotation: A \code{list} of annotation data about the \code{LongTableDataMapper},
+\item annotation: A \code{list} of annotation data about the \code{CoreSet},
 including the \verb{$name} and the session information for how the object
 was created, detailing the exact versions of R and all the packages used.
 \item molecularProfiles: A \code{list} or \code{MultiAssayExperiment} containing
-\code{LongTableDataMapper} object.
+\code{CoreSet} object.
 \item cell: A \code{data.frame} containg the annotations for all the cell
 lines profiled in the data set, across all molecular data types and
 treatment response experiments.
@@ -65,7 +65,7 @@ summarizing the available perturbation data. This slot is currently
 being deprecated.
 \item curation: \code{list} containing mappings for
 \code{cell}, \code{tissue} names used in the data set to universal
-identifiers used between different \code{LongTableDataMapper} objects
+identifiers used between different \code{CoreSet} objects
 \item datasetType: \code{character} string of 'sensitivity',
 'perturbation', or both detailing what type of data can be found in the
 CoreSet, for proper processing of the data

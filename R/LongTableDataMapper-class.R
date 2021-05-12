@@ -1,4 +1,5 @@
 #' @include DataMapper-class.R
+NULL
 
 #' A Class for Mapping Between Raw Data and an `LongTable` Object
 #'
@@ -17,8 +18,6 @@
 #'
 #' @md
 #' @aliases LongTableDataMapper-class
-#' @keywords internal
-#' @export
 .LongTableDataMapper <- setClass('LongTableDataMapper', 
     contains=c('DataMapper'),
     slots=list(
@@ -55,15 +54,13 @@ LongTableDataMapper <- function(rawdata, rowDataMap=list(),
 ## LongTableDataMapper Accessors Documentation
 ## -------------------------------------------
 
-.local_class <- 'LongTableDataMapper'
-exampleDataMapper <- LongTableDataMapper(rawdata=data.table(drug_id='drug1', 
-    cell_id='cell1', vaibility=c(0.75, 0.1, 0.9)))
-.local_data <- 'exampleDataMapper'
+.local_class_3 <- 'LongTableDataMapper'
+.local_data_3 <- 'exampleDataMapper'
 
 #' @name LongTableDataMapper-accessors
 #'
-#' @eval .docs_DataMapper_accessors(class_=.local_class)
-#' @eval .docs_DataMapper_get_rawdata(class_=.local_class)
+#' @eval .docs_DataMapper_accessors(class_=.local_class_3)
+#' @eval .docs_DataMapper_get_rawdata(class_=.local_class_3)
 #' 
 #' @param value See details. 
 NULL
@@ -104,8 +101,8 @@ setGeneric('rowDataMap', function(object, ...) standardGeneric('rowDataMap'))
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval 
-#' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class, 
-#' data_=.local_data)
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_3, 
+#' data_=.local_data_3)
 setMethod('rowDataMap', signature(object='LongTableDataMapper'), function(object) 
 {
     object@rowDataMap
@@ -120,17 +117,16 @@ setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowData
     __{dim_}DataMap<-__: Update the `@{dim_}DataMap` slot of a `{class_}` object,
     returning an invisible NULL. Arguments:
     - value: A `list` or `List` where the first item is the names of the
-   identifier columns -- columns needed to uniquely identify each row in
-   {dim_}Data -- and the second item is the metadata associated with those
-   the identifier columns, but not required to uniquely identify rows in
-   the object rowData.
+    identifier columns -- columns needed to uniquely identify each row in
+    {dim_}Data -- and the second item is the metadata associated with those
+    the identifier columns, but not required to uniquely identify rows in
+    the object rowData.
 
     @examples
     {dim_}DataMap({data_}) <- list(c('{id_col_}'), c())
 
     @md
-    @aliases rowDataMap<-,{class_},list-method {dim_}DataMap<-{class_},List-method
-    {dim_}DataMap<-
+    @aliases rowDataMap<-,{class_},list-method {dim_}DataMap<-{class_},List-method {dim_}DataMap<-
     @exportMethod {dim_}DataMap<-
     ",
     ...
@@ -138,9 +134,9 @@ setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowData
 
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval 
-#' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class, 
-#' data_=.local_data, id_col_='drug_id')
+#' @eval
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_3, 
+#' data_=.local_data_3, id_col_='drug_id')
 setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper', 
     value='list_or_List'), function(object, value) 
 {
@@ -194,8 +190,8 @@ setGeneric('colDataMap', function(object, ...) standardGeneric('colDataMap'))
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval 
-#' .docs_LongTableDataMapper_get_dimDataMap(dim_='col', class_=.local_class, 
-#' data_=.local_data)
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='col', class_=.local_class_3, 
+#' data_=.local_data_3)
 setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object) 
 {
     object@colDataMap
@@ -206,8 +202,8 @@ setGeneric('colDataMap<-', function(object, ..., value) standardGeneric('colData
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval 
-#' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class, 
-#' data_=.local_data, id_col_='cell_id')
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_3, 
+#' data_=.local_data_3, id_col_='cell_id')
 setReplaceMethod('colDataMap', signature(object='LongTableDataMapper',
     value='list_or_List'), function(object, value) 
 {
@@ -277,7 +273,7 @@ setGeneric('assayMap', function(object, ...) standardGeneric('assayMap'))
 )
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_get_assayMap(class_=.local_class, data_=.local_data)
+#' @eval .docs_LongTableDataMapper_get_assayMap(class_=.local_class_3, data_=.local_data_3)
 setMethod('assayMap', signature(object='LongTableDataMapper'), function(object) 
 {
     object@assayMap
@@ -310,7 +306,7 @@ setGeneric('assayMap<-', function(object, ..., value) standardGeneric('assayMap<
 )
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_set_assayMap(class_=.local_class, data_=.local_data)
+#' @eval .docs_LongTableDataMapper_set_assayMap(class_=.local_class_3, data_=.local_data_3)
 setReplaceMethod('assayMap', signature(object='LongTableDataMapper', 
     value='list_or_List'), function(object, value) 
 {
@@ -357,7 +353,7 @@ setGeneric('metadataMap', function(object, ...) standardGeneric('metadataMap'))
 )
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class, data_=.local_data)
+#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class_3, data_=.local_data_3)
 setMethod('metadataMap', signature(object='LongTableDataMapper'), function(object) 
 {
     object@metadataMap
@@ -372,25 +368,25 @@ setGeneric('metadataMap<-', function(object, ..., value)
 .docs_LongTableDataMapper_set_metadataMap <- function(...) .parseToRoxygen(
     "
     @details
-    __metadataMap<-__: Updates `{class_}` object in-place, then returns and 
-   `invisible(NULL)`. Arguments:
+    __metadataMap<-__: Updates `{class_}` object in-place, then returns an 
+    `invisible(NULL)`. Arguments:
     - value:  A `list` of `character` vectors. The name of each list item
     is the name of the item in the `@metadata` slot of the `{class_}` object 
-    created when `metaConstruct` is called on the `DataMapper`, and the 
-    character vector specifies the columns of `@rawdata` to assign the item.
+    created when `metaConstruct` is called on the `DataMapper`, and a 
+    character vector specifies the columns of `@rawdata` to assign to each item.
 
     @examples
-    metadataMap({data_})
+    metadataMap({data_}) <- list(object_metadata=c('metadata))
 
     @md
-    @aliases metadataMap,{class_}-method metadataMap
-    @exportMethod metadataMap
+    @aliases metadataMap<-,{class_}-method metadataMap<-
+    @exportMethod metadataMap<-
     ",
     ...
 )
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class, data_=.local_data)
+#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_3, data_=.local_data_3, col_='metadata')
 setReplaceMethod('metadataMap', signature(object='LongTableDataMapper', 
     value='list_or_List'), function(object, value) 
 {

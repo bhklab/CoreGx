@@ -3,33 +3,30 @@
 \name{DataMapper-accessors}
 \alias{DataMapper-accessors}
 \alias{rawdata,DataMapper-method}
-\alias{rawdata,LongTableDataMapper-method}
 \alias{rawdata}
-\title{Accessing and modifying data in a \code{LongTableDataMapper} object.}
+\title{Accessing and modifying data in a \code{DataMapper} object.}
 \usage{
 \S4method{rawdata}{DataMapper}(object)
 }
 \arguments{
-\item{object}{A \code{LongTableDataMapper} object to get or set data from.}
-
-\item{...}{See details.}
+\item{object}{A \code{DataMapper} object to get or set data from.}
 }
 \value{
 Accessors: See details
 
-Setters: An update \code{LongTableDataMapper} object, returned invisibly.
+Setters: An update \code{DataMapper} object, returned invisibly.
 }
 \description{
 Documentation for the various setters and getters which allow manipulation
-of data in the slots of a \code{LongTableDataMapper} object.
+of data in the slots of a \code{DataMapper} object.
 }
 \details{
-\strong{rawdata}: Get the raw data slot from a \code{LongTableDataMapper} object. Returns
+\strong{rawdata}: Get the raw data slot from a \code{DataMapper} object. Returns
 a list-like containing one or more raw data inputs to the
-\code{LongTableDataMapper} object.
+\code{DataMapper} object.
 }
 \seealso{
-Other DataMapper-acessors: 
+Other DataMapper-accessors: 
 \code{\link{LongTableDataMapper-accessors}}
 }
-\concept{DataMapper-acessors}
+\concept{DataMapper-accessors}

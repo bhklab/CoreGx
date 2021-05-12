@@ -29,3 +29,14 @@ NULL
 #' @keywords datasets
 #' @format LongTable object
 NULL
+
+#' Example LongTableDataMapper
+#'
+#' A dummy LongTableDataMapper object to be used in package examples.
+#'
+#' @docType data
+#' @name exampleDataMapper
+#' @usage data(exampleDataMapper)
+#' @keywords datasets
+#' @format LongTableDataMapper object
+NULL

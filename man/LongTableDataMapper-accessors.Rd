@@ -3,13 +3,17 @@
 \name{LongTableDataMapper-accessors}
 \alias{LongTableDataMapper-accessors}
 \alias{rawdata,LongTableDataMapper-method}
-\alias{rawdata}
 \alias{rowDataMap,LongTableDataMapper-method}
 \alias{rowDataMap}
 \alias{rowDataMap<-,LongTableDataMapper,list_or_List-method}
+\alias{rowDataMap<-,LongTableDataMapper,list-method}
+\alias{rowDataMap<-LongTableDataMapper,List-method}
+\alias{rowDataMap<-}
 \alias{colDataMap,LongTableDataMapper-method}
 \alias{colDataMap}
 \alias{colDataMap<-,LongTableDataMapper,list_or_List-method}
+\alias{colDataMap<-LongTableDataMapper,List-method}
+\alias{colDataMap<-}
 \alias{assayMap,LongTableDataMapper-method}
 \alias{assayMap,LongTableDataMapper,list-method}
 \alias{assayMap,LongTableDataMapper,List-method}
@@ -21,6 +25,8 @@
 \alias{metadataMap,LongTableDataMapper-method}
 \alias{metadataMap}
 \alias{metadataMap<-,LongTableDataMapper,list_or_List-method}
+\alias{metadataMap<-,LongTableDataMapper-method}
+\alias{metadataMap<-}
 \title{Accessing and modifying data in a \code{LongTableDataMapper} object.}
 \usage{
 \S4method{rowDataMap}{LongTableDataMapper}(object)
@@ -43,8 +49,6 @@
 \item{object}{A \code{LongTableDataMapper} object to get or set data from.}
 
 \item{value}{See details.}
-
-\item{...}{See details.}
 }
 \value{
 Accessors: See details
@@ -54,15 +58,6 @@ Setters: An update \code{LongTableDataMapper} object, returned invisibly.
 \description{
 Documentation for the various setters and getters which allow manipulation
 of data in the slots of a \code{LongTableDataMapper} object.
-
-@examples
-rowDataMap(exampleDataMapper) <- list(c('drug_id'), c())
-
-@examples
-colDataMap(exampleDataMapper) <- list(c('cell_id'), c())
-
-@examples
-metadataMap(exampleDataMapper)
 }
 \details{
 \strong{rawdata}: Get the raw data slot from a \code{LongTableDataMapper} object. Returns
@@ -75,10 +70,15 @@ second any additional row-level metadata. If the character vectors
 have names, the resulting columns are automatically renamed to the
 item name of the specified column.
 
-@md
-@aliases rowDataMap<-,LongTableDataMapper,list-method rowDataMap<-LongTableDataMapper,List-method
-rowDataMap<-
-@exportMethod rowDataMap<-
+\strong{rowDataMap<-}: Update the \verb{@rowDataMap} slot of a \code{LongTableDataMapper} object,
+returning an invisible NULL. Arguments:
+\itemize{
+\item value: A \code{list} or \code{List} where the first item is the names of the
+identifier columns -- columns needed to uniquely identify each row in
+rowData -- and the second item is the metadata associated with those
+the identifier columns, but not required to uniquely identify rows in
+the object rowData.
+}
 
 \strong{colDataMap}: \code{list} of two \code{character} vectors, the first are the
 columns required to uniquely identify each row of a \code{LongTableDataMapper} and the
@@ -86,10 +86,15 @@ second any additional col-level metadata. If the character vectors
 have names, the resulting columns are automatically renamed to the
 item name of the specified column.
 
-@md
-@aliases rowDataMap<-,LongTableDataMapper,list-method colDataMap<-LongTableDataMapper,List-method
-colDataMap<-
-@exportMethod colDataMap<-
+\strong{colDataMap<-}: Update the \verb{@colDataMap} slot of a \code{LongTableDataMapper} object,
+returning an invisible NULL. Arguments:
+\itemize{
+\item value: A \code{list} or \code{List} where the first item is the names of the
+identifier columns -- columns needed to uniquely identify each row in
+colData -- and the second item is the metadata associated with those
+the identifier columns, but not required to uniquely identify rows in
+the object rowData.
+}
 
 \strong{assayMap}:  A \code{list} of character vectors. The name of each list item
 will be the assay in a \code{LongTableDataMapper} object that the columns in the
@@ -108,14 +113,23 @@ specify the columns mapping to the assay in the \code{S4} object the
 \strong{metadataMap}:  A \code{list} of \code{character} vectors. Each item is an element
 of the constructed objects \verb{@metadata} slot.
 
-@md
-@aliases metadataMap,LongTableDataMapper-method metadataMap
-@exportMethod metadataMap
+\strong{metadataMap<-}: Updates \code{LongTableDataMapper} object in-place, then returns an
+\code{invisible(NULL)}. Arguments:
+\itemize{
+\item value:  A \code{list} of \code{character} vectors. The name of each list item
+is the name of the item in the \verb{@metadata} slot of the \code{LongTableDataMapper} object
+created when \code{metaConstruct} is called on the \code{DataMapper}, and a
+character vector specifies the columns of \verb{@rawdata} to assign to each item.
+}
 }
 \examples{
 rowDataMap(exampleDataMapper)
 
+rowDataMap(exampleDataMapper) <- list(c('drug_id'), c())
+
 colDataMap(exampleDataMapper)
+
+colDataMap(exampleDataMapper) <- list(c('cell_id'), c())
 
 assayMap(exampleDataMapper)
 
@@ -125,7 +139,7 @@ metadataMap(exampleDataMapper)
 
 }
 \seealso{
-Other DataMapper-acessors: 
+Other DataMapper-accessors: 
 \code{\link{DataMapper-accessors}}
 }
-\concept{DataMapper-acessors}
+\concept{DataMapper-accessors}

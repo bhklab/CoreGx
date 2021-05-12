@@ -15,7 +15,7 @@ setClassUnion("list_or_List", c('list', 'List'))
 .DataMapper <- setClass('DataMapper', 
     contains=c('VIRTUAL', 'Annotated'), slots=list(rawdata='list_or_List'))
 
-.local_class <- 'DataMapper'
+.local_class_2 <- 'DataMapper'
 
 .docs_DataMapper_accessors <- function(...) .parseToRoxygen(
     "
@@ -26,9 +26,8 @@ setClassUnion("list_or_List", c('list', 'List'))
     of data in the slots of a `{class_}` object.
 
     @param object A `{class_}` object to get or set data from.
-    @param ... See details.
 
-    @family DataMapper-acessors
+    @family DataMapper-accessors
 
     @return Accessors: See details
     @return Setters: An update `{class_}` object, returned invisibly.
@@ -41,7 +40,7 @@ setClassUnion("list_or_List", c('list', 'List'))
 # ----------------------------------
 
 #' @name DataMapper-accessors
-#' @eval .docs_DataMapper_accessors(class_=.local_class)
+#' @eval .docs_DataMapper_accessors(class_=.local_class_2)
 NULL
 
 #' @export
@@ -55,14 +54,15 @@ setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
     `{class_}` object.
 
     @md
-    @aliases rawdata,{class_}-method rawdata
+    @aliases rawdata,{class_}-method
     @exportMethod rawdata
     ",
     ...
 )
 
 #' @rdname DataMapper-accessors
-#' @eval .docs_DataMapper_get_rawdata(class_=.local_class)
+#' @aliases rawdata
+#' @eval .docs_DataMapper_get_rawdata(class_=.local_class_2)
 setMethod('rawdata', signature(object='DataMapper'), function(object) {
     object@rawdata
 })
