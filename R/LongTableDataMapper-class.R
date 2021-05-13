@@ -340,7 +340,7 @@ setGeneric('assayMap<-', function(object, ..., value) standardGeneric('assayMap<
     `{class_}` constructs.
 
     @examples
-    assayMap({data_}) <- list(sensitivity=c(viability1='vaibility'))
+    assayMap({data_}) <- list(sensitivity=c(viability1='viability'))
 
     @md
     @aliases assayMap<-,{class_},list-method assayMap<-,{class_},List-methhod

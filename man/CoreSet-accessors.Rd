@@ -44,11 +44,15 @@
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
 \alias{featureInfo<-,CoreSet,character,DataFrame-method}
 \alias{featureInfo<-}
-\alias{phenoInfo,CoreSet-method}
+\alias{phenoInfo,CoreSet,character-method}
 \alias{phenoInfo}
 \alias{phenoInfo<-,CoreSet,character,data.frame-method}
 \alias{phenoInfo<-,CoreSet,character,DataFrame-method}
 \alias{phenoInfo<-}
+\alias{fNames,CoreSet,character-method}
+\alias{fNames}
+\alias{fNames<-,CoreSet,character,character-method}
+\alias{fNames<-}
 \alias{mDataNames,CoreSet-method}
 \alias{mDataNames}
 \alias{mDataNames<-,CoreSet-method}
@@ -125,9 +129,13 @@
 
 \S4method{featureInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
 
-\S4method{phenoInfo}{CoreSet}(object, mDataType)
+\S4method{phenoInfo}{CoreSet,character}(object, mDataType)
 
 \S4method{phenoInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
+
+\S4method{fNames}{CoreSet,character}(object, mDataType)
+
+\S4method{fNames}{CoreSet,character,character}(object, mDataType) <- value
 
 \S4method{mDataNames}{CoreSet}(object)
 
@@ -268,7 +276,17 @@ or 'both'
 
 \subsection{@molecularProfiles}{
 
-\strong{molecularProfiles}: Retrieve
+\strong{molecularProfiles}: \code{matrix()} Retrieve an assay in a
+\code{SummarizedExperiment} from the \code{molecularProfiles} slot of a \code{CoreSet}
+object with the specified \code{mDataType}. Valid \code{mDataType} arguments can be
+found with \code{mDataNames(object)}. Arguments:
+\itemize{
+\item assay: Optional \code{character(1)} vector specifying an assay in the
+\code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
+\code{CoreSet} object for the specified \code{mDataType}. If excluded,
+defaults to modifying the first assay in the \code{SummarizedExperiment} for
+the given \code{mDataType}.
+}
 }
 
 \strong{molecularProfiles<-}: Update an assay in a \code{SummarizedExperiment} from
@@ -287,7 +305,10 @@ column names must match the associated \code{SummarizedExperiment}.
 }
 
 \strong{featureInfo}: Retrieve a \code{DataFrame} of feature metadata for the specified
-\code{mDataType} from the \code{molecularProfiles} slot of a CoreSet object.
+\code{mDataType} from the \code{molecularProfiles} slot of a \code{CoreSet} object. More
+specifically, retrieve the \verb{@rowData} slot from the \code{SummarizedExperiment}
+from the \verb{@molecularProfiles} of a \code{CoreSet} object with the name
+\code{mDataType}.
 
 \strong{featureInfo<-}: Update the \code{featureInfo(object, mDataType)} \code{DataFrame}
 with new feature metadata. Arguments:
@@ -306,6 +327,19 @@ This updates the sample-level metadata in-place.
 \itemize{
 \item value: A \code{data.frame} or \code{DataFrame} object where rows are samples
 and columns are sample metadata.
+}
+
+\strong{fNames}: \code{character()} The features names from the \code{rowData} slot of a
+\code{SummarizedExperiment} of \code{mDataType} within a \code{CoreSet} object.
+
+\strong{fNames}: Updates the rownames of the feature metadata (i.e., \code{rowData})
+for a \code{SummarizedExperiment} of \code{mDataType} within a \code{CoreSet} object.
+\itemize{
+\item value: \code{character()} A character vector of new features names for the
+\code{rowData} of the \code{SummarizedExperiment} of \code{mDataType} in the
+\verb{@molecularProfiles} slot of a \code{CoreSet} object. Must be the same
+length as \code{nrow(featureInfo(object, mDataType))},
+the number of rows in the feature metadata.
 }
 
 \strong{mDataNames}: \code{character} Retrieve the names of the molecular data types
@@ -462,7 +496,8 @@ datasetType(clevelandSmall_cSet) <- 'both'
 molecularProfiles(clevelandSmall_cSet, 'rna') <- molecularProfiles(clevelandSmall_cSet, 'rna')
 
 # Specific assay
-molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs') <- molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs')
+molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs') <- 
+    molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs')
 
 featureInfo(clevelandSmall_cSet, 'rna')
 
@@ -471,6 +506,10 @@ featureInfo(clevelandSmall_cSet, 'rna') <- featureInfo(clevelandSmall_cSet, 'rna
 phenoInfo(clevelandSmall_cSet, 'rna')
 
 phenoInfo(clevelandSmall_cSet, 'rna') <- phenoInfo(clevelandSmall_cSet, 'rna')
+
+fNames(clevelandSmall_cSet, 'rna')
+
+fNames(clevelandSmall_cSet, 'rna') <- fNames(clevelandSmall_cSet, 'rna')
 
 mDataNames(clevelandSmall_cSet)
 

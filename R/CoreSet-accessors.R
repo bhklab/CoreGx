@@ -1,3 +1,14 @@
+# Navigating this file:
+# - Slot section names start with ----
+# - Method section names start with --
+# 
+# As a result, you can use Ctrl + f to find the slot or method you are looking
+# for quickly, assuming you know its name.
+# 
+# For example Ctrl + f '-- molecularProfiles' would take you the molecularProfiles
+# method, while Ctrl +f '---- molecularProfiles' would take you to the slot
+# section.
+
 #' @include CoreSet-class.R allGenerics.R LongTable-class.R
 NULL
 
@@ -500,7 +511,15 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
     "
     @details
     ## @molecularProfiles
-    __molecularProfiles__: Retrieve 
+    __molecularProfiles__: `matrix()` Retrieve an assay in a 
+    `SummarizedExperiment` from the `molecularProfiles` slot of a `{class_}` 
+    object with the specified `mDataType`. Valid `mDataType` arguments can be 
+    found with `mDataNames(object)`. Arguments:
+    - assay: Optional `character(1)` vector specifying an assay in the 
+    `SummarizedExperiment` of the `molecularProfiles` slot of the
+    `{class_}` object for the specified `mDataType`. If excluded, 
+    defaults to modifying the first assay in the `SummarizedExperiment` for
+    the given `mDataType`.
 
     @md
     @aliases molecularProfiles,{class_}-method molecularProfiles
@@ -515,14 +534,14 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_molecularProfiles(class_=.local_class, data_=.local_data)
 setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
-  funConetext <- .funContext('::molecularProlfiles,CoreSet-method')
+  funContext <- .funContext('::molecularProlfiles,CoreSet-method')
   ## TODO:: Add an all option that returns a list?
   if(mDataType %in% names(object@molecularProfiles)){
     if (!missing(assay)) {
       if (assay %in% assayNames(object@molecularProfiles[[mDataType]])) {
         return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay))
       } else {
-        error(funContext, (paste('Assay', assay, 'not found in the SummarizedExperiment object!')))
+        .error(funContext, (paste('Assay', assay, 'not found in the SummarizedExperiment object!')))
       }
     } else {
       return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1))
@@ -557,7 +576,8 @@ setGeneric("molecularProfiles<-", function(object, mDataType, assay, value)
     molecularProfiles({data_}, 'rna') <- molecularProfiles({data_}, 'rna')
 
     # Specific assay
-    molecularProfiles({data_}, 'rna', 'exprs') <- molecularProfiles({data_}, 'rna', 'exprs')
+    molecularProfiles({data_}, 'rna', 'exprs') <- 
+        molecularProfiles({data_}, 'rna', 'exprs')
 
     @md
     @aliases molecularProfiles<-,{class_},character,character,matrix-method 
@@ -602,7 +622,10 @@ setGeneric("featureInfo", function(object, mDataType, ...)
     "
     @details
     __featureInfo__: Retrieve a `DataFrame` of feature metadata for the specified
-    `mDataType` from the `molecularProfiles` slot of a {class_} object.
+    `mDataType` from the `molecularProfiles` slot of a `{class_}` object. More
+    specifically, retrieve the `@rowData` slot from the `SummarizedExperiment`
+    from the `@molecularProfiles` of a `{class_}` object with the name 
+    `mDataType`.
     @examples
     featureInfo({data_}, 'rna')
 
@@ -674,6 +697,7 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
   object
 })
 
+
 ##
 ## -- phenoInfo
 
@@ -681,6 +705,7 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
 setGeneric("phenoInfo", function(object, mDataType, ...) 
     standardGeneric("phenoInfo"))
 
+#' @noRd
 .docs_CoreSet_get_phenoInfo <- function(...) .parseToRoxygen(
     "
     @details
@@ -700,7 +725,9 @@ setGeneric("phenoInfo", function(object, mDataType, ...)
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_phenoInfo(class_=.local_class, data_=.local_data, mDataType_='rna')
-setMethod(phenoInfo, "CoreSet", function(object, mDataType){
+setMethod(phenoInfo, signature(object='CoreSet', mDataType='character'), 
+    function(object, mDataType)
+{
     if (mDataType %in% mDataNames(object)) { # Columns = Samples
         return(colData(object@molecularProfiles[[mDataType]]))
     }else{
@@ -713,6 +740,7 @@ setMethod(phenoInfo, "CoreSet", function(object, mDataType){
 setGeneric("phenoInfo<-", function(object, mDataType, value) 
     standardGeneric("phenoInfo<-"))
 
+#' @noRd
 .docs_CoreSet_set_phenoInfo <- function(...) .parseToRoxygen(
     "
     @details
@@ -747,7 +775,7 @@ setReplaceMethod("phenoInfo", signature(object="CoreSet", mDataType ="character"
     object
 })
 setReplaceMethod("phenoInfo", signature(object="CoreSet", 
-    mDataType ="character", value="DataFrame"), 
+    mDataType ="character", value="DataFrame"),
     function(object, mDataType, value)
 {
     if (mDataType %in% mDataNames(object)) {
@@ -756,6 +784,75 @@ setReplaceMethod("phenoInfo", signature(object="CoreSet",
     object
 })
 
+
+##
+## -- fNames
+
+#' @export
+setGeneric('fNames', function(object, mDataType, ...) standardGeneric('fNames'))
+
+#' @noRd
+.docs_CoreSet_get_fNames <- function(...) .parseToRoxygen(
+    "
+    @details
+    __fNames__: `character()` The features names from the `rowData` slot of a
+    `SummarizedExperiment` of `mDataType` within a `{class_}` object.
+
+    @examples
+    fNames({data_}, '{mDataType_}')
+
+    @md
+    @aliases fNames,{class_},character-method fNames
+    @exportMethod fNames
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_get_fNames(class_=.local_class, data_=.local_data, 
+#' mDataType_='rna')
+setMethod('fNames', signature(object='CoreSet', mDataType='character'), 
+    function(object, mDataType)
+{
+    rownames(featureInfo(object, mDataType))
+})
+
+
+#' @export
+setGeneric('fNames<-', function(object, mDataType, ..., value) 
+    standardGeneric('fNames<-'))
+
+#' @noRd
+.docs_CoreSet_set_fNames <- function(...) .parseToRoxygen(
+    "
+    @details
+    __fNames__: Updates the rownames of the feature metadata (i.e., `rowData`) 
+    for a `SummarizedExperiment` of `mDataType` within a `{class_}` object.
+    - value: `character()` A character vector of new features names for the
+    `rowData` of the `SummarizedExperiment` of `mDataType` in the 
+    `@molecularProfiles` slot of a `{class_}` object. Must be the same
+    length as `nrow(featureInfo(object, mDataType))`,
+    the number of rows in the feature metadata.
+
+    @examples
+    fNames({data_}, '{mDataType_}') <- fNames({data_}, '{mDataType_}')
+
+    @md
+    @aliases fNames<-,{class_},character,character-method fNames<-
+    @exportMethod fNames<-
+    ",
+    ...
+)
+
+#' @rdname CoreSet-accessors
+#' @eval .docs_CoreSet_set_fNames(class_=.local_class, data_=.local_data, 
+#' mDataType_='rna')
+setReplaceMethod('fNames', signature(object='CoreSet', mDataType='character',
+    value='character'), function(object, mDataType, value)
+{
+    rownames(featureInfo(object, mDataType)) <- value
+    object
+})
 
 ##
 ## -- mDataNames

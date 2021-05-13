@@ -133,7 +133,7 @@ colDataMap(exampleDataMapper) <- list(c('cell_id'), c())
 
 assayMap(exampleDataMapper)
 
-assayMap(exampleDataMapper) <- list(sensitivity=c(viability1='vaibility'))
+assayMap(exampleDataMapper) <- list(sensitivity=c(viability1='viability'))
 
 metadataMap(exampleDataMapper)
 

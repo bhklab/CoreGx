@@ -112,7 +112,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #'
 #' @examples
 #' df <- rawdata(exampleDataMapper)
-#' checkColumnCardinality(df, group='drugid')
+#' checkColumnCardinality(df, group='drug_id')
 #'
 #' @aliases cardinality
 #' 
