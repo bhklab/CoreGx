@@ -878,8 +878,10 @@ setReplaceMethod('fNames', signature(object='CoreSet', mDataType='character',
     object
 })
 
+
 ##
 ## == mDataNames
+
 
 #' @export
 setGeneric("mDataNames", function(object, ...) standardGeneric("mDataNames"))
@@ -1204,8 +1206,10 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
     return(object)
 })
 
+
 #
 # == sensitvityMeasures
+
 
 #' @noRd
 .docs_CoreSet_get_sensitivityMeasures <- function(...) .parseToRoxygen(
@@ -1260,8 +1264,10 @@ setReplaceMethod('sensitivityMeasures',
     object
 })
 
+
 #
 # == sensitivityProfiles
+
 
 #' @noRd
 .docs_CoreSet_get_sensitivityProfiles <- function(...) .parseToRoxygen(
@@ -1474,6 +1480,7 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
 #
 # == sensitivitySlot
 
+
 #' @export
 setGeneric("sensitivitySlot", function(object, ...) standardGeneric("sensitivitySlot"))
 
@@ -1543,6 +1550,10 @@ setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_or_L
     object@sensitivity <- value
     object
 })
+
+
+##
+## == sensNumber
 
 
 #' @export
@@ -1626,7 +1637,7 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
 
     @md
     @aliases sensNumber<-
-    @export sensNumber<-
+    @exportMethod sensNumber<-
     ",
     ...
 )
@@ -1640,8 +1651,10 @@ setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"),
     object
 })
 
+
 ## ======================
 ## ---- perturbation slot
+
 
 ##
 ## == pertNumber 
