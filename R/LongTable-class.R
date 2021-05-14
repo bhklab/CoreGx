@@ -229,7 +229,6 @@ setMethod('show', signature(object='LongTable'), function(object) {
     assayNamesString <-
         if (length(assayNames(object)) > 6) {
             paste0(.collapse(head(assayNames, 3), ' ... ', .collapse(tail(assayNames, 3))))
-
         } else {
             .collapse(assayNames(object))
         }

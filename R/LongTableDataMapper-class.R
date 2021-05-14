@@ -94,6 +94,52 @@ LongTableDataMapper <- function(rawdata, rowDataMap=list(),
         colDataMap=colDataMap, assayMap=assayMap, metadataMap=metadataMap)
 }
 
+# ======================
+# DataMapper Show Method
+# ----------------------
+
+#' @describeIn LongTableDataMapper-class Show method for LongTableDataMapper. 
+#' Determines how the object is displayed in the console.
+#'
+#' @param object A `LongTableDataMapper` to display in the console. 
+#'
+#' @examples
+#' show(exampleDataMapper)
+#'
+#' @return `invisible` Prints to console.
+#'
+#' @importFrom crayon %+% yellow red green blue cyan magenta
+#' @exportMethod show
+setMethod('show', signature(object='LongTableDataMapper'), function(object) {
+    
+    ## -- class
+    cat(yellow$bold$italic('< LongTableDataMapper >', '\n'))
+
+    ## -- rawdata
+    cat(yellow$bold('rawdata:', '\n'))
+    rawdata_head <- .collapse(
+        capture.output(
+            print(rawdata(object), nrows=3, trunc.cols=TRUE, class=TRUE)), 
+        '\n    ')
+    cat('    ', red(rawdata_head), '\r')
+
+    ## -- rowDataMap
+    cat(yellow$bold('rowDataMap:', '\n'))
+    rows <- rowDataMap(object)
+    cat('\t', green('rowIDs'))
+
+    ## -- colDataMap
+    cat(yellow$bold('colDataMap:', '\n'))
+    cols <- colDataMap(object)
+
+    ## -- assayMap
+    cat(yellow$bold('assayMap:', '\n'))
+
+
+    ## -- metadataMap
+    cat(yellow$bold('metadataMap:', '\n'))
+
+})
 
 ## ===========================================
 ## LongTableDataMapper Accessors Documentation

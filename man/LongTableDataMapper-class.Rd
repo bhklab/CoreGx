@@ -4,10 +4,26 @@
 \name{LongTableDataMapper-class}
 \alias{LongTableDataMapper-class}
 \alias{.LongTableDataMapper}
+\alias{show,LongTableDataMapper-method}
 \title{A Class for Mapping Between Raw Data and an \code{LongTable} Object}
+\usage{
+\S4method{show}{LongTableDataMapper}(object)
+}
+\arguments{
+\item{object}{A \code{LongTableDataMapper} to display in the console.}
+}
+\value{
+\code{invisible} Prints to console.
+}
 \description{
 A Class for Mapping Between Raw Data and an \code{LongTable} Object
 }
+\section{Functions}{
+\itemize{
+\item \code{show,LongTableDataMapper-method}: Show method for LongTableDataMapper.
+Determines how the object is displayed in the console.
+}}
+
 \section{Slots}{
 
 \describe{
@@ -49,3 +65,7 @@ that will be processed and mapped to the slots of an \code{S4} object.
 }
 }
 
+\examples{
+show(exampleDataMapper)
+
+}

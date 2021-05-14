@@ -7,4 +7,5 @@
 #'
 #' @export
 #' @keywords internal
-setGeneric("drugSensitivitySig", function(object, ...) standardGeneric("drugSensitivitySig"))
+setGeneric("drugSensitivitySig", function(object, ...) 
+    standardGeneric("drugSensitivitySig"))
