@@ -1,11 +1,11 @@
 # Navigating this file:
 # - Slot section names start with ----
-# - Method section names start with --
+# - Method section names start with ==
 # 
 # As a result, you can use Ctrl + f to find the slot or method you are looking
 # for quickly, assuming you know its name.
 # 
-# For example Ctrl + f '-- molecularProfiles' would take you the molecularProfiles
+# For example Ctrl + f '== molecularProfiles' would take you the molecularProfiles
 # method, while Ctrl +f '---- molecularProfiles' would take you to the slot
 # section.
 
@@ -14,7 +14,13 @@ NULL
 
 .local_class <- 'CoreSet'
 .local_data <- 'clevelandSmall_cSet'
-data('clevelandSmall_cSet')
+
+#### CoreGx dynamic documentation
+####
+#### Warning: for dynamic docs to work, you must set
+#### Roxygen: list(markdown = TRUE, r6=FALSE)
+#### in the DESCRPTION file!
+
 
 # =======================================
 # Accessor Method Documentation Object
@@ -46,6 +52,7 @@ data('clevelandSmall_cSet')
 
 #' @name CoreSet-accessors
 #' @eval .docs_CoreSet_accessors(class_='CoreSet')
+#' @eval .parseToRoxygen("@examples data({data_})", data_=.local_data)
 NULL
 
 
@@ -56,29 +63,39 @@ NULL
 
 ## ====================
 ## ---- annotation slot
+## --------------------
 
 ##
-## -- annotation
+## == annotation
 
 #' @noRd
 .docs_CoreSet_get_annotation <- function(...) .parseToRoxygen(
     "
     @details 
+
     ## @annotation
+
     __annotation__: A `list` of {class_} annotations with items: 'name', 
     the name of the object; 'dateCreated', date the object was created; 'sessionInfo',
     the `sessionInfo()` when the object was created; 'call', the R constructor call;
     and 'version', the object version.
-    @aliases annotation
+
+    @examples
+
+    ## @annotation
+
+    annotation({data_})
+
     @md
     @importMethodsFrom BiocGenerics annotation
+    @aliases annotation
     @exportMethod annotation
     ",
     ...
 )
 
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_get_annotation(class_=.local_class)
+#' @eval .docs_CoreSet_get_annotation(class_=.local_class, data_=.local_data)
 setMethod('annotation', signature("CoreSet"), function(object) {
     object@annotation
 })
@@ -90,16 +107,20 @@ setMethod('annotation', signature("CoreSet"), function(object) {
     @details 
     __annotation<-__: Setter method for the annotation slot. Arguments:
     - value: a `list` of annotations to update the {class_} with.
-    @aliases annotation<-
+    
+    @examples
+    annotation({data_}) <- annotation({data_})
+    
     @md
     @importMethodsFrom BiocGenerics annotation<-
+    @aliases annotation<-
     @exportMethod annotation<-
     ",
     ...
 )
 
 #' @rdname CoreSet-accessors 
-#' @eval .docs_CoreSet_set_annotation(class_=.local_class)
+#' @eval .docs_CoreSet_set_annotation(class_=.local_class, data_=.local_data)
 setReplaceMethod("annotation", signature("CoreSet", "list"), 
     function(object, value) 
 {
@@ -108,7 +129,7 @@ setReplaceMethod("annotation", signature("CoreSet", "list"),
 })
 
 ##
-## -- dateCreated
+## == dateCreated
 
 #' @export
 setGeneric("dateCreated", function(object, ...) standardGeneric("dateCreated"))
@@ -171,7 +192,7 @@ setReplaceMethod('dateCreated', signature(object="CoreSet", value="character"),
 })
 
 ##
-## -- name
+## == name
 
 #' @export
 setGeneric("name", function(object, ...) standardGeneric("name"))
@@ -231,7 +252,7 @@ setReplaceMethod('name', signature("CoreSet"), function(object, value){
 
 
 ##
-## -- cellInfo
+## == cellInfo
 
 
 #' @export
@@ -291,7 +312,7 @@ setReplaceMethod("cellInfo", signature(object="CoreSet", value="data.frame"),
 
 
 ##
-## -- cellNames
+## == cellNames
 
 
 #' @export
@@ -356,7 +377,7 @@ setReplaceMethod("cellNames", signature(object="CoreSet",value="character"),
 
 
 ##
-## -- curation
+## == curation
 
 #' @export
 setGeneric("curation", function(object, ...) standardGeneric("curation"))
@@ -421,12 +442,12 @@ setReplaceMethod("curation", signature(object="CoreSet", value="list"),
 
 
 
-# ----------------------
+## ----------------------
 ## ---- datasetType slot
 
 
 #
-# -- datasetType
+# == datasetType
 
 #' @export
 setGeneric("datasetType", function(object, ...) standardGeneric("datasetType"))
@@ -499,7 +520,7 @@ setReplaceMethod("datasetType", signature(object="CoreSet", value='character'),
 
 
 ##
-## -- molecularProfiles
+## == molecularProfiles
 
 
 #' @export
@@ -610,8 +631,10 @@ setReplaceMethod("molecularProfiles",
   object
 })
 
+
 ##
-## -- featureInfo
+## == featureInfo
+
 
 #' @export
 setGeneric("featureInfo", function(object, mDataType, ...) 
@@ -699,7 +722,8 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
 
 
 ##
-## -- phenoInfo
+## == phenoInfo
+
 
 #' @export
 setGeneric("phenoInfo", function(object, mDataType, ...) 
@@ -786,7 +810,7 @@ setReplaceMethod("phenoInfo", signature(object="CoreSet",
 
 
 ##
-## -- fNames
+## == fNames
 
 #' @export
 setGeneric('fNames', function(object, mDataType, ...) standardGeneric('fNames'))
@@ -855,7 +879,7 @@ setReplaceMethod('fNames', signature(object='CoreSet', mDataType='character',
 })
 
 ##
-## -- mDataNames
+## == mDataNames
 
 #' @export
 setGeneric("mDataNames", function(object, ...) standardGeneric("mDataNames"))
@@ -914,7 +938,7 @@ setReplaceMethod("mDataNames", "CoreSet", function(object, value){
 })
 
 ##
-## -- molecularProfilesSlot
+## == molecularProfilesSlot
 
 
 #' @export
@@ -991,7 +1015,7 @@ setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_or_MAE"),
 
 
 #
-# -- sensitivityInfo
+# == sensitivityInfo
 
 #' @noRd
 .docs_CoreSet_get_sensitivityInfo <- function(...) .parseToRoxygen(
@@ -1181,7 +1205,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
 })
 
 #
-# -- sensitvityMeasures
+# == sensitvityMeasures
 
 #' @noRd
 .docs_CoreSet_get_sensitivityMeasures <- function(...) .parseToRoxygen(
@@ -1237,7 +1261,7 @@ setReplaceMethod('sensitivityMeasures',
 })
 
 #
-# -- sensitivityProfiles
+# == sensitivityProfiles
 
 #' @noRd
 .docs_CoreSet_get_sensitivityProfiles <- function(...) .parseToRoxygen(
@@ -1307,7 +1331,7 @@ setReplaceMethod("sensitivityProfiles",
 
 
 #
-# -- sensitivityRaw
+# == sensitivityRaw
 
 
 #' @noRd
@@ -1448,7 +1472,7 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
 
 
 #
-# -- sensitivitySlot
+# == sensitivitySlot
 
 #' @export
 setGeneric("sensitivitySlot", function(object, ...) standardGeneric("sensitivitySlot"))
@@ -1620,7 +1644,7 @@ setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"),
 ## ---- perturbation slot
 
 ##
-## -- pertNumber 
+## == pertNumber 
 
 
 #' @export

@@ -468,6 +468,14 @@ drug and cell line, and data type
 }
 }
 \examples{
+data(clevelandSmall_cSet)
+
+## @annotation
+
+annotation(clevelandSmall_cSet)
+
+annotation(clevelandSmall_cSet) <- annotation(clevelandSmall_cSet)
+
 dateCreated(clevelandSmall_cSet)
 
 ## dateCreated
