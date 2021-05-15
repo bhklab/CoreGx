@@ -125,10 +125,12 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
         })
 
     # Create the row and column keys for LongTable internal mappings
-    rowData[, c('rowKey') := .GRP, by=rowIDs]
-    setkeyv(rowData, 'rowKey')
-    colData[, c('colKey') := .GRP, by=colIDs]
-    setkeyv(colData, 'colKey')
+    # Currently skipping if row and col key already exist to prevent failed
+    #   join when calling this function from subset,LongTable-method
+    if (!('rowKey' %in% colnames(rowData)))
+        rowData[, c('rowKey') := .GRP, by=rowIDs]
+    if(!('colKey' %in% colnames(colData)))
+        colData[, c('colKey') := .GRP, by=colIDs]
 
     # initialize the internals object to store private metadata for a LongTable
     internals <- new.env()
@@ -320,11 +322,11 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #' @import data.table
 #' @export
 setMethod('rowIDs', signature(object='LongTable'),
-    function(object, data=FALSE, key=FALSE) {
-
+    function(object, data=FALSE, key=FALSE) 
+{
     cols <- getIntern(object, 'rowIDs')
     if (key) cols <- c(cols, 'rowKey')
-    if (data) rowData(object, key=TRUE)[, ..cols] else cols
+    if (data) rowData(object, key=key)[, ..cols] else cols
 })
 
 #' Get the id column names for the rowData slot of a LongTable
@@ -345,12 +347,12 @@ setMethod('rowIDs', signature(object='LongTable'),
 #' @import data.table
 #' @export
 setMethod('rowMeta', signature(object='LongTable'),
-    function(object, data=FALSE, key=FALSE){
-
+    function(object, data=FALSE, key=FALSE)
+{
     cols <- getIntern(object, 'rowMeta')
+    cols <- cols[!grepl('^\\.', cols)]
     if (key) cols <- c(cols, 'rowKey')
-    if (data) rowData(object, key=TRUE)[, ..cols] else cols
-
+    if (data) rowData(object, key=key)[, ..cols] else cols
 })
 
 #' Get the id column names for the colData slot of a LongTable
@@ -402,6 +404,7 @@ setMethod('colMeta', signature(object='LongTable'),
     function(object, data=FALSE, key=FALSE) {
 
     cols <- getIntern(object, 'colMeta')
+    cols <- cols[!grepl('^\\.', cols)]
     if (key) cols <- c(cols, 'colKey')
     if (data) colData(object, key=TRUE)[, ..cols] else cols
 })

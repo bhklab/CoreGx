@@ -52,13 +52,15 @@ This function is endomorphic, it always returns a LongTable object.
 }
 \examples{
 # Character
-merckLongTable['CAOV3', 'ABT-888']
+merckLongTable['ABT-888', 'CAOV3']
 # Numeric
 merckLongTable[1, c(1, 2)]
 # Logical
-merckLongTable[rowData(merckLongTable)$cell_line1 == 'A2058', ]
+merckLongTable[, colData(merckLongTable)$cellid == 'A2058']
 # Call
-merckLongTable[.(cell_line1 == 'A2058'),
-  .(drug1 == 'Dasatinib' & drug2 != '5-FU')]
+merckLongTable[
+     .(drug1id == 'Dasatinib' & drug2id != '5-FU'), 
+     .(cellid == 'A2058'),
+ ]
 
 }

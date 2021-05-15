@@ -9,14 +9,14 @@
 #'
 #' @examples
 #' # Character
-#' subset(merckLongTable, 'CAOV3', 'ABT-888')
+#' subset(merckLongTable, 'ABT-888', 'CAOV3')
 #' # Numeric
 #' subset(merckLongTable, 1, c(1, 2))
 #' # Logical
-#' subset(merckLongTable, rowData(merckLongTable)$cell_line1 == 'A2058')
+#' subset(merckLongTable, , colData(merckLongTable)$cellid == 'A2058')
 #' # Call
-#' subset(merckLongTable, cell_line1 == 'A2058',
-#'   drug1 == 'Dasatinib' & drug2 != '5-FU')
+#' subset(merckLongTable, drug1id == 'Dasatinib' & drug2id != '5-FU', 
+#'     cellid == 'A2058')
 #'
 #' @param x `LongTable` The object to subset.
 #' @param i `character`, `numeric`, `logical` or `expression`
@@ -135,7 +135,9 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
                      rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
                      assays=assayData, metadata=metadata(longTable))
 
-    return(if (reindex) reindex(newLongTable) else newLongTable)
+    newLongTable <- if (reindex) reindex(newLongTable) else newLongTable
+
+    return(newLongTable)
 })
 
 

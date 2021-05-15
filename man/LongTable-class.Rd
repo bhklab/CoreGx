@@ -310,20 +310,21 @@ colMeta(merckLongTable)
 
 assayCols(merckLongTable)
 
-merckLongTable[['viability']]
+merckLongTable[['sensitivity']]
 
 # Default annotations, just the key columns
-assay(merckLongTable, 'viability')
+assay(merckLongTable, 'sensitivity')
 assay(merckLongTable, 1)
 
 # With identifiers joined
-assay(merckLongTable, 'viability', withDimnames=TRUE)
+assay(merckLongTable, 'sensitivity', withDimnames=TRUE)
 
 # With identifiers and metadata
-assay(merckLongTable, 'viability_summary', withDimnames=TRUE, metadata=TRUE)
+assay(merckLongTable, 'profiles', withDimnames=TRUE, metadata=TRUE)
 
-assay(merckLongTable, 'viability') <- assay(merckLongTable, 'viability', withDimnames=TRUE)
-assay(merckLongTable, 'viability') <- merckLongTable$viability
+assay(merckLongTable, 'sensitivity') <- 
+     assay(merckLongTable, 'sensitivity', withDimnames=TRUE)
+assay(merckLongTable, 'sensitivity') <- merckLongTable$sensitivity
 
 assayNames(merckLongTable)
 

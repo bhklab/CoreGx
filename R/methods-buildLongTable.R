@@ -154,7 +154,7 @@ setMethod('buildLongTable', signature(from='character'),
 #'
 #' @examples
 #' assayList <- assays(merckLongTable, withDimnames=TRUE)
-#' rowDataCols <- list(rowIDs(merckLongTable))
+#' rowDataCols <- list(rowIDs(merckLongTable), rowMeta(merckLongTable))
 #' colDataCols <- list(colIDs(merckLongTable), colMeta(merckLongTable))
 #' assayCols <- assayCols(merckLongTable)
 #' longTable <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)

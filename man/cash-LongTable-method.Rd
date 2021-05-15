@@ -18,6 +18,6 @@
 Select an assay from a LongTable object
 }
 \examples{
-merckLongTable$viability
+merckLongTable$sensitivity
 
 }

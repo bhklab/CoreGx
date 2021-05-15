@@ -5,14 +5,14 @@
 #'
 #' @examples
 #' # Default annotations, just the key columns
-#' assay(merckLongTable, 'viability')
+#' assay(merckLongTable, 'sensitivity')
 #' assay(merckLongTable, 1)
 #'
 #' # With identifiers joined
-#' assay(merckLongTable, 'viability', withDimnames=TRUE)
+#' assay(merckLongTable, 'sensitivity', withDimnames=TRUE)
 #'
 #' # With identifiers and metadata
-#' assay(merckLongTable, 'viability_summary', withDimnames=TRUE, metadata=TRUE)
+#' assay(merckLongTable, 'profiles', withDimnames=TRUE, metadata=TRUE)
 #'
 #' @param x `LongTable` The `LongTable` object to get the assay from.
 #' @param i `integer` or `character` vector containing the index or name
@@ -89,8 +89,9 @@ setMethod('assay',
 #'    be fixed in future updates.
 #'
 #' @examples
-#' assay(merckLongTable, 'viability') <- assay(merckLongTable, 'viability', withDimnames=TRUE)
-#' assay(merckLongTable, 'viability') <- merckLongTable$viability
+#' assay(merckLongTable, 'sensitivity') <- 
+#'      assay(merckLongTable, 'sensitivity', withDimnames=TRUE)
+#' assay(merckLongTable, 'sensitivity') <- merckLongTable$sensitivity
 #'
 #' @param x A `LongTable` to update.
 #' @param i `integer` or `character` vector containing the index or name

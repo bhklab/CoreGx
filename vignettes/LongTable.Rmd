@@ -16,12 +16,10 @@ vignette: |
   %\VignetteEncoding{UTF-8}
 ---
 
-
 ```{r setup, include=FALSE}
 library(formatR)
 knitr::opts_chunk$set(echo = FALSE)
 ```
-
 
 ```{r dependencies, include=FALSE}
 library(CoreGx)
@@ -30,8 +28,8 @@ library(data.table)
 
 # Why Do We Need A New Class?
 
-The current implementation for the `@sensitivity` slot in a `PharmacoSet` has some
-limitations.
+The current implementation for the `@sensitivity` slot in a `PharmacoSet` has 
+some limitations.
 
 Firstly, it does not natively support dose-response experiments with
 multiple drugs and/or cancer cell lines. As a result we have not been
@@ -46,9 +44,10 @@ computations on such data can be completed in a timely manner.
 
 The current use case is supporting drug and cell-line combinations in
 `PharmacoGx`, but we wanted to create something flexible enough to fit
-other use cases. As such, the current class makes no mention of drugs or cell-lines,
-nor anything specifically related to Bioinformatics or Computation Biology. Rather, we tried to design a general purpose data structure which could support
-high dimensional data for any use case.
+other use cases. As such, the current class makes no mention of drugs or 
+cell-lines, nor anything specifically related to Bioinformatics or Computation 
+Biology. Rather, we tried to design a general purpose data structure which 
+could support high dimensional data for any use case.
 
 Our design takes the best aspects
 of the `SummarizedExperiment` and `MultiAssayExperiment` class and implements
@@ -65,7 +64,8 @@ knitr::include_graphics('LongTableClassDiagram.png')
 
 We have borrowed directly from the `SummarizedExperiment` class
 for the `rowData`, `colData`, `metadata` and `assays` slot names.
-We also implemented the `SummarizedExperiment` accessor generics for the `LongTable`.
+We also implemented the `SummarizedExperiment` accessor generics for the 
+`LongTable`.
 
 ## Object Structure and Cardinality
 
@@ -79,11 +79,13 @@ knitr::include_graphics('LongTableStructure.png')
 Unlike a `SummarizedExperiment`, there are three distinct
 classes of columns in `rowData` and `colData`.
 
-The first is the `rowKey` or `colKey`, these are implemented internally to keep mappings between each assay and the associated samples or drugs; these will not be returned by the accessors by default. The second is the `rowIDs` and `colIDs`, these hold all of the
-information necessary to uniquely identify a row or column and are used to
-generate the `rowKey` and `colKey`. Finally, there are the `rowMeta` and `colMeta`
-columns, which store any additional data about samples or drugs not required
-to uniquely identify a row in either table.
+The first is the `rowKey` or `colKey`, these are implemented internally to keep 
+mappings between each assay and the associated samples or drugs; these will not 
+be returned by the accessors by default. The second is the `rowIDs` and 
+`colIDs`, these hold all of the information necessary to uniquely identify a 
+row or column and are used to generate the `rowKey` and `colKey`. Finally, there
+are the `rowMeta` and `colMeta` columns, which store any additional data about 
+samples or drugs not required to uniquely identify a row in either table.
 
 Within the assays the `rowKey` and `colKey` are combined to form a primary key
 for each assay row. This is required because each assay is stored in 'long'
@@ -99,20 +101,53 @@ the assay table. Conversely for each row in the assay there may be zero or one k
 in `colData` or `rowData`. When combined, the `rowKey` and `colKey` for a given
 row in an assay become a composite key which maps that to
 
+# Constructing a LongTable
 
-# Building a LongTable
+To deal with the complex kinds of experimental designs which can be stored
+in a `LongTable`, we have engineered a new object to help document and validate
+the way data is mapped from your raw data, as a single large `data.frame`,
+to the various slots of a `LongTable` object.
 
-he current implementation of the `buildLongTable` function is able to assemble
-a `LongTable` object from two sources. The first is a single large table with
-all assays, row and column data contained within it. This is the structure of the Merck drug combination data that has been used to test the data structure thus far.
+## The DataMapper Class
+
+The `DataMapper` is an abstract class, which means in cannot be instatiated.
+Its purpose is to provide a description of the concept of a DataMapper and
+define a basic interface for any classes inheriting from it.
+
+This object is not important for general users, but may be useful for other
+developers who want to map from some rawdata to some `S4` class. In this case,
+any derived data mapper should inherit from the `DataMapper` abstract class. 
+Only slot is defined by default, a `list` or `List` in the `@rawdata` slot. An
+accessor method, `rawdata(DataMapper)`, is defined to assign and retrieve
+the raw data from your mapper object.
+
+## The LongTableDataMapper Class
+
+The `LongTableDataMapper` class is the first concrete sub-class of a `DataMapper`.
+It is the object which defines how to go a single `data.frame` or `data.table` 
+of raw experimental data, to a properly formatted and valid `LongTable` object. 
+This is accomplished by defining various maps, which let the the user decide
+which columns from `rawdata` should go into which slots of the object.
+
+Additionally, a helper method has been included, `guessMapping`, which will
+try to determine which dimensions of a `LongTable`s `rawdata` should be assigned
+to which slots, and therefore which maps.
+
+To get started making a `LongTable` lets have a look at some rawdata which is
+a subset of the data from Oneil et al, 2016. The full set of rawdata is
+available for exploration and download from
+(SynergxDB.ca)[https://www.synergxdb.ca/], a free and open source web-app and 
+database of drug combination sensitivity experiments which we created and 
+released (Seo **et al.**, 2019).
+
+The data was generated as part of the commercial activities of the 
+pharmaceutical company Merck, and is thus named according.
 
 ```{r head_data, echo=TRUE}
-
 filePath <- '../data/merckLongTable.csv'
 merckDT <- fread(filePath, na.strings=c('NULL'))
 colnames(merckDT)
 ```
-
 
 ```{r sample_data, fig.width=80, echo=TRUE}
 knitr::kable(head(merckDT)[, 1:5])
@@ -121,57 +156,88 @@ knitr::kable(head(merckDT)[, 1:5])
 ```{r sample_data2, fig.width=80, echo=TRUE}
 knitr::kable(head(merckDT)[, 5:ncol(merckDT)])
 ```
-We can see that all the data related to the treatment response experiment is contained within this table.
+We can see that all the data related to the treatment response experiment is 
+contained within this table.
 
-## Single Assays Table
+To get an idea of where in a `LongTable` this data should go, lets come up
+with some guesses for mappings.
 
-To build a `LongTable` object from this file:
+```{r guess_mapping}
+# Our guesses of how we may identify rows, columns and assays
+groups <- list(
+  justDrugs=c('drug1id', 'drug2id'),
+  drugsAndDoses=c('drug1id', 'drug2id', 'drug1dose', 'drug2dose'),
+  justCells=c('cellid'),
+  cellsAndBatches=c('cellid', 'batchid'),
+  assays1=c('drug1id', 'drug2id', 'cellid'),
+  assays2=c('drug1id', 'drug2id', 'drug1dose', 'drug2dose', 'cellid', 'batchid')
+)
 
-```{r build_from_single_table_file, echo=TRUE}
-rowDataCols <- list(
-    c(cell_line1="cell_line", BatchID="BatchID"))
-colDataCols <- list(
-    c(drug1='drugA_name', drug2='drugB_name',
-     drug1dose='drugA Conc (uM)', drug2dose='drugB Conc (uM)'),
-    c(comboName='combination_name'))
-assayCols <- list(viability=paste0('viability', seq_len(4)),
-                  viability_summary=c('mu/muMax', 'X/X0'))
-longTable <- buildLongTable(from=filePath, rowDataCols,
-                            colDataCols, assayCols)
+# Decide if we want to subset out mapped columns after each group
+subsets <- c(FALSE, TRUE, FALSE, TRUE, FALSE, TRUE)
+
+# First we put out data in the `LongTableDataMapper`
+LTdataMapper <- LongTableDataMapper(rawdata=merckDT)
+
+# Then we can test our hypothesis, subset=FALSE means we don't remove mapped 
+#   columns after each group is mapped
+guess <- guessMapping(LTdataMapper, groups=groups, subset=subsets)
+guess
 ```
 
+Since we want out `LongTable` to have drugs as rows and samples as columns,
+we see that both `justDrug` and `drugsAndDoses` yield the same result. So we
+do not yet prefer one after the other. Looking at `justCells` and 
+`cellsAndBatches`, we see one column maps to both of them and therefore still
+have no preference. For `assay1` however, we see that no columns mapped, while
+`assay2` maps many of the rows.
 
-```{r show_method}
-longTable
-```
-This function will also work if directly passed a `data.table` or `data.frame`
-object:
+Since assays will be subset based on the `rowKey` and `colKey`, we know that
+the rowIDs must be `drugsAndDose` and the the colIDs must be `cellsAndBatches`.
+Therefore, to uniquely identify an observation in any given assay we need
+all of these columns. We can use this information to assign maps to our 
+`LongTableDataMapper`.
 
-```{r from_single_table, eche=TRUE}
-longTable1 <- buildLongTable(from=merckDT, rowDataCols, colDataCols, assayCols)
-
-paste0('All equal? ', all.equal(longTable, longTable1))
-```
-
-## Multiple Assay Tables
-
-The second option for building a `LongTable` is to pass it a list of different
-assays with a shared set of row and column identifiers. We haven't had a chance to testing this functionality with real data yet, but do have a toy example.
-
-
-```{r from_list_of_tables, echo=TRUE}
-assayList <- assays(longTable, withDimnames=TRUE, metadata=TRUE, key=FALSE)
-assayList$new_viability <- assayList$viability  # Add a fake additional assay
-assayCols$new_viability <-  assayCols$viability  # Add column names for fake assay
-longTable2 <- buildLongTable(from=assayList, lapply(rowDataCols, names), lapply(colDataCols, names), assayCols)
+```{r mappings_to_datamapper}
+rowDataMap(LTdataMapper) <- guess$drugsAndDose
+colDataMap(LTdataMapper) <- guess$cellsAndBatches
 ```
 
-```{r show_method2}
-longTable2
+Looking at our mapped columns for `assay2`, we must decide if we want these
+to go into more than one assay. If we do, we should name each item of our
+`assayMap` for the `LongTableDataMapper` and specify the it in a list of 
+`character` vectors, one for each assay. Since viability is the raw measurement
+and the final two columns are summaries, we will assign them to two assays:
+sensitivity and profiles.
+
+```{r split_assays}
+assays <- list(
+  sensitivity=guess$assays2[[2]][seq_len(4)],
+  profiles=guess$assays2[[2]][c(5, 6)]
+)
+assays
 ```
-We can see that a new assay has been added to the `LongTable` object when passed
-a list of assay tables containing the required row and column IDs. Additionally, any row or
-column IDs not already in rowData or colData will be appended to these slots automatically!
+
+```{r assign_assaymap}
+assayMap(LTdataMapper) <- assays
+```
+
+## metaConstruct Method
+
+The metaConstruct method accepts a `DataMapper` object as its only argument,
+and uses the information in that `DataMapper` to preprocess all `rawdata` and
+map them to the appriate slots of an `S4` object. In our case, we are mapping
+from the merckDT to a `LongTable`.
+
+At minimum, a `LongTableDataMapper` must specify the `rowDataMap`, `colDataMap`,
+and `assayMap`. Additional maps are available, see `?LongTableDataMapper-class`
+and `?LongTableDataMapper-accessors` for more details.
+
+After configuration, creating the object is very straight forward.
+
+```{r }
+longTable <- metaConstruct(LTdataMapper)
+```
 
 # LongTable Object
 
@@ -179,9 +245,9 @@ As mentioned previously, a `LongTable` has both list and table like behaviours.
 For table like operations, a given `LongTable` can be thought of as a `rowKey`
 by `colKey` rectangular object.
 
-To support `data.frame` like sub-setting for this
-object, the constructor makes pseudo row and column names, which are the ID columns
-for each row of `rowData` or `colData` pasted together with a ':'.
+To support `data.frame` like sub-setting for this object, the constructor makes 
+pseudo row and column names, which are the ID columns for each row of 
+`rowData` or `colData` pasted together with a ':'.
 
 ## Row and Column Names
 
@@ -189,7 +255,7 @@ for each row of `rowData` or `colData` pasted together with a ':'.
 head(rownames(longTable))
 ```
 
-We see that the rownames for the Merck `LongTable` are the cell line name
+We see that the rownames for the Merck `LongTable` are the cell-line name
 pasted to the batch id.
 
 ```{r colnames, echo=TRUE}
@@ -223,13 +289,13 @@ head(colData(longTable), 3)
 For example, if we want to get all instance where '5-FU' is the drug:
 
 ```{r simple_regex, echo=TRUE}
-longTable[, '5-FU']
+longTable['5-FU', ]
 ```
 
 This has matched all colnames where 5-FU was in either drug1 or drug2. If we only want to match drug1, we have several options:
 
 ```{r column_specific_regex, echo=TRUE}
-all.equal(longTable[, '5-FU:*:*:*'], longTable[, '^5-FU'])
+all.equal(longTable['5-FU:*:*:*', ], longTable['^5-FU',  ])
 ```
 
 ## `data.table` Subsetting
@@ -243,23 +309,28 @@ For example if I want to subset to rows where the cell line is VCAP and columns
 where drug1 is Temozolomide and drug2 is either Lapatinib or Bortezomib:
 
 ```{r , echo=TRUE}
-longTable[.(cell_line1 == 'CAOV3'),  # row query
-          .(drug1 == 'Temozolomide' & drug2 %in% c('Lapatinib', 'Bortezomib'))]  # column query
+longTable[
+    # row query
+    .(drug1id == 'Temozolomide' & drug2id %in% c('Lapatinib', 'Bortezomib')), 
+    .(cellid == 'CAOV3') # column query
+]
 ```
 
 We can also invert matches or subset on other columns in `rowData` or `colData`:
 
 ```{r echo=TRUE}
 subLongTable <-
-  longTable[.(BatchID != 2),
-            .(drug1 == 'Temozolomide' & drug2 != 'Lapatinib')]
+  longTable[.(drug1id == 'Temozolomide' & drug2id != 'Lapatinib'),
+            .(batchid != 2)]
 ```
 
 To show that it works as expected:
 
 ```{r echo=TRUE}
-print(paste0('BatchID: ', paste0(unique(rowData(subLongTable)$BatchID), collapse=', ')))
-print(paste0('drug2: ', paste0(unique(colData(subLongTable)$drug2), collapse=', ')))
+print(paste0('drug2id: ', paste0(unique(rowData(subLongTable)$drug2id), 
+    collapse=', ')))
+print(paste0('batchid: ', paste0(unique(colData(subLongTable)$batchid), 
+    collapse=', ')))
 ```
 
 # Accessor Methods
@@ -316,14 +387,25 @@ Using these names we can access specific assays within a `LongTable`.
 ## assay
 
 ```{r echo=TRUE}
-colnames(assay(longTable, 'viability'))
-assay(longTable, 'viability')
+colnames(assay(longTable, 'sensitivity'))
+assay(longTable, 'sensitivity')
 ```
 
 ```{r echo=TRUE}
-colnames(assay(longTable, 'viability', withDimnames=TRUE))
-assay(longTable, 'viability', withDimnames=TRUE)
+colnames(assay(longTable, 'sensitivity', withDimnames=TRUE))
+assay(longTable, 'sensitivity', withDimnames=TRUE)
 ```
 
+# References
 
+1. O'Neil J, Benita Y, Feldman I, Chenard M, Roberts B, Liu Y, Li J, Kral A, 
+Lejnine S, Loboda A, Arthur W, Cristescu R, Haines BB, Winter C, Zhang T, 
+Bloecher A, Shumway SD. An Unbiased Oncology Compound Screen to Identify Novel 
+Combination Strategies. Mol Cancer Ther. 2016 Jun;15(6):1155-62. 
+doi: 10.1158/1535-7163.MCT-15-0843. Epub 2016 Mar 16. PMID: 26983881.
 
+2. Heewon Seo, Denis Tkachuk, Chantal Ho, Anthony Mammoliti, Aria Rezaie, 
+Seyed Ali Madani Tonekaboni, Benjamin Haibe-Kains, SYNERGxDB: an integrative 
+pharmacogenomic portal to identify synergistic drug combinations for precision 
+oncology, Nucleic Acids Research, Volume 48, Issue W1, 02 July 2020, Pages 
+W494–W501, https://doi.org/10.1093/nar/gkaa421

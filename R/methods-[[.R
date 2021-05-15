@@ -9,7 +9,7 @@
 #'   and aggregate operations easiers.
 #'
 #' @examples
-#' merckLongTable[['viability']]
+#' merckLongTable[['sensitivity']]
 #'
 #' @param x `LongTable` object to retrieve assays from
 #' @param i `character` name or `integer` index of the desired assay.

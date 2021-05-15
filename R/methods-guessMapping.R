@@ -86,9 +86,9 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
         unique(c(unlist(groups), unlist(lapply(mappings, colnames)))))
     if (!data) mappings <- lapply(mappings, colnames)
     mappings <- mapply(list, groups, mappings, SIMPLIFY=FALSE)
-    mappings <- lapply(mappings, `names<-`, value=c('id_columns', 'meta_columns'))
+    mappings <- lapply(mappings, `names<-`, value=c('id_columns', 'mapped_columns'))
 
-    if (length(unmapped) > 0) mappings[['unmapped']] <- unmapped
+    mappings[['unmapped']] <- unmapped
 
     return(mappings)
 })

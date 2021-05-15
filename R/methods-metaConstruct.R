@@ -95,7 +95,7 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         assayDtL[[i]] <- assayDT
     }
 
-    CoreGx:::LongTable(
+    CoreGx::LongTable(
         rowData=rowDataDT, rowIDs=rowIDs,
         colData=colDataDT, colIDs=colIDs,
         assays=assayDtL,
