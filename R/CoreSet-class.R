@@ -241,28 +241,21 @@ setMethod("show", signature=signature(object="CoreSet"),
 #' @export
 updateCellId <- function(object, new.ids=vector("character")) {
     
-    cell_names <- cellNames(object)
+    if (length(new.ids)!=nrow(cellInfo(object))){
+      stop("Wrong number of cell identifiers")
+    }
 
-    if (length(new.ids) != length(cell_names)) {
-        .error("Wrong number of cell identifiers")
+    if(object@datasetType=="sensitivity"|object@datasetType=="both"){
+      myx <- match(sensitivityInfo(object)[,"cellid"],rownames(cellInfo(object)))
+      sensitivityInfo(object)[,"cellid"] <- new.ids[myx]
     }
     
-    ## -- update the sensitivityInfo
-    if (datasetType(object) %in% c('sensitivity', 'both')) {
-        hasCellNames <- sensitivityInfo(object)[, 'cellid'] %in% cell_names
-        sensitivityInfo(object)[, 'cellid'] <- new.ids[hasCellNames]
-    }
-
-    ## -- Update the molecularProfiles slot
-    molecular_data <- mDataNames(object)
-    for (mdata_type in molecular_data) {
-        whichCellNames <- 
-            which(colData(molecularProfilesSlot(object)[[mdata_type]])$cellid %in% 
-                cell_names)
-        colData(molecularProfilesSlot(object)[[mdata_type]])$cellid <- 
-            new.ids[whichCellNames]
-    }
-
+    object@molecularProfiles <- lapply(object@molecularProfiles, function(SE) {
+        myx <- match(SummarizedExperiment::colData(SE)[["cellid"]], 
+            rownames(cellInfo(object)))
+        SummarizedExperiment::colData(SE)[["cellid"]]  <- new.ids[myx]
+        return(SE)
+    })
 
     ## -- ???
     if (any(duplicated(new.ids))) {
@@ -398,7 +391,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
   cellids <- cellids[grep("///", drugids, invert=TRUE)]
   drugids <- drugids[grep("///", drugids, invert=TRUE)]
   
-  
+
   tt <- table(cellids, drugids)
   sensitivity.info[rownames(tt), colnames(tt)] <- tt
   
