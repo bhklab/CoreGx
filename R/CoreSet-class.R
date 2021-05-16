@@ -190,11 +190,14 @@ CoreSet <-  function(name,
   return(object)
 }
 
-#'
-#'
-#'
-#'
-#'
+#' 
+#' 
+#' 
+#' 
+#' 
+CoreSet2 <- function() {
+
+}
 
 #' Show a CoreSet
 #' 
@@ -234,110 +237,107 @@ setMethod("show", signature=signature(object="CoreSet"),
 #' @return \code{CoreSet} The modified CoreSet object
 #'
 #' @keywords internal
+#' @importFrom S4Vectors endoapply
 #' @export
-updateCellId <- function(object, new.ids = vector("character")){
-  
-  if (length(new.ids)!=nrow(cellInfo(object))){
-    stop("Wrong number of cell identifiers")
-  }
-
-  if(object@datasetType=="sensitivity"|object@datasetType=="both"){
-    myx <- match(sensitivityInfo(object)[,"cellid"],rownames(cellInfo(object)))
-    sensitivityInfo(object)[,"cellid"] <- new.ids[myx]
-  }
-  
-  
-  object@molecularProfiles <- lapply(object@molecularProfiles, function(SE){
+updateCellId <- function(object, new.ids=vector("character")) {
     
-    myx <- match(SummarizedExperiment::colData(SE)[["cellid"]], rownames(cellInfo(object)))
-    SummarizedExperiment::colData(SE)[["cellid"]]  <- new.ids[myx]
-    return(SE)
-  })
+    cell_names <- cellNames(object)
 
-  if(any(duplicated(new.ids))){
-    warning("Duplicated ids passed to updateCellId. Merging old ids into the same identifier")
+    if (length(new.ids) != length(cell_names)) {
+        .error("Wrong number of cell identifiers")
+    }
     
-    if(ncol(sensNumber(object))>0) {
-      sensMatch <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
+    ## -- update the sensitivityInfo
+    if (datasetType(object) %in% c('sensitivity', 'both')) {
+        hasCellNames <- sensitivityInfo(object)[, 'cellid'] %in% cell_names
+        sensitivityInfo(object)[, 'cellid'] <- new.ids[hasCellNames]
     }
-    if(dim(pertNumber(object))[[2]]>0) {
-      pertMatch <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
+
+    ## -- Update the molecularProfiles slot
+    molecular_data <- mDataNames(object)
+    for (mdata_type in molecular_data) {
+        whichCellNames <- 
+            which(colData(molecularProfilesSlot(object)[[mdata_type]])$cellid %in% 
+                cell_names)
+        colData(molecularProfilesSlot(object)[[mdata_type]])$cellid <- 
+            new.ids[whichCellNames]
     }
-    curMatch <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
 
-    duplId <- unique(new.ids[duplicated(new.ids)])
-    for(id in duplId){
 
-      if (ncol(sensNumber(object))>0){
-        myx <- which(new.ids[sensMatch] == id)
-        sensNumber(object)[myx[1],] <- apply(sensNumber(object)[myx,], 2, sum)
-        sensNumber(object) <- sensNumber(object)[-myx[-1],]
-        # sensMatch <- sensMatch[-myx[-1]]
-      }
-      if (dim(pertNumber(object))[[1]]>0){
-        myx <- which(new.ids[pertMatch] == id)
-        pertNumber(object)[myx[1],,] <- apply(pertNumber(object)[myx,,], c(1,3), sum)
-        pertNumber(object) <- pertNumber(object)[-myx[-1],,]
-        # pertMatch <- pertMatch[-myx[-1]]
-      }
-
-      myx <- which(new.ids[curMatch] == id)
-      object@curation$cell[myx[1],] <- apply(object@curation$cell[myx,], 2, paste, collapse="///")
-      object@curation$cell <- object@curation$cell[-myx[-1],]
-      object@curation$tissue[myx[1],] <- apply(object@curation$tissue[myx,], 2, paste, collapse="///")
-      object@curation$tissue <- object@curation$tissue[-myx[-1],]
-      # curMatch <- curMatch[-myx[-1]]
-
-      myx <- which(new.ids == id)
-      cellInfo(object)[myx[1],] <- apply(cellInfo(object)[myx,], 2, paste, collapse="///")
-      cellInfo(object) <- cellInfo(object)[-myx[-1],]
-      new.ids <- new.ids[-myx[-1]]
-      if(ncol(sensNumber(object))>0){
+    ## -- ???
+    if (any(duplicated(new.ids))) {
+        warning("Duplicated ids passed to updateCellId. Merging old ids into the same identifier")
+    
+      if(ncol(sensNumber(object))>0) {
         sensMatch <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
       }
-      if(dim(pertNumber(object))[[1]]>0){
+      if(dim(pertNumber(object))[[2]]>0) {
         pertMatch <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
       }
+      curMatch <- match(rownames(object@curation$cell),rownames(cellInfo(object)))  
+      duplId <- unique(new.ids[duplicated(new.ids)])
+      for(id in duplId){  
+        if (ncol(sensNumber(object))>0){
+          myx <- which(new.ids[sensMatch] == id)
+          sensNumber(object)[myx[1],] <- apply(sensNumber(object)[myx,], 2, sum)
+          sensNumber(object) <- sensNumber(object)[-myx[-1],]
+          # sensMatch <- sensMatch[-myx[-1]]
+        }
+        if (dim(pertNumber(object))[[1]]>0){
+          myx <- which(new.ids[pertMatch] == id)
+          pertNumber(object)[myx[1],,] <- apply(pertNumber(object)[myx,,], c(1,3), sum)
+          pertNumber(object) <- pertNumber(object)[-myx[-1],,]
+          # pertMatch <- pertMatch[-myx[-1]]
+        } 
+        myx <- which(new.ids[curMatch] == id)
+        object@curation$cell[myx[1],] <- apply(object@curation$cell[myx,], 2, paste, collapse="///")
+        object@curation$cell <- object@curation$cell[-myx[-1],]
+        object@curation$tissue[myx[1],] <- apply(object@curation$tissue[myx,], 2, paste, collapse="///")
+        object@curation$tissue <- object@curation$tissue[-myx[-1],]
+        # curMatch <- curMatch[-myx[-1]]  
+        myx <- which(new.ids == id)
+        cellInfo(object)[myx[1],] <- apply(cellInfo(object)[myx,], 2, paste, collapse="///")
+        cellInfo(object) <- cellInfo(object)[-myx[-1],]
+        new.ids <- new.ids[-myx[-1]]
+        if(ncol(sensNumber(object))>0){
+          sensMatch <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
+        }
+        if(dim(pertNumber(object))[[1]]>0){
+          pertMatch <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
+        }
+        curMatch <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
+      }
+    } else {
+      if (dim(pertNumber(object))[[1]]>0){
+        pertMatch <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
+      }
+      if (ncol(sensNumber(object))>0){
+        sensMatch <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
+      }
       curMatch <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
-    }
-  } else {
+    } 
     if (dim(pertNumber(object))[[1]]>0){
-      pertMatch <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
+      dimnames(pertNumber(object))[[1]] <- new.ids[pertMatch]
     }
     if (ncol(sensNumber(object))>0){
-      sensMatch <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
+      rownames(sensNumber(object)) <- new.ids[sensMatch]
     }
-    curMatch <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
-  }
-
-  if (dim(pertNumber(object))[[1]]>0){
-    dimnames(pertNumber(object))[[1]] <- new.ids[pertMatch]
-  }
-  if (ncol(sensNumber(object))>0){
-    rownames(sensNumber(object)) <- new.ids[sensMatch]
-  }
-  rownames(object@curation$cell) <- new.ids[curMatch]
-  rownames(object@curation$tissue) <- new.ids[curMatch]
-  rownames(cellInfo(object)) <- new.ids
-
-
-
-
-
-  # myx <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
-  # rownames(object@curation$cell) <- new.ids[myx]
-  # rownames(object@curation$tissue) <- new.ids[myx]
-  # if (dim(pertNumber(object))[[1]]>0){
-  #   myx <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
-  #   dimnames(pertNumber(object))[[1]] <- new.ids[myx]
-  # }
-  # if (nrow(sensNumber(object))>0){
-  #   myx <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
-  #   rownames(sensNumber(object)) <- new.ids[myx]
-  # }
-  # rownames(cellInfo(object)) <- new.ids
-  return(object)
-
+    rownames(object@curation$cell) <- new.ids[curMatch]
+    rownames(object@curation$tissue) <- new.ids[curMatch]
+    rownames(cellInfo(object)) <- new.ids   
+    # myx <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
+    # rownames(object@curation$cell) <- new.ids[myx]
+    # rownames(object@curation$tissue) <- new.ids[myx]
+    # if (dim(pertNumber(object))[[1]]>0){
+    #   myx <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
+    #   dimnames(pertNumber(object))[[1]] <- new.ids[myx]
+    # }
+    # if (nrow(sensNumber(object))>0){
+    #   myx <- match(rownames(sensNumber(object)), rownames(cellInfo(object)))
+    #   rownames(sensNumber(object)) <- new.ids[myx]
+    # }
+    # rownames(cellInfo(object)) <- new.ids
+    return(object)  
 }
 
 # updateFeatureNames <- function(object, new.ids = vector("character")){
@@ -393,8 +393,8 @@ updateCellId <- function(object, new.ids = vector("character")){
   celln <- rownames(object@cell)
   
   sensitivity.info <- matrix(0, nrow=length(celln), ncol=length(drugn), dimnames=list(celln, drugn))
-  drugids <- object@sensitivity$info[ , "drugid"]
-  cellids <- object@sensitivity$info[ , "cellid"]
+  drugids <- sensitivityInfo(object)[, "drugid"]
+  cellids <- sensitivityInfo(object)[, "cellid"]
   cellids <- cellids[grep("///", drugids, invert=TRUE)]
   drugids <- drugids[grep("///", drugids, invert=TRUE)]
   

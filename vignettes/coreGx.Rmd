@@ -155,7 +155,7 @@ existing methods as follows:
 
 ```{r defining_methods_for_a_new_class}
 clevelandSmall_dSet <- DemoSet(clevelandSmall_cSet)
-class(clevelandSmall_dSet@molecularProfiles$rna)
+class(clevelandSmall_dSet@molecularProfiles[['rna']])
 
 expressionSets <- lapply(molecularProfilesSlot(clevelandSmall_dSet), as, 'ExpressionSet')
 molecularProfilesSlot(clevelandSmall_dSet) <- expressionSets
