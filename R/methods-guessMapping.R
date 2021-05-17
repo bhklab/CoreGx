@@ -64,17 +64,22 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     
     if (length(subset) == 1) subset <- rep(subset, length(groups))
 
+    # Get the id columns to prevent subsetting them out
+    idCols <- unique(unlist(groups))
+
     # Map unique columns in the data to the metadata slot
     metadataColumns <- names(which(vapply(mapData, FUN=.length_unique, 
         numeric(1)) == 1))
+    metadataColumns <- setdiff(metadataColumns, idCols)
     metadata <- mapData[, .SD, .SDcols=metadataColumns]
-    DT <- if (any(subset)) mapData[, .SD, .SDcols=!metadataColumns] else mapData
+    DT <- mapData[, .SD, .SDcols=!metadataColumns]
 
     # Check the mappings for each group in groups
     for (i in seq_along(groups)) {
         message(funContext, paste0('Mapping for group ', names(groups)[i], 
             ': ', paste0(groups[[i]], collapse=', ')))
         mappedCols <- checkColumnCardinality(DT, groups[[i]])
+        mappedCols <- setdiff(mappedCols, idCols)
         assign(names(groups)[i], DT[, .SD, .SDcols=mappedCols])
         if (subset[i]) DT <- DT[, .SD, .SDcols=!mappedCols]
     }

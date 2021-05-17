@@ -241,13 +241,20 @@ setMethod("show", signature=signature(object="CoreSet"),
 #' @export
 updateCellId <- function(object, new.ids=vector("character")) {
     
-    if (length(new.ids)!=nrow(cellInfo(object))){
+    if (length(new.ids) != nrow(cellInfo(object))){
       stop("Wrong number of cell identifiers")
     }
 
-    if(object@datasetType=="sensitivity"|object@datasetType=="both"){
-      myx <- match(sensitivityInfo(object)[,"cellid"],rownames(cellInfo(object)))
-      sensitivityInfo(object)[,"cellid"] <- new.ids[myx]
+    if(object@datasetType=="sensitivity"|object@datasetType=="both") {
+      myx <- match(sensitivityInfo(object)[, "cellid"], rownames(cellInfo(object)))
+      if (is(sensitivitySlot(object), 'LongTable')) {
+        LT <- sensitivitySlot(object)
+        whichCellIds <- which(colData(LT)$cellid %in% cellNames(object))
+        colData(LT)$cellid <- new.ids[whichCellIds]
+        sensitivitySlot(object) <- LT
+      } else {
+        sensitivityInfo(object)[,"cellid"] <- new.ids[myx]
+      }
     }
     
     object@molecularProfiles <- lapply(object@molecularProfiles, function(SE) {

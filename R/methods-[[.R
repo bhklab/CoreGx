@@ -25,21 +25,23 @@
 #' @import data.table
 #' @export
 setMethod('[[', signature('LongTable'),
-    function(x, i, withDimnames=TRUE, metadata=withDimnames, keys=!withDimnames) {
+    function(x, i, withDimnames=TRUE, metadata=withDimnames, keys=!withDimnames) 
+{
+    funContext <- .S4MethodContext('[[', class(x))
 
     if (metadata && !withDimnames) {
-        warning(.warnMsg('\nUnable to return metadata without dimnames, proceeding',
-            ' as if withDimnames=TRUE.'))
+        .warning('\nUnable to return metadata without dimnames, proceeding',
+            ' as if withDimnames=TRUE.')
         withDimnames <- TRUE
     }
 
     if (length(i) > 1)
-        stop(.errorMsg('\nPlease only select one assay! To subset on multiple',
-            'assays please see ?subset'))
+        .error('\nPlease only select one assay! To subset on multiple',
+            'assays please see ?subset')
 
     if (keys) {
-        warning(.warnMsg('\nIgnoring withDimnames and metadata arguments when',
-            ' keys=TRUE.'))
+        .warning('\nIgnoring withDimnames and metadata arguments when',
+            ' keys=TRUE.')
         return(assay(x, i))
     } else {
         if (withDimnames || metadata)
@@ -47,4 +49,25 @@ setMethod('[[', signature('LongTable'),
         else
             return(assay(x, i)[, -c('rowKey', 'colKey')])
     }
+})
+
+#' `[[<-` Method for LongTable Class
+#'
+#' Just a wrapper around assay<- for convenience. See 
+#' `?'assay<-,LongTable,character-method'.`
+#'
+#' @param x A `LongTable` to update.
+#' @param i The name of the assay to update, must be in `assayNames(object)`.
+#' @param value A `data.frame`
+#'
+#' @examples
+#' merckLongTable[['sensitivity']] <- merckLongTable[['sensitivity']]
+#'
+#' @return A `LongTable` object with the assay `i` updated using `value`.
+#'
+#' @export
+setReplaceMethod('[[', signature(x='LongTable'), 
+    function(x, i, value) 
+{
+    assay(x, i) <- value
 })

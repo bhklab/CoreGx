@@ -21,7 +21,6 @@
 #' @export
 setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct'))
 
-
 #' @rdname metaConstruct
 #' @title metaConstruct
 #' 
@@ -57,9 +56,8 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
     if (any(renameRowCols)) {
         setnames(rowDataDT, rowIDs[renameRowCols], names(rowIDs)[renameRowCols])
         setnames(DT, rowIDs[renameRowCols], names(rowIDs)[renameRowCols])
-        rowIDs <- c(rowIDs[!renameRowCols], names(rowIDs)[renameRowCols])
+        rowIDs[renameRowCols] <- names(rowIDs)[renameRowCols]
     }
-
 
     # -- preprocess the col identifiers and metadata
     colDataDT <- unique(DT[, unlist(colDataMap(mapper)), with=FALSE])
@@ -69,7 +67,7 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
     if (any(renameColCols)) {
         setnames(colDataDT, colIDs[renameColCols], names(colIDs)[renameColCols])
         setnames(DT, colIDs[renameColCols], names(colIDs)[renameColCols])
-        colIDs <- c(colIDs[!renameColCols], names(colIDs)[renameColCols])
+        colIDs[renameColCols] <- names(colIDs)[renameColCols]
     }
 
     # -- extract LongTable level metadata
@@ -91,7 +89,7 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         notMissingNames <- names(assayColumns[[i]]) != ""
         if (any(notMissingNames))
             setnames(assayDT, old=assayColumns[[i]][notMissingNames], 
-                new=names(assayColumns[[i]])[notMissingNames])
+                new=names(assayColumns[[i]])[notMissingNames], skip_absent=TRUE)
         assayDtL[[i]] <- assayDT
     }
 

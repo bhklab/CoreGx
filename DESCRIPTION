@@ -1,7 +1,7 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
-Version: 1.3.7
+Version: 1.3.8
 Date: 2021-05-12
 Authors@R: c(
     person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca", role = c("aut")),
@@ -99,3 +99,4 @@ Collate:
     'utilities.R'
     'utils-iteration.R'
     'utils-messages.R'
+    'utils-updateS4.R'

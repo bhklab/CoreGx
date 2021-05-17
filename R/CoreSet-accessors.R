@@ -1296,6 +1296,8 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
             .error(funContext, 'The LongTable onject in the sensivitiy slot
                 is not formatted correctly: it must contain and assay
                 named "profiles"!')
+        else
+            return(sensitivitySlot(object)$profiles)
     } else {
         return(object@sensitivity$profiles)
     }
@@ -1326,10 +1328,8 @@ setReplaceMethod("sensitivityProfiles",
     function(object, value) 
 {
     if (is(sensitivitySlot(object), 'LongTable'))
-        stop(.errorMsg('[CoreGx::sensitivityProfiles<-] No setter has been ',
-            'implemented for this method when the sensitivity slot in a CoreSet',
-            ' is a LongTable. Please define a method using setReplaceMethod() ',
-            'for the subclass of CoreSet in your current package!'))
+        LT <- sensitivitySlot(object)
+        
     else
         object@sensitivity$profiles <- value
     return(object)
@@ -1453,15 +1453,18 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
         longTable <- sensitivitySlot(object)
 
         # Process into a the proper format for the sensitivity assay
-        raw <- as.data.table(value[, , 'Viability'], keep.rownames=TRUE, 
-            na.rm=FALSE)
+        # NOTE: as.matrix deals with the case where there is only a single
+        #   viability column in the sensitivityRaw array object,
+        #   in which case the drop=TRUE argument causes a vector to be returned
+        raw <- as.data.table(as.matrix(value[, , 'Viability']), 
+            keep.rownames='rn', na.rm=FALSE)
         coerceCols <- colnames(raw)[-1]
         raw[, (coerceCols) := lapply(.SD, as.numeric), .SDcols=!'rn']
         raw[, c('row_id', 'col_id') := tstrsplit(rn, '_')]
         raw[, (rowIDs(longTable)) := tstrsplit(row_id, ':', type.convert=TRUE)]
         raw[, (colIDs(longTable)) := tstrsplit(col_id, ':', type.convert=TRUE)]
         raw[, c('row_id', 'col_id', 'rn') := NULL]
-        colnames(raw) <- gsub('^dose', 'viability', colnames(raw))
+        colnames(raw) <- gsub('^dose|^V', 'viability', colnames(raw))
 
         # Update the assay
         assay(longTable, i='sensitivity') <- raw
@@ -1607,10 +1610,10 @@ setMethod(sensNumber, "CoreSet", function(object){
     .count_not_NA <- function(x) sum(!is.na(x))
     sensNumbDT <- dcast(sensitivityDT_melted, .drugCombo ~ .cellCombo,
         value.var='viability', fun.aggregate=.count_not_NA)
-    sensNumber <- as.matrix(sensNumbDT[, !'.drugCombo'], 
-        rownames=sensNumbDT$`.drugCombo`)
+    sensNumberM <- as.matrix(sensNumbDT[, !'.drugCombo'])
+    rownames(sensNumberM) <- sensNumbDT[['.drugCombo']]
 
-    return(sensNumber)
+    return(sensNumberM)
 
     ## TODO:: Pad for any missing drugs or cells
     allDrugCombos <- rowData(object)[, Reduce(.paste_colon, mget(drugidCols))]
@@ -1647,8 +1650,12 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
 setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"), 
     function(object, value)
 {
-    object@sensitivity$n <- value
-    object
+    if (is(sensitivitySlot(object), 'LongTable')) {
+        object
+    } else {
+        object@sensitivity$n <- value
+        object
+    }
 })
 
 
