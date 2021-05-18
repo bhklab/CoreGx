@@ -66,9 +66,10 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 
     existingColDataDT <- colData(x, key=TRUE)
     colDataDT <- unique(value)[existingColDataDT, on=.NATURAL]
+    colDataDT <- colDataDT[!duplicated(colKey), ]
 
     setkeyv(colDataDT, 'colKey')
-    colDataDT[, .colnames := paste(mget(..colIDcols), collapse=':')]
+    colDataDT[, .colnames := Reduce(.paste_colon, mget(colIDcols))]
 
     x@colData <- colDataDT
     x

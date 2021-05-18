@@ -77,15 +77,16 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
     # error if all the rowID columns are not present in the new rowData
     equalRowIDs <- rowIDCols %in% sharedRowIDCols
     if (!all(equalRowIDs)) warning(.warnMsg('\n[CoreGx::rowData<-] The ID columns ',
-        rowIDCols[!equalRowIDs], 'are not present in value. The function ',
+        rowIDCols[!equalRowIDs], ' are not present in value. The function ',
         'will attempt to join with existing rowIDs, but this may fail!', 
         collapse=', '))
 
     rowIDs <- rowIDs(x, data=TRUE, key=TRUE)
 
-    rowData <- rowIDs[unique(value), on=.NATURAL]
+    rowData <- unique(value)[rowIDs, on=.NATURAL, allow.cartesian=FALSE]
+    rowData <- rowData[!duplicated(rowKey), ]
     setkeyv(rowData, 'rowKey')
-    rowData[, .rownames := paste0(mget(..rowIDCols), collapse=':')]
+    rowData[, .rownames := Reduce(.paste_colon, mget(rowIDCols))]
 
     x@rowData <- rowData
     x

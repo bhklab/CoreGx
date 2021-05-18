@@ -51,7 +51,9 @@
 
     rawdataDT <- merge.data.table(assayDT, profDT, by='rn')
     rawdataDT <- merge.data.table(rawdataDT, infoDT, by='rn')
-    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols, colCols)]
+    # Find any hidden replicates
+    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols[1], colCols, 
+        'old_column')]
 
     if (max(rawdataDT$replicate_id) > 1) {
         # Handle case where there is only 1 drug (i.e., radiation in RadioGx)

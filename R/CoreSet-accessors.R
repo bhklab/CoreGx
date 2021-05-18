@@ -1102,7 +1102,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     colDataDT <- colData(longTable, key=TRUE)
     setkeyv(colDataDT, 'colKey')
 
-    rowIDcols <- rowIDs(longTable)[!grepl('dose', rowIDs(longTable))]
+    rowIDcols <- rowIDs(longTable)[!grepl('dose$', rowIDs(longTable))]
     colIDcols <- colIDs(longTable)
     rownameCols <- c(rowIDcols, colIDcols)
 
@@ -1121,11 +1121,10 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     infoDT_sub <- unique(infoDT[, ..keepCols])
 
     # rebuld the rownames
-    .paste_ <- function(x, y) paste(x, y, sep='_')
-    .paste_colon <- function(x, y) paste(x, y, sep=':')
-    infoDT_sub[, drugid := Reduce(.paste_colon, mget(..rowIDcols))]
-    infoDT_sub[, cellid := Reduce(.paste_colon, mget(..colIDcols))]
-    infoDT_sub[, exp_id := Reduce(.paste_, .(drugid, cellid))]
+    infoDT_sub[, drugid := drug1id]
+    infoDT_sub[, drug_uid := Reduce(.paste_colon, mget(..rowIDcols))]
+    infoDT_sub[, cell_uid := Reduce(.paste_colon, mget(..colIDcols))]
+    infoDT_sub[, exp_id := Reduce(.paste_, .(drug_uid, cell_uid))]
 
     # convert to data.frame
     setDF(infoDT_sub, rownames=infoDT_sub$exp_id)
@@ -1165,13 +1164,12 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_sensitivityInfo(class_=.local_class, data_=.local_data)
 setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.frame"),
-                
                 function(object, dimension, ..., value) {
 
     funContext <- .funContext('::sensitivityInfo<-')
     if (is(sensitivitySlot(object), 'LongTable')) {
         # coerce to data.table
-        if (!is.data.table(value)) value <- data.table(value, keep.rownames=TRUE)
+        if (!is.data.table(value)) value <- data.table(value)
         if (missing(dimension)) {
             valueCols <- colnames(value)
             # get existing column names
@@ -1283,27 +1281,41 @@ setReplaceMethod('sensitivityMeasures',
     sensitivityProfiles({data_})
 
     @md
-    @exportMethod sensitivityInfo
+    @exportMethod sensitivityProfiles
     ",
     ...
 )
-
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_sensitivityProfiles(class_=.local_class, data_=.local_data)
 setMethod(sensitivityProfiles, "CoreSet", function(object) {
     funContext <- .funContext('::sensitivityProfiles')
     if (is(sensitivitySlot(object), 'LongTable')) {
-        if (!('profiles' %in% assayNames(sensitivitySlot(object))))
+        if (!('profiles' %in% assayNames(sensitivitySlot(object)))) {
             .error(funContext, 'The LongTable onject in the sensivitiy slot
                 is not formatted correctly: it must contain and assay
                 named "profiles"!')
-        else
-            return(sensitivitySlot(object)$profiles)
+        } else {
+            .rebuildProfiles(sensitivitySlot(object))
+        }
     } else {
         return(object@sensitivity$profiles)
     }
 })
+
+#' @keywords internal
+.rebuildProfiles <- function(LT) {
+    profDT <- LT$profiles
+    rowCols <- rowIDs(LT)[!grepl('drug.*dose', rowIDs(LT))]
+    colCols <- colIDs(LT)
+    profDT[, cell_uid := Reduce(.paste_colon, mget(colCols))]
+    profDT[, drug_uid := Reduce(.paste_colon, mget(rowCols))]
+    profDT[, exp_id := .paste_(drug_uid, cell_uid)]
+    assayCols <- colnames(assay(LT, 'profiles', metadata=FALSE, key=FALSE))
+    sensProf <- as.data.frame(profDT[, .SD, .SDcols=assayCols])
+    rownames(sensProf) <- profDT$exp_id
+    return(sensProf)
+}
 
 #' @noRd
 .docs_CoreSet_set_sensitivityProfiles <- function(...) .parseToRoxygen(
@@ -1395,19 +1407,27 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 
     # Early return for single drug sensitivity experimentss
     ## TODO:: refactor this into a helper?
-    if ('assay_metadata' %in% assayNames(longTable) && 
+    if ('assay_metadata' %in% assayNames(longTable) &&
         'old_column' %in% colnames(longTable$assay_metadata)) 
     {
-        metadataDT <- longTable$assay_metadata
-        sensitivityDT <- longTable$sensitivity
+        metadataDT <- copy(longTable$assay_metadata)
+        sensitivityDT <- copy(longTable$sensitivity)
         # .NATURAL joins on all identical columns
         assayDT <- metadataDT[sensitivityDT, on=.NATURAL]
-        doseDT <- dcast(assayDT, rn ~ old_column, value.var='drug1dose')
-        viabDT <- dcast(assayDT, rn ~ old_column, value.var='viability')
+        if (length(colIDs(longTable)) > 1) {
+            assayDT[, cellid := Reduce(.paste_colon, mget(colIDs(longTable)))]
+        }
+        assayDT[, exp_id := paste0(drug1id, '_', cellid)]
+        .mean <- function(x) mean(as.numeric(x), na.rm=TRUE)
+        doseDT <- dcast(assayDT, exp_id ~ old_column, value.var='drug1dose', 
+            fun.aggregate=.mean)
+        viabDT <- dcast(assayDT, exp_id ~ old_column, value.var='viability', 
+            fun.aggregate=.mean)
         sensRaw <- array(dim=list(nrow(doseDT), ncol(doseDT) -1, 2),
-            dimnames=list(doseDT$rn, colnames(doseDT)[-1], c('Dose', 'Viability')))
-        sensRaw[, , 'Dose'] <- as.matrix(doseDT)
-        sensRaw[, , 'Viability'] <- as.matrix(viabDT)
+            dimnames=list(doseDT$exp_id, colnames(doseDT)[-1], 
+                c('Dose', 'Viability')))
+        sensRaw[, , 'Dose'] <- as.matrix(doseDT[, !'exp_id'])
+        sensRaw[, , 'Viability'] <- as.matrix(viabDT[, !'exp_id'])
         return(sensRaw)
     }
 
@@ -1419,7 +1439,6 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     viability[, c('row_ids', 'col_ids') := NULL]
 
     # Merge the doses into vectors in a list column
-    .paste_slashes <- function(...) paste(.., sep='///')
     viability[, dose := Reduce(.paste_slashes, mget(colnames(.SD))), 
         .SDcols=patterns('^.*dose$')]
 

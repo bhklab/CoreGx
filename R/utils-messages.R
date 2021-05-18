@@ -115,3 +115,12 @@
         with(list(...), glue::glue(string)),
     '\n'))
 }
+
+#' @keywords internal
+.paste_ <- function(x, y) paste(x, y, sep='_')
+
+#' @keywords internal
+.paste_colon <- function(x, y) paste(x, y, sep=':')
+
+#' @keywords interanl
+.paste_slashes <- function(...) paste(.., sep='///')
