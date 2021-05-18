@@ -53,17 +53,17 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
     if (is(value, 'data.frame'))
         value <- data.table(value)
     if (!is(value, 'data.table'))
-        stop(.errorMsg('\n[CoreGx::rowData<-] Please pass a data.frame or ',
+        .error('\n[CoreGx::rowData<-] Please pass a data.frame or ',
             'data.table to update the rowData slot. We recommend modifying the ',
             'object returned by rowData(x) then reassigning it with rowData(x) ',
-            '<- newRowData'))
+            '<- newRowData')
 
     # remove key column
     if ('rowKey' %in% colnames(value)) {
         value[, rowKey := NULL]
-        warning(.warnMsg('\n[CoreGx::rowData<-] Dropping rowKey from replacement',
+        .message('\n[CoreGx::rowData<-] Dropping rowKey from replacement',
             ' value, this function will deal with mapping the rowKey',
-            ' automatically.'))
+            ' automatically.')
     }
 
     # assemble information to select proper update method
@@ -76,17 +76,21 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
 
     # error if all the rowID columns are not present in the new rowData
     equalRowIDs <- rowIDCols %in% sharedRowIDCols
-    if (!all(equalRowIDs)) warning(.warnMsg('\n[CoreGx::rowData<-] The ID columns ',
+    if (!all(equalRowIDs)) .warning('\n[CoreGx::rowData<-] The ID columns ',
         rowIDCols[!equalRowIDs], ' are not present in value. The function ',
         'will attempt to join with existing rowIDs, but this may fail!', 
-        collapse=', '))
+        collapse=', ')
 
     rowIDs <- rowIDs(x, data=TRUE, key=TRUE)
+
+    ## TODO:: Throw error if user tries to modify ID columns
 
     rowData <- unique(value)[rowIDs, on=.NATURAL, allow.cartesian=FALSE]
     rowData <- rowData[!duplicated(rowKey), ]
     setkeyv(rowData, 'rowKey')
     rowData[, .rownames := Reduce(.paste_colon, mget(rowIDCols))]
+
+    ## TODO:: Add some sanity checks before returing
 
     x@rowData <- rowData
     x

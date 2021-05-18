@@ -50,19 +50,21 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
     if (is(value, 'data.frame'))
         value <- data.table(value)
     if (!is(value, 'data.table'))
-        stop(.errorMsg('\n[CoreGx::colData<-] Please pass a data.frame or ',
+        .error('\n[CoreGx::colData<-] Please pass a data.frame or ',
             'data.table to update the rowData slot. We recommend modifying the ',
             'object returned by colData(x) then reassigning it with colData(x) ',
-            '<- newColData'))
+            '<- newColData')
 
     # remove key column
     if ('colKey' %in% colnames(value)) {
         value[, colKey := NULL]
-        warning(.warnMsg('\n[CoreGx::colData<-] Dropping colKey from replacement',
+        .message('\n[CoreGx::colData<-] Dropping colKey from replacement',
             ' value, this function will deal with mapping the colKey',
-            ' automatically.'))
+            ' automatically.')
     }
     colIDcols <- colIDs(x)
+
+    ## TODO:: Throw error if user tries to modify colIDs
 
     existingColDataDT <- colData(x, key=TRUE)
     colDataDT <- unique(value)[existingColDataDT, on=.NATURAL]
@@ -70,6 +72,8 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 
     setkeyv(colDataDT, 'colKey')
     colDataDT[, .colnames := Reduce(.paste_colon, mget(colIDcols))]
+
+    ## TODO:: Sanity checks that this works as expected
 
     x@colData <- colDataDT
     x

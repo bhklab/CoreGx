@@ -1178,7 +1178,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
             # drop any value columns that don't already exist
             hasValueCols <- valueCols %in% c(rowDataCols, colDataCols)
             if (!all(hasValueCols))
-                .warning(funContext, 'Dropping columns ', 
+                .message(funContext, 'Dropping columns ', 
                     .collapse(valueCols[!hasValueCols]), ' from value. Currently 
                     this setter only allows modifying existing columns when 
                     @sensitivity is a LongTable. For more fine grained updates 
@@ -1312,8 +1312,8 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
     profDT[, drug_uid := Reduce(.paste_colon, mget(rowCols))]
     profDT[, exp_id := .paste_(drug_uid, cell_uid)]
     assayCols <- colnames(assay(LT, 'profiles', metadata=FALSE, key=FALSE))
-    sensProf <- as.data.frame(profDT[, .SD, .SDcols=assayCols])
-    rownames(sensProf) <- profDT$exp_id
+    sensProf <- as.data.frame(unique(profDT[, .SD, .SDcols=assayCols]))
+    rownames(sensProf) <- unique(profDT$exp_id)
     return(sensProf)
 }
 
@@ -1510,6 +1510,8 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
         # Update the assay
         assay(longTable, i='sensitivity') <- raw
 
+        # Update the object
+        sensitivitySlot(obect) <- longTable
     } else {
         if (!is.array(value)) .error(funContext, "Values assigned to the
             sensitivityRaw slot must be an array of experiment by dose by 
