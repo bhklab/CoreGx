@@ -1115,7 +1115,9 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     # determine which columns map 1:1 with new identifiers and subset to those
     infoDT_first <- infoDT[, head(.SD, 1), by=rownameCols]
     infoDT_last <- infoDT[, tail(.SD, 1), by=rownameCols]
-    keepCols <- colAlls(infoDT_first == infoDT_last, na.rm=TRUE)
+    keepCols <- colnames(infoDT_first)[
+        colAlls(infoDT_first == infoDT_last, na.rm=TRUE)
+        ]
     infoDT_sub <- unique(infoDT[, ..keepCols])
 
     # rebuld the rownames
@@ -1370,11 +1372,12 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 #'
 #' @param longTable `LongTable`
 #'
-#' @return A 3D  where rows are experiment_ids, columns are doses
+#' @return A 3D `array` where rows are experiment_ids, columns are doses
 #' and the third dimension is metric, either 'Dose' for the doses used or 
 #' 'Viability' for the cell-line viability at that dose.
 #'
 #' @keywords internal
+#' @importFrom data.table merge.data.table dcast
 #' @noRd
 .rebuildRaw <- function(longTable) {
 
@@ -1390,6 +1393,24 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     # Extract the information needed to reconstruct the sensitivityRaw array
     viability <- longTable$sensitivity
 
+    # Early return for single drug sensitivity experimentss
+    ## TODO:: refactor this into a helper?
+    if ('assay_metadata' %in% assayNames(longTable) && 
+        'old_column' %in% colnames(longTable$assay_metadata)) 
+    {
+        metadataDT <- longTable$assay_metadata
+        sensitivityDT <- longTable$sensitivity
+        # .NATURAL joins on all identical columns
+        assayDT <- metadataDT[sensitivityDT, on=.NATURAL]
+        doseDT <- dcast(assayDT, rn ~ old_column, value.var='drug1dose')
+        viabDT <- dcast(assayDT, rn ~ old_column, value.var='viability')
+        sensRaw <- array(dim=list(nrow(doseDT), ncol(doseDT) -1, 2),
+            dimnames=list(doseDT$rn, colnames(doseDT)[-1], c('Dose', 'Viability')))
+        sensRaw[, , 'Dose'] <- as.matrix(doseDT)
+        sensRaw[, , 'Viability'] <- as.matrix(viabDT)
+        return(sensRaw)
+    }
+
     # Build the rownames
     .paste_colons <- function(...) paste(..., sep=':')
     viability[, row_ids := Reduce(.paste_colons, mget(rowIDs(longTable)))]
@@ -1398,7 +1419,8 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     viability[, c('row_ids', 'col_ids') := NULL]
 
     # Merge the doses into vectors in a list column
-    viability[, dose := Reduce(.paste_colons, mget(colnames(.SD))), 
+    .paste_slashes <- function(...) paste(.., sep='///')
+    viability[, dose := Reduce(.paste_slashes, mget(colnames(.SD))), 
         .SDcols=patterns('^.*dose$')]
 
     # Repeat the dose values if there are more viabilities
@@ -1425,7 +1447,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     "
     @details
 
-    __sensitvityRaw<-__: Update the raw dose and viability data in a {class_}.
+    __sensitvityRaw<-__: Update the raw dose and viability data in a `{class_}`.
     - value: A 3D `array` object where rows are experiment_ids, columns are
     replicates and pages are c('Dose', 'Viability'), with the corresponding
     dose or viability measurement for that experiment_id and replicate.

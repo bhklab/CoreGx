@@ -38,14 +38,14 @@
     # sensitivityRaw
     doseDT <- as.data.table(oldSensitivity$raw[, , 1], keep.rownames=TRUE)
     meltedDoseDT <- melt.data.table(doseDT, id.vars='rn', 
-        variable.name='replicate', value.name='dose')
+        variable.name='old_column', value.name='dose')
     viabDT <- as.data.table(oldSensitivity$raw[, , 2], keep.rownames=TRUE)
     meltedViabDT <- melt.data.table(viabDT, id.vars='rn', 
-        variable.name='replicate', value.name='viability')
+        variable.name='old_column', value.name='viability')
     
     # -- merge into a single long format data.table
     assayDT <- merge.data.table(meltedDoseDT, meltedViabDT, 
-        by=c('rn', 'replicate'))[, replicate := NULL]
+        by=c('rn', 'old_column'))
     assayMap <- list(sensitivity=c('viability'), 
         profiles=setdiff(colnames(profDT), 'rn'))
 
@@ -81,6 +81,7 @@
     guess$colDataMap[[2]] <- setdiff(guess$colDataMap[[2]], assayCols)
     guess$metadata[[2]] <- setdiff(guess$metadata[[2]], 
         c(assayCols, guess$rowDataMap[[2]], guess$colDataMap[[2]]))
+    assayMap$assay_metadata <- setdiff(guess$assayMap$mapped_columns, assayCols)
 
     # set the names correctly
 
