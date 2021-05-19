@@ -39,9 +39,11 @@
     doseDT <- as.data.table(oldSensitivity$raw[, , 1], keep.rownames=TRUE)
     meltedDoseDT <- melt.data.table(doseDT, id.vars='rn', 
         variable.name='old_column', value.name='dose')
+    meltedDoseDT[, dose := as.numeric(dose)]
     viabDT <- as.data.table(oldSensitivity$raw[, , 2], keep.rownames=TRUE)
     meltedViabDT <- melt.data.table(viabDT, id.vars='rn', 
         variable.name='old_column', value.name='viability')
+    meltedViabDT[, viability := as.numeric(viability)]
     
     # -- merge into a single long format data.table
     assayDT <- merge.data.table(meltedDoseDT, meltedViabDT, 

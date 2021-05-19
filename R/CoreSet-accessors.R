@@ -1493,25 +1493,41 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
         ## TODO:: validate value
         longTable <- sensitivitySlot(object)
 
-        # Process into a the proper format for the sensitivity assay
-        # NOTE: as.matrix deals with the case where there is only a single
-        #   viability column in the sensitivityRaw array object,
-        #   in which case the drop=TRUE argument causes a vector to be returned
-        raw <- as.data.table(as.matrix(value[, , 'Viability']), 
-            keep.rownames='rn', na.rm=FALSE)
-        coerceCols <- colnames(raw)[-1]
-        raw[, (coerceCols) := lapply(.SD, as.numeric), .SDcols=!'rn']
-        raw[, c('row_id', 'col_id') := tstrsplit(rn, '_')]
-        raw[, (rowIDs(longTable)) := tstrsplit(row_id, ':', type.convert=TRUE)]
-        raw[, (colIDs(longTable)) := tstrsplit(col_id, ':', type.convert=TRUE)]
-        raw[, c('row_id', 'col_id', 'rn') := NULL]
-        colnames(raw) <- gsub('^dose|^V', 'viability', colnames(raw))
 
-        # Update the assay
-        assay(longTable, i='sensitivity') <- raw
+        viabilityCols <- colnames(assay(longTable, 'sensitivity', 
+            metadata=FALSE, key=FALSE))
+        # Handle the non-drug combo case
+        if (length(viabilityCols) != ncol(value)) {
+            valueDT <- as.data.table(value)
+            valueDT <- dcast(valueDT, V1 + V2 ~ V3, value.var='value')
+            valueDT[, V2 := NULL] # drop the column names
+            setnames(valueDT, old=c('Dose', 'Viability'), 
+                new=c('drug1dose', 'viability'))
+            valueDT[, c('drug1id', 'cell_uid') := tstrsplit(V1, '_', type.convert=TRUE)]
+            valueDT[, (colIDs(longTable)) := tstrsplit(cell_uid, ':', type.convert=TRUE)]
+            valueDT[, c('V1', 'cell_uid') := NULL]
+            assay(longTable, i='sensitivity') <- valueDT
+        } else {
+            # Process into a the proper format for the sensitivity assay
+            # NOTE: as.matrix deals with the case where there is only a single
+            #   viability column in the sensitivityRaw array object,
+            #   in which case the drop=TRUE argument causes a vector to be returned
+            raw <- as.data.table(as.matrix(value[, , 'Viability']),
+                keep.rownames='rn', na.rm=FALSE)
+            coerceCols <- colnames(raw)[-1]
+            raw[, (coerceCols) := lapply(.SD, as.numeric), .SDcols=!'rn']
+            raw[, c('row_id', 'col_id') := tstrsplit(rn, '_')]
+            raw[, (rowIDs(longTable)) := tstrsplit(row_id, ':', type.convert=TRUE)]
+            raw[, (colIDs(longTable)) := tstrsplit(col_id, ':', type.convert=TRUE)]
+            raw[, c('row_id', 'col_id', 'rn') := NULL]
+            colnames(raw) <- gsub('^dose|^V', 'viability', colnames(raw))
+    
+            # Update the assay
+            assay(longTable, i='sensitivity') <- raw
+        }
 
         # Update the object
-        sensitivitySlot(obect) <- longTable
+        sensitivitySlot(object) <- longTable
     } else {
         if (!is.array(value)) .error(funContext, "Values assigned to the
             sensitivityRaw slot must be an array of experiment by dose by 
