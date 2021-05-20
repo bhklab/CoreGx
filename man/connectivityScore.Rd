@@ -4,14 +4,20 @@
 \alias{connectivityScore}
 \title{Function computing connectivity scores between two signatures}
 \usage{
-connectivityScore(x, y, method = c("gsea", "fgsea", "gwc"),
-  nperm = 10000, nthread = 1, gwc.method = c("spearman", "pearson"),
-  ...)
+connectivityScore(
+  x,
+  y,
+  method = c("fgsea", "gwc"),
+  nperm = 10000,
+  nthread = 1,
+  gwc.method = c("spearman", "pearson"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{matrix} with the first gene signature. In the case of GSEA the vector of
-values per gene for GSEA in which we are looking for an enrichment. In the 
-case of gwc, this should be a matrix, with the per gene responses in the 
+values per gene for GSEA in which we are looking for an enrichment. In the
+case of gwc, this should be a matrix, with the per gene responses in the
 first column, and the significance values in the second.}
 
 \item{y}{A \code{matrix} with the second signature. In the case of GSEA, this is the
@@ -20,7 +26,7 @@ with the direction being determined from the sign. In the case of gwc, this
 should be a matrix of identical size to x, once again with the per gene
 responses in the first column, and their significance in the second.}
 
-\item{method}{\code{character} string identifying which method to use, out of 'gsea' and 'gwc'}
+\item{method}{\code{character} string identifying which method to use, out of 'fgsea' and 'gwc'}
 
 \item{nperm}{\code{numeric}, how many permutations should be done to determine
 significance through permutation testing? The minimum is 100, default is
@@ -35,11 +41,11 @@ statistic?}
 }
 \value{
 \code{numeric} a numeric vector with the score and the p-value associated
-  with it
+with it
 }
 \description{
 A function for finding the connectivity between two signatures, using either
-the GSEA method based on the KS statistic, or the gwc method based on a 
+the GSEA method based on the KS statistic, or the gwc method based on a
 weighted spearman statistic. The GSEA analysis is implemented in the piano package.
 }
 \examples{
@@ -50,16 +56,16 @@ ySig <- c(0.01, 0.001, .97,0.01, 0.01,0.78,0.9,0.01,0.01,0.01,0.01)
 xx <- cbind(xValue, xSig)
 yy <- cbind(yValue, ySig)
 rownames(xx) <- rownames(yy) <- c('1','2','3','4','5','6','7','8','9','10','11')
-data.cor <- connectivityScore(xx,yy,method="gwc", gwc.method="spearman", nperm=300)
+data.cor <- connectivityScore(xx,yy,method='gwc', gwc.method='spearman', nperm=300)
 
 }
 \references{
-F. Pozzi, T. Di Matteo, T. Aste, "Exponential smoothing weighted
-   correlations", The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
-   10.1140/epjb/e2012-20697-x
+F. Pozzi, T. Di Matteo, T. Aste, 'Exponential smoothing weighted
+correlations', The European Physical Journal B, Vol. 85, No 6, 2012. DOI:
+10.1140/epjb/e2012-20697-x
 
 Varemo, L., Nielsen, J. and Nookaew, I. (2013) Enriching the gene set
-   analysis of genome-wide data by incorporating directionality of gene
-   expression and combining statistical hypotheses and methods. Nucleic
-   Acids Research. 41 (8), 4378-4391. doi: 10.1093/nar/gkt111
+analysis of genome-wide data by incorporating directionality of gene
+expression and combining statistical hypotheses and methods. Nucleic
+Acids Research. 41 (8), 4378-4391. doi: 10.1093/nar/gkt111
 }

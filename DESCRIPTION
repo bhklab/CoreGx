@@ -1,8 +1,8 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
-Version: 0.1.1
-Date: 2019-12-19
+Version: 1.5.0
+Date: 2021-05-12
 Authors@R: c(
     person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca", role = c("aut")),
     person("Ian","Smith", email = "ianc.smith@mail.utoronto.ca", role = c("aut")),
@@ -14,7 +14,7 @@ Description: A collection of functions and classes which serve as the foundation
     package was created to abstract shared functionality from other lab package 
     releases to increase ease of maintainability and reduce code repetition in 
     current and future 'Gx' suite programs. Major features include a 'CoreSet' 
-    class, from which 'RadioSet' and 'PharmaSet' are derived, along with get and 
+    class, from which 'RadioSet' and 'PharmacoSet' are derived, along with get and
     set methods for each respective slot. Additional functions related to 
     fitting and plotting dose response curves, quantifying statistical 
     correlation and calculating area under the curve (AUC) or survival fraction
@@ -25,17 +25,78 @@ Description: A collection of functions and classes which serve as the foundation
       Lupien, M., Goldenberg, A. (2015) <doi:10.1093/bioinformatics/btv723>.
     Manem, V., Labie, M., Smirnov, P., Kofia, V., Freeman, M., Koritzinksy, M.,
       Abazeed, M., Haibe-Kains, B., Bratman, S. (2018) <doi:10.1101/449793>.
-biocViews: Software, Pharmacogenomics
+VignetteBuilder: knitr
+VignetteEngine: knitr::rmarkdown
+biocViews: Software, Pharmacogenomics, Classification, Survival
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.6.0)
+Depends: R (>= 4.1), BiocGenerics, SummarizedExperiment
 Imports: 
-    lsa,
-    methods, 
-    piano, 
     Biobase,
+    S4Vectors,
+    MultiAssayExperiment,
+    MatrixGenerics,
+    piano,
+    BiocParallel,
+    methods,
     stats,
+    utils,
+    graphics,
+    grDevices,
+    lsa,
+    data.table,
+    crayon,
+    glue,
     rlang
-Suggests: PharmacoGx
+Suggests: 
+    pander,
+    markdown,
+    BiocStyle,
+    rmarkdown,
+    knitr,
+    formatR,
+    testthat
 License: GPL-3
-RoxygenNote: 6.1.1
+Roxygen: list(markdown = TRUE, r6=FALSE)
+RoxygenNote: 7.1.1
+Collate: 
+    'allGenerics.R'
+    'LongTable-class.R'
+    'CoreSet-class.R'
+    'CoreSet-accessors.R'
+    'DataMapper-class.R'
+    'LongTable-accessors.R'
+    'LongTableDataMapper-class.R'
+    'adaptiveMatthewCor.R'
+    'callingWaterfall.R'
+    'connectivityScore.R'
+    'cosinePerm.R'
+    'datasets.R'
+    'globals.R'
+    'gwc.R'
+    'matthewCor.R'
+    'methods-$.R'
+    'methods-[.R'
+    'methods-[[.R'
+    'methods-assay.R'
+    'methods-assayNames.R'
+    'methods-assays.R'
+    'methods-buildLongTable.R'
+    'methods-coerce.R'
+    'methods-colData.R'
+    'methods-dim.R'
+    'methods-dimnames.R'
+    'methods-drugSensitivitySig.R'
+    'methods-getIntern.R'
+    'methods-guessMapping.R'
+    'methods-intersect.R'
+    'methods-metaConstruct.R'
+    'methods-metadata.R'
+    'methods-reindex.R'
+    'methods-rowData.R'
+    'methods-subset.R'
+    'methods-subsetTo.R'
+    'utilities.R'
+    'utils-iteration.R'
+    'utils-messages.R'
+    'utils-updateS4.R'

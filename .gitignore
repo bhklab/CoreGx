@@ -9,3 +9,4 @@ CoreGx*gz
 Meta
 doc
 logs
+vignettes/.*html
