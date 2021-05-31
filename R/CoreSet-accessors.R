@@ -65,8 +65,10 @@ NULL
 ## ---- annotation slot
 ## --------------------
 
+
 ##
 ## == annotation
+
 
 #' @noRd
 .docs_CoreSet_get_annotation <- function(...) .parseToRoxygen(
@@ -128,8 +130,10 @@ setReplaceMethod("annotation", signature("CoreSet", "list"),
     object
 })
 
+
 ##
 ## == dateCreated
+
 
 #' @export
 setGeneric("dateCreated", function(object, ...) standardGeneric("dateCreated"))
@@ -191,8 +195,10 @@ setReplaceMethod('dateCreated', signature(object="CoreSet", value="character"),
   return(object)
 })
 
+
 ##
 ## == name
+
 
 #' @export
 setGeneric("name", function(object, ...) standardGeneric("name"))
@@ -379,6 +385,7 @@ setReplaceMethod("cellNames", signature(object="CoreSet",value="character"),
 ##
 ## == curation
 
+
 #' @export
 setGeneric("curation", function(object, ...) standardGeneric("curation"))
 
@@ -448,6 +455,7 @@ setReplaceMethod("curation", signature(object="CoreSet", value="list"),
 
 #
 # == datasetType
+
 
 #' @export
 setGeneric("datasetType", function(object, ...) standardGeneric("datasetType"))
@@ -1293,7 +1301,7 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
     if (is(sensitivitySlot(object), 'LongTable')) {
         if (!('profiles' %in% assayNames(sensitivitySlot(object)))) {
             .error(funContext, 'The LongTable onject in the sensivitiy slot
-                is not formatted correctly: it must contain and assay
+                is not formatted correctly: it must contain an assay
                 named "profiles"!')
         } else {
             .rebuildProfiles(sensitivitySlot(object))
@@ -1306,7 +1314,7 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
 #' @keywords internal
 .rebuildProfiles <- function(LT) {
     profDT <- LT$profiles
-    rowCols <- rowIDs(LT)[!grepl('drug.*dose', rowIDs(LT))]
+    rowCols <- rowIDs(LT)[!grepl('drug.*dose|replicate.*', rowIDs(LT))]
     colCols <- colIDs(LT)
     profDT[, cell_uid := Reduce(.paste_colon, mget(colCols))]
     profDT[, drug_uid := Reduce(.paste_colon, mget(rowCols))]

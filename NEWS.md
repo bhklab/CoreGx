@@ -1,10 +1,12 @@
 # CoreGx News File
 
-## 1.4.1
+## 1.5.1
 - Fixed some spelling errors and incorrect code chunk configurations in the 
 LongTable vignette
+- Fix bug in .rebuildProfiles where the function fails if replicate_id is
+assigned as a rowID column in the LongTable in @sensitivity.
 
-## 1.4.0
+## 1.5.0
 - Bioconductor spring 2021 release
 - Added the DataMapper abstract class
 - Added the LongTableDataMapper concrete class
