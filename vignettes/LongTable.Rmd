@@ -18,7 +18,7 @@ vignette: |
 
 ```{r setup, include=FALSE}
 library(formatR)
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo=FALSE)
 ```
 
 ```{r dependencies, include=FALSE}
@@ -50,7 +50,7 @@ Biology. Rather, we tried to design a general purpose data structure which
 could support high dimensional data for any use case.
 
 Our design takes the best aspects
-of the `SummarizedExperiment` and `MultiAssayExperiment` class and implements
+of the `SummarizedExperiment` and `MultiAssayExperiment` classes and implements
 them using the `data.table` package, which provides an R API to a rich set of
 tools for high performance data processing implemented in C.
 
@@ -99,46 +99,52 @@ assay within the assays list. As indicated by the lower connection between these
 tables and an assay, for each row or column key there may be zero or more rows in
 the assay table. Conversely for each row in the assay there may be zero or one key
 in `colData` or `rowData`. When combined, the `rowKey` and `colKey` for a given
-row in an assay become a composite key which maps that to
+row in an assay become a composite key which uniquely identify an observation.
 
 # Constructing a LongTable
 
 To deal with the complex kinds of experimental designs which can be stored
 in a `LongTable`, we have engineered a new object to help document and validate
-the way data is mapped from your raw data, as a single large `data.frame`,
-to the various slots of a `LongTable` object.
+the way data is mapped from raw data files, as a single large `data.frame` or 
+`data.table`, to the various slots of a `LongTable` object.
 
 ## The DataMapper Class
 
 The `DataMapper` is an abstract class, which means in cannot be instatiated.
 Its purpose is to provide a description of the concept of a DataMapper and
-define a basic interface for any classes inheriting from it.
+define a basic interface for any classes inheriting from it. A DataMapper is
+simply a way to map columns from some raw data file to the slots of an S4 class.
+It is similar to a schema in SQL in that it defines the valid parts of an 
+object (analogously a SQL table), but differs in that no types are specified or 
+enforced at this time.
 
 This object is not important for general users, but may be useful for other
-developers who want to map from some rawdata to some `S4` class. In this case,
+developers who want to map from some raw data to some `S4` class. In this case,
 any derived data mapper should inherit from the `DataMapper` abstract class. 
-Only slot is defined by default, a `list` or `List` in the `@rawdata` slot. An
-accessor method, `rawdata(DataMapper)`, is defined to assign and retrieve
+Only one slot is defined by default, a `list` or `List` in the `@rawdata` slot. 
+An accessor method, `rawdata(DataMapper)`, is defined to assign and retrieve
 the raw data from your mapper object.
 
 ## The LongTableDataMapper Class
 
-The `LongTableDataMapper` class is the first concrete sub-class of a `DataMapper`.
-It is the object which defines how to go a single `data.frame` or `data.table` 
-of raw experimental data, to a properly formatted and valid `LongTable` object. 
-This is accomplished by defining various maps, which let the the user decide
-which columns from `rawdata` should go into which slots of the object.
+The `LongTableDataMapper` class is the first concrete sub-class of a 
+`DataMapper`. It is the object which defines how to go from a single 
+`data.frame` or `data.table` of raw experimental data to a properly formatted 
+and valid `LongTable` object. This is accomplished by defining various mappings, 
+which let the the user decide which columns from `rawdata` should go into which 
+slots of the object. Each slot mapping is implemented as a list of character 
+vectors specifying the column names from `rawdata` to assign to each slot.
 
-Additionally, a helper method has been included, `guessMapping`, which will
-try to determine which dimensions of a `LongTable`s `rawdata` should be assigned
+Additionally, a helper method has been included, `guessMapping`, that will
+try to determine which columns of a `LongTable`s `rawdata` should be assigned
 to which slots, and therefore which maps.
 
 To get started making a `LongTable` lets have a look at some rawdata which is
-a subset of the data from Oneil et al, 2016. The full set of rawdata is
+a subset of the data from Oneil *et al.*, 2016. The full set of rawdata is
 available for exploration and download from
-(SynergxDB.ca)[https://www.synergxdb.ca/], a free and open source web-app and 
-database of drug combination sensitivity experiments which we created and 
-released (Seo **et al.**, 2019).
+[SynergxDB.ca](https://www.synergxdb.ca/), a free and open source web-app and 
+database of publicly available drug combination sensitivity experiments which we 
+created and released (Seo *et al.*, 2019).
 
 The data was generated as part of the commercial activities of the 
 pharmaceutical company Merck, and is thus named according.
@@ -149,11 +155,11 @@ merckDT <- fread(filePath, na.strings=c('NULL'))
 colnames(merckDT)
 ```
 
-```{r sample_data, fig.width=80, echo=TRUE}
+```{r sample_data, fig.width=80}
 knitr::kable(head(merckDT)[, 1:5])
 ```
 
-```{r sample_data2, fig.width=80, echo=TRUE}
+```{r sample_data2, fig.width=80}
 knitr::kable(head(merckDT)[, 5:ncol(merckDT)])
 ```
 We can see that all the data related to the treatment response experiment is 
@@ -162,7 +168,7 @@ contained within this table.
 To get an idea of where in a `LongTable` this data should go, lets come up
 with some guesses for mappings.
 
-```{r guess_mapping}
+```{r guess_mapping, echo=TRUE}
 # Our guesses of how we may identify rows, columns and assays
 groups <- list(
   justDrugs=c('drug1id', 'drug2id'),
@@ -176,21 +182,21 @@ groups <- list(
 # Decide if we want to subset out mapped columns after each group
 subsets <- c(FALSE, TRUE, FALSE, TRUE, FALSE, TRUE)
 
-# First we put out data in the `LongTableDataMapper`
+# First we put our data in the `LongTableDataMapper`
 LTdataMapper <- LongTableDataMapper(rawdata=merckDT)
 
-# Then we can test our hypothesis, subset=FALSE means we don't remove mapped 
+# Then we can test our hypotheses, subset=FALSE means we don't remove mapped 
 #   columns after each group is mapped
 guess <- guessMapping(LTdataMapper, groups=groups, subset=subsets)
 guess
 ```
 
-Since we want out `LongTable` to have drugs as rows and samples as columns,
+Since we want our `LongTable` to have drugs as rows and samples as columns,
 we see that both `justDrug` and `drugsAndDoses` yield the same result. So we
-do not yet prefer one after the other. Looking at `justCells` and 
-`cellsAndBatches`, we see one column maps to both of them and therefore still
+do not yet prefer one over the other. Looking at `justCells` and 
+`cellsAndBatches`, we see one column maps to each of them and therefore still
 have no preference. For `assay1` however, we see that no columns mapped, while
-`assay2` maps many of the rows.
+`assay2` maps many of raw data columns.
 
 Since assays will be subset based on the `rowKey` and `colKey`, we know that
 the rowIDs must be `drugsAndDose` and the the colIDs must be `cellsAndBatches`.
@@ -198,19 +204,19 @@ Therefore, to uniquely identify an observation in any given assay we need
 all of these columns. We can use this information to assign maps to our 
 `LongTableDataMapper`.
 
-```{r mappings_to_datamapper}
+```{r mappings_to_datamapper, echo=TRUE}
 rowDataMap(LTdataMapper) <- guess$drugsAndDose
 colDataMap(LTdataMapper) <- guess$cellsAndBatches
 ```
 
 Looking at our mapped columns for `assay2`, we must decide if we want these
 to go into more than one assay. If we do, we should name each item of our
-`assayMap` for the `LongTableDataMapper` and specify the it in a list of 
-`character` vectors, one for each assay. Since viability is the raw measurement
-and the final two columns are summaries, we will assign them to two assays:
-sensitivity and profiles.
+`assayMap` for the `LongTableDataMapper` and specify it in a list of 
+`character` vectors, one for each assay. Since viability is the raw experimental
+measurement and the final two columns are summaries of it, we will assign them 
+to two assays:sensitivity and profiles.
 
-```{r split_assays}
+```{r split_assays, echo=TRUE}
 assays <- list(
   sensitivity=guess$assays2[[2]][seq_len(4)],
   profiles=guess$assays2[[2]][c(5, 6)]
@@ -218,7 +224,7 @@ assays <- list(
 assays
 ```
 
-```{r assign_assaymap}
+```{r assign_assaymap, echo=TRUE}
 assayMap(LTdataMapper) <- assays
 ```
 
@@ -226,8 +232,8 @@ assayMap(LTdataMapper) <- assays
 
 The metaConstruct method accepts a `DataMapper` object as its only argument,
 and uses the information in that `DataMapper` to preprocess all `rawdata` and
-map them to the appriate slots of an `S4` object. In our case, we are mapping
-from the merckDT to a `LongTable`.
+map them to the appropriate slots of an `S4` object. In our case, we are mapping
+from the merckDT `data.table` to a `LongTable`.
 
 At minimum, a `LongTableDataMapper` must specify the `rowDataMap`, `colDataMap`,
 and `assayMap`. Additional maps are available, see `?LongTableDataMapper-class`
@@ -235,7 +241,7 @@ and `?LongTableDataMapper-accessors` for more details.
 
 After configuration, creating the object is very straight forward.
 
-```{r }
+```{r echo=TRUE}
 longTable <- metaConstruct(LTdataMapper)
 ```
 
@@ -247,7 +253,9 @@ by `colKey` rectangular object.
 
 To support `data.frame` like sub-setting for this object, the constructor makes 
 pseudo row and column names, which are the ID columns for each row of 
-`rowData` or `colData` pasted together with a ':'.
+`rowData` or `colData` pasted together with a ':'. The ordering of these
+columns is preserved in the pseudo-dim names, so be sure to arrange them
+as desirged before creating the `LongTable`.
 
 ## Row and Column Names
 
@@ -292,20 +300,25 @@ For example, if we want to get all instance where '5-FU' is the drug:
 longTable['5-FU', ]
 ```
 
-This has matched all colnames where 5-FU was in either drug1 or drug2. If we only want to match drug1, we have several options:
+This has matched all colnames where 5-FU was in either drug1 or drug2. If we 
+only want to match drug1, we have several options:
 
 ```{r column_specific_regex, echo=TRUE}
 all.equal(longTable['5-FU:*:*:*', ], longTable['^5-FU',  ])
 ```
 
+As a technicaly note, '\*' is replaced with '.\*' internally for regex queries.
+This was implemented to mimic the linux shell style patten matching that most
+command-line users are familiar with.
+
 ## `data.table` Subsetting
 
 In addition to regex queries, a `LongTable` object supports arbitrarily complex
-subset queries using the `data.table` API. To access this API, you will need to use the `.` function, which allows you
-to pass raw R expressions to be evaluated inside the `i` and `j` arguments
-for `dataTable[i, j]`.
+subset queries using the `data.table` API. To access this API, you will need to 
+use the `.` function, which allows you to pass raw R expressions to be evaluated 
+inside the `i` and `j` arguments for `dataTable[i, j]`.
 
-For example if I want to subset to rows where the cell line is VCAP and columns
+For example if we want to subset to rows where the cell line is VCAP and columns
 where drug1 is Temozolomide and drug2 is either Lapatinib or Bortezomib:
 
 ```{r , echo=TRUE}

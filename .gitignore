@@ -9,3 +9,5 @@ doc
 Meta
 logs
 vignettes/.*html
+scripts
+scripts/*
