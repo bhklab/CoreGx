@@ -1,5 +1,18 @@
 # CoreGx News File
 
+## 1.4.1
+- Fixed some spelling errors and incorrect code chunk configurations in the 
+LongTable vignette
+
+## 1.4.0
+- Bioconductor spring 2021 release
+- Added the DataMapper abstract class
+- Added the LongTableDataMapper concrete class
+- Added the metaConstruct method, for making an S4 object from a sub-class of DataMapper
+- Updated LongTable vignette with documentation for the DataMapper and LongTableDataMapper
+- Refactored various methods to work with a LongTable in @sensititivty
+- Refactored various methods to work with a MultiAssayExperiment in @molecularProfiles
+
 ## v1.1.5
 - Implemented a new class, the `LongTable`, to store the results of a treatment
 response experiment. This class provides a flexible and fast data storage 
