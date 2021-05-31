@@ -4,7 +4,7 @@
 - Fixed some spelling errors and incorrect code chunk configurations in the 
 LongTable vignette
 - Fix bug in .rebuildProfiles where the function fails if replicate_id is
-assigned as a rowID column in the LongTable in @sensitivity.
+assigned as a rowID column in the LongTable in @sensitivity
 
 ## 1.5.0
 - Bioconductor spring 2021 release
@@ -32,5 +32,5 @@ CoreSet class for use in other treatment-response experiments.
 ## v1.0.0
 - Implemented molecularProfiles as `SummarizedExperiment`s instead of `ExpressionSet`s
 - Modifying generic implementation to add `...`; allows for additional arguments in `setMethods()` for CoreGx generics
-- Removing package from CRAN]
+- Removing package from CRAN
 - Submitting package to Bioconductor
