@@ -141,7 +141,6 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 })
 
 
-## TODO:: Can we import this from one of the tidyverse pacakges?
 #' Convenience function for converting R code to a call
 #'
 #' This is used to pass through unevaluated R expressions into subset and

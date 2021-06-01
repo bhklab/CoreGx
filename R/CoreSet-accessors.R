@@ -121,7 +121,7 @@ setMethod('annotation', signature("CoreSet"), function(object) {
     ...
 )
 
-#' @rdname CoreSet-accessors 
+#' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_annotation(class_=.local_class, data_=.local_data)
 setReplaceMethod("annotation", signature("CoreSet", "list"), 
     function(object, value) 
@@ -1728,7 +1728,6 @@ setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"),
 
 ## ======================
 ## ---- perturbation slot
-
 
 ##
 ## == pertNumber 
