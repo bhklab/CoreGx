@@ -1,12 +1,18 @@
 # CoreGx News File
 
-## 1.5.1
+## v1.5.2
+- Add subsetBySample method for CoreSet object; this is the first step in
+modularizing the subset methods for reuse in dependent packages
+- Added a CoreSet-utils documentation section to document subset, intersect,
+combine and other set operations for a CoreSet object.
+
+## v1.5.1
 - Fixed some spelling errors and incorrect code chunk configurations in the 
 LongTable vignette
 - Fix bug in .rebuildProfiles where the function fails if replicate_id is
 assigned as a rowID column in the LongTable in @sensitivity
 
-## 1.5.0
+## v1.5.0
 - Bioconductor spring 2021 release
 - Added the DataMapper abstract class
 - Added the LongTableDataMapper concrete class
