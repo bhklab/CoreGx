@@ -20,11 +20,15 @@
 #' estimation. If 0, no permutation testing is done
 #' @param nthread \code{numeric} can parallelize permutation texting using
 #'   BiocParallels bplapply
+#' @param alternative indicates the alternative hypothesis and must be one of
+#' ‘"two.sided"’, ‘"greater"’ or ‘"less"’.  You can specify just
+#' the initial letter.  ‘"greater"’ corresponds to positive
+#' association, ‘"less"’ to negative association.
 #' @param ... \code{list} Additional arguments
 #'
 #' @return A list with the MCC as the $estimate, and p value as $p.value
 #' @export
-mcc <- function(x, y, nperm = 1000, nthread = 1, ...) {
+mcc <- function(x, y, nperm = 1000, nthread = 1, alternative=c("two.sided", "less", "greater"), ...) {
     # PARAMETER CHANGE WARNING
     if (!missing(...)) {
         if ("setseed" %in% names(...)) {
@@ -33,7 +37,7 @@ mcc <- function(x, y, nperm = 1000, nthread = 1, ...) {
               script before running this function.")
         }
     }
-
+    alternative <- match.arg(alternative)
     if ((length(x) != length(y)) || (!is.factor(x) || length(levels(x)) < 2) || (!is.factor(y) || length(levels(y)) < 2)) {
         stop("x and y must be factors of the same length with at least two levels")
     }
@@ -61,13 +65,17 @@ mcc <- function(x, y, nperm = 1000, nthread = 1, ...) {
         }, xx = x, yy = y)
         mcres <- unlist(mcres)
         #res[["p.value"]] <- sum(mcres > res["estimate"])/sum(!is.na(mcres))
-        if(res[["estimate"]] > 0)
-        {
-          res[["p.value"]] <- sum(res[["estimate"]] <=  mcres )/sum(!is.na(mcres))
-        } else
-        {
-          res[["p.value"]] <- sum(res[["estimate"]] >=  mcres )/sum(!is.na(mcres))
-        }
+        switch(alternative, "two.sided" = {
+            if(res[["estimate"]] > 0) {
+                res[["p.value"]] <- 2*sum(res[["estimate"]] <=  mcres )/sum(!is.na(mcres))
+            } else {
+                res[["p.value"]] <- 2*sum(res[["estimate"]] >=  mcres )/sum(!is.na(mcres))
+            }
+        }, "less" = {
+            res[["p.value"]] <- sum(res[["estimate"]] >=  mcres )/sum(!is.na(mcres)) 
+        }, "greater" = {
+            res[["p.value"]] <- sum(res[["estimate"]] <=  mcres )/sum(!is.na(mcres))
+        })
         if (res["p.value"] == 0) {
             res["p.value"] <- 1/(nperm + 1)
         }
