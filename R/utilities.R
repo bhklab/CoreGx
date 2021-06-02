@@ -51,7 +51,9 @@
 ## TODO:: Add documentation!
 #' @export
 #' @noRd
-.sanitizeInput <- function(x, y, lower, upper, pars, x_as_log, y_as_log, y_as_pct, trunc, verbose = FALSE) {
+.sanitizeInput <- function(x, y, lower, upper, pars, x_as_log, y_as_log, 
+    y_as_pct, trunc, verbose = FALSE) 
+{
     # Set to 2 to see debug printouts
     
     if (!is.logical(x_as_log)) {
@@ -103,7 +105,7 @@
     }
     
     if (!missing(x)) {
-        if (!all(is.finite(x) || is.na(x) || (x_as_log && x == -Inf))) {
+        if (!all(is.finite(x) | is.na(x)) || (x_as_log && any(x == -Inf))) {
             if (verbose == 2) {
                 message("x:")
                 message(x)
