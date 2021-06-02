@@ -1,7 +1,10 @@
 # CoreGx News File
 
+## v1.5.4
+- Fix bug in .sanitize input caused by length > 1 coercing to logical vector
+
 ## v1.5.3
-- Fix bug in connectivityScore caused by length >= 1 coercing to logical vector; this should fix errors in RadioGx and PharmacoGx vignettes that were caused by failed R CMD build
+- Fix bug in connectivityScore caused by length > 1 coercing to logical vector; this should fix errors in RadioGx and PharmacoGx vignettes that were caused by failed R CMD build
 
 ## v1.5.2
 - Add subsetBySample method for CoreSet object; this is the first step in
