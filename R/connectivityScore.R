@@ -106,7 +106,7 @@ connectivityScore <- function(x, y, method = c("fgsea", "gwc"), nperm = 10000, n
             score = c(es = -nes.down[1], p = nes.down[2])
         } else if (length(nes.down) == 0) {
             score = c(es = nes.up[1], p = nes.up[2])
-        } else if (complete.cases(cbind(nes.up, nes.down)) && sign(nes.up[1]) != sign(nes.down[1])) {
+        } else if (all(complete.cases(cbind(nes.up, nes.down))) && sign(nes.up[1]) != sign(nes.down[1])) {
             score <- c(es = (nes.up[1] - nes.down[1])/2, p = .combineTest(p = c(nes.up[2], nes.down[2]), method = "fisher", na.rm = TRUE))
         } else {
             score <- c(score = 0, p = 1)

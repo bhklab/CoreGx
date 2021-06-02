@@ -4,7 +4,14 @@
 \alias{mcc}
 \title{Compute a Mathews Correlation Coefficient}
 \usage{
-mcc(x, y, nperm = 1000, nthread = 1, ...)
+mcc(
+  x,
+  y,
+  nperm = 1000,
+  nthread = 1,
+  alternative = c("two.sided", "less", "greater"),
+  ...
+)
 }
 \arguments{
 \item{x, y}{\code{factor} of the same length with the same number of levels}
@@ -14,6 +21,11 @@ estimation. If 0, no permutation testing is done}
 
 \item{nthread}{\code{numeric} can parallelize permutation texting using
 BiocParallels bplapply}
+
+\item{alternative}{indicates the alternative hypothesis and must be one of
+‘"two.sided"’, ‘"greater"’ or ‘"less"’.  You can specify just
+the initial letter.  ‘"greater"’ corresponds to positive
+association, ‘"less"’ to negative association.}
 
 \item{...}{\code{list} Additional arguments}
 }
