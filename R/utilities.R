@@ -179,7 +179,7 @@
         
     } else {
         
-        if (!all(is.finite(y) || is.na(y) || (y_as_log && y == -Inf))) {
+        if (!all(is.finite(y) | is.na(y) || (y_as_log && any(y == -Inf)))) {
             if (verbose == 2) {
                 message("y:")
                 message(y)
