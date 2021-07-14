@@ -49,9 +49,9 @@ setAs('LongTable', 'data.table', def=function(from) {
     }
 
     # join the row and column data
-    DT <- merge.data.table(DT, rowData(from, key=TRUE))
+    DT <- merge.data.table(DT, rowData(from, key=TRUE), by='rowKey')
+    DT <- merge.data.table(DT, colData(from, key=TRUE), by='colKey')
     setkeyv(DT, c('rowKey', 'colKey'))
-    DT <- merge.data.table(DT, colData(from, key=TRUE))
 
     # drop interal key columns
     DT[, c('rowKey', 'colKey') := NULL]

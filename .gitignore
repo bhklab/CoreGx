@@ -12,3 +12,5 @@ logs
 vignettes/.*html
 scripts
 scripts/*
+local_data
+local_data/*

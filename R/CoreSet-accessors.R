@@ -157,7 +157,7 @@ setGeneric("dateCreated", function(object, ...) standardGeneric("dateCreated"))
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_dateCreated(class_=.local_class, data_=.local_data)
 setMethod('dateCreated', signature("CoreSet"), function(object) {
-  object@annotation$dateCreated
+    object@annotation$dateCreated
 })
 
 
@@ -187,12 +187,12 @@ setGeneric("dateCreated<-", function(object, ..., value)
 setReplaceMethod('dateCreated', signature(object="CoreSet", value="character"), 
     function(object, value) 
 {
-  ## TODO:: Error handling - do we ever want to allow a datetime object?
-  funContext <- .funContext('dateCreated')
-  if (length(value) > 1) .error(funContext, 'dateCreated must by a character
-      vector of length 1, as returned by the `date()` function.')
-  object@annotation$dateCreated <- value
-  return(object)
+    ## TODO:: Error handling - do we ever want to allow a datetime object?
+    funContext <- .funContext('dateCreated')
+    if (length(value) > 1) .error(funContext, 'dateCreated must by a character
+        vector of length 1, as returned by the `date()` function.')
+    object@annotation$dateCreated <- value
+    return(object)
 })
 
 
@@ -272,16 +272,19 @@ setGeneric("cellInfo", function(object, ...) standardGeneric("cellInfo"))
     __cellInfo__: `data.frame` Metadata for all cell-lines in a `{class_}` object.
 
     @md
-    @aliases cellInfo,{class_}-method cellInfo
+    @aliases cellInfo,{class_}-method cellInfo sampleInfo
     @exportMethod cellInfo
     ",
     ...
 )
 
+#' @export
+sampleInfo <- cellInfo
+
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_cellInfo(class_=.local_class)
 setMethod(cellInfo, "CoreSet", function(object){
-  object@cell
+    object@cell
 })
 
 #' @export
@@ -297,23 +300,26 @@ setGeneric("cellInfo<-", function(object, value) standardGeneric("cellInfo<-"))
     cellInfo({data_}) <- cellInfo({data_})
 
     @md
-    @aliases cellInfo<-,{class_},data.frame-method cellInfo<-
+    @aliases cellInfo<-,{class_},data.frame-method cellInfo<- sampleInfo<-
     @exportMethod cellInfo<-
     ",
     ...
 )
+
+#' @export
+`sampleInfo<-` <- `cellInfo<-`
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_cellInfo(class_=.local_class, data_=.local_data)
 setReplaceMethod("cellInfo", signature(object="CoreSet", value="data.frame"), 
     function(object, value)
 {
-  funContext <- .funContext('::cellInfo')
-  if(is.null(rownames(value)))
+    funContext <- .funContext('::cellInfo')
+    if(is.null(rownames(value)))
     .error(funContext, "Please provide the cell_id as rownames for the cell 
         line annotations")
-  object@cell <- value
-  object
+    object@cell <- value
+    object
 })
 
 
@@ -334,11 +340,14 @@ setGeneric("cellNames", function(object, ...) standardGeneric("cellNames"))
     cellNames({data_})
 
     @md
-    @aliases cellName,{class_}-method cellNames
+    @aliases cellName,{class_}-method cellNames sampleNames
     @exportMethod cellNames
     ",
     ...
 )
+
+#' @export
+sampleNames <- cellNames
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_cellNames(class_=.local_class, data_=.local_data)
@@ -362,11 +371,14 @@ setGeneric("cellNames<-", function(object, ..., value)
     cellNames({data_}) <- cellNames({data_})
 
     @md
-    @aliases cellNames<-,{class_},list-method cellNames<-
+    @aliases cellNames<-,{class_},list-method cellNames<- sampleNames<-
     @exportMethod cellNames<-
     ",
     ...
 )
+
+#' @export
+`sampleNames<-` <- `cellNames<-`
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_cellNames(class_=.local_class, data_=.local_data)

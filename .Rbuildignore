@@ -21,3 +21,4 @@ CONTRIBUTING.md
 ^\.github$
 scripts
 combos
+local_data

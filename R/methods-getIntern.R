@@ -35,3 +35,8 @@ setMethod('getIntern', signature(object='LongTable', x='character'),
             error=function(e) {
                 message(e); get(x, envir=object@.intern) })
 })
+#' @export
+setMethod('getIntern', signature(object='LongTable', x='missing'), 
+    function(object, x) {
+        object@.intern
+})
