@@ -32,4 +32,5 @@ setMethod('$', signature('LongTable'), function(x, name) {
 setReplaceMethod('$', signature('LongTable'), function(x, name, value) {
     # error handling done inside `assay<-`
     x[[name]] <- value
+    x
 })
