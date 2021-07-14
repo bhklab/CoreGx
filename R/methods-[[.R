@@ -70,4 +70,5 @@ setReplaceMethod('[[', signature(x='LongTable'),
     function(x, i, value) 
 {
     assay(x, i) <- value
+    x
 })
