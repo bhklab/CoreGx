@@ -6,15 +6,16 @@
 \alias{subsetBySample}
 \alias{subsetByTreatment,CoreSet-method}
 \alias{subsetByTreatment}
-\alias{subsetByFeature,CoreSet-method}
+\alias{subsetByFeature,CoreSet,character-method}
 \alias{subsetByFeature}
+\alias{subsetByFeature,CoreSet-method}
 \title{Utility methods for a \code{CoreSet} object.}
 \usage{
 \S4method{subsetBySample}{CoreSet}(x, samples)
 
 \S4method{subsetByTreatment}{CoreSet}(x, treatments)
 
-\S4method{subsetByFeature}{CoreSet}(x, features, mDataTypes)
+\S4method{subsetByFeature}{CoreSet,character}(x, features, mDataTypes)
 }
 \arguments{
 \item{x}{A \code{CoreSet} object.}
@@ -79,6 +80,6 @@ clevelandSmall_cSet_sub <- subsetByTreatment(clevelandSmall_cSet, treatments)
 
 ### subsetByFeature
 features <- featureNames(clevelandSmall_cSet, 'rna')[seq_len(5)]
-clevelandSmall_cSet_sub <- subsetByFeature(clevelandSmall_cSet, features)
+clevelandSmall_cSet_sub <- subsetByFeature(clevelandSmall_cSet, features, 'rna')
 
 }

@@ -188,7 +188,7 @@ setGeneric('subsetByTreatment', function(x, treatments, ...)
 #' @rdname CoreSet-utils
 #' @eval CoreGx:::.docs_CoreSet_subsetByTreatment(class_=.local_class, 
 #' data_=.local_data, treatment_='treatment')
-setMethod('subsetByTreatment', signature('CoreSet'), 
+setMethod('subsetByTreatment', signature('CoreSet'),
     function(x, treatments) 
 {
     funContext <- .S4MethodContext('subsetByTreatment', 'PharmacoSet')
@@ -281,7 +281,7 @@ setGeneric('subsetByFeature', function(x, features, ...)
 
     ### subsetByFeature
     features <- featureNames({data_}, 'rna')[seq_len(5)]
-    {data_}_sub <- subsetByFeature({data_}, features)
+    {data_}_sub <- subsetByFeature({data_}, features, 'rna')
 
     @md
     @aliases subsetByFeature subsetByFeature,CoreSet-method
@@ -293,11 +293,15 @@ setGeneric('subsetByFeature', function(x, features, ...)
 
 #' @rdname CoreSet-utils
 #' @eval .docs_CoreSet_subsetByFeature(class_=.local_class, data_=.local_data)
-setMethod('subsetByFeature', signature(x='CoreSet'), 
+setMethod('subsetByFeature', signature(x='CoreSet', features='character'), 
     function(x, features, mDataTypes)
-{ 
+{
     slotData <- molecularProfilesSlot(x)
-    MAE <- if (!is(MAE, 'MultiAssayExperiment')) MultiAssayExperiment(slotData)
-        else slotData
-    
+    MAE <- if (!is(slotData, 'MultiAssayExperiment')) 
+        MultiAssayExperiment(slotData) else slotData
+    if (missing(mDataTypes)) mDataTypes <- names(MAE)
+    MAE_sub <- MAE[, , mDataTypes]
+    keepFeatures <- rownames(MAE_sub) %in% features
+    subsetMAE <- MAE[keepFeatures, drop=TRUE]
+    return(subsetMAE)
 })
