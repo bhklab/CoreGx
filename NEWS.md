@@ -1,5 +1,8 @@
 # CoreGx News File
 
+## v1.5.4
+- Fix bug in `$<-` and `[[<-` methods where value was returned instead of updated object
+
 ## v1.5.3
 - Fix bug in connectivityScore caused by length >= 1 coercing to logical vector; this should fix errors in RadioGx and PharmacoGx vignettes that were caused by failed R CMD build
 
