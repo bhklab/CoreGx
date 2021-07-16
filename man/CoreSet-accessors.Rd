@@ -30,6 +30,13 @@
 \alias{cellNames<-,CoreSet,list-method}
 \alias{cellNames<-}
 \alias{sampleNames<-}
+\alias{treatmentInfo,CoreSet-method}
+\alias{treatmentInfo}
+\alias{treatmentInfo<-,CoreSet,data.frame-method}
+\alias{treatmentInfo<-}
+\alias{treatmentNames,CoreSet-method}
+\alias{treatmentNames}
+\alias{treatmentNames<-,CoreSet,character-method}
 \alias{curation,CoreSet-method}
 \alias{curation}
 \alias{curation<-,CoreSet,list-method}
@@ -116,6 +123,14 @@
 \S4method{cellNames}{CoreSet}(object)
 
 \S4method{cellNames}{CoreSet,character}(object) <- value
+
+\S4method{treatmentInfo}{CoreSet}(object)
+
+\S4method{treatmentInfo}{CoreSet,data.frame}(object) <- value
+
+\S4method{treatmentNames}{CoreSet}(object)
+
+\S4method{treatmentNames}{CoreSet,character}(object) <- value
 
 \S4method{curation}{CoreSet}(object)
 
@@ -249,6 +264,31 @@ the \code{cell} slot from a CoreSet object.
 a CoreSet object. Arguments:
 \itemize{
 \item value: \code{character} vector of rownames for the \code{cellInfo(object)} \code{data.frame}.
+}
+
+\strong{treatmentInfo}: \code{data.frame} Metadata for all treatments in a \code{CoreSet}
+object. Arguments:
+\itemize{
+\item object: \code{CoreSet} An object to retrieve treatment metadata from.
+}
+
+\strong{treatmentInfo<-}: \code{CoreSet} object with updated treatment metadata.
+object. Arguments:
+\itemize{
+\item object: \code{CoreSet} An object to set treatment metadata for.
+\item value: \code{data.frame} A new table of treatment metadata for \code{object}.
+}
+
+\strong{treatmentNames}: \code{character} Names for all treatments in a \code{CoreSet}
+object. Arguments:
+\itemize{
+\item object: \code{CoreSet} An object to retrieve treatment names from.
+}
+
+\strong{treatmentNames}: \code{character} Names for all treatments in a \code{CoreSet}
+object. Arguments:
+\itemize{
+\item object: \code{CoreSet} An object to retrieve treatment names from.
 }
 
 \subsection{@curation}{
@@ -494,6 +534,14 @@ cellInfo(clevelandSmall_cSet) <- cellInfo(clevelandSmall_cSet)
 cellNames(clevelandSmall_cSet)
 
 cellNames(clevelandSmall_cSet) <- cellNames(clevelandSmall_cSet)
+
+treatmentInfo(clevelandSmall_cSet)
+
+treatmentInfo(clevelandSmall_cSet) <- treatmentInfo(clevelandSmall_cSet)
+
+treatmentNAmes(clevelandSmall_cSet)
+
+treatmentNAmes(clevelandSmall_cSet)
 
 ## curation
 curation(clevelandSmall_cSet)

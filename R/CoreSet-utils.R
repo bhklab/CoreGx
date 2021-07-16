@@ -1,4 +1,5 @@
 #' @include CoreSet-class.R CoreSet-accessors.R
+#' @importFrom BiocGenerics match %in%
 NULL
 
 .local_class <- 'CoreSet'
@@ -192,14 +193,6 @@ setMethod('subsetByTreatment', signature('CoreSet'),
     function(x, treatments) 
 {
     funContext <- .S4MethodContext('subsetByTreatment', 'PharmacoSet')
-    treatmentType <- switch(class(x)[1],
-        'PharmacoSet'='drug',
-        'ToxicoSet'='drug',
-        'RadioSet'='radiation',
-        'CoreSet'=return(x),
-    )
-    treatmentInfo <- get(paste0(treatmentType, 'Info'))
-    `treatmentInfo<-` <- get(paste0(treatmentType, 'Info<-'))
     treatmentNames <- rownames(treatmentInfo(x))
     if (!all(treatments %in% treatmentNames)) {
         .warning(funContext, 'Treatments missing from ', class(x)[1], ': ',
@@ -227,6 +220,7 @@ setMethod('subsetByTreatment', signature('CoreSet'),
     treatmentInfo(x) <- treatmentInf[rownames(treatmentInf) %in% treatments, ]
 
     # -- molecularProfiles
+    # deal with potential loss of samples when subsetting by treatment
     keepSamples <- cellNames(x)
     molecSlot <- molecularProfilesSlot(x)
     molecularProfilesSlot(x) <- .subsetMolecularProfilesBySample(molecSlot, 
@@ -300,8 +294,16 @@ setMethod('subsetByFeature', signature(x='CoreSet', features='character'),
     MAE <- if (!is(slotData, 'MultiAssayExperiment')) 
         MultiAssayExperiment(slotData) else slotData
     if (missing(mDataTypes)) mDataTypes <- names(MAE)
-    MAE_sub <- MAE[, , mDataTypes]
+    suppressMessages({
+        suppressWarnings({
+            MAE_sub <- MAE[, , mDataTypes]
+        })
+    })
     keepFeatures <- rownames(MAE_sub) %in% features
     subsetMAE <- MAE[keepFeatures, drop=TRUE]
-    return(subsetMAE)
+    newSlotData <- if (is(slotData, 'MultiAssayExperiment')) subsetMAE else
+        as.list(experiments(subsetMAE))
+    molecularProfilesSlot(x) <- newSlotData
+    ## TODO:: What if this drops cells from the PSet?
+    return(x)
 })
