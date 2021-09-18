@@ -90,10 +90,10 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         if (any(notMissingNames))
             setnames(assayDT, old=assayColumns[[i]][notMissingNames], 
                 new=names(assayColumns[[i]])[notMissingNames], skip_absent=TRUE)
-        assayDtL[[i]] <- assayDT
+        assayDtL[[i]] <- na.omit(assayDT)
     }
 
-    CoreGx::LongTable(
+    LT <- CoreGx::LongTable(
         rowData=rowDataDT, rowIDs=rowIDs,
         colData=colDataDT, colIDs=colIDs,
         assays=assayDtL,

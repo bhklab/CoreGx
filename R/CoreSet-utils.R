@@ -56,7 +56,7 @@ NULL
 
 
 #' @export
-setGeneric('subsetBySample', function(x, samples, ...) 
+setGeneric('subsetBySample', function(x, samples, ...)
     standardGeneric('subsetBySample'))
 
 #' @noRd
@@ -159,7 +159,7 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
 ## ----------------------
 
 #' @export
-setGeneric('subsetByTreatment', function(x, treatments, ...) 
+setGeneric('subsetByTreatment', function(x, treatments, ...)
     standardGeneric('subsetByTreatment'))
 
 #' @noRd
@@ -193,18 +193,23 @@ setMethod('subsetByTreatment', signature('CoreSet'),
     function(x, treatments) 
 {
     funContext <- .S4MethodContext('subsetByTreatment', 'PharmacoSet')
+    treatmentType <- switch(class(x)[1],
+        'PharmacoSet'='drug',
+        'ToxicoSet'='drug',
+        'RadioSet'='radiation',
+        'CoreSet'=return(data.frame())
+    )
     treatmentNames <- rownames(treatmentInfo(x))
     if (!all(treatments %in% treatmentNames)) {
         .warning(funContext, 'Treatments missing from ', class(x)[1], ': ',
             setdiff(treatments, treatmentNames), '! Please ensure all specified
-            treatments are valid rownames of ', treatmentType, 'Info(x). 
+            treatments are valid rownames of treatmentInfo(x). 
             Proceeding with the valid treatments only.')
         treatments <- union(treatments, treatmentNames)
     }
-
     # -- sensitivity slot
     sensSlot <- sensitivitySlot(x)
-    sensitivitySlot(x) <- .subsetSensitivityByTreatment(sensSlot, treatments, 
+    sensitivitySlot(x) <- .subsetSensitivityByTreatment(sensSlot, treatments,
         treatmentType=treatmentType)
 
     # -- perturbation slot
@@ -223,7 +228,7 @@ setMethod('subsetByTreatment', signature('CoreSet'),
     # deal with potential loss of samples when subsetting by treatment
     keepSamples <- cellNames(x)
     molecSlot <- molecularProfilesSlot(x)
-    molecularProfilesSlot(x) <- .subsetMolecularProfilesBySample(molecSlot, 
+    molecularProfilesSlot(x) <- .subsetMolecularProfilesBySample(molecSlot,
         keepSamples)
 
     # -- check object is still valid and return
@@ -266,7 +271,8 @@ setGeneric('subsetByFeature', function(x, features, ...)
     @details
 
     ## subset methods
-    __subsetByFeature__: Subset a `{class_}` object by feature identifier.
+    __subsetByFeature__: Subset a `{class_}` object by molecular feature
+        identifier.
     - value: a `{class_}` object containing only `features`.
 
     @examples
@@ -274,11 +280,11 @@ setGeneric('subsetByFeature', function(x, features, ...)
     ## subset methods
 
     ### subsetByFeature
-    features <- featureNames({data_}, 'rna')[seq_len(5)]
+    features <- fNames({data_}, 'rna')[seq_len(5)]
     {data_}_sub <- subsetByFeature({data_}, features, 'rna')
 
     @md
-    @aliases subsetByFeature subsetByFeature,CoreSet-method
+    @aliases subsetByFeature subsetByFeature,{class_}-method
     @importFrom MultiAssayExperiment MultiAssayExperiment
     @exportMethod subsetByFeature
     ",
@@ -287,11 +293,11 @@ setGeneric('subsetByFeature', function(x, features, ...)
 
 #' @rdname CoreSet-utils
 #' @eval .docs_CoreSet_subsetByFeature(class_=.local_class, data_=.local_data)
-setMethod('subsetByFeature', signature(x='CoreSet', features='character'), 
+setMethod('subsetByFeature', signature(x='CoreSet'),
     function(x, features, mDataTypes)
 {
     slotData <- molecularProfilesSlot(x)
-    MAE <- if (!is(slotData, 'MultiAssayExperiment')) 
+    MAE <- if (!is(slotData, 'MultiAssayExperiment'))
         MultiAssayExperiment(slotData) else slotData
     if (missing(mDataTypes)) mDataTypes <- names(MAE)
     suppressMessages({

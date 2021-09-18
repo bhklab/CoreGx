@@ -322,8 +322,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #' @import data.table
 #' @export
 setMethod('rowIDs', signature(object='LongTable'),
-    function(object, data=FALSE, key=FALSE) 
-{
+        function(object, data=FALSE, key=FALSE) {
     cols <- getIntern(object, 'rowIDs')
     if (key) cols <- c(cols, 'rowKey')
     if (data) rowData(object, key=key)[, ..cols] else cols

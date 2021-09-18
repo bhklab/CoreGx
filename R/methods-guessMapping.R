@@ -1,22 +1,22 @@
 #' Generic for Guessing the Mapping Between Some Raw Data and an S4 Object
-#' 
+#'
 #' @param object An `S4` object containing so raw data to guess data to
 #'   object slot mappings for.
 #' @param ... Allow new arguments to be defined for this generic.
-#' 
+#'
 #' @return A `list` with mapping guesses as items.
-#' 
+#'
 #' @md
 #' @export
 setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping'))
 
 #' Guess which columns in raw experiment data map to which dimensions.
-#' 
+#'
 #' Checks for columns which are uniquely identified by a group of identifiers.
 #' This should be used to help identify the columns required to uniquely
 #' identify the rows, columns, assays and metadata of a `DataMapper` class
 #' object.
-#' 
+#'
 #' @details
 #' Any unmapped columns will be added to the end of the returned `list` in an
 #' item called unmapped.
@@ -37,22 +37,21 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 #' @param data A `logical` vector indicating whether you would like the data
 #'   for mapped columns to be returned instead of their column names. Defaults
 #'   to `FALSE` for easy use assigning mapped columns to a `DataMapper` object.
-#' 
+#'
 #' @return A `list`, where each item is named for the associated `groups` item
 #' the guess is for. The character vector in each item are columns which are
 #' uniquely identified by the identifiers from that group.
 #'
 #' @examples
-#' guessMapping(exampleDataMapper, groups=list(rows='drug_id', cols='cell_id'), 
+#' guessMapping(exampleDataMapper, groups=list(rows='drug_id', cols='cell_id'),
 #' subset=FALSE)
 #'
 #' @md
 #' @export
-setMethod('guessMapping', signature(object='LongTableDataMapper'), 
-    function(object, groups, subset, data=FALSE)
-{
+setMethod('guessMapping', signature(object='LongTableDataMapper'),
+        function(object, groups, subset, data=FALSE) {
     funContext <- '[CoreGx::guessMapping,LongTableDataMapper-method]\n\t'
-    
+
     # Extract the raw data
     mapData <- copy(rawdata(object))
     if (!is.data.table(mapData)) setDT(mapData)
@@ -61,7 +60,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     if (!(length(subset) == length(groups) || length(subset) == 1))
         stop(.errorMsg(funContext, ' The subset parameter must be
             either length 1 or length equal to the groups parameter!'))
-    
+
     if (length(subset) == 1) subset <- rep(subset, length(groups))
 
     # Get the id columns to prevent subsetting them out

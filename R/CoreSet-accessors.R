@@ -1,10 +1,10 @@
 # Navigating this file:
 # - Slot section names start with ----
 # - Method section names start with ==
-# 
+#
 # As a result, you can use Ctrl + f to find the slot or method you are looking
 # for quickly, assuming you know its name.
-# 
+#
 # For example Ctrl + f '== molecularProfiles' would take you the molecularProfiles
 # method, while Ctrl + f '---- molecularProfiles' would take you to the slot
 # section.
@@ -384,10 +384,10 @@ setGeneric("cellNames<-", function(object, ..., value)
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_cellNames(class_=.local_class, data_=.local_data)
 setReplaceMethod("cellNames", signature(object="CoreSet",value="character"), 
-  function(object, value){
-    ## TODO: does updateCellId also update slots other than cell?
-    object <- updateCellId(object, value)
-    return(object)
+    function(object, value){
+        ## TODO: does updateCellId also update slots other than cell?
+        object <- updateCellId(object, value)
+        return(object)
 })
 
 

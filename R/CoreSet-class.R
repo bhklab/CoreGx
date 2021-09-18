@@ -642,6 +642,7 @@ checkCsetStructure <-
     # hasEnsemblId <- rowColNamesL %in% 'ensemblid'
 
     # ---- Check all samples are in the @cell slot
+    samples <- cellNames(object)
     cellIdL <- as(lapply(colDataL, `[[`, i='cellid'), 'List')
     hasValidSamples <- cellIdL %in% samples
     if (!all(all(hasValidSamples))) {

@@ -98,6 +98,8 @@ LongTableDataMapper <- function(rawdata, rowDataMap=list(),
 # DataMapper Show Method
 # ----------------------
 
+## FIXME:: Finish show method
+
 #' @describeIn LongTableDataMapper-class Show method for LongTableDataMapper. 
 #' Determines how the object is displayed in the console.
 #'
@@ -111,7 +113,7 @@ LongTableDataMapper <- function(rawdata, rowDataMap=list(),
 #' @importFrom crayon %+% yellow red green blue cyan magenta
 #' @exportMethod show
 setMethod('show', signature(object='LongTableDataMapper'), function(object) {
-    
+
     ## -- class
     cat(yellow$bold$italic('< LongTableDataMapper >', '\n'))
 
@@ -152,8 +154,8 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
 #'
 #' @eval .docs_DataMapper_accessors(class_=.local_class_3)
 #' @eval .docs_DataMapper_get_rawdata(class_=.local_class_3)
-#' 
-#' @param value See details. 
+#'
+#' @param value See details.
 NULL
 
 ## =====================================
@@ -192,10 +194,10 @@ setGeneric('rowDataMap', function(object, ...) standardGeneric('rowDataMap'))
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval 
-#' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_3, 
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_3,
 #' data_=.local_data_3)
-setMethod('rowDataMap', signature(object='LongTableDataMapper'), function(object) 
-{
+setMethod('rowDataMap', signature(object='LongTableDataMapper'),
+        function(object) {
     object@rowDataMap
 })
 
