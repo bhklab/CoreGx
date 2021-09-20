@@ -67,7 +67,7 @@ NULL
 #' Get the symbol(s) x from the object@.intern slot of a LongTable
 #'
 #' This is used as an alternative to R attributes for storing structural
-#' metadata of S4 objects.
+#' metadata of an S4 objects.
 #'
 #' @examples
 #' getIntern(merckLongTable, 'rowIDs')
@@ -101,9 +101,8 @@ setMethod('getIntern', signature(object='LongTable', x='character'),
 })
 #' @export
 setMethod('getIntern', signature(object='LongTable', x='missing'),
-    function(object, x) {
-        object@.intern
-})
+    function(object, x) object@.intern
+)
 
 
 ## ==================
@@ -122,17 +121,19 @@ setMethod('getIntern', signature(object='LongTable', x='missing'),
 #' @param key `logical` Should the rowKey column also be returned? Defaults
 #'     to FALSE.
 #' @param use.names `logical` This parameter is just here to stop matching
-#'     the key argument to use.names from the rowData generic. It doesn't do
-#'     anything at this time and can be ignored.
+#'     the posotopoma; argument to use.names from the rowData generic. It 
+#'     doesn't do anything at this time and can be ignored.
 #'
 #' @return A `data.table` containing rowID, row identifiers, and row metadata.
 #'
-#' @import data.table
+#' @importFrom data.table data.table copy
 #' @export
 setMethod('rowData', signature(x='LongTable'), 
         function(x, key=FALSE, use.names=FALSE) {
-    return(if (key) copy(x@rowData[, -'.rownames']) else
-        copy(x@rowData[, -c('.rownames', 'rowKey')]))
+    return(
+        if (key) copy(x@rowData[, -'.rownames']) else
+        copy(x@rowData[, -c('.rownames', 'rowKey')])
+    )
 })
 
 #' Updates the `rowData` slot as long as the ID columns are not changed.
@@ -356,74 +357,11 @@ setMethod('assays', signature(x='LongTable'),
 #' @export
 setReplaceMethod('assays', signature(x='LongTable', value='list'),
         function(x, value) {
-    # check input is correct
-    isDF <- is.items(value, 'data.frame')
-    isDT <- is.items(value, 'data.table')
-    if (!all(isDF))
-        stop(.errorMsg('\n[CoreGx::assays<-] Items ', .collapse(which(!isDT)),
-            ' in value are not data.tables or data.frames. These are the only ',
-            'types allowed in the value argument!', collapse=', '))
-
-    if (!all(isDT))
-        for (i in which(!isDT)) setDT(values[[i]])
-
-    # check new assay names
-    if (is.null(names(value))) {
-        .warning('\n[CoreGx::assays<-] The list being assigned to ',
-            'assays has no names. Defaulting to numbered assays. You can ',
-            'correct his with assayNames(value) <- names.')
-        names(value) <- paste0('assay', seq_along(value))
+    assay_names <- names(value)
+    for (name in assay_names) {
+        x[[name]] <- value[[name]]
     }
-
-    # extract the row and column values
-    rowIDCols <- rowIDs(x, key=FALSE)
-    colIDCols <- colIDs(x, key=FALSE)
-    rowMetaCols <- rowMeta(x, key=FALSE)
-    colMetaCols <- colMeta(x, key=FALSE)
-
-    # check that all the id columns are present
-    idCols <- idCols(x)
-    assayCols <- lapply(value, colnames)
-    hasIDCols <- lapply(assayCols, FUN=`%in%`, x=idCols)
-    assayHasIDCols <- unlist(lapply(hasIDCols, FUN=all))
-    if (!all(assayHasIDCols)) {
-        assayMissingCols <- names(value)[!assayHasIDCols]
-        missingCols <- idCols[unique(Reduce(c, lapply(hasIDCols, which)))]
-        stop(.errorMsg('\n[CoreGx::assays<-] Assay(s) ', .collapse(assayMissingCols),
-            , 'are missing one or more id cols: ', .collapse(missingCols),
-            '. Please ensure you modify assays as returned by assays(longTable,',
-            ' withDimnames=TRUE, metadata=TRUE).', collapse=', '))
-    }
-
-    ## TODO:: Should we support passing colKey and rowKey if the metadata columns are missing?
-    ## TODO:: Could then use them to join with the rowData and colData?
-    # Need to drop the keys because buildLongTable redoes indexing
-    .drop_in <- function(x, y) x[!(x %in% y)]
-    assayCols <- lapply(assayCols, .drop_in, y=c('colKey', 'rowKey'))
-    nonAssayCols <- c(idCols, rowMetaCols, colMetaCols)
-    assayCols <- lapply(assayCols, setdiff, nonAssayCols)
-
-    # get the rowData and colData column mappings
-    rowDataCols <- list(rowIDCols, rowMetaCols)
-    colDataCols <- list(colIDCols, colMetaCols)
-
-    # get assay column names
-    allCols <- c(unlist(rowDataCols), unlist(colDataCols))
-    assayCols <- lapply(assayCols, setdiff, y=allCols)
-    names(assayCols) <- names(value)
-
-    # rebuild the 
-    .mergeOnNonAssayCols <- function(x, y) merge.data.table(x, y, by=nonAssayCols)
-    valueDT <- Reduce(.mergeOnNonAssayCols, value)
-
-    # reconstruct a new LongTable with the updated assay
-    LTdataMapper <- LongTableDataMapper(rawdata=valueDT,
-        rowDataMap=rowDataCols, colDataMap=colDataCols, assayMap=assayCols)
-    LT <- metaConstruct(LTdataMapper)
-
-    # keep the metadata
-    metadata(LT) <- metadata(x)
-    return(LT)
+    return(x)
 })
 
 
@@ -607,7 +545,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
 
     # Handle missing non-identifier columns in rowData or colData
     if (existingAssay) {
-        metaCols <- unique(c(rowMetaCols, colMetaCols))
+        metaCols <- unique(c(rowMeta(x), colMeta(x)))
         hasMetaCols <- metaCols %in% colnames(value)
         if (!all(hasMetaCols)) {
             missingMetaCols <- metaCols[!hasMetaCols]

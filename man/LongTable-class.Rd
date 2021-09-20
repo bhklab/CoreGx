@@ -91,8 +91,8 @@ instead of the column names? Default is FALSE.}
 function.}
 
 \item{use.names}{\code{logical} This parameter is just here to stop matching
-the key argument to use.names from the rowData generic. It doesn't do
-anything at this time and can be ignored.}
+the posotopoma; argument to use.names from the rowData generic. It
+doesn't do anything at this time and can be ignored.}
 
 \item{value}{A \code{data.frame} or \code{data.table} to update the assay data
 with. This must at minumum contain the row and column data identifier
@@ -193,7 +193,7 @@ Define a private constructor method to be used to build a
 \code{LongTable} object.
 
 This is used as an alternative to R attributes for storing structural
-metadata of S4 objects.
+metadata of an S4 objects.
 
 Add or replace an assay in a LongTable by name. Currently
 this function only works when the assay has all columns in row and column
