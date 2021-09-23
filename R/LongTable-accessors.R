@@ -186,7 +186,7 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
     equalRowIDs <- rowIDCols %in% sharedRowIDCols
     if (!all(equalRowIDs)) .warning('\n[CoreGx::rowData<-] The ID columns ',
         rowIDCols[!equalRowIDs], ' are not present in value. The function ',
-        'will attempt to join with existing rowIDs, but this may fail!',
+        'will attempt to join with existing rowIDs, but this may fail!', 
         collapse=', ')
 
     rowIDs <- rowIDs(x, data=TRUE, key=TRUE)
@@ -326,7 +326,7 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 #' @export
 ##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
 setMethod('assays', signature(x='LongTable'),
-        function(x, withDimnames=TRUE, metadata=withDimnames,
+        function(x, withDimnames=TRUE, metadata=withDimnames, 
             key=!withDimnames) {
     return(structure(
         lapply(assayNames(x), FUN=assay, x=x, withDimnames=withDimnames,
@@ -488,14 +488,6 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
 #' @export
 setReplaceMethod('assay', signature(x='LongTable', i='character'),
         function(x, i, value) {
-
-    # Support delete by NULL assignment
-    if (is.null(value) && i %in% assayNames(x)) {
-        x@assays[[i]] <- value
-        x <- reindex(x)
-        return(x)
-    }
-
     funContext <- CoreGx:::.S4MethodContext('assay', class(x), class(i))
     if (!is.data.frame(value)) .error(funContext, 'Only a data.frame or
         data.table can be assiged to the assay slot!')
@@ -521,14 +513,14 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
         FUN.VALUE=character(1))
     missingColumns <- c(missingRowCols, missingColCols)
     missingTypes <- c(missingRowTypes, missingColTypes)
-
+    
     if (existingAssay) {
         if (length(missingColumns) > 0) {
             tryCatch({
                 value <- merge.data.table(
                     assay(x, i, withDimnames=TRUE, metadata=FALSE),
-                    value,
-                    on=intersect(idColumns, colnames(value)),
+                    value, 
+                    on=intersect(idColumns, colnames(value)), 
                     all.x=TRUE)
             }, error=function(e) .error(funContext, 'Failed to map missing
                 id columns via join with existing assay: ', e))
@@ -539,15 +531,15 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
             set(value, j=missingColumns[idx], value=as(NA, missingTypes[idx]))
         setcolorder(value, idColumns)
         # Identify new identifiers to be added to the metadata
-        newRowData <- fsetdiff(value[, .SD, .SDcols=rowIDs(x)],
+        newRowData <- fsetdiff(value[, .SD, .SDcols=rowIDs(x)], 
             rowData(x)[, .SD, .SDcols=rowIDs(x)]
         )
         rowData(x) <- rbind(rowData(x), newRowData,
             use.names=TRUE, fill=TRUE)
-        newColData <- fsetdiff(value[, .SD, .SDcols=colIDs(x)],
+        newColData <- fsetdiff(value[, .SD, .SDcols=colIDs(x)], 
             colData(x)[, .SD, .SDcols=colIDs(x)]
         )
-        colData(x) <- rbind(colData(x), newColData,
+        colData(x) <- rbind(colData(x), newColData, 
             use.names=TRUE, fill=TRUE)
     }
 
@@ -559,36 +551,25 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
             missingMetaCols <- metaCols[!hasMetaCols]
             tryCatch({
                 value <- merge.data.table(
-                    assay(x, i, withDimnames=TRUE, metadata=TRUE)[, .SD,
+                    assay(x, i, withDimnames=TRUE, metadata=TRUE)[, .SD, 
                         .SDcols=c(idCols, missingMetaCols)],
                     value,
                     on=idCols,
                     all.x=TRUE
                 )
-            }, error=function(e) .error(funContext, "Failed to map missing
-                metadata columns via join with existing assay: ", e))
+            }, error=function(e) .error(funContext, 'Failed to map missing
+                metadata columns via join with existing assay: ', e))
         }
     }
-
-    # Map rowKey and colKey to the assay using a natural join, e.g., all shared
-    #>columns
-    originalNRow <- nrow(value)
-    value <- colIDs(x, data=TRUE, key=TRUE)[value, on=.NATURAL]
-    value <- rowIDs(x, data=TRUE, key=TRUE)[value, on=.NATURAL]
-    setkeyv(value, c('rowKey', 'colKey'), physical=TRUE)
-    # Drop the identifier and metadata columns present in value
-    dropCols <- intersect(
-        colnames(value), 
-        c(idCols(x), rowMeta(x), colMeta(x))
-    )
-    value <- value[, .SD, .SDcols=-dropCols]
-
-    if (nrow(value) != originalNRow) .error(funContext, "Failed mapping
-        rowKey and colKey to the new assay!")
 
     x@assays[[i]] <- value
     return(x)
 })
+
+
+mapToMetadata <- function(object) {
+
+}
 
 
 ##
