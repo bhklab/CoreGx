@@ -64,46 +64,55 @@ setOldClass('long.table', S4Class='LongTable')
 #'   is used to key assays, as well as additional row metadata to subset on.
 #' @param rowIDs `character`, `integer` A vector specifying
 #'   the names or integer indexes of the row data identifier columns. These
-#'   columns will be pasted together to make up the row.names of the
+#'   columns will be pasted together to make up the rownames of the
 #'   `LongTable` object.
 #' @param colData `data.table`, `data.frame`, `matrix` A table like object
 #'   coercible to a `data.table` containing the a unique `colID` column which
 #'   is used to key assays, as well as additional column metadata to subset on.
 #' @param colIDs `character`, `integer` A vector specifying
-#'   the names or integer indexes of the col data identifier columns. These
-#'   columns will be pasted together to make up the col.names of the
+#'   the names or integer indexes of the column data identifier columns. These
+#'   columns will be pasted together to make up the colnames of the
 #'   `LongTable` object.
 #' @param assays A `list` containing one or more objects coercible to a
 #'   `data.table`, and keyed by rowID and colID corresponding to the rowID and
 #'   colID columns in colData and rowData.
 #' @param metadata A `list` of metadata associated with the `LongTable`
 #'   object being constructed
-#' @param keep.rownames `logical` or `character` 
-#'   Logical: whether rownames should be added as a column if coercing to a 
-#'   `data.table`, default is FALSE. If TRUE, rownames are added to the column 
-#'   'rn'. 
-#'   Character: specify a custom column name to store the rownames in.
+#' @param keep.rownames `logical` or `character` Logical: whether rownames
+#'   should be added as a column if coercing to a `data.table`, default is FALSE.
+#'   If TRUE, rownames are added to the column 'rn'. Character: specify a custom
+#'   column name to store the rownames in.
 #'
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
 #' @import data.table
 #' @export
-LongTable <- function(rowData=data.table(drug1id=character(),
-        drug1dose=numeric()), rowIDs=c('drug1id', 'drug1dose'),
-        colData=data.table(cellid=character()), colIDs=c('cellid'),
-        assays=list(), metadata=list(), keep.rownames=FALSE) {
+LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
+                      metadata=list(), keep.rownames=FALSE) {
+
+    # handle missing parameters
+    isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
+        colData=missing(colData), assays=missing(assays))
+
+    if (any(isMissing))
+        stop(.errorMsg('\nRequired parameter(s) missing: ',
+            names(isMissing)[isMissing], collapse='\n\t'))
 
     # check parameter types and coerce or error
     if (!is(colData, 'data.table'))
-        tryCatch({ colData <- data.table(colData, keep.rownames=keep.rownames) },
-            error=function(e)
-                stop(.errorMsg("colData must be coercible to a data.frame!")))
+        tryCatch({ 
+            colData <- data.table(colData, keep.rownames=keep.rownames) 
+        }, error=function(e)
+            stop(.errorMsg("colData must be coercible to a data.frame!"))
+        )
 
     if (!is(rowData, 'data.table'))
-        tryCatch({ rowData <- data.table(rowData, keep.rownames=keep.rownames) },
-            error=function(e)
-                stop(.errorMsg('rowData must be coerceible to a data.frame!')))
+        tryCatch({ 
+            rowData <- data.table(rowData, keep.rownames=keep.rownames) },
+        error=function(e) 
+            stop(.errorMsg('rowData must be coerceible to a data.frame!'))
+        )
 
     isDT <- is.items(assays, FUN=is.data.table)
     isDF <- is.items(assays, FUN=is.data.frame) & !isDT
@@ -132,8 +141,7 @@ LongTable <- function(rowData=data.table(drug1id=character(),
     internals <- new.env()
 
     # capture row interal metadata
-    if (is.numeric(rowIDs) || is.logical(rowIDs))
-        rowIDs <- colnames(rowData)[rowIDs]
+    if (is.numeric(rowIDs) || is.logical(rowIDs)) rowIDs <- colnames(rowData)[rowIDs]
     if (!all(rowIDs %in% colnames(rowData)))
         stop(.errorMsg('\nRow IDs not in rowData: ',
             setdiff(rowIDs, colnames(rowData)), collapse=', '))
@@ -158,16 +166,13 @@ LongTable <- function(rowData=data.table(drug1id=character(),
     setcolorder(rowData, unlist(mget(c('rowIDs', 'rowMeta'), internals)))
     setcolorder(colData, unlist(mget(c('colIDs', 'colMeta'), internals)))
 
-    ## Assemble the pseudo row and column names for the LongTable
+    ## Assemble  the pseudo row and column names for the LongTable
     ### TODO:: Is this the slow part of the constructor?
     .pasteColons <- function(...) paste(..., collapse=':')
-    # Check for nrows to deal with empty LongTable, where paste errors
-    if (nrow(rowData))
-        rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))),
-            .SDcols=internals$rowIDs]
-    if (nrow(colData))
-        colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
-            .SDcols=internals$colIDs]
+    rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))),
+        .SDcols=internals$rowIDs]
+    colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
+        .SDcols=internals$colIDs]
 
     return(.LongTable(rowData=rowData, colData=colData,
                       assays=assays, metadata=metadata,
