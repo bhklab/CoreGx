@@ -5,11 +5,11 @@
 \title{LongTable constructor method}
 \usage{
 LongTable(
-  rowData,
-  rowIDs,
-  colData,
-  colIDs,
-  assays,
+  rowData = data.table(drug1id = character(), drug1dose = numeric()),
+  rowIDs = c("drug1id", "drug1dose"),
+  colData = data.table(cellid = character()),
+  colIDs = c("cellid"),
+  assays = list(),
   metadata = list(),
   keep.rownames = FALSE
 )
