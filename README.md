@@ -1,6 +1,4 @@
-<!-- badges: start -->
-[![R-CMD-check](https://github.com/bhklab/CoreGx/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/bhklab/CoreGx/actions)
-<!-- badges: end -->
+[![R-CMD-check](https://github.com/bhklab/CoreGx/workflows/R-CMD-check-bioc-devel/badge.svg)](https://github.com/bhklab/CoreGx/actions)
 
 CoreGx
 ==========

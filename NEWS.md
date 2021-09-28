@@ -1,10 +1,16 @@
 # CoreGx News File
 
+## v1.5.5
+- Fix bug in .distancePointLine where function fails with no intercept specified (Issue #120)
+- Added support for aggregating an assay inside of a LongTable class object
+- Some in-progress updates to the CoreSet constructor which will be completed for the Fall release
+
 ## v1.5.4
 - Fix bug in `$<-` and `[[<-` methods where value was returned instead of updated object
+- Fix bug in .sanitize input caused by length > 1 coercing to logical vector
 
 ## v1.5.3
-- Fix bug in connectivityScore caused by length >= 1 coercing to logical vector; this should fix errors in RadioGx and PharmacoGx vignettes that were caused by failed R CMD build
+- Fix bug in connectivityScore caused by length > 1 coercing to logical vector; this should fix errors in RadioGx and PharmacoGx vignettes that were caused by failed R CMD build
 
 ## v1.5.2
 - Add subsetBySample method for CoreSet object; this is the first step in

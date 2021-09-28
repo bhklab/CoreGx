@@ -150,7 +150,8 @@ The data was generated as part of the commercial activities of the
 pharmaceutical company Merck, and is thus named according.
 
 ```{r head_data, echo=TRUE}
-filePath <- '../data/merckLongTable.csv'
+filePath <- system.file('extdata', 'merckLongTable.csv', package='CoreGx', 
+  mustWork=TRUE)
 merckDT <- fread(filePath, na.strings=c('NULL'))
 colnames(merckDT)
 ```
