@@ -34,11 +34,13 @@
 #' @aliases .LongTable
 #' @exportClass LongTable
 .LongTable <- setClass("LongTable",
-                       slots=list(rowData='data.table',
-                                  colData='data.table',
-                                  assays='list',
-                                  metadata='list',
-                                  .intern='environment'))
+    slots=list(
+        rowData='data.table',
+        colData='data.table',
+        assays='list',
+        metadata='list',
+        .intern='environment')
+)
 #' @export
 setOldClass('long.table', S4Class='LongTable')
 
@@ -78,10 +80,11 @@ setOldClass('long.table', S4Class='LongTable')
 #'   colID columns in colData and rowData.
 #' @param metadata A `list` of metadata associated with the `LongTable`
 #'   object being constructed
-#' @param keep.rownames `logical` or `character` Logical: whether rownames
-#'   should be added as a column if coercing to a `data.table`, default is FALSE.
-#'   If TRUE, rownames are added to the column 'rn'. Character: specify a custom
-#'   column name to store the rownames in.
+#' @param keep.rownames `logical`, `character`
+#'   Logical: whether rownames should be added as a column if coercing to a
+#'   `data.table`, default is FALSE. If TRUE, rownames are added to the column
+#'   'rn'.
+#'   Character: specify a custom column name to store the rownames in.
 #'
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
@@ -89,7 +92,7 @@ setOldClass('long.table', S4Class='LongTable')
 #' @import data.table
 #' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
-                      metadata=list(), keep.rownames=FALSE) {
+        metadata=list(), keep.rownames=FALSE) {
 
     # handle missing parameters
     isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),

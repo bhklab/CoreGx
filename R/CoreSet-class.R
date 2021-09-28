@@ -65,13 +65,14 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' @aliases CoreSet-class
 #' @exportClass CoreSet
 .CoreSet <- setClass("CoreSet",
-    slots = list(sensitivity="list_or_LongTable",
-                 annotation = "list",
-                 molecularProfiles = "list_or_MAE",
-                 cell="data.frame",
-                 datasetType="character",
-                 perturbation="list",
-                 curation="list"))
+    slots = list(
+        sensitivity="list_or_LongTable",
+        annotation = "list",
+        molecularProfiles = "list_or_MAE",
+        cell="data.frame",
+        datasetType="character",
+        perturbation="list",
+        curation="list"))
 
 # The default constructor above does a poor job of explaining the required structure of a CoreSet. 
 # The constructor function defined below guides the user into providing the required components of the curation and senstivity lists
@@ -181,15 +182,20 @@ CoreSet <-  function(name,
                         curation=curation)
     if (verify) { checkCsetStructure(object)}
 
-  if(length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
-    sensNumber(object) <- .summarizeSensitivityNumbers(object)
-  }
-    if(length(perturbationN) == 0  & datasetType %in% c("perturbation", "both")) {
-      pertNumber(object) <- .summarizePerturbationNumbers(object)
+    if(length(sensitivityN) == 0 && datasetType %in% c("sensitivity", "both")) {
+        sensNumber(object) <- .summarizeSensitivityNumbers(object)
     }
-  return(object)
+    if(length(perturbationN) == 0  && datasetType %in% c("perturbation", "both")) {
+        pertNumber(object) <- .summarizePerturbationNumbers(object)
+    }
+    return(object)
 }
 
+#'
+#' 
+#' 
+#' 
+CoreSet2 <- function()
 
 #' Show a CoreSet
 #' 

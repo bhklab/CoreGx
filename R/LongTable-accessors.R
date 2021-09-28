@@ -317,14 +317,13 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 #'   to the returned assays. This is useful for modifying assays before
 #'   reconstructing a new LongTable.
 #' @param key `logical` Should the key columns also be returned? Defaults
-#'   to !withDimnames.
+#'   to !`withDimnames`.
 #'
 #' @return A `list` of `data.table` objects, one per assay in the object.
 #'
 #' @importMethodsFrom SummarizedExperiment assays
 #' @import data.table
 #' @export
-##TODO:: Add key argument with default to FALSE to remove rowKey and colKey
 setMethod('assays', signature(x='LongTable'),
         function(x, withDimnames=TRUE, metadata=withDimnames, 
             key=!withDimnames) {
