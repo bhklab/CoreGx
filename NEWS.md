@@ -4,6 +4,7 @@
 - Fix bug in .distancePointLine where function fails with no intercept specified (Issue #120)
 - Added support for aggregating an assay inside of a LongTable class object
 - Some in-progress updates to the CoreSet constructor which will be completed for the Fall release
+- Fixed an error in treatmentNames example
 
 ## v1.5.4
 - Fix bug in `$<-` and `[[<-` methods where value was returned instead of updated object

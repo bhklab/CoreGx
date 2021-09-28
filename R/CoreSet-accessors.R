@@ -493,7 +493,7 @@ setGeneric('treatmentNames', function(object, ...)
     - object: `{class_}` An object to retrieve treatment names from.
 
     @examples
-    treatmentNAmes({data_})
+    treatmentNames({data_})
 
     @md
     @aliases treatmentNames,{class_}-method treatmentNames
