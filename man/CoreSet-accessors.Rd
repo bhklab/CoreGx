@@ -37,6 +37,7 @@
 \alias{treatmentNames,CoreSet-method}
 \alias{treatmentNames}
 \alias{treatmentNames<-,CoreSet,character-method}
+\alias{treatmentNames<-}
 \alias{curation,CoreSet-method}
 \alias{curation}
 \alias{curation<-,CoreSet,list-method}
@@ -285,10 +286,11 @@ object. Arguments:
 \item object: \code{CoreSet} An object to retrieve treatment names from.
 }
 
-\strong{treatmentNames}: \code{character} Names for all treatments in a \code{CoreSet}
+\strong{treatmentNames<-}: \code{CoreSet} Object with updates treatment names.
 object. Arguments:
 \itemize{
-\item object: \code{CoreSet} An object to retrieve treatment names from.
+\item object: \code{CoreSet} An object to set treatment names from.
+\item value: \code{character} A character vector of updated treatment names.
 }
 
 \subsection{@curation}{
@@ -539,9 +541,9 @@ treatmentInfo(clevelandSmall_cSet)
 
 treatmentInfo(clevelandSmall_cSet) <- treatmentInfo(clevelandSmall_cSet)
 
-treatmentNAmes(clevelandSmall_cSet)
+treatmentNames(clevelandSmall_cSet)
 
-treatmentNAmes(clevelandSmall_cSet)
+treatmentNames(clevelandSmall_cSet) <- treatmentNames(clevelandSmall_cSet)
 
 ## curation
 curation(clevelandSmall_cSet)

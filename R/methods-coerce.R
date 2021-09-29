@@ -18,17 +18,15 @@
 #' @export
 setAs('LongTable', 'data.table', def=function(from) {
 
-    # local helpers
-    .mapply <- function(...) mapply(..., SIMPLIFY=FALSE)
-
     # extract the assay data
-    longTableData <- assays(from, key=TRUE)
+    longTableData <- assays(from, withDimnames=FALSE, key=TRUE)
 
     # join assays into a single table
     DT <- longTableData[[1]]
     longTableData[[1]] <- NULL
     for (i in seq_along(longTableData))
-        DT <- merge.data.table(DT, longTableData[[i]], suffixes=c('', paste0('._', i)), by=.EACHI)
+        DT <- merge.data.table(DT, longTableData[[i]], 
+            suffixes=c('', paste0('._', i)), by=.EACHI)
 
     # extract assay columns
     assayCols <- assayCols(from)
@@ -39,13 +37,15 @@ setAs('LongTable', 'data.table', def=function(from) {
     .greplAny <- function(...) any(grepl(...))
     .paste0IfElse <- function(vector, suffix, isIn=c('rowKey', 'colKey'))
         ifelse(vector %in% isIn, vector, paste0(vector, suffix))
-    hasSuffixes <- unlist(lapply(paste0('._', seq_along(longTableData)), .greplAny, x=colnames(DT)))
+    hasSuffixes <- unlist(lapply(paste0('._', seq_along(longTableData)), 
+        FUN=.greplAny, x=colnames(DT)))
     if (any(hasSuffixes)) {
         whichHasSuffixes <- which(hasSuffixes) + 1
         assayCols[whichHasSuffixes] <-
-            .mapply(FUN=.paste0IfElse,
-                    vector=assayCols[whichHasSuffixes],
-                    suffix=paste0('._', seq_along(longTableData))[hasSuffixes])
+            Map(FUN=.paste0IfElse,
+                vector=assayCols[whichHasSuffixes],
+                suffix=paste0('._', seq_along(longTableData))[hasSuffixes]
+            )
     }
 
     # join the row and column data
@@ -57,7 +57,10 @@ setAs('LongTable', 'data.table', def=function(from) {
     DT[, c('rowKey', 'colKey') := NULL]
 
     # organize the returned columns
-    colOrder <- c(setdiff(colnames(DT), unlist(assayCols)), unlist(assayCols))
+    colOrder <- unique(c(setdiff(
+        colnames(DT), unlist(assayCols)),
+        unlist(assayCols)
+    ))
     setcolorder(DT, colOrder)
 
     # capture configuration needed to reverse this operation

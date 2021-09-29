@@ -20,10 +20,16 @@
 \item{x}{A \code{CoreSet} object.}
 
 \item{samples}{\code{character()} vector of sample names. Must be valid rownames
-from \code{cellInfo(x)}.}
+from \code{sampleInfo(x)}.}
+
+\item{treatments}{\code{character()} vector of treatment names. Must be valid
+rownames from \code{treatmentInfo(x)}. This method does not work with
+\code{CoreSet} objects yet.}
 
 \item{features}{\code{character()} vector of feature names. Must be valid feature
 names for a given \code{mDataType}}
+
+\item{mDataTypes}{\code{character()}}
 }
 \value{
 See details.
@@ -72,8 +78,8 @@ clevelandSmall_cSet_sub <- subsetBySample(clevelandSmall_cSet, samples)
 ## subset methods
 
 ### subsetByTreatment
-treatments <- treatmentInfo(clevelandSmall_cSet)$treatmentid[seq_len(10)]
-clevelandSmall_cSet_sub <- subsetByTreatment(clevelandSmall_cSet, treatments)
+#treatments <- treatmentInfo(clevelandSmall_cSet)$treatmentid[seq_len(10)]
+#clevelandSmall_cSet_sub <- subsetByTreatment(clevelandSmall_cSet, treatments)
 
 
 ## subset methods

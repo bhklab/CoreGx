@@ -29,9 +29,13 @@ NULL
 
     @param x A `{class_}` object.
     @param samples `character()` vector of sample names. Must be valid rownames
-    from `cellInfo(x)`.
+    from `sampleInfo(x)`.
     @param features `character()` vector of feature names. Must be valid feature
     names for a given `mDataType`
+    @param treatments `character()` vector of treatment names. Must be valid
+    rownames from `treatmentInfo(x)`. This method does not work with
+    `CoreSet` objects yet.
+    @param mDataTypes `character()`
 
     @return See details.
     ",
@@ -176,8 +180,8 @@ setGeneric('subsetByTreatment', function(x, treatments, ...)
     ## subset methods
 
     ### subsetByTreatment
-    treatments <- {treatment_}Info({data_})${treatment_}id[seq_len(10)]
-    {data_}_sub <- subsetByTreatment({data_}, treatments)
+    #treatments <- {treatment_}Info({data_})${treatment_}id[seq_len(10)]
+    #{data_}_sub <- subsetByTreatment({data_}, treatments)
 
     @md
     @aliases subsetByTreatment subsetByTreatment,{class_}-method
@@ -187,11 +191,10 @@ setGeneric('subsetByTreatment', function(x, treatments, ...)
 )
 
 #' @rdname CoreSet-utils
-#' @eval CoreGx:::.docs_CoreSet_subsetByTreatment(class_=.local_class, 
+#' @eval CoreGx:::.docs_CoreSet_subsetByTreatment(class_=.local_class,
 #' data_=.local_data, treatment_='treatment')
 setMethod('subsetByTreatment', signature('CoreSet'),
-    function(x, treatments) 
-{
+        function(x, treatments) {
     funContext <- .S4MethodContext('subsetByTreatment', 'PharmacoSet')
     treatmentType <- switch(class(x)[1],
         'PharmacoSet'='drug',
@@ -237,9 +240,8 @@ setMethod('subsetByTreatment', signature('CoreSet'),
     return(x)
 })
 
-.subsetSensitivityByTreatment <- function(slotData, treatments, 
-    treatmentType) 
-{
+.subsetSensitivityByTreatment <- function(slotData, treatments,
+        treatmentType) {
     funContext <- .funContext(':::.subsetSensitivityByTreatment')
     treatmentId <- if (treatmentType == 'radiation')
         paste0(treatmentType, '.type') else paste0(treatmentType, 'id')
@@ -262,7 +264,7 @@ setMethod('subsetByTreatment', signature('CoreSet'),
 
 
 #' @export
-setGeneric('subsetByFeature', function(x, features, ...) 
+setGeneric('subsetByFeature', function(x, features, ...)
     standardGeneric('subsetByFeature'))
 
 #' @noRd
@@ -294,8 +296,7 @@ setGeneric('subsetByFeature', function(x, features, ...)
 #' @rdname CoreSet-utils
 #' @eval .docs_CoreSet_subsetByFeature(class_=.local_class, data_=.local_data)
 setMethod('subsetByFeature', signature(x='CoreSet'),
-    function(x, features, mDataTypes)
-{
+        function(x, features, mDataTypes) {
     slotData <- molecularProfilesSlot(x)
     MAE <- if (!is(slotData, 'MultiAssayExperiment'))
         MultiAssayExperiment(slotData) else slotData

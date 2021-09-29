@@ -36,8 +36,6 @@ NULL
     Documentation for the various setters and getters which allow manipulation
     of data in the slots of a `{class_}` object.
 
-    @param 
-
     @return Accessors: See details.
     @return Setters: An updated `{class_}` object, returned invisibly.
     ",
@@ -64,6 +62,7 @@ NULL
 ## == getIntern
 
 
+#' @title getIntern
 #' Get the symbol(s) x from the object@.intern slot of a LongTable
 #'
 #' This is used as an alternative to R attributes for storing structural
@@ -99,6 +98,9 @@ setMethod('getIntern', signature(object='LongTable', x='character'),
             error=function(e) {
                 message(e); get(x, envir=object@.intern) })
 })
+#' @name getIntern
+#' @aliases getIntern,LongTable,missing
+#' @include LongTable-class.R
 #' @export
 setMethod('getIntern', signature(object='LongTable', x='missing'),
     function(object, x) object@.intern
@@ -325,7 +327,7 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 #' @import data.table
 #' @export
 setMethod('assays', signature(x='LongTable'),
-        function(x, withDimnames=TRUE, metadata=withDimnames, 
+        function(x, withDimnames=TRUE, metadata=withDimnames,
             key=!withDimnames) {
     return(structure(
         lapply(assayNames(x), FUN=assay, x=x, withDimnames=withDimnames,
@@ -488,17 +490,20 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
 setReplaceMethod('assay', signature(x='LongTable', i='character'),
         function(x, i, value) {
     funContext <- CoreGx:::.S4MethodContext('assay', class(x), class(i))
-    if (!is.data.frame(value)) .error(funContext, 'Only a data.frame or
-        data.table can be assiged to the assay slot!')
+    if (!is.data.frame(value)) .error(funContext, 'Only a data.frame or',
+        ' data.table can be assiged to the assay slot!')
 
-    if (length(i) > 1) .error(funContext, 'Only a single assay ',
+    if (length(i) > 1) .error(funContext, ' Only a single assay ',
         'name can be assiged with assay(x, i) <- value.')
 
     if (!is.data.table(value)) setDT(value)
 
+    ## TODO:: Do we want to support mutating the row and column metadata?
+
     # Extract identifier columns
     idColumns <- idCols(x)
     valueColumns <- setdiff(colnames(value), idColumns)
+    metaColumns <- unique(c(rowMeta(x), colMeta(x)))
 
     # Determine if assigning new assay or updating existing assay
     existingAssay <- i %in% assayNames(x)
@@ -512,63 +517,53 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
         FUN.VALUE=character(1))
     missingColumns <- c(missingRowCols, missingColCols)
     missingTypes <- c(missingRowTypes, missingColTypes)
-    
-    if (existingAssay) {
-        if (length(missingColumns) > 0) {
+
+    if (existingAssay && length(missingColumns) > 0) {
             tryCatch({
                 value <- merge.data.table(
                     assay(x, i, withDimnames=TRUE, metadata=FALSE),
-                    value, 
-                    on=intersect(idColumns, colnames(value)), 
+                    value,
+                    on=intersect(idColumns, colnames(value)),
                     all.x=TRUE)
-            }, error=function(e) .error(funContext, 'Failed to map missing
-                id columns via join with existing assay: ', e))
-        }
+            }, error=function(e) .error(funContext, 'Failed to map missing ',
+                'id columns via join with existing assay: ', e))
     } else {
         # Pad missing id columns and sort
         for (idx in seq_along(missingColumns))
             set(value, j=missingColumns[idx], value=as(NA, missingTypes[idx]))
         setcolorder(value, idColumns)
-        # Identify new identifiers to be added to the metadata
-        newRowData <- fsetdiff(value[, .SD, .SDcols=rowIDs(x)], 
+        # Add new identifiers to be to the metadata
+        newRowData <- fsetdiff(value[, .SD, .SDcols=rowIDs(x)],
             rowData(x)[, .SD, .SDcols=rowIDs(x)]
         )
         rowData(x) <- rbind(rowData(x), newRowData,
             use.names=TRUE, fill=TRUE)
-        newColData <- fsetdiff(value[, .SD, .SDcols=colIDs(x)], 
+        newColData <- fsetdiff(value[, .SD, .SDcols=colIDs(x)],
             colData(x)[, .SD, .SDcols=colIDs(x)]
         )
-        colData(x) <- rbind(colData(x), newColData, 
+        colData(x) <- rbind(colData(x), newColData,
             use.names=TRUE, fill=TRUE)
     }
 
-    # Handle missing non-identifier columns in rowData or colData
-    if (existingAssay) {
-        metaCols <- unique(c(rowMeta(x), colMeta(x)))
-        hasMetaCols <- metaCols %in% colnames(value)
-        if (!all(hasMetaCols)) {
-            missingMetaCols <- metaCols[!hasMetaCols]
-            tryCatch({
-                value <- merge.data.table(
-                    assay(x, i, withDimnames=TRUE, metadata=TRUE)[, .SD, 
-                        .SDcols=c(idCols, missingMetaCols)],
-                    value,
-                    on=idCols,
-                    all.x=TRUE
-                )
-            }, error=function(e) .error(funContext, 'Failed to map missing
-                metadata columns via join with existing assay: ', e))
-        }
+    # Determine what joins need to be done
+    hasKeyColumns <- all(c('rowKey', 'colKey') %in% colnames(value))
+    hasIdColumns <- all(idColumns %in% colnames(value))
+    hasMetaColumns <- all(metaColumns %in% colnames(value))
+
+    # Join to fetch the key columns if they are missing
+    if (hasIdColumns && !hasKeyColumns) {
+        value <- colData(x, key=TRUE)[value, on=colIDs(x)]
+        value <- rowData(x, key=TRUE)[value, on=rowIDs(x)]
+        value <- value[, .SD, .SDcols=c('rowKey', 'colKey', valueColumns)]
+    } else if (!hasKeyColumns) {
+        stop("The assay has insufficient information to be retrieve",
+            " the row or column keys. Please ensure either the rowKey",
+            " and colKey columns are present, or all of idCols(x)!")
     }
 
     x@assays[[i]] <- value
     return(x)
 })
-
-
-mapToMetadata <- function(object) {
-
-}
 
 
 ##

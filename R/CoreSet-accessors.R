@@ -383,11 +383,11 @@ setGeneric("cellNames<-", function(object, ..., value)
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_cellNames(class_=.local_class, data_=.local_data)
-setReplaceMethod("cellNames", signature(object="CoreSet",value="character"), 
-    function(object, value){
-        ## TODO: does updateCellId also update slots other than cell?
-        object <- updateCellId(object, value)
-        return(object)
+setReplaceMethod("cellNames", signature(object="CoreSet",value="character"),
+        function(object, value) {
+    ## TODO: does updateCellId also update slots other than cell?
+    object <- updateCellId(object, value)
+    return(object)
 })
 
 
@@ -399,8 +399,8 @@ setReplaceMethod("cellNames", signature(object="CoreSet",value="character"),
 #
 # == treatmentInfo
 
-#' @export 
-setGeneric('treatmentInfo', function(object, ...) 
+#' @export
+setGeneric('treatmentInfo', function(object, ...)
     standardGeneric('treatmentInfo'))
 
 #' @noRd
@@ -461,9 +461,8 @@ setGeneric('treatmentInfo<-', function(object, ..., value)
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_treatmentInfo(class_=.local_class, data_=.local_data)
-setReplaceMethod('treatmentInfo', signature(object='CoreSet', 
-    value='data.frame'), function(object, value) 
-{
+setReplaceMethod('treatmentInfo', signature(object='CoreSet',
+        value='data.frame'), function(object, value) {
     treatmentType <- switch(class(object)[1],
         'PharmacoSet'='drug',
         'ToxicoSet'='drug',
@@ -471,7 +470,7 @@ setReplaceMethod('treatmentInfo', signature(object='CoreSet',
         'CoreSet'=return(invisible(object))
     )
     package <- gsub('Set', 'Gx', class(object)[1])
-    `treatmentInfo<-` <- get(paste0(treatmentType, 'Info<-'), 
+    `treatmentInfo<-` <- get(paste0(treatmentType, 'Info<-'),
         envir=asNamespace(package))
     treatmentInfo(object) <- value
     return(invisible(object))
@@ -480,8 +479,8 @@ setReplaceMethod('treatmentInfo', signature(object='CoreSet',
 ##
 ## == treatmentNames
 
-#' @export 
-setGeneric('treatmentNames', function(object, ...) 
+#' @export
+setGeneric('treatmentNames', function(object, ...)
     standardGeneric('treatmentNames'))
 
 #' @noRd 
@@ -509,11 +508,11 @@ setMethod('treatmentNames', signature(object='CoreSet'), function(object) {
 })
 
 
-#' @export 
-setGeneric('treatmentNames<-', function(object, ..., value) 
+#' @export
+setGeneric('treatmentNames<-', function(object, ..., value)
     standardGeneric('treatmentNames<-'))
 
-#' @noRd 
+#' @noRd
 .docs_CoreSet_set_treatmentNames <- function(...) .parseToRoxygen(
     "
     @details
@@ -533,10 +532,10 @@ setGeneric('treatmentNames<-', function(object, ..., value)
 )
 
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_get_treatmentNames(class_=.local_class, data_=.local_data)
-setReplaceMethod('treatmentNames', signature(object='CoreSet', value='character'), 
-    function(object, value)
-{
+#' @eval .docs_CoreSet_set_treatmentNames(class_=.local_class, data_=.local_data)
+setReplaceMethod('treatmentNames',
+        signature(object='CoreSet', value='character'),
+        function(object, value) {
     rownames(treatmentInfo(object)) <- value
     return(invisible(object))
 })
@@ -1665,7 +1664,6 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
         ## TODO:: validate value
         longTable <- sensitivitySlot(object)
 
-
         viabilityCols <- colnames(assay(longTable, 'sensitivity', 
             metadata=FALSE, key=FALSE))
         # Handle the non-drug combo case
@@ -1683,7 +1681,8 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
             # Process into a the proper format for the sensitivity assay
             # NOTE: as.matrix deals with the case where there is only a single
             #   viability column in the sensitivityRaw array object,
-            #   in which case the drop=TRUE argument causes a vector to be returned
+            #   in which case the drop=TRUE argument causes a vector to be 
+            #   returned
             raw <- as.data.table(as.matrix(value[, , 'Viability']),
                 keep.rownames='rn', na.rm=FALSE)
             coerceCols <- colnames(raw)[-1]
@@ -1782,7 +1781,7 @@ setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_or_L
         of the current and @sensitivity slot and the value parameter must be
         the same!')
     object@sensitivity <- value
-    object
+    return(object)
 })
 
 

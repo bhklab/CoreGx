@@ -191,11 +191,6 @@ CoreSet <-  function(name,
     return(object)
 }
 
-#'
-#' 
-#' 
-#' 
-CoreSet2 <- function()
 
 #' Show a CoreSet
 #' 
