@@ -98,7 +98,6 @@ LongTableDataMapper <- function(rawdata=list(), rowDataMap=list(),
 # DataMapper Show Method
 # ----------------------
 
-## FIXME:: Finish show method
 
 #' @describeIn LongTableDataMapper-class Show method for LongTableDataMapper. 
 #' Determines how the object is displayed in the console.
@@ -117,22 +116,27 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
     ## -- class
     cat(yellow$bold$italic('<LongTableDataMapper>', '\n'))
 
-    missingVal <- ' NA \n'
+    missingVal <- ' NA'
 
     ## -- rawdata
-    cat(yellow$bold('rawdata:'), paste0('dim(',
-        paste0(dim(rawdata(object)), collapse=', '),
-        ')\n'))
-    table_data <- capture.output(
-        print(head(rawdata(object), 3), trunc.cols=TRUE, class=TRUE)
-    )
-    rawdata_head <- paste0(
-        paste0(table_data[-length(table_data)], collapse='\n  '),
-        paste0(
-            strwrap(table_data[length(table_data)], initial='\n  ', exdent=4),
-            collapse='\n'
-        ))
-    cat(rawdata_head, '\n\r')  # print the snapshot
+    cat(yellow$bold('rawdata:'))
+    if (length(rawdata(object))) {
+        cat(paste0(' dim(', paste0(dim(rawdata(object)), collapse=', '), ')\n'))
+        table_data <- capture.output(
+            print(head(rawdata(object), 3), trunc.cols=TRUE, class=TRUE)
+        )
+        table_data[1] <- paste0('  ', table_data[1])
+        rawdata_head <- paste0(
+            paste0(table_data[-length(table_data)], collapse='\n  '),
+            paste0(
+                strwrap(table_data[length(table_data)], initial='\n  ', exdent=4),
+                collapse='\n'
+            ))
+        cat(rawdata_head, '\n\r')  # print the snapshot
+    } else {
+        red(cat(missingVal, '\n'))
+    }
+    
 
     ## -- rowDataMap
     cat(yellow$bold('rowDataMap:'))
@@ -142,19 +146,28 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
     } else {
         cat(green(missingVal))
     }
-    if (length(rows) > 1)
+    if (length(rows) > 1) {
         cat('\n ', green('rowMeta:'), paste0(rows[[2]], collapse=', '))
+        cat('\n')
+    } else {
+        cat('\n')
+    }
+
 
     ## -- colDataMap
-    cat(yellow$bold('\ncolDataMap:'))
+    cat(yellow$bold('colDataMap:'))
     cols <- colDataMap(object)
     if (length(cols)) {
         cat('\n ', green('colIDs:'), paste0(cols[[1]], collapse=', '))
     } else {
         cat(green(missingVal))
     }
-    if (length(cols) > 1)
+    if (length(cols) > 1) {
         cat('\n ', green('colMeta:'), paste0(cols[[2]], collapse=', '))
+    } else {
+        cat(green(missingVal))
+    }
+        
 
     ## -- assayMap
     cat(yellow$bold('\nassayMap:'))
@@ -265,7 +278,7 @@ setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowData
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval
-#' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_3, 
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_3,
 #' data_=.local_data_3, id_col_='drug_id')
 setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper', 
     value='list_or_List'), function(object, value) {
