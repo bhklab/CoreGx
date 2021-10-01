@@ -207,6 +207,40 @@ NULL
 ## LongTableDataMapper Accessors Methods
 ## -------------------------------------
 
+## ---------------
+## -- rawdata slot
+
+setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
+        value='list'), function(object, value) {
+    funContext <- .S4MethodContext('rawdata<-', class(object)[1],
+        class(value)[1])
+
+    rows <- unlist(rowDataMap(object))
+    cols <- unlist(colDataMap(object))
+    assays <- unlist(assayMap(object))
+    meta <- unlist(metadataMap(object))
+
+    ## TODO:: Improve parsing here such that it only throws warnings if meta-
+    ##>data columns are missing
+
+    mandatory <- c(rows, cols, assays, meta)
+    if (!length(mandatory)) {
+        object@rawdata <- value
+    } else if (length(mandatory) && !length(rawdata(object))) {
+        hasMandatory <- mandatory %in% colnames(value)
+        if (!all(hasMandatory)) {
+            .error(funContext, "One or more map column is missing from value",
+                ": ", paste0(mandatory[!hasMandatory], collapse=', '), '!'
+            )
+        }
+        object@rawdata <- value
+    } else {
+        .error(funContext, "In order to assign to the rawdata slot of ",
+                "a LongTableDataMapper, either all the map slots must be ",
+                "empty or the rawdata slot must be an empty list!")
+    }
+    return(object)
+})
 
 ## --------------------
 ## ---- rowDataMap slot

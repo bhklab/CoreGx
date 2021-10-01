@@ -70,6 +70,27 @@ setMethod('rawdata', signature(object='DataMapper'), function(object) {
     object@rawdata
 })
 
-## FIXME:: Currently can't make DataMapper without rawdata, this doesn't
-##   fit with the model where we preconfigure column maps to use with
-##   new instances of rawdata from the same experimental design.
+#' @export
+setGeneric("rawdata<-", function(object, ..., value) standardgeneric("rawdata<-"))
+
+.docs_DataMapper_set_rawdata <- function(...) .parseToRoxygen(
+    "
+    @details
+    __rawdata__: Set the raw data slot from a `{class_}` object.
+    __value__: The list-like object to set for the rawdata slot. Note: this
+        currently only supports data.frame or data.table objects.
+
+    @md
+    @aliases rawdata<-,{class_}-method
+    @exportMethod rawdata<-
+    ",
+    ...
+)
+
+#' @rdname DataMapper-accessors
+#' @aliases rawdata
+#' @eval .docs_DataMapper_set_rawdata(class_=.local_class_2)
+setReplaceMethod('rawdata', signature(object='DataMapper'), 
+        function(object, value) {
+    object@rawdata <- value
+})

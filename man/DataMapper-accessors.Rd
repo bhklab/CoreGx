@@ -4,9 +4,13 @@
 \alias{DataMapper-accessors}
 \alias{rawdata,DataMapper-method}
 \alias{rawdata}
+\alias{rawdata<-,DataMapper,ANY-method}
+\alias{rawdata<-,DataMapper-method}
 \title{Accessing and modifying data in a \code{DataMapper} object.}
 \usage{
 \S4method{rawdata}{DataMapper}(object)
+
+\S4method{rawdata}{DataMapper,ANY}(object) <- value
 }
 \arguments{
 \item{object}{A \code{DataMapper} object to get or set data from.}
@@ -24,6 +28,10 @@ of data in the slots of a \code{DataMapper} object.
 \strong{rawdata}: Get the raw data slot from a \code{DataMapper} object. Returns
 a list-like containing one or more raw data inputs to the
 \code{DataMapper} object.
+
+\strong{rawdata}: Set the raw data slot from a \code{DataMapper} object.
+\strong{value}: The list-like object to set for the rawdata slot. Note: this
+currently only supports data.frame or data.table objects.
 }
 \seealso{
 Other DataMapper-accessors: 

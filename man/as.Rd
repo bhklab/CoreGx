@@ -13,10 +13,10 @@ and 'data.frame' are supported}
 A \code{data.table} with the data from a LongTable.
 
 \code{data.table} containing the data from the LongTable, with the
-`LongTable.config' attribute containg the metadata needed to reverse
+`longTableDataMapper' attribute containg the metadata needed to reverse
 the coercing operation.
 
-\code{LongTable} object configured with the LongTable.config
+\code{LongTable} object configured with the longTableDataMapper
 
 \code{data.table} with long format of data in \code{from}
 
