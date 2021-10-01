@@ -136,7 +136,6 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
     } else {
         red(cat(missingVal, '\n'))
     }
-    
 
     ## -- rowDataMap
     cat(yellow$bold('rowDataMap:'))
@@ -153,7 +152,6 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
         cat('\n')
     }
 
-
     ## -- colDataMap
     cat(yellow$bold('colDataMap:'))
     cols <- colDataMap(object)
@@ -164,10 +162,7 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
     }
     if (length(cols) > 1) {
         cat('\n ', green('colMeta:'), paste0(cols[[2]], collapse=', '))
-    } else {
-        cat(green(missingVal))
     }
-        
 
     ## -- assayMap
     cat(yellow$bold('\nassayMap:'))
