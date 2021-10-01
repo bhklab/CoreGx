@@ -192,6 +192,9 @@ column names.
 Define a private constructor method to be used to build a
 \code{LongTable} object.
 
+This is used as an alternative to R attributes for storing structural
+metadata of an S4 objects.
+
 Add or replace an assay in a LongTable by name. Currently
 this function only works when the assay has all columns in row and column
 data tables (i.e., when assays is retured withDimnames=TRUE). This will

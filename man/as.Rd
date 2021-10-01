@@ -7,9 +7,7 @@
 \item{to}{\code{character} Class name to coerce to, currently only 'data.table'
 and 'data.frame' are supported}
 
-\item{from}{A \code{data.table} with the 'LongTable.config' attribute, containing
-three lists named assayCols, rowDataCols and colDataCols. This attribute is
-automatically created when coercing from a \code{LongTable} to a \code{data.table}.}
+\item{from}{\code{SummarizedExperiment} object.}
 }
 \value{
 A \code{data.table} with the data from a LongTable.
@@ -19,6 +17,10 @@ A \code{data.table} with the data from a LongTable.
 the coercing operation.
 
 \code{LongTable} object configured with the LongTable.config
+
+\code{data.table} with long format of data in \code{from}
+
+\code{data.frame} with long format of data in \code{from}.
 }
 \description{
 Coerce a LongTable into a \code{data.table}.
@@ -34,5 +36,11 @@ as(merckLongTable, 'data.table')
 dataTable <- as(merckLongTable, 'data.table')
 print(attr(dataTable, 'LongTable.config')) # Method doesn't work without this
 as(dataTable, 'LongTable')
+
+SE <- molecularProfileSlot(GDSCsmall)[[1]]
+as(SE, 'data.table')
+
+SE <- molecularProfileSlot(GDSCsmall)[[1]]
+as(SE, 'data.frame')
 
 }

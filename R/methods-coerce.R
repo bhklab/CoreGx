@@ -180,6 +180,7 @@ setAs('data.table', 'LongTable', def=function(from) {
     with(LongTable.config,
         buildLongTable(from, rowDataCols, colDataCols, assayCols))
 })
+#' @name as.long.table
 #' @title Coerce from data.table to LongTable
 #'
 #' @examples
@@ -199,16 +200,17 @@ setAs('data.table', 'LongTable', def=function(from) {
 as.long.table <- function(x) as(x, 'LongTable')
 
 
+#' @name as
 #' @title Coerce a SummarizedExperiment to a data.table
-#' 
-#' @examples 
+#'
+#' @examples
 #' SE <- molecularProfileSlot(GDSCsmall)[[1]]
 #' as(SE, 'data.table')
-#' 
+#'
 #' @param from `SummarizedExperiment` object.
-#' 
+#'
 #' @return `data.table` with long format of data in `from`
-#' 
+#'
 #' @importFrom data.table as.data.table melt.data.table merge.data.table
 #' @export
 setAs(from='SummarizedExperiment', to='data.table', function(from) {
@@ -235,6 +237,7 @@ setAs(from='SummarizedExperiment', to='data.table', function(from) {
     return(DT)
 })
 
+#' @name as
 #' @title Coerce a SummarizedExperiment to a data.frame
 #' 
 #' @examples 

@@ -1,5 +1,5 @@
 #' @importClassesFrom S4Vectors List
-setClassUnion("list_or_List", c('list', 'List'))
+setClassUnion('list_or_List', c('list', 'List'))
 
 #' An S4 Class For Mapping from Raw Experimental Data to a Specific S4 Object
 #' 
@@ -12,8 +12,10 @@ setClassUnion("list_or_List", c('list', 'List'))
 #' 
 #' @md
 #' @aliases DataMapper-class
-.DataMapper <- setClass('DataMapper', 
-    contains=c('VIRTUAL', 'Annotated'), slots=list(rawdata='list_or_List'))
+.DataMapper <- setClass('DataMapper',
+    contains=c('VIRTUAL', 'Annotated'),
+    slots=list(rawdata='list_or_List')
+)
 
 .local_class_2 <- 'DataMapper'
 
@@ -51,7 +53,7 @@ setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
     "
     @details
     __rawdata__: Get the raw data slot from a `{class_}` object. Returns
-    a list-like containing one or more raw data inputs to the 
+    a list-like containing one or more raw data inputs to the
     `{class_}` object.
 
     @md

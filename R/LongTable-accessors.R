@@ -62,7 +62,6 @@ NULL
 ## == getIntern
 
 
-#' @title getIntern
 #' Get the symbol(s) x from the object@.intern slot of a LongTable
 #'
 #' This is used as an alternative to R attributes for storing structural
@@ -98,8 +97,7 @@ setMethod('getIntern', signature(object='LongTable', x='character'),
             error=function(e) {
                 message(e); get(x, envir=object@.intern) })
 })
-#' @name getIntern
-#' @aliases getIntern,LongTable,missing
+#' @aliases getIntern,LongTable,missing-method
 #' @include LongTable-class.R
 #' @export
 setMethod('getIntern', signature(object='LongTable', x='missing'),

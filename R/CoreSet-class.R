@@ -123,7 +123,7 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' @importFrom SummarizedExperiment rowData colData assays
 CoreSet <-  function(name, 
     molecularProfiles=list(), cell=data.frame(), sensitivityInfo=data.frame(),
-	sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(), 
+    sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(), 
 	sensitivityN=matrix(nrow=0, ncol=0), perturbationN=array(NA, dim=c(0,0,0)), 
 	curationCell = data.frame(), curationTissue = data.frame(), 
 	datasetType=c("sensitivity", "perturbation", "both"), verify = TRUE)
@@ -168,18 +168,18 @@ CoreSet <-  function(name,
     perturbation$n <- perturbationN
     if (datasetType == "perturbation" || datasetType == "both") {
         perturbation$info <- "The metadata for the perturbation experiments is 
-          available for each molecular type by calling the appropriate info 
-          function. \n For example, for RNA transcriptome perturbations, the 
-          metadata can be accessed using rnaInfo(cSet)."
+            available for each molecular type by calling the appropriate info 
+            function. \n For example, for RNA transcriptome perturbations, the 
+            metadata can be accessed using rnaInfo(cSet)."
     } else {
         perturbation$info <- "Not a perturbation dataset."
     }
     
     object  <- .CoreSet(annotation=annotation, 
-                        molecularProfiles=molecularProfiles, 
-                        cell=as.data.frame(cell), datasetType=datasetType, 
-                        sensitivity=sensitivity, perturbation=perturbation, 
-                        curation=curation)
+        molecularProfiles=molecularProfiles, 
+        cell=as.data.frame(cell), datasetType=datasetType, 
+        sensitivity=sensitivity, perturbation=perturbation, 
+        curation=curation)
     if (verify) { checkCsetStructure(object)}
 
     if(length(sensitivityN) == 0 && datasetType %in% c("sensitivity", "both")) {
