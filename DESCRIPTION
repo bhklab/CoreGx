@@ -33,6 +33,7 @@ VignetteBuilder: knitr
 VignetteEngine: knitr::rmarkdown
 biocViews: Software, Pharmacogenomics, Classification, Survival
 Encoding: UTF-8
+LazyData: TRUE
 Depends: R (>= 4.1), BiocGenerics, SummarizedExperiment
 Imports:
     Biobase,
