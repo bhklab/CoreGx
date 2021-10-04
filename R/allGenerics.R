@@ -245,6 +245,7 @@ setGeneric('buildLongTable',
 
 # ===== Other Generics
 
+
 #' Retrieve the symbol for the object@.intern slot
 #'
 #' Internal slot for storing metadata relevant to the internal operation of an
@@ -263,7 +264,7 @@ setGeneric('buildLongTable',
 #'
 #' @return Depends on the implemented method
 #'
-#' @export
+#' @export getIntern
 setGeneric('getIntern',
     function(object, x, ...) standardGeneric('getIntern'))
 

@@ -34,11 +34,13 @@
 #' @aliases .LongTable
 #' @exportClass LongTable
 .LongTable <- setClass("LongTable",
-                       slots=list(rowData='data.table',
-                                  colData='data.table',
-                                  assays='list',
-                                  metadata='list',
-                                  .intern='environment'))
+    slots=list(
+        rowData='data.table',
+        colData='data.table',
+        assays='list',
+        metadata='list',
+        .intern='environment')
+)
 #' @export
 setOldClass('long.table', S4Class='LongTable')
 
@@ -64,24 +66,25 @@ setOldClass('long.table', S4Class='LongTable')
 #'   is used to key assays, as well as additional row metadata to subset on.
 #' @param rowIDs `character`, `integer` A vector specifying
 #'   the names or integer indexes of the row data identifier columns. These
-#'   columns will be pasted together to make up the row.names of the
+#'   columns will be pasted together to make up the rownames of the
 #'   `LongTable` object.
 #' @param colData `data.table`, `data.frame`, `matrix` A table like object
 #'   coercible to a `data.table` containing the a unique `colID` column which
 #'   is used to key assays, as well as additional column metadata to subset on.
 #' @param colIDs `character`, `integer` A vector specifying
-#'   the names or integer indexes of the col data identifier columns. These
-#'   columns will be pasted together to make up the col.names of the
+#'   the names or integer indexes of the column data identifier columns. These
+#'   columns will be pasted together to make up the colnames of the
 #'   `LongTable` object.
 #' @param assays A `list` containing one or more objects coercible to a
 #'   `data.table`, and keyed by rowID and colID corresponding to the rowID and
 #'   colID columns in colData and rowData.
 #' @param metadata A `list` of metadata associated with the `LongTable`
 #'   object being constructed
-#' @param keep.rownames `logical` or `character` Logical: whether rownames
-#'   should be added as a column if coercing to a `data.table`, default is FALSE.
-#'   If TRUE, rownames are added to the column 'rn'. Character: specify a custom
-#'   column name to store the rownames in.
+#' @param keep.rownames `logical`, `character`
+#'   Logical: whether rownames should be added as a column if coercing to a
+#'   `data.table`, default is FALSE. If TRUE, rownames are added to the column
+#'   'rn'.
+#'   Character: specify a custom column name to store the rownames in.
 #'
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
@@ -89,7 +92,7 @@ setOldClass('long.table', S4Class='LongTable')
 #' @import data.table
 #' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
-                      metadata=list(), keep.rownames=FALSE) {
+        metadata=list(), keep.rownames=FALSE) {
 
     # handle missing parameters
     isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
@@ -101,20 +104,25 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 
     # check parameter types and coerce or error
     if (!is(colData, 'data.table'))
-        tryCatch({ colData <- data.table(colData, keep.rownames=keep.rownames) },
-            error=function(e)
-                stop(.errorMsg("colData must be coercible to a data.frame!")))
+        tryCatch({ 
+            colData <- data.table(colData, keep.rownames=keep.rownames) 
+        }, error=function(e)
+            stop(.errorMsg("colData must be coercible to a data.frame!"))
+        )
 
     if (!is(rowData, 'data.table'))
-        tryCatch({ rowData <- data.table(rowData, keep.rownames=keep.rownames) },
-            error=function(e)
-                stop(.errorMsg('rowData must be coerceible to a data.frame!')))
+        tryCatch({ 
+            rowData <- data.table(rowData, keep.rownames=keep.rownames) },
+        error=function(e) 
+            stop(.errorMsg('rowData must be coerceible to a data.frame!'))
+        )
 
     isDT <- is.items(assays, FUN=is.data.table)
     isDF <- is.items(assays, FUN=is.data.frame) & !isDT
     if (!all(isDT))
         tryCatch({
-            for (i in which(isDF)) assays[[i]] <- data.table(assays[[i]], keep.rownames)
+            for (i in which(isDF)) 
+                assays[[i]] <- data.table(assays[[i]], keep.rownames)
         }, error = function(e, assays) {
             message(e)
             types <- lapply(assays, typeof)
@@ -322,8 +330,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #' @import data.table
 #' @export
 setMethod('rowIDs', signature(object='LongTable'),
-    function(object, data=FALSE, key=FALSE) 
-{
+        function(object, data=FALSE, key=FALSE) {
     cols <- getIntern(object, 'rowIDs')
     if (key) cols <- c(cols, 'rowKey')
     if (data) rowData(object, key=key)[, ..cols] else cols

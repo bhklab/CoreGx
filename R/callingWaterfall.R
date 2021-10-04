@@ -212,21 +212,24 @@ callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fo
 #'
 #' @param x x-coordinate of point
 #' @param y y-coordinate of point
-#' @param a coefficient in line equation a * x + b * y + c = 0
-#' @param b coefficient in line equation a * x + b * y + c = 0
-#' @param c coefficient in line equation a * x + b * y + c = 0
-#' 
-#' @return \code{numeric} The shortest distance between a point and a line
+#' @param a `numeric(1)` The coefficient in line equation a * x + b * y + c = 0.
+#'   Defaults to 1.
+#' @param b `numeric(1)` The coefficient in line equation a * x + b * y + c = 0.
+#'   Defaults to 1.
+#' @param c `numeric(1)` The intercept in line equation a * x + b * y + c = 0.
+#'   Defaults to 0.
+#'
+#' @return `numeric` The shortest distance between a point and a line.
 #' 
 #' @export
 #' @keywords internal
-.distancePointLine <- function(x, y, a, b, c) {
-    
+.distancePointLine <- function(x, y, a=1, b=1, c=0) {
+
     if (!(all(is.finite(c(x, y, a, b, c))))) {
-        stop("All inputs to linePtDist must be real numbers.")
+        stop("All inputs to .distancePointLine must be real numbers.")
     }
-    
-    return(abs(a * x + b * y + c)/sqrt(a^2 + b^2))
+
+    return(abs(a * x + b * y + c) / sqrt(a^2 + b^2))
 }
 
 #' @export

@@ -65,13 +65,14 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' @aliases CoreSet-class
 #' @exportClass CoreSet
 .CoreSet <- setClass("CoreSet",
-    slots = list(sensitivity="list_or_LongTable",
-                 annotation = "list",
-                 molecularProfiles = "list_or_MAE",
-                 cell="data.frame",
-                 datasetType="character",
-                 perturbation="list",
-                 curation="list"))
+    slots = list(
+        sensitivity="list_or_LongTable",
+        annotation = "list",
+        molecularProfiles = "list_or_MAE",
+        cell="data.frame",
+        datasetType="character",
+        perturbation="list",
+        curation="list"))
 
 # The default constructor above does a poor job of explaining the required structure of a CoreSet. 
 # The constructor function defined below guides the user into providing the required components of the curation and senstivity lists
@@ -122,7 +123,7 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' @importFrom SummarizedExperiment rowData colData assays
 CoreSet <-  function(name, 
     molecularProfiles=list(), cell=data.frame(), sensitivityInfo=data.frame(),
-	sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(), 
+    sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(), 
 	sensitivityN=matrix(nrow=0, ncol=0), perturbationN=array(NA, dim=c(0,0,0)), 
 	curationCell = data.frame(), curationTissue = data.frame(), 
 	datasetType=c("sensitivity", "perturbation", "both"), verify = TRUE)
@@ -167,27 +168,27 @@ CoreSet <-  function(name,
     perturbation$n <- perturbationN
     if (datasetType == "perturbation" || datasetType == "both") {
         perturbation$info <- "The metadata for the perturbation experiments is 
-          available for each molecular type by calling the appropriate info 
-          function. \n For example, for RNA transcriptome perturbations, the 
-          metadata can be accessed using rnaInfo(cSet)."
+            available for each molecular type by calling the appropriate info 
+            function. \n For example, for RNA transcriptome perturbations, the 
+            metadata can be accessed using rnaInfo(cSet)."
     } else {
         perturbation$info <- "Not a perturbation dataset."
     }
     
     object  <- .CoreSet(annotation=annotation, 
-                        molecularProfiles=molecularProfiles, 
-                        cell=as.data.frame(cell), datasetType=datasetType, 
-                        sensitivity=sensitivity, perturbation=perturbation, 
-                        curation=curation)
+        molecularProfiles=molecularProfiles, 
+        cell=as.data.frame(cell), datasetType=datasetType, 
+        sensitivity=sensitivity, perturbation=perturbation, 
+        curation=curation)
     if (verify) { checkCsetStructure(object)}
 
-  if(length(sensitivityN) == 0 & datasetType %in% c("sensitivity", "both")) {
-    sensNumber(object) <- .summarizeSensitivityNumbers(object)
-  }
-    if(length(perturbationN) == 0  & datasetType %in% c("perturbation", "both")) {
-      pertNumber(object) <- .summarizePerturbationNumbers(object)
+    if(length(sensitivityN) == 0 && datasetType %in% c("sensitivity", "both")) {
+        sensNumber(object) <- .summarizeSensitivityNumbers(object)
     }
-  return(object)
+    if(length(perturbationN) == 0  && datasetType %in% c("perturbation", "both")) {
+        pertNumber(object) <- .summarizePerturbationNumbers(object)
+    }
+    return(object)
 }
 
 
@@ -552,23 +553,23 @@ checkCsetStructure <-
         message(sprintf("There is no tissue type for this cell line(s): %s", paste(rownames(cSet@cell)[which(is.na(cSet@cell[,"tissueid"]) | cSet@cell[,"tissueid"]=="")], collapse=" ")))
       }
     } else {
-      warning("tissueid does not exist in cell slot")
+        warning("tissueid does not exist in cell slot")
     }
     
     if("unique.cellid" %in% colnames(cSet@curation$cell)) {
-      if(length(intersect(cSet@curation$cell$unique.cellid, rownames(cSet@cell))) != nrow(cSet@cell)) {
-        print("rownames of cell slot should be curated cell ids")
-      }
+        if(length(intersect(cSet@curation$cell$unique.cellid, rownames(cSet@cell))) != nrow(cSet@cell)) {
+            print("rownames of cell slot should be curated cell ids")
+        }
     } else {
-      print("unique.cellid which is curated cell id across data set should be a column of cell curation slot")
+        print("unique.cellid which is curated cell id across data set should be a column of cell curation slot")
     }
     
     if(length(intersect(rownames(cSet@curation$cell), rownames(cSet@cell))) != nrow(cSet@cell)) {
-      print("rownames of curation cell slot should be the same as cell slot (curated cell ids)")
+        print("rownames of curation cell slot should be the same as cell slot (curated cell ids)")
     }
     
     if(!is(cSet@cell, "data.frame")) {
-      warning("cell slot class type should be dataframe")
+        warning("cell slot class type should be dataframe")
     }
     #if(cSet@datasetType %in% c("sensitivity", "both"))
     #{
@@ -592,4 +593,78 @@ checkCsetStructure <-
     #    warning("For some experiments there is sensitivity profiles but no experimet information in sensitivity info")
     #  }
     #}
-  }
+}
+
+#' @importFrom MultiAssayExperiment MultiAssayExperiment
+#' @importFrom S4Vectors List
+#' @importFrom BiocGenerics %in% match
+.checkMolecularProfilesSlot <- function(object) {
+    msg <- character()
+    # ---- Make a MutliAssayExperiment, if it isn't one already
+    molecProf <- molecularProfilesSlot(object)
+    isSummarizedExperiment <- all(as(lapply(molecProf, is, 'SummarizedExperiment'), 
+        'List'))
+    if (!all(isSummarizedExperiment)) {
+        nmsg <- .formatMessage('All molecular profiles must be stored as 
+            SummarizedExperiment objects. The following are not ', 
+            paste(names(which(!isSummarizedExperiment)), collapse=', '))
+        msg <- c(msg, nmsg)
+    }
+    tryCatch({
+        MAE <- if(is(molecProf, 'MultiAssayExperient')) molecProf else 
+            MultiAssayExperiment(molecProf)
+    }, error=function(e) msg <- c(msg, paste0('Failed coercing to 
+        MultiAssayExperiment: ', as.character(e))))
+    
+    # ---- Check for correct metadata columns
+    # -- sample identifiers
+    colDataL <- lapply(experiments(MAE), FUN=colData)
+    colColNameL <- as(lapply(colDataL, FUN=colnames), 'List')
+    hasCellId <- any(colColNameL %in% 'cellid')
+    if (!all(hasCellId)) {
+        nmsg <- .formatMessage('All SummarizedExperiments must have a cellid
+            column. This is not the case for ', 
+            paste(names(which(!hasCellId)), collapse=', '), '!')
+        msg <- c(msg, nmsg)
+    }
+    hasBatchId <- any(colColNameL %in% 'batchid')
+    if (!all(hasBatchId)) {
+        nmsg <- .formatMessage('All SummarizedExpeirments must have a batchid
+            column. This is not the case for ',
+            paste(names(which(!hasBatchId)), collapse=', '), '!')
+        msg <- c(msg, nmsg)
+    }
+    # -- feature identifiers
+    rowDataL <- lapply(experiments(MAE), FUN=rowData)
+    rowColNameL <- as(lapply(rowDataL, colnames), 'List')
+    # hasGeneId <- rowColNameL %in% 'geneid'
+    hasSymbol <- rowColNameL %in% 'Symbol'
+    hasBEST <- rowColNameL %in% 'BEST'
+    # hasEnsemblId <- rowColNamesL %in% 'ensemblid'
+
+    # ---- Check all samples are in the @cell slot
+    samples <- cellNames(object)
+    cellIdL <- as(lapply(colDataL, `[[`, i='cellid'), 'List')
+    hasValidSamples <- cellIdL %in% samples
+    if (!all(all(hasValidSamples))) {
+        nmsg <- .formatMessage('All cellids in the @molecularProfiles slot
+            must also be in the @cell slot. This is not the case
+            for ', paste(names(which(all(hasValidSamples))), collapse=', '))
+        msg <- c(msg, nmsg)
+    }
+
+    # ---- Return messages if something is wrong, or TRUE if everything is good
+    return(if (length(msg)) msg else TRUE)
+}
+
+.checkSensitivitySlot <- function(object) {
+    msg <- character()
+    # ---- Extract sensitivity data
+    samples <- cellNames(object)
+    sensSlot <- sensitivitySlot(object)
+    if (is(sensSlot, 'LongTable')) {
+        
+    } else {
+
+    }
+}

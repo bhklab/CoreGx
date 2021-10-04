@@ -1,5 +1,5 @@
 #' @importClassesFrom S4Vectors List
-setClassUnion("list_or_List", c('list', 'List'))
+setClassUnion('list_or_List', c('list', 'List'))
 
 #' An S4 Class For Mapping from Raw Experimental Data to a Specific S4 Object
 #' 
@@ -9,11 +9,13 @@ setClassUnion("list_or_List", c('list', 'List'))
 #' * rawdata: A list-like object containing one or more pieces of raw data
 #'   that will be processed and mapped to the slots of an `S4` object.
 #' * metadata: A `List` of object level metadata.
-#' 
+#'
 #' @md
 #' @aliases DataMapper-class
-.DataMapper <- setClass('DataMapper', 
-    contains=c('VIRTUAL', 'Annotated'), slots=list(rawdata='list_or_List'))
+.DataMapper <- setClass('DataMapper',
+    contains=c('VIRTUAL', 'Annotated'),
+    slots=list(rawdata='list_or_List')
+)
 
 .local_class_2 <- 'DataMapper'
 
@@ -26,6 +28,8 @@ setClassUnion("list_or_List", c('list', 'List'))
     of data in the slots of a `{class_}` object.
 
     @param object A `{class_}` object to get or set data from.
+    @param value A `list`-like object to assign to the rawdata slot. Should be
+        a `data.frame` or `data.table` with the current implementation.
 
     @family DataMapper-accessors
 
@@ -51,7 +55,7 @@ setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
     "
     @details
     __rawdata__: Get the raw data slot from a `{class_}` object. Returns
-    a list-like containing one or more raw data inputs to the 
+    a list-like containing one or more raw data inputs to the
     `{class_}` object.
 
     @md
@@ -68,6 +72,29 @@ setMethod('rawdata', signature(object='DataMapper'), function(object) {
     object@rawdata
 })
 
-## FIXME:: Currently can't make DataMapper without rawdata, this doesn't
-##   fit with the model where we preconfigure column maps to use with
-##   new instances of rawdata from the same experimental design.
+#' @export
+setGeneric("rawdata<-", function(object, ..., value) 
+    standardgeneric("rawdata<-"))
+
+.docs_DataMapper_set_rawdata <- function(...) .parseToRoxygen(
+    "
+    @details
+    __rawdata__: Set the raw data slot from a `{class_}` object.
+    __value__: The `list`-like object to set for the rawdata slot. Note: this
+        currently only supports `data.frame` or `data.table` objects.
+
+    @md
+    @aliases rawdata<-,{class_},{class1_}-method
+    @exportMethod rawdata<-
+    ",
+    ...
+)
+
+#' @rdname DataMapper-accessors
+#' @aliases rawdata<-
+#' @eval .docs_DataMapper_set_rawdata(class_=.local_class_2, class1_='ANY')
+setReplaceMethod('rawdata', signature(object='DataMapper'),
+        function(object, value) {
+    object@rawdata <- value
+    object
+})

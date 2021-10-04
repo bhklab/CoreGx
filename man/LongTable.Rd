@@ -21,7 +21,7 @@ is used to key assays, as well as additional row metadata to subset on.}
 
 \item{rowIDs}{\code{character}, \code{integer} A vector specifying
 the names or integer indexes of the row data identifier columns. These
-columns will be pasted together to make up the row.names of the
+columns will be pasted together to make up the rownames of the
 \code{LongTable} object.}
 
 \item{colData}{\code{data.table}, \code{data.frame}, \code{matrix} A table like object
@@ -29,8 +29,8 @@ coercible to a \code{data.table} containing the a unique \code{colID} column whi
 is used to key assays, as well as additional column metadata to subset on.}
 
 \item{colIDs}{\code{character}, \code{integer} A vector specifying
-the names or integer indexes of the col data identifier columns. These
-columns will be pasted together to make up the col.names of the
+the names or integer indexes of the column data identifier columns. These
+columns will be pasted together to make up the colnames of the
 \code{LongTable} object.}
 
 \item{assays}{A \code{list} containing one or more objects coercible to a
@@ -40,10 +40,11 @@ colID columns in colData and rowData.}
 \item{metadata}{A \code{list} of metadata associated with the \code{LongTable}
 object being constructed}
 
-\item{keep.rownames}{\code{logical} or \code{character} Logical: whether rownames
-should be added as a column if coercing to a \code{data.table}, default is FALSE.
-If TRUE, rownames are added to the column 'rn'. Character: specify a custom
-column name to store the rownames in.}
+\item{keep.rownames}{\code{logical}, \code{character}
+Logical: whether rownames should be added as a column if coercing to a
+\code{data.table}, default is FALSE. If TRUE, rownames are added to the column
+'rn'.
+Character: specify a custom column name to store the rownames in.}
 }
 \value{
 A \code{LongTable} object containing the data for a treatment response

@@ -4,15 +4,32 @@
 \alias{CoreSet-utils}
 \alias{subsetBySample,CoreSet-method}
 \alias{subsetBySample}
+\alias{subsetByTreatment,CoreSet-method}
+\alias{subsetByTreatment}
+\alias{subsetByFeature,CoreSet-method}
+\alias{subsetByFeature}
 \title{Utility methods for a \code{CoreSet} object.}
 \usage{
 \S4method{subsetBySample}{CoreSet}(x, samples)
+
+\S4method{subsetByTreatment}{CoreSet}(x, treatments)
+
+\S4method{subsetByFeature}{CoreSet}(x, features, mDataTypes)
 }
 \arguments{
 \item{x}{A \code{CoreSet} object.}
 
-\item{samples}{A \code{character} vector of sample names. Must be valid rownames
-from \code{cellInfo(x)}.}
+\item{samples}{\code{character()} vector of sample names. Must be valid rownames
+from \code{sampleInfo(x)}.}
+
+\item{treatments}{\code{character()} vector of treatment names. Must be valid
+rownames from \code{treatmentInfo(x)}. This method does not work with
+\code{CoreSet} objects yet.}
+
+\item{features}{\code{character()} vector of feature names. Must be valid feature
+names for a given \code{mDataType}}
+
+\item{mDataTypes}{\code{character()}}
 }
 \value{
 See details.
@@ -30,6 +47,23 @@ on different types of methods and their implementations.
 \item value: a \code{CoreSet} object containing only \code{samples}.
 }
 }
+
+\subsection{subset methods}{
+
+\strong{subsetByTreatment}: Subset a \code{CoreSet} object by treatment identifier.
+\itemize{
+\item value: a \code{CoreSet} object containing only \code{treatments}.
+}
+}
+
+\subsection{subset methods}{
+
+\strong{subsetByFeature}: Subset a \code{CoreSet} object by molecular feature
+identifier.
+\itemize{
+\item value: a \code{CoreSet} object containing only \code{features}.
+}
+}
 }
 \examples{
 data(clevelandSmall_cSet)
@@ -39,5 +73,19 @@ data(clevelandSmall_cSet)
 ### subsetBySample
 samples <- cellInfo(clevelandSmall_cSet)$cellid[seq_len(10)]
 clevelandSmall_cSet_sub <- subsetBySample(clevelandSmall_cSet, samples)
+
+
+## subset methods
+
+### subsetByTreatment
+#treatments <- treatmentInfo(clevelandSmall_cSet)$treatmentid[seq_len(10)]
+#clevelandSmall_cSet_sub <- subsetByTreatment(clevelandSmall_cSet, treatments)
+
+
+## subset methods
+
+### subsetByFeature
+features <- fNames(clevelandSmall_cSet, 'rna')[seq_len(5)]
+clevelandSmall_cSet_sub <- subsetByFeature(clevelandSmall_cSet, features, 'rna')
 
 }

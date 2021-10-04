@@ -1,6 +1,15 @@
 # CoreGx News File
 
+## v1.5.5
+- Fix bug in .distancePointLine where function fails with no intercept specified (Issue #120)
+- Added support for aggregating an assay inside of a LongTable class object
+- Some in-progress updates to the CoreSet constructor which will be completed for the Fall release
+- Fixed an error in treatmentNames example
+- Fixed roxygen2 documentation warnings about S4 method documentation
+- Overhauled LongTable coerce methods to use the LongTableDataMapper class instead of the deprecated 'LongTable.config' attribute
+
 ## v1.5.4
+- Fix bug in `$<-` and `[[<-` methods where value was returned instead of updated object
 - Fix bug in .sanitize input caused by length > 1 coercing to logical vector
 
 ## v1.5.3

@@ -3,6 +3,7 @@ NULL
 
 #' A Class for Mapping Between Raw Data and an `LongTable` Object
 #'
+#' @slot rawdata See Slots section.
 #' @slot rowDataMap See Slots section.
 #' @slot colDataMap See Slots section.
 #' @slot assayMap See Slots section.
@@ -81,27 +82,28 @@ NULL
 #' @md
 #' @importFrom data.table setDT
 #' @export
-LongTableDataMapper <- function(rawdata, rowDataMap=list(), 
-    colDataMap=list(), assayMap=list(), metadataMap=list())
-{
+LongTableDataMapper <- function(rawdata=list(), rowDataMap=list(),
+    colDataMap=list(), assayMap=list(), metadataMap=list()) {
     funContext <- '[CoreGx::LongTableDataMapper]\n\t'
-    if (missing(rawdata)) stop(.errorMsg(funContext, 'The rawdata parameter ',
-        'is mandatory. Please provide a list of raw data to map from.'))
-    
+
     if (is(rawdata, 'data.frame') && !is(rawdata, 'data.table')) setDT(rawdata)
 
     .LongTableDataMapper(rawdata=rawdata, rowDataMap=rowDataMap, 
         colDataMap=colDataMap, assayMap=assayMap, metadataMap=metadataMap)
 }
 
+## FIXME:: Modify rawdata setter to check that columns exist in maps for case
+##>when maps are assigned first, then rawdata
+
 # ======================
 # DataMapper Show Method
 # ----------------------
 
-#' @describeIn LongTableDataMapper-class Show method for LongTableDataMapper. 
+
+#' @describeIn LongTableDataMapper-class Show method for LongTableDataMapper.
 #' Determines how the object is displayed in the console.
 #'
-#' @param object A `LongTableDataMapper` to display in the console. 
+#' @param object A `LongTableDataMapper` to display in the console.
 #'
 #' @examples
 #' show(exampleDataMapper)
@@ -111,34 +113,80 @@ LongTableDataMapper <- function(rawdata, rowDataMap=list(),
 #' @importFrom crayon %+% yellow red green blue cyan magenta
 #' @exportMethod show
 setMethod('show', signature(object='LongTableDataMapper'), function(object) {
-    
+
     ## -- class
-    cat(yellow$bold$italic('< LongTableDataMapper >', '\n'))
+    cat(yellow$bold$italic('<LongTableDataMapper>', '\n'))
+
+    missingVal <- ' NA'
 
     ## -- rawdata
-    cat(yellow$bold('rawdata:', '\n'))
-    rawdata_head <- .collapse(
-        capture.output(
-            print(rawdata(object), nrows=3, trunc.cols=TRUE, class=TRUE)), 
-        '\n    ')
-    cat('    ', red(rawdata_head), '\r')
+    cat(yellow$bold('rawdata:'))
+    if (length(rawdata(object))) {
+        cat(paste0(' dim(', paste0(dim(rawdata(object)), collapse=', '), ')\n'))
+        table_data <- capture.output(
+            print(head(rawdata(object), 3), trunc.cols=TRUE, class=TRUE)
+        )
+        table_data[1] <- paste0('  ', table_data[1])
+        rawdata_head <- paste0(
+            paste0(table_data[-length(table_data)], collapse='\n  '),
+            paste0(
+                strwrap(table_data[length(table_data)], initial='\n  ', exdent=4),
+                collapse='\n'
+            ))
+        cat(rawdata_head, '\n\r')  # print the snapshot
+    } else {
+        red(cat(missingVal, '\n'))
+    }
 
     ## -- rowDataMap
-    cat(yellow$bold('rowDataMap:', '\n'))
+    cat(yellow$bold('rowDataMap:'))
     rows <- rowDataMap(object)
-    cat('\t', green('rowIDs'))
+    if (length(rows)) {
+        cat('\n ', green('rowIDs:'), paste0(rows[[1]], collapse=', '))
+    } else {
+        cat(green(missingVal))
+    }
+    if (length(rows) > 1) {
+        cat('\n ', green('rowMeta:'), paste0(rows[[2]], collapse=', '))
+        cat('\n')
+    } else {
+        cat('\n')
+    }
 
     ## -- colDataMap
-    cat(yellow$bold('colDataMap:', '\n'))
+    cat(yellow$bold('colDataMap:'))
     cols <- colDataMap(object)
+    if (length(cols)) {
+        cat('\n ', green('colIDs:'), paste0(cols[[1]], collapse=', '))
+    } else {
+        cat(green(missingVal))
+    }
+    if (length(cols) > 1) {
+        cat('\n ', green('colMeta:'), paste0(cols[[2]], collapse=', '))
+    }
 
     ## -- assayMap
-    cat(yellow$bold('assayMap:', '\n'))
-
+    cat(yellow$bold('\nassayMap:'))
+    assayM <- assayMap(object)
+    if (length(assayM)) {
+        for (aName in names(assayM))
+            cat('\n ', red(paste0(aName, ':')),
+                paste0(assayM[[aName]], collapse=', '))
+    } else {
+        cat(green(missingVal))
+    }
 
     ## -- metadataMap
-    cat(yellow$bold('metadataMap:', '\n'))
-
+    cat(yellow$bold('\nmetadataMap:'))
+    metadataM <- metadataMap(object)
+    if (length(metadataM)) {
+        for (mName in names(metadataM))
+            cat('\n ', green(paste0(mName, ':')),
+                paste0(metadataM[[mName]], collapse=', '))
+    } else {
+        cat(green(missingVal))
+    }
+    cat('\n')
 })
 
 ## ===========================================
@@ -152,14 +200,51 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
 #'
 #' @eval .docs_DataMapper_accessors(class_=.local_class_3)
 #' @eval .docs_DataMapper_get_rawdata(class_=.local_class_3)
-#' 
-#' @param value See details. 
+#'
+#' @param value See details.
 NULL
 
 ## =====================================
 ## LongTableDataMapper Accessors Methods
 ## -------------------------------------
 
+## ---------------
+## -- rawdata slot
+
+#' @rdname LongTableDataMapper-accessors
+#' @eval .docs_DataMapper_set_rawdata(class_=.local_class_3,
+#' class1_='list')
+setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
+        value='list'), function(object, value) {
+    funContext <- .S4MethodContext('rawdata<-', class(object)[1],
+        class(value)[1])
+
+    rows <- unlist(rowDataMap(object))
+    cols <- unlist(colDataMap(object))
+    assays <- unlist(assayMap(object))
+    meta <- unlist(metadataMap(object))
+
+    ## TODO:: Improve parsing here such that it only throws warnings if meta-
+    ##>data columns are missing
+
+    mandatory <- c(rows, cols, assays, meta)
+    if (!length(mandatory) || !length(value)) {
+        object@rawdata <- value
+    } else if (length(mandatory) && !length(rawdata(object))) {
+        hasMandatory <- mandatory %in% colnames(value)
+        if (!all(hasMandatory)) {
+            .error(funContext, "One or more map column is missing from value",
+                ": ", paste0(mandatory[!hasMandatory], collapse=', '), '!'
+            )
+        }
+        object@rawdata <- value
+    } else {
+        .error(funContext, "In order to assign to the rawdata slot of ",
+                "a LongTableDataMapper, either all the map slots must be ",
+                "empty or the rawdata slot must be an empty list!")
+    }
+    return(object)
+})
 
 ## --------------------
 ## ---- rowDataMap slot
@@ -171,8 +256,8 @@ NULL
 .docs_LongTableDataMapper_get_dimDataMap <- function(...) .parseToRoxygen(
     "
     @details
-    __{dim_}DataMap__: `list` of two `character` vectors, the first are the 
-    columns required to uniquely identify each row of a `{class_}` and the 
+    __{dim_}DataMap__: `list` of two `character` vectors, the first are the
+    columns required to uniquely identify each row of a `{class_}` and the
     second any additional {dim_}-level metadata. If the character vectors
     have names, the resulting columns are automatically renamed to the
     item name of the specified column.
@@ -191,11 +276,11 @@ NULL
 setGeneric('rowDataMap', function(object, ...) standardGeneric('rowDataMap'))
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval 
-#' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_3, 
+#' @eval
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_3,
 #' data_=.local_data_3)
-setMethod('rowDataMap', signature(object='LongTableDataMapper'), function(object) 
-{
+setMethod('rowDataMap', signature(object='LongTableDataMapper'),
+        function(object) {
     object@rowDataMap
 })
 
@@ -226,11 +311,10 @@ setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowData
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval
-#' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_3, 
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_3,
 #' data_=.local_data_3, id_col_='drug_id')
 setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper', 
-    value='list_or_List'), function(object, value) 
-{
+    value='list_or_List'), function(object, value) {
     funContext <- '[CoreGx::`rowDataMap<-`,LongTableDataMapper-method]\n\t'
     rawdataCols <- colnames(rawdata(object))
 
@@ -243,20 +327,20 @@ setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
     }
 
     hasIDcols <- value[[1]] %in% rawdataCols
-    if (!all(hasIDcols)) {
+    if (!all(hasIDcols) && length(rawdata(object))) {
         stop(.errorMsg(funContext, 'One or more of the id columns specified ',
             'in value[[1]] are not valid column names in the rawdata slot of ',
             'this ', class(object)[1], ' object!'))
     }
-    
-    if (length(value) > 1 && length(value[[2]]) != 0) {
+
+    if (length(value) > 1 && length(value[[2]]) != 0 && length(rawdata(object))) {
         hasMetaCols <- value[[2]] %in% rawdataCols
         if (!all(hasMetaCols)) {
             stop(.errorMsg(funContext, 'The follow metadata columns in value[[2]] ',
                 'are not present in rawdata(object): ', 
                 .collapse(value[[2]][!hasMetaCols]), '!'))
         }
-        hasOneToOneRelationship <- 
+        hasOneToOneRelationship <-
             value[[2]] %in% cardinality(rawdata(object), group=value[[1]])
         if (!all(hasOneToOneRelationship)) {
             stop(.errorMsg(funContext, 'The columns ', 
@@ -281,10 +365,10 @@ setGeneric('colDataMap', function(object, ...) standardGeneric('colDataMap'))
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval 
-#' .docs_LongTableDataMapper_get_dimDataMap(dim_='col', class_=.local_class_3, 
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='col', class_=.local_class_3,
 #' data_=.local_data_3)
-setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object) 
-{
+setMethod('colDataMap', signature(object='LongTableDataMapper'),
+        function(object) {
     object@colDataMap
 })
 
@@ -292,12 +376,12 @@ setMethod('colDataMap', signature(object='LongTableDataMapper'), function(object
 setGeneric('colDataMap<-', function(object, ..., value) standardGeneric('colDataMap<-'))
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval 
-#' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_3, 
+#' @eval
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_3,
 #' data_=.local_data_3, id_col_='cell_id')
-setReplaceMethod('colDataMap', signature(object='LongTableDataMapper',
-    value='list_or_List'), function(object, value) 
-{
+setReplaceMethod('colDataMap',
+        signature(object='LongTableDataMapper', value='list_or_List'),
+        function(object, value) {
     funContext <- '[CoreGx::`colDataMap<-`,LongTableDataMapper-method]\n\t'
     rawdataCols <- colnames(rawdata(object))
 
@@ -310,25 +394,28 @@ setReplaceMethod('colDataMap', signature(object='LongTableDataMapper',
     }
 
     hasIDcols <- value[[1]] %in% rawdataCols
-    if (!all(hasIDcols)) {
+    if (!all(hasIDcols) && length(rawdata(object))) {
         stop(.errorMsg(funContext, 'One or more of the id columns specified ',
             'in value[[1]] are not valid column names in the rawdata slot of ',
             'this ', class(object)[1], ' object!'))
     }
-    
-    if (length(value) > 1 && length(value[[2]]) != 0) {
+
+    if (length(value) > 1 && length(value[[2]]) != 0 &&
+            length(rawdata(object))) {
         hasMetaCols <- value[[2]] %in% rawdataCols
         if (!all(hasMetaCols)) {
-            stop(.errorMsg(funContext, 'The follow metadata columns in value[[2]] ',
-                'are not present in rawdata(object): ', 
+            stop(.errorMsg(funContext,
+                'The follow metadata columns in value[[2]] ',
+                'are not present in rawdata(object): ',
                 .collapse(value[[2]][!hasMetaCols]), '!'))
         }
-        hasOneToOneRelationship <- 
+        hasOneToOneRelationship <-
             value[[2]] %in% cardinality(rawdata(object), group=value[[1]])
         if (!all(hasOneToOneRelationship)) {
-            stop(.errorMsg(funContext, 'The columns ', 
-                .collapse(value[[2]][!hasOneToOneRelationship], ' do not have a ',
-                '1:1 relationship with the specified ID columns!')))
+            stop(.errorMsg(funContext, 'The columns ',
+                .collapse(value[[2]][!hasOneToOneRelationship],
+                    ' do not have a 1:1 relationship with the specified ID ',
+                    'columns!')))
         }
     }
 
@@ -398,9 +485,8 @@ setGeneric('assayMap<-', function(object, ..., value) standardGeneric('assayMap<
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval .docs_LongTableDataMapper_set_assayMap(class_=.local_class_3, data_=.local_data_3)
-setReplaceMethod('assayMap', signature(object='LongTableDataMapper', 
-    value='list_or_List'), function(object, value) 
-{
+setReplaceMethod('assayMap', signature(object='LongTableDataMapper',
+        value='list_or_List'), function(object, value) {
     funContext <- '[CoreGx::`assayMap<-,LongTableDataMapper-method`]\n\t'
     rawdataCols <- colnames(rawdata(object))
     if (length(names(value)) == 0) stop(.errorMsg('The value argument must
@@ -408,7 +494,7 @@ setReplaceMethod('assayMap', signature(object='LongTableDataMapper',
 
     for (i in seq_along(value)) {
         hasRawdataCols <- value[[i]] %in% rawdataCols
-        if (!all(hasRawdataCols)) {
+        if (!all(hasRawdataCols) && length(rawdata(object))) {
             stop(.errorMsg(funContext, 'There are no columns named ',
                 .collapse(value[[i]][!hasRawdataCols]), ' in the rawdata ',
                 'of this ', class(object)[1], ' object. Please ensure item ',
@@ -444,15 +530,16 @@ setGeneric('metadataMap', function(object, ...) standardGeneric('metadataMap'))
 )
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class_3, data_=.local_data_3)
-setMethod('metadataMap', signature(object='LongTableDataMapper'), function(object) 
-{
+#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class_3,
+#' data_=.local_data_3)
+setMethod('metadataMap', signature(object='LongTableDataMapper'),
+        function(object) {
     object@metadataMap
 })
 
 
 #' @export
-setGeneric('metadataMap<-', function(object, ..., value) 
+setGeneric('metadataMap<-', function(object, ..., value)
     standardGeneric('metadataMap<-'))
 
 #' @noRd
@@ -477,7 +564,8 @@ setGeneric('metadataMap<-', function(object, ..., value)
 )
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_3, data_=.local_data_3, col_='metadata')
+#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_3, 
+#' data_=.local_data_3, col_='metadata')
 setReplaceMethod('metadataMap', signature(object='LongTableDataMapper', 
     value='list_or_List'), function(object, value) 
 {
@@ -488,7 +576,7 @@ setReplaceMethod('metadataMap', signature(object='LongTableDataMapper',
 
     for (i in seq_along(value)) {
         hasRawdataCols <- value[[i]] %in% rawdataCols
-        if (!all(hasRawdataCols)) {
+        if (!all(hasRawdataCols) && length(rawdata(object))) {
             stop(.errorMsg(funContext, 'There are no columns named ',
                 .collapse(value[[i]][!hasRawdataCols]), ' in the rawdata ',
                 'of this ', class(object)[1], ' object. Please ensure item ',

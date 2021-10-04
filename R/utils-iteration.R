@@ -13,8 +13,8 @@
 #' @importFrom S4Vectors endoapply
 #' @importFrom MultiAssayExperiment experiments experiments<-
 #' @exportMethod lapply
-setMethod('lapply', signature(X='MultiAssayExperiment'), function(X, FUN, ...) 
-{
+setMethod('lapply', signature(X='MultiAssayExperiment'),
+        function(X, FUN, ...) {
     experiments(X) <- endoapply(experiments(X), FUN, ...)
     return(X)
 })

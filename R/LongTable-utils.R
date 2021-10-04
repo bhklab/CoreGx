@@ -1,4 +1,29 @@
-# ==== LongTable Class
+#' @include LongTable-class.R LongTable-accessors.R
+NULL
+
+
+#### CoreGx dynamic documentation
+####
+#### Warning: for dynamic docs to work, you must set
+#### Roxygen: list(markdown = TRUE, r6=FALSE)
+#### in the DESCRPTION file!
+
+
+# ===================================
+# Utility Method Documentation Object
+# -----------------------------------
+
+
+
+
+# ======================================
+# Subset Methods
+# --------------------------------------
+
+
+##
+## == subset
+
 
 #' Subset method for a LongTable object.
 #'
@@ -118,7 +143,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     if (missing(assays)) { assays <- assayNames(longTable) }
     keepAssays <- assayNames(longTable) %in% assays
 
-    assayData <- lapply(assays(longTable)[keepAssays],
+    assayData <- lapply(assays(longTable, withDimnames=FALSE)[keepAssays],
                      FUN=.filterLongDataTable,
                      indexList=list(rowKeys, colKeys))
 
@@ -226,4 +251,252 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 
     # return filtered data.table
     return(copy(DT[rowKey %in% rowIndices & colKey %in% colIndices, ]))
+}
+
+##
+## == [ method
+
+
+#' [ LongTable Method
+#'
+#' Single bracket subsetting for a LongTable object. See subset for more details.
+#'
+#' This function is endomorphic, it always returns a LongTable object.
+#'
+#' @examples
+#' # Character
+#' merckLongTable['ABT-888', 'CAOV3']
+#' # Numeric
+#' merckLongTable[1, c(1, 2)]
+#' # Logical
+#' merckLongTable[, colData(merckLongTable)$cellid == 'A2058']
+#' # Call
+#' merckLongTable[
+#'      .(drug1id == 'Dasatinib' & drug2id != '5-FU'),
+#'      .(cellid == 'A2058'),
+#'  ]
+#'
+#' @param x `LongTable` The object to subset.
+#' @param i `character`, `numeric`, `logical` or `call`
+#'  Character: pass in a character vector of drug names, which will subset the
+#'    object on all row id columns matching the vector. This parameter also
+#'    supports valid R regex query strings which will match on the colnames
+#'    of `x`. For convenience, * is converted to .* automatically. Colon
+#'    can be to denote a specific part of the colnames string to query.
+#'  Numeric or Logical: these select based on the rowKey from the `rowData`
+#'    method for the `LongTable`.
+#'  Call: Accepts valid query statements to the `data.table` i parameter as
+#'    a call object. We have provided the function .() to conveniently
+#'    convert raw R statements into a call for use in this function.
+#' @param j `character`, `numeric`, `logical` or `call`
+#'  Character: pass in a character vector of drug names, which will subset the
+#'      object on all drug id columns matching the vector. This parameter also
+#'      supports regex queries. Colon can be to denote a specific part of the
+#'      colnames string to query.
+#'  Numeric or Logical: these select based on the rowID from the `rowData`
+#'      method for the `LongTable`.
+#'  Call: Accepts valid query statements to the `data.table` i parameter as
+#'      a call object. We have provided the function .() to conveniently
+#'      convert raw R statements into a call for use in this function.
+#' @param assays `character` Names of assays which should be kept in the
+#'   `LongTable` after subsetting.
+#' @param ... Included to ensure drop can only be set by name.
+#' @param drop `logical` Included for compatibility with the '[' primitive,
+#'   it defaults to FALSE and changing it does nothing.
+#'
+#' @return A `LongTable` containing only the data specified in the function
+#'   parameters.
+#'
+#' @export
+setMethod('[', signature('LongTable'), function(x, i, j, assays, ..., drop=FALSE) {
+    subset(x, i, j, assays)
+})
+
+
+##
+## == [[ method'
+
+
+#' [[ Method for LongTable Class
+#'
+#' Select an assay from within a LongTable object.
+#'
+#' @describeIn LongTable Get an assay from a LongTable object. This method
+#'   returns the row and column annotations by default to make assignment
+#'   and aggregate operations easiers.
+#'
+#' @examples
+#' merckLongTable[['sensitivity']]
+#'
+#' @param x `LongTable` object to retrieve assays from
+#' @param i `character` name or `integer` index of the desired assay.
+#' @param withDimnames `logical` Should the row and column IDs be joined to
+#'    the assay. Default is TRUE to allow easy use of group by arguments when
+#'    performing data aggregation using the `data.table` API.
+#' @param metadata `logical` Should the row and column metadata also
+#'    be joined to the to the returned assay. Default is withDimnames.
+#' @param keys `logical` Should the row and column keys also be returned?
+#'    Defaults to !withDimnames.
+#'
+#' @importFrom crayon cyan magenta
+#' @import data.table
+#' @export
+setMethod('[[', signature('LongTable'),
+    function(x, i, withDimnames=TRUE, metadata=withDimnames, keys=!withDimnames) 
+{
+    funContext <- .S4MethodContext('[[', class(x))
+
+    if (metadata && !withDimnames) {
+        .warning('\nUnable to return metadata without dimnames, proceeding',
+            ' as if withDimnames=TRUE.')
+        withDimnames <- TRUE
+    }
+
+    if (length(i) > 1)
+        .error('\nPlease only select one assay! To subset on multiple',
+            'assays please see ?subset')
+
+    if (keys) {
+        .warning('\nIgnoring withDimnames and metadata arguments when',
+            ' keys=TRUE.')
+        return(assay(x, i))
+    } else {
+        if (withDimnames || metadata)
+            return(assay(x, i, withDimnames, metadata))
+        else
+            return(assay(x, i)[, -c('rowKey', 'colKey')])
+    }
+})
+
+
+#' `[[<-` Method for LongTable Class
+#'
+#' Just a wrapper around assay<- for convenience. See
+#' `?'assay<-,LongTable,character-method'.`
+#'
+#' @param x A `LongTable` to update.
+#' @param i The name of the assay to update, must be in `assayNames(object)`.
+#' @param value A `data.frame`
+#'
+#' @examples
+#' merckLongTable[['sensitivity']] <- merckLongTable[['sensitivity']]
+#'
+#' @return A `LongTable` object with the assay `i` updated using `value`.
+#'
+#' @export
+setReplaceMethod('[[', signature(x='LongTable'), function(x, i, value) {
+    assay(x, i) <- value
+    x
+})
+
+
+##
+## == $ method
+
+
+#' Select an assay from a LongTable object
+#'
+#' @examples
+#' merckLongTable$sensitivity
+#'
+#' @param x A `LongTable` object to retrieve an assay from
+#' @param name `character` The name of the assay to get.
+#'
+#' @return `data.frame` The assay object.
+#'
+#' @export
+setMethod('$', signature('LongTable'), function(x, name) {
+    # error handling is done inside `[[`
+    x[[name]]
+})
+
+#' Update an assay from a LongTable object 
+#'
+#' @examples
+#' merckLongTable$sensitivity <- merckLongTable$sensitivity
+#'
+#' @param x A `LongTable` to update an assay for.
+#' @param name `character(1)` The name of the assay to update
+#' @param value A `data.frame` or `data.table` to update the assay with.
+#'
+#' @return Updates the assay `name` in `x` with `value`, returning an invsible
+#' NULL.
+#'
+#' @export
+setReplaceMethod('$', signature('LongTable'), function(x, name, value) {
+    # error handling done inside `assay<-`
+    x[[name]] <- value
+    x
+})
+
+
+# ======================================
+# Reindex Methods
+# --------------------------------------
+
+##
+## == reindex
+
+#' Redo indexing for a LongTable object to remove any gaps in integer indexes
+#'
+#' After subsetting a LongTable, it is possible that values of rowKey or colKey
+#'   could no longer be present in the object. As a result there the indexes
+#'   will no longer be contiguous integers. This method will calcualte a new
+#'   set of rowKey and colKey values such that integer indexes are the smallest
+#'   set of contiguous integers possible for the data.
+#'
+#' @param object The `LongTable` object to recalcualte indexes (rowKey and
+#'     colKey values) for.
+#'
+#' @return A copy of the `LongTable` with all keys as the smallest set of
+#'     contiguous integers possible given the current data.
+#'
+#' @export
+setMethod('reindex', signature(object='LongTable'), function(object) {
+
+    # extract assays joined to row/colData
+    assayDataList <- assays(object, withDimnames=TRUE, metadata=TRUE)
+
+    # find names of ID columns
+    rowIDCols <- colnames(rowData(object))
+    colIDCols <- colnames(colData(object))
+
+    # extract the ID columns from the assay data
+    newRowData <- .extractIDData(assayDataList, rowIDCols, 'rowKey')
+    newColData <- .extractIDData(assayDataList, colIDCols, 'colKey')
+
+    # remap the rowKey and colKey columns to the assays
+    newAssayData <- lapply(assayDataList,
+                           FUN=.joinDropOn,
+                           DT2=newRowData, on=rowIDCols)
+    newAssayData <- lapply(newAssayData,
+                           FUN=.joinDropOn,
+                           DT2=newColData, on=colIDCols)
+    newAssayData <- lapply(newAssayData, setkeyv, cols=c('rowKey', 'colKey'))
+
+    return(LongTable(rowData=newRowData, rowIDs=getIntern(object, 'rowIDs'),
+                     colData=newColData, colIDs=getIntern(object, 'colIDs'),
+                     assays=newAssayData, metadata=metadata(object)))
+
+})
+
+
+#' @keywords internal
+#' @noRd
+.extractIDData <- function(assayDataList, idCols, keyName) {
+    idDT <- data.table()
+    for (assay in assayDataList) {
+        idDT <- unique(rbindlist(list(idDT, assay[, ..idCols])))
+    }
+    rm(assayDataList)
+    idDT[, eval(substitute(keyName := seq_len(.N)))]
+    setkeyv(idDT, keyName)
+    return(idDT)
+}
+
+
+#' @keywords interal
+#' @noRd
+.joinDropOn <- function(DT1, DT2, on) {
+    DT1[DT2, on=on][, -get('on')]
 }

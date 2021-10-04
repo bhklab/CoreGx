@@ -4,21 +4,24 @@
 \alias{.distancePointLine}
 \title{Calculate shortest distance between point and line}
 \usage{
-.distancePointLine(x, y, a, b, c)
+.distancePointLine(x, y, a = 1, b = 1, c = 0)
 }
 \arguments{
 \item{x}{x-coordinate of point}
 
 \item{y}{y-coordinate of point}
 
-\item{a}{coefficient in line equation a * x + b * y + c = 0}
+\item{a}{\code{numeric(1)} The coefficient in line equation a * x + b * y + c = 0.
+Defaults to 1.}
 
-\item{b}{coefficient in line equation a * x + b * y + c = 0}
+\item{b}{\code{numeric(1)} The coefficient in line equation a * x + b * y + c = 0.
+Defaults to 1.}
 
-\item{c}{coefficient in line equation a * x + b * y + c = 0}
+\item{c}{\code{numeric(1)} The intercept in line equation a * x + b * y + c = 0.
+Defaults to 0.}
 }
 \value{
-\code{numeric} The shortest distance between a point and a line
+\code{numeric} The shortest distance between a point and a line.
 }
 \description{
 This function calculates the shortest distance between a point

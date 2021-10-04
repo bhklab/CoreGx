@@ -6,7 +6,7 @@
 more raw experimental data files to the slots of a \code{LongTable} object.}
 \usage{
 LongTableDataMapper(
-  rawdata,
+  rawdata = list(),
   rowDataMap = list(),
   colDataMap = list(),
   assayMap = list(),
