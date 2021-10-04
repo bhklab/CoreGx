@@ -3,6 +3,7 @@
 \name{LongTableDataMapper-accessors}
 \alias{LongTableDataMapper-accessors}
 \alias{rawdata,LongTableDataMapper-method}
+\alias{rawdata<-,LongTableDataMapper,list_or_List-method}
 \alias{rowDataMap,LongTableDataMapper-method}
 \alias{rowDataMap}
 \alias{rowDataMap<-,LongTableDataMapper,list_or_List-method}
@@ -29,6 +30,8 @@
 \alias{metadataMap<-}
 \title{Accessing and modifying data in a \code{LongTableDataMapper} object.}
 \usage{
+\S4method{rawdata}{LongTableDataMapper,list_or_List}(object) <- value
+
 \S4method{rowDataMap}{LongTableDataMapper}(object)
 
 \S4method{rowDataMap}{LongTableDataMapper,list_or_List}(object) <- value
@@ -63,6 +66,10 @@ of data in the slots of a \code{LongTableDataMapper} object.
 \strong{rawdata}: Get the raw data slot from a \code{LongTableDataMapper} object. Returns
 a list-like containing one or more raw data inputs to the
 \code{LongTableDataMapper} object.
+
+\strong{rawdata}: Set the raw data slot from a \code{LongTableDataMapper} object.
+\strong{value}: The \code{list}-like object to set for the rawdata slot. Note: this
+currently only supports \code{data.frame} or \code{data.table} objects.
 
 \strong{rowDataMap}: \code{list} of two \code{character} vectors, the first are the
 columns required to uniquely identify each row of a \code{LongTableDataMapper} and the

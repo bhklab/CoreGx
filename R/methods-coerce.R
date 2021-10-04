@@ -158,7 +158,7 @@ as.data.frame.long.table <- function(x, row.names, optional=TRUE, ...) {
 #'
 #' @examples
 #' dataTable <- as(merckLongTable, 'data.table')
-#' print(attr(dataTable, 'LongTable.config')) # Method doesn't work without this
+#' print(attr(dataTable, 'LongTableDataMapper')) # Method doesn't work without this
 #' as(dataTable, 'LongTable')
 #'
 #' @description Coerce a data.table with the proper configuration attributes
@@ -216,7 +216,7 @@ as.long.table <- function(x) as(x, 'LongTable')
 #' @title Coerce a SummarizedExperiment to a data.table
 #'
 #' @examples
-#' SE <- molecularProfileSlot(GDSCsmall)[[1]]
+#' SE <- molecularProfilesSlot(clevelandSmall_cSet)[[1]]
 #' as(SE, 'data.table')
 #'
 #' @param from `SummarizedExperiment` object.
@@ -236,7 +236,7 @@ setAs(from='SummarizedExperiment', to='data.table', function(from) {
     meltDtL <- lapply(assayDtL, melt, id.vars='.feature', 
         variable.name='.sample', variable.factor=FALSE)
     assayDT <- meltDtL[[1]][, .(.sample, .feature)]
-    for (i in seq_along(meltDtL)) 
+    for (i in seq_along(meltDtL))
         assayDT[[names(assayL)[[i]]]] <- meltDtL[[i]][['value']]
     # -- merge into a single long format table
     DT <- merge.data.table(assayDT, colDT, by='.sample')
@@ -253,7 +253,7 @@ setAs(from='SummarizedExperiment', to='data.table', function(from) {
 #' @title Coerce a SummarizedExperiment to a data.frame
 #' 
 #' @examples 
-#' SE <- molecularProfileSlot(GDSCsmall)[[1]]
+#' SE <- molecularProfilesSlot(clevelandSmall_cSet)[[1]]
 #' as(SE, 'data.frame')
 #' 
 #' @param from `SummarizedExperiment` object.

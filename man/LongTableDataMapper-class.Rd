@@ -27,6 +27,8 @@ Determines how the object is displayed in the console.
 \section{Slots}{
 
 \describe{
+\item{\code{rawdata}}{See Slots section.}
+
 \item{\code{rowDataMap}}{See Slots section.}
 
 \item{\code{colDataMap}}{See Slots section.}

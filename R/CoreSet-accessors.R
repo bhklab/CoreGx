@@ -1077,8 +1077,8 @@ setGeneric("mDataNames", function(object, ...) standardGeneric("mDataNames"))
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_mDataNames(class_=.local_class, data_=.local_data)
-setMethod("mDataNames", "CoreSet", function(object){
-  return(names(object@molecularProfiles))
+setMethod("mDataNames", "CoreSet", function(object) {
+    return(names(object@molecularProfiles))
 })
 
 
@@ -1105,9 +1105,9 @@ setGeneric("mDataNames<-", function(object, ..., value) standardGeneric("mDataNa
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_mDataNames(class_=.local_class, data_=.local_data)
-setReplaceMethod("mDataNames", "CoreSet", function(object, value){
-  names(object@molecularProfiles) <- value
-  return(object)
+setReplaceMethod("mDataNames", "CoreSet", function(object, value) {
+    names(object@molecularProfiles) <- value
+    return(object)
 })
 
 ##
@@ -1115,7 +1115,7 @@ setReplaceMethod("mDataNames", "CoreSet", function(object, value){
 
 
 #' @export
-setGeneric("molecularProfilesSlot", function(object, ...) 
+setGeneric("molecularProfilesSlot", function(object, ...)
     standardGeneric("molecularProfilesSlot"))
 
 #' @noRd
@@ -1139,7 +1139,7 @@ setGeneric("molecularProfilesSlot", function(object, ...)
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_molecularProfilesSlot(class_=.local_class, data_=.local_data)
 setMethod("molecularProfilesSlot", signature("CoreSet"), function(object) {
-  object@molecularProfiles
+    object@molecularProfiles
 })
 
 

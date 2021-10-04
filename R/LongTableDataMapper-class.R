@@ -3,6 +3,7 @@ NULL
 
 #' A Class for Mapping Between Raw Data and an `LongTable` Object
 #'
+#' @slot rawdata See Slots section.
 #' @slot rowDataMap See Slots section.
 #' @slot colDataMap See Slots section.
 #' @slot assayMap See Slots section.
@@ -99,10 +100,10 @@ LongTableDataMapper <- function(rawdata=list(), rowDataMap=list(),
 # ----------------------
 
 
-#' @describeIn LongTableDataMapper-class Show method for LongTableDataMapper. 
+#' @describeIn LongTableDataMapper-class Show method for LongTableDataMapper.
 #' Determines how the object is displayed in the console.
 #'
-#' @param object A `LongTableDataMapper` to display in the console. 
+#' @param object A `LongTableDataMapper` to display in the console.
 #'
 #' @examples
 #' show(exampleDataMapper)
@@ -210,8 +211,11 @@ NULL
 ## ---------------
 ## -- rawdata slot
 
+#' @rdname LongTableDataMapper-accessors
+#' @eval .docs_DataMapper_set_rawdata(class_=.local_class_3,
+#' class1_='list_or_List')
 setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
-        value='list'), function(object, value) {
+        value='list_or_List'), function(object, value) {
     funContext <- .S4MethodContext('rawdata<-', class(object)[1],
         class(value)[1])
 
@@ -224,7 +228,7 @@ setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
     ##>data columns are missing
 
     mandatory <- c(rows, cols, assays, meta)
-    if (!length(mandatory)) {
+    if (!length(mandatory) || !length(value)) {
         object@rawdata <- value
     } else if (length(mandatory) && !length(rawdata(object))) {
         hasMandatory <- mandatory %in% colnames(value)
@@ -252,8 +256,8 @@ setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
 .docs_LongTableDataMapper_get_dimDataMap <- function(...) .parseToRoxygen(
     "
     @details
-    __{dim_}DataMap__: `list` of two `character` vectors, the first are the 
-    columns required to uniquely identify each row of a `{class_}` and the 
+    __{dim_}DataMap__: `list` of two `character` vectors, the first are the
+    columns required to uniquely identify each row of a `{class_}` and the
     second any additional {dim_}-level metadata. If the character vectors
     have names, the resulting columns are automatically renamed to the
     item name of the specified column.
@@ -272,7 +276,7 @@ setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
 setGeneric('rowDataMap', function(object, ...) standardGeneric('rowDataMap'))
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval 
+#' @eval
 #' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_3,
 #' data_=.local_data_3)
 setMethod('rowDataMap', signature(object='LongTableDataMapper'),
@@ -336,7 +340,7 @@ setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
                 'are not present in rawdata(object): ', 
                 .collapse(value[[2]][!hasMetaCols]), '!'))
         }
-        hasOneToOneRelationship <- 
+        hasOneToOneRelationship <-
             value[[2]] %in% cardinality(rawdata(object), group=value[[1]])
         if (!all(hasOneToOneRelationship)) {
             stop(.errorMsg(funContext, 'The columns ', 
@@ -373,7 +377,7 @@ setGeneric('colDataMap<-', function(object, ..., value) standardGeneric('colData
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval
-#' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_3, 
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_3,
 #' data_=.local_data_3, id_col_='cell_id')
 setReplaceMethod('colDataMap',
         signature(object='LongTableDataMapper', value='list_or_List'),

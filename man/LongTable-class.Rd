@@ -12,6 +12,7 @@
 \alias{colMeta,LongTable-method}
 \alias{assayCols,LongTable-method}
 \alias{getIntern,LongTable,character-method}
+\alias{getIntern,LongTable,missing-method}
 \alias{rowData,LongTable-method}
 \alias{rowData<-,LongTable-method}
 \alias{colData,LongTable-method}
@@ -41,6 +42,8 @@
 \S4method{assayCols}{LongTable}(object, i)
 
 \S4method{getIntern}{LongTable,character}(object, x, ...)
+
+\S4method{getIntern}{LongTable,missing}(object, x)
 
 \S4method{rowData}{LongTable}(x, key = FALSE, use.names = FALSE)
 
@@ -155,6 +158,9 @@ names for the selected assay.
 value of x if length(x) == 1 else named list of values for all
 symbols in x
 
+A named \code{list} with all values in environment object@.intern coerced
+to a list (and therefore copied).
+
 A \code{data.table} containing rowID, row identifiers, and row metadata.
 
 A copy of the \code{LongTable} object with the \code{rowData}
@@ -216,6 +222,9 @@ uniquely identify each row.
 \code{LongTable}.
 
 \item \code{getIntern}: Access structural metadata present within a
+LongTable object. This is mostly for developmer use.
+
+\item \code{getIntern}: Access all structural metadata present within a
 LongTable object. This is mostly for developmer use.
 
 \item \code{rowData}: Get the row level annotations for a \code{LongTable} object.
@@ -318,6 +327,8 @@ assayCols(merckLongTable)
 
 getIntern(merckLongTable, 'rowIDs')
 getIntern(merckLongTable, c('colIDs', 'colMeta'))
+
+getIntern(merckLongTable)
 
 rowData(merckLongTable)
 

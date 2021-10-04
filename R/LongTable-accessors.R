@@ -97,8 +97,19 @@ setMethod('getIntern', signature(object='LongTable', x='character'),
             error=function(e) {
                 message(e); get(x, envir=object@.intern) })
 })
+#' @describeIn LongTable Access all structural metadata present within a
+#'   LongTable object. This is mostly for developmer use.
+#'
+#' @param object `LongTable`
+#' @param x `missing` This argument is excluded from from the function call.
+#'
+#' @return A named `list` with all values in environment object@.intern coerced
+#' to a list (and therefore copied).
+#' 
+#' @examples
+#' getIntern(merckLongTable)
+#'
 #' @aliases getIntern,LongTable,missing-method
-#' @include LongTable-class.R
 #' @export
 setMethod('getIntern', signature(object='LongTable', x='missing'),
     function(object, x) object@.intern

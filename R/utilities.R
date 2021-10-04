@@ -52,10 +52,9 @@
 #' @export
 #' @noRd
 .sanitizeInput <- function(x, y, lower, upper, pars, x_as_log, y_as_log, 
-    y_as_pct, trunc, verbose = FALSE) 
-{
+        y_as_pct, trunc, verbose = FALSE) {
     # Set to 2 to see debug printouts
-    
+
     if (!is.logical(x_as_log)) {
         if (verbose == 2) {
             message("x_as_log:")
@@ -63,7 +62,7 @@
         }
         stop("'x_as_log' is not a logical.")
     }
-    
+
     if (!is.logical(y_as_log)) {
         if (verbose == 2) {
             message("y_as_log:")
@@ -71,7 +70,7 @@
         }
         stop("'y_as_log' is not a logical.")
     }
-    
+
     if (!is.logical(y_as_pct)) {
         if (verbose == 2) {
             message("y_as_pct:")
@@ -79,7 +78,7 @@
         }
         stop("'y_as_pct' is not a logical.")
     }
-    
+
     if (!is.logical(trunc)) {
         if (verbose == 2) {
             message("trunc:")
@@ -87,7 +86,7 @@
         }
         stop("'trunc' is not a logical.")
     }
-    
+
     if (y_as_pct && y_as_log) {
         if (verbose == 2) {
             message("y_as_pct:")
@@ -97,13 +96,13 @@
         }
         warning("y_as_pct and y_as_log flags should almost certainly not both be TRUE.")
     }
-    
+
     if (!(verbose %in% c(0, 1, 2))) {
         message("verbose:")  #can't have the if(verbose == 2) statement here since verbose itself is the problem!
         message(verbose)
         stop("'verbose' flag is not set correctly.")
     }
-    
+
     if (!missing(x)) {
         if (!all(is.finite(x) | is.na(x)) || (x_as_log && any(x == -Inf))) {
             if (verbose == 2) {
@@ -112,7 +111,7 @@
             }
             stop("x must contain only real numbers, NA-values, and/or -Inf (if x_as_log flag is set to TRUE).")
         }
-        
+
         if (x_as_log == FALSE && min(x) < 0) {
             if (verbose == 2) {
                 message("x:")
@@ -126,7 +125,7 @@
             stop("Please pass in at least 3 unique dose points.")
         }
     }
-    
+
     if (missing(y)) {
         if (missing(pars)) {
             stop("Both 'pars' and 'y' missing, please pass in some data!")
