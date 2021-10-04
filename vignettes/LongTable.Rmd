@@ -325,7 +325,7 @@ where drug1 is Temozolomide and drug2 is either Lapatinib or Bortezomib:
 ```{r , echo=TRUE}
 longTable[
     # row query
-    .(drug1id == 'Temozolomide' & drug2id %in% c('Lapatinib', 'Bortezomib')), 
+    .(drug1id == 'Temozolomide' & drug2id %in% c('Lapatinib', 'Bortezomib')),
     .(cellid == 'CAOV3') # column query
 ]
 ```
@@ -423,3 +423,9 @@ Seyed Ali Madani Tonekaboni, Benjamin Haibe-Kains, SYNERGxDB: an integrative
 pharmacogenomic portal to identify synergistic drug combinations for precision 
 oncology, Nucleic Acids Research, Volume 48, Issue W1, 02 July 2020, Pages 
 W494–W501, https://doi.org/10.1093/nar/gkaa421
+
+# sessionInfo
+
+```{r sessionInfo}
+sessionInfo()
+```

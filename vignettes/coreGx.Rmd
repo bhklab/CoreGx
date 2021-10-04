@@ -235,3 +235,9 @@ for use in other treatment-response experiments!
 
 For more information about this package and the possibility of collaborating on 
 its extension please contact benjamin.haibe.kains@utoronto.ca.
+
+# sessionInfo
+
+```{r sessionInfo}
+sessionInfo()
+```
