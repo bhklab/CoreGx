@@ -34,7 +34,7 @@ back to a LongTable
 as(merckLongTable, 'data.table')
 
 dataTable <- as(merckLongTable, 'data.table')
-print(attr(dataTable, 'LongTableDataMapper')) # Method doesn't work without this
+print(attr(dataTable, 'longTableDataMapper')) # Method doesn't work without this
 as(dataTable, 'LongTable')
 
 SE <- molecularProfilesSlot(clevelandSmall_cSet)[[1]]

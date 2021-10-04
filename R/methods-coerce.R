@@ -158,7 +158,7 @@ as.data.frame.long.table <- function(x, row.names, optional=TRUE, ...) {
 #'
 #' @examples
 #' dataTable <- as(merckLongTable, 'data.table')
-#' print(attr(dataTable, 'LongTableDataMapper')) # Method doesn't work without this
+#' print(attr(dataTable, 'longTableDataMapper')) # Method doesn't work without this
 #' as(dataTable, 'LongTable')
 #'
 #' @description Coerce a data.table with the proper configuration attributes

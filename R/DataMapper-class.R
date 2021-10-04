@@ -96,4 +96,5 @@ setGeneric("rawdata<-", function(object, ..., value)
 setReplaceMethod('rawdata', signature(object='DataMapper'),
         function(object, value) {
     object@rawdata <- value
+    object
 })

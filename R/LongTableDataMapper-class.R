@@ -213,9 +213,9 @@ NULL
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval .docs_DataMapper_set_rawdata(class_=.local_class_3,
-#' class1_='list_or_List')
+#' class1_='list')
 setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
-        value='list_or_List'), function(object, value) {
+        value='list'), function(object, value) {
     funContext <- .S4MethodContext('rawdata<-', class(object)[1],
         class(value)[1])
 

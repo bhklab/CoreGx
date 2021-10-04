@@ -3,7 +3,7 @@
 \name{LongTableDataMapper-accessors}
 \alias{LongTableDataMapper-accessors}
 \alias{rawdata,LongTableDataMapper-method}
-\alias{rawdata<-,LongTableDataMapper,list_or_List-method}
+\alias{rawdata<-,LongTableDataMapper,list-method}
 \alias{rowDataMap,LongTableDataMapper-method}
 \alias{rowDataMap}
 \alias{rowDataMap<-,LongTableDataMapper,list_or_List-method}
@@ -30,7 +30,7 @@
 \alias{metadataMap<-}
 \title{Accessing and modifying data in a \code{LongTableDataMapper} object.}
 \usage{
-\S4method{rawdata}{LongTableDataMapper,list_or_List}(object) <- value
+\S4method{rawdata}{LongTableDataMapper,list}(object) <- value
 
 \S4method{rowDataMap}{LongTableDataMapper}(object)
 
