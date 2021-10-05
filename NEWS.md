@@ -1,5 +1,8 @@
 # CoreGx News File
 
+## v1.5.6
+- Fix bug in LongTable -> data.table coerce method that was causing rows of some assays to be dropped
+
 ## v1.5.5
 - Fix bug in .distancePointLine where function fails with no intercept specified (Issue #120)
 - Added support for aggregating an assay inside of a LongTable class object
