@@ -28,9 +28,10 @@ setAs('LongTable', 'data.table', def=function(from) {
     # join assays into a single table
     DT <- longTableData[[1]]
     longTableData[[1]] <- NULL
-    for (i in seq_along(longTableData))
-        DT <- merge.data.table(DT, longTableData[[i]],
-            suffixes=c('', paste0('._', i)), by=.EACHI)
+    for (i in seq_along(longTableData)) {
+        DT <- merge.data.table(DT, longTableData[[i]], 
+            suffixes=c('', paste0('._', i)), by=.EACHI, all.x=TRUE, all.y=TRUE)
+    }
 
     # extract assay columns
     assayCols <- assayCols(from)
