@@ -42,6 +42,7 @@ Imports:
     MatrixGenerics,
     piano,
     BiocParallel,
+    checkmate,
     methods,
     stats,
     utils,
@@ -89,6 +90,7 @@ Collate:
     'methods-guessMapping.R'
     'methods-metaConstruct.R'
     'methods-subsetTo.R'
+    'updateObject-methods.R'
     'utilities.R'
     'utils-iteration.R'
     'utils-messages.R'

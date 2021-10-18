@@ -2,6 +2,7 @@
 NULL
 
 #' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
+#' @import glue
 setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 
 .local_class <- 'CoreSet'
@@ -69,6 +70,7 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
         sensitivity="list_or_LongTable",
         annotation = "list",
         molecularProfiles = "list_or_MAE",
+        treatment="data.frame",
         cell="data.frame",
         datasetType="character",
         perturbation="list",
@@ -126,7 +128,7 @@ CoreSet <-  function(name,
     sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(), 
 	sensitivityN=matrix(nrow=0, ncol=0), perturbationN=array(NA, dim=c(0,0,0)), 
 	curationCell = data.frame(), curationTissue = data.frame(), 
-	datasetType=c("sensitivity", "perturbation", "both"), verify = TRUE)
+	datasetType=c("sensitivity", "perturbation", "both"), verify = TRUE) 
 {
     datasetType <- match.arg(datasetType)
     
@@ -191,6 +193,65 @@ CoreSet <-  function(name,
     return(object)
 }
 
+
+#' @noRd
+.docs_CoreSet2_constructor <- function(...) {
+    "
+    New implementation of the CoreSet constructor to support MAE and TRE. This
+    constructor will be swapped with the original `CoreSet` constructor as 
+    part of an overhaul of the CoreSet class structure.
+
+    @param name A `character(1)` vector with the `{class_}` objects name.
+    @param treatment A `data.frame` with treatment level metadata. {tx_}
+    @param sample A `data.frame` with sample level metadata for the union
+        of samples in `treatmentResponse` and `molecularProfiles`. {sx_}
+    @param molecularProfiles A `MultiAssayExperiment` containing one 
+        `SummarizedExperiment` object for each molecular data type.
+    @param treatmentResponse A `LongTable` or `LongTableDataMapper` object
+        containing all treatment response data associated with the `{class_}`
+        object.
+    @param curation A `list(2)` object with two items named `treatment` and
+        `sample` with mappings from publication identifiers to standardized
+        identifiers for both annotations, respectively.
+    @param datasetType A `character(1)` One of 
+
+    @return A `CoreSet` object storing standardized and curated treatment
+        response and multiomic profile data associated with a given publication.
+
+    @md
+    @importFrom MultiAssayExperiment MultiAssayExperiment
+    "
+}
+
+#' @eval .docs_CoreSet2_constructor(class_=.local_class, tx_="", sx_="")
+#' @export
+CoreSet2 <- function(name="EmptySet", treatment=data.frame(), 
+        sample=data.frame(), molecularProfiles=MultiAssayExperiment(), 
+        treatmentResponse=CoreGx:::.LongTable(), 
+        curation=list(sample=data.frame(), treatment=data.frame()), 
+        datasetType=c("sensitivity", "perturbation", "both")) {
+
+    annotation <- list(name=name, dateCreated=date(), 
+        sessionInfo=sessionInfo(), cell=match.call())
+
+    datasetType <- match.arg(datasetType)
+
+    longTable <- if (is(treatmentResponse, 'LongTableDataMapper')) {
+        metaConstruct(treatmentResponse)
+    } else {
+        treatmentResponse
+    }
+
+    .CoreSet(
+        annotation=annotation,
+        treatment=treatment,
+        cell=sample,
+        molecularProfiles=molecularProfiles,
+        sensitivity=treatmentResponse,
+        datasetType=datasetType,
+        curation=curation
+    )
+}
 
 #' Show a CoreSet
 #' 

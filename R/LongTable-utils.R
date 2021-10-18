@@ -40,7 +40,7 @@ NULL
 #' # Logical
 #' subset(merckLongTable, , colData(merckLongTable)$cellid == 'A2058')
 #' # Call
-#' subset(merckLongTable, drug1id == 'Dasatinib' & drug2id != '5-FU', 
+#' subset(merckLongTable, drug1id == 'Dasatinib' & drug2id != '5-FU',
 #'     cellid == 'A2058')
 #'
 #' @param x `LongTable` The object to subset.
