@@ -11,7 +11,7 @@ CoreSet2(
   treatment = data.frame(),
   sample = data.frame(),
   molecularProfiles = MultiAssayExperiment(),
-  treatmentResponse = CoreGx:::.LongTable(),
+  treatmentResponse = LongTable(),
   curation = list(sample = data.frame(), treatment = data.frame())
 )
 }

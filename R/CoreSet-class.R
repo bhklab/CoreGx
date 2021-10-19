@@ -142,7 +142,7 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
     annotation$dateCreated <- date()
     annotation$sessionInfo <- sessionInfo()
     annotation$call <- match.call()
-    
+
     for (i in seq_len(length(molecularProfiles))){
         if (!is(molecularProfiles[[i]], "SummarizedExperiment")) {
             stop(sprintf("Please provide the %s data as a SummarizedExperiment",
@@ -236,18 +236,24 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
 
 #' @eval .docs_CoreSet2_constructor(class_=.local_class, 
 #' tx_="This slot is not implemented for a CoreSet object yet.", sx_="")
+#' @md
 #' @export
 CoreSet2 <- function(name="EmptySet", treatment=data.frame(), 
         sample=data.frame(), molecularProfiles=MultiAssayExperiment(), 
-        treatmentResponse=CoreGx:::.LongTable(), 
+        treatmentResponse=LongTable(), 
         curation=list(sample=data.frame(), treatment=data.frame())) {
     # input validation
     assertCharacter(name, len=1)
     assertDataFrame(treatment)
     assertDataFrame(sample)
     assertClass(molecularProfiles, "MultiAssayExperiment")
-    assertClass(treatmentResponse, c("LongTable", "LongTableDataMapper"))
-    assertList(curation, len=2, names=c("sample", "treatment"))
+    assert(
+        checkClass(treatmentResponse, "LongTable"),
+        checkClass(treatmentResposne, "LongTableDataMapper")
+    )
+    assertList(curation, len=2)
+    assertSubset(names(curation), choices=c("sample", "treatment"))
+    
     # capture object creation context
     annotation <- list(name=name, dateCreated=date(), 
         sessionInfo=sessionInfo(), cell=match.call())
