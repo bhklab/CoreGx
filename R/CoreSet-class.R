@@ -124,12 +124,12 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' @importFrom utils sessionInfo
 #' @importFrom stats na.omit
 #' @importFrom SummarizedExperiment rowData colData assays
-CoreSet <-  function(name, 
-    molecularProfiles=list(), cell=data.frame(), sensitivityInfo=data.frame(),
-    sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(), 
-	sensitivityN=matrix(nrow=0, ncol=0), perturbationN=array(NA, dim=c(0,0,0)), 
-	curationCell=data.frame(), curationTissue=data.frame(), 
-	datasetType=c("sensitivity", "perturbation", "both"), verify=TRUE) {
+CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(), 
+        sensitivityInfo=data.frame(), sensitivityRaw=array(dim=c(0,0,0)), 
+        sensitivityProfiles=matrix(), sensitivityN=matrix(nrow=0, ncol=0), 
+        perturbationN=array(NA, dim=c(0,0,0)), curationCell=data.frame(), 
+        curationTissue=data.frame(), 
+        datasetType=c("sensitivity", "perturbation", "both"), verify=TRUE) {
 
     .Deprecated("CoreSet2", package=packageName(), msg="The CoreSet class is
         being redesigned. Please use the new constructor to ensure forwards

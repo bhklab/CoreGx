@@ -12,8 +12,7 @@ CoreSet2(
   sample = data.frame(),
   molecularProfiles = MultiAssayExperiment(),
   treatmentResponse = CoreGx:::.LongTable(),
-  curation = list(sample = data.frame(), treatment = data.frame()),
-  datasetType = c("sensitivity", "perturbation", "both")
+  curation = list(sample = data.frame(), treatment = data.frame())
 )
 }
 \description{

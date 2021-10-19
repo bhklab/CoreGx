@@ -98,9 +98,17 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
         colData=missing(colData), assays=missing(assays))
 
-    if (any(isMissing))
+    if (all(isMissing)) {
+        rowData <- data.table(rowKey=1)
+        rowIDs <- "rowKey"
+        colData <- data.table(colKey=1)
+        colIDs <- "colKey"
+        assays <- list(measurement=data.table(rowKey=1, colKey=1, metric=0.123))
+        isMissing <- FALSE
+    } else if (any(isMissing)) {
         stop(.errorMsg('\nRequired parameter(s) missing: ',
             names(isMissing)[isMissing], collapse='\n\t'))
+    }
 
     # check parameter types and coerce or error
     if (!is(colData, 'data.table'))
@@ -127,9 +135,9 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
             message(e)
             types <- lapply(assays, typeof)
             stop(.errorMsg(
-                 '\nList items are types: ',
-                 types, '\nPlease ensure all items in the assays list are ',
-                 'coerceable to a data.frame!'), collapse=', ')
+                '\nList items are types: ',
+                types, '\nPlease ensure all items in the assays list are ',
+                'coerceable to a data.frame!'), collapse=', ')
         })
 
     # Create the row and column keys for LongTable internal mappings
@@ -154,7 +162,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     lockBinding('rowMeta', internals)
 
     # capture column internal metadata
-    if (is.numeric(colIDs) | is.logical(colIDs))
+    if (is.numeric(colIDs) || is.logical(colIDs))
         colIDs <- colnames(colData)[colIDs]
     if (!all(colIDs %in% colnames(colData)))
         stop(.errorMsg('\nColumn IDs not in colData: ',
@@ -177,9 +185,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
         .SDcols=internals$colIDs]
 
-    return(.LongTable(rowData=rowData, colData=colData,
-                      assays=assays, metadata=metadata,
-                      .intern=internals))
+    return(.LongTable(rowData=rowData, colData=colData, assays=assays, 
+        metadata=metadata, .intern=internals))
 }
 
 # ---- Class unions for CoreSet slots
