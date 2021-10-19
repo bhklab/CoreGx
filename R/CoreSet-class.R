@@ -129,8 +129,8 @@ CoreSet <-  function(name,
     sensitivityRaw=array(dim=c(0,0,0)), sensitivityProfiles=matrix(), 
 	sensitivityN=matrix(nrow=0, ncol=0), perturbationN=array(NA, dim=c(0,0,0)), 
 	curationCell=data.frame(), curationTissue=data.frame(), 
-	datasetType=c("sensitivity", "perturbation", "both"), verify=TRUE) 
-{
+	datasetType=c("sensitivity", "perturbation", "both"), verify=TRUE) {
+
     .Deprecated("CoreSet2", package=packageName(), msg="The CoreSet class is
         being redesigned. Please use the new constructor to ensure forwards
         compatibility with future releases.", old="CoreSet")
@@ -240,13 +240,17 @@ CoreSet <-  function(name,
 CoreSet2 <- function(name="EmptySet", treatment=data.frame(), 
         sample=data.frame(), molecularProfiles=MultiAssayExperiment(), 
         treatmentResponse=CoreGx:::.LongTable(), 
-        curation=list(sample=data.frame(), treatment=data.frame()), 
-        datasetType=c("sensitivity", "perturbation", "both")) {
-
+        curation=list(sample=data.frame(), treatment=data.frame())) {
+    # input validation
+    assertCharacter(name, len=1)
+    assertDataFrame(treatment)
+    assertDataFrame(sample)
+    assertClass(molecularProfiles, "MultiAssayExperiment")
+    assertClass(treatmentResponse, c("LongTable", "LongTableDataMapper"))
+    assertList(curation, len=2, names=c("sample", "treatment"))
+    # capture object creation context
     annotation <- list(name=name, dateCreated=date(), 
         sessionInfo=sessionInfo(), cell=match.call())
-
-    datasetType <- match.arg(datasetType)
 
     longTable <- if (is(treatmentResponse, 'LongTableDataMapper')) {
         metaConstruct(treatmentResponse)
@@ -259,7 +263,7 @@ CoreSet2 <- function(name="EmptySet", treatment=data.frame(),
         cell=sample,
         molecularProfiles=molecularProfiles,
         sensitivity=treatmentResponse,
-        datasetType=datasetType,
+        datasetType="sensitivity",
         curation=curation
     )
 }
@@ -572,12 +576,12 @@ updateCellId <- function(object, new.ids=vector("character")) {
 checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
 
     msg <- c()
-    
+
     # Make directory to store results if it doesn't exist
     if (!file.exists(result.dir) && plotDist) { 
         dir.create(result.dir, showWarnings=FALSE, recursive=TRUE) 
     }
-    
+
     ####
     ## Checking molecularProfiles
     ####
@@ -637,7 +641,7 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
                 "(samples)"))
         }
     }
-    
+
     #####
     # Checking cell
     #####
@@ -673,7 +677,7 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
     } else {
         msg <- c(msg, "tissueid does not exist in cell slot")
     }
-    
+
     if("unique.cellid" %in% colnames(cSet@curation$cell)) {
         if (length(intersect(cSet@curation$cell$unique.cellid, 
                 rownames(cSet@cell))) != nrow(cSet@cell)) {
@@ -683,13 +687,13 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
         msg <- c(msg, paste0("unique.cellid which is curated cell id across",
             " data set should be a column of cell curation slot"))
     }
-    
+
     if (length(intersect(rownames(cSet@curation$cell), 
             rownames(cSet@cell))) != nrow(cSet@cell)) {
         msg <- c(msg, paste0("rownames of curation cell slot should be the",
             " same as cell slot (curated cell ids)"))
     }
-    
+
     if (!is(cSet@cell, "data.frame")) {
         msg <- c(msg, "cell slot class type should be dataframe")
     }
