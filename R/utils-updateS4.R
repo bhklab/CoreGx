@@ -4,17 +4,17 @@
 #' @param object Inheriting from `CoreSet`.
 #' @param mapper Should the `LongTableDataMapper` object be early returned,
 #' instead of the `LongTable` object. This can be useful if the conversion
-#' fails or corrupts your data. You can then modify the `DataMapper` as 
+#' fails or corrupts your data. You can then modify the `DataMapper` as
 #' necessary to fix the sensititivity data.
 #'
 #' @return A `LongTable` constructed from `object@sensitivty`, or a
-#' `LongTableDataMapper` if `mapper==TRUE`.
+#' `LongTableDataMapper` if `mapper`=TRUE.
 #'
 #' @keywords internal
-#' @importFrom data.table data.table as.data.table merge.data.table 
+#' @importFrom data.table data.table as.data.table merge.data.table
 #' melt.data.table
 .sensitivityToLongTable <- function(object, mapper=FALSE) {
-    
+
     # -- validate input
     funContext <- .funContext(':::.sensitivitySlotToLongTable')
     if (!is(object, 'CoreSet')) .error(funContext, ' object must inherit from
@@ -24,7 +24,7 @@
     if (!is(oldSensitivity, 'list')) .error(funContext, ' @sensitivty slot
         is not a `list`?')
 
-    # -- extact the old data as data.tables
+    # -- extract the old data as data.tables
 
     # sensitivityInfo
     infoDT <- as.data.table(oldSensitivity$info, keep.rownames=TRUE)
@@ -95,7 +95,7 @@
     assayMap(LTdataMapper) <- assayMap
     metadataMap(LTdataMapper) <- 
         list(experiment_metadata=guess$metadata$mapped_columns)
-    
+
     # build the object
     return(if (!mapper) metaConstruct(LTdataMapper) else LTdataMapper)
 }

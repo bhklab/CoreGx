@@ -24,3 +24,5 @@ combos
 local_data
 ./scripts
 .*sql
+.vscode
+.VSCodeCounter

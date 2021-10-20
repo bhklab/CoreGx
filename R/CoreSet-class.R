@@ -160,7 +160,7 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
 
     sensitivity <- list()
 
-    if (!all(rownames(sensitivityInfo) == rownames(sensitivityProfiles) & 
+    if (!all(rownames(sensitivityInfo) == rownames(sensitivityProfiles) &
         rownames(sensitivityInfo) == dimnames(sensitivityRaw)[[1]])) {
         stop("Please ensure all the row names match between the sensitivity data.")
     }
@@ -238,12 +238,12 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
 #' tx_="This slot is not implemented for a CoreSet object yet.", sx_="")
 #' @md
 #' @export
-CoreSet2 <- function(name="EmptySet", treatment=data.frame(), 
+CoreSet2 <- function(name="emptySet", treatment=data.frame(), 
         sample=data.frame(), molecularProfiles=MultiAssayExperiment(), 
         treatmentResponse=LongTable(), 
         curation=list(sample=data.frame(), treatment=data.frame())) {
 
-    # input validation
+    ## -- input validation
     assertCharacter(name, len=1)
     assertDataFrame(treatment)
     assertDataFrame(sample)
@@ -255,19 +255,23 @@ CoreSet2 <- function(name="EmptySet", treatment=data.frame(),
     assertList(curation, len=2)
     assertSubset(names(curation), choices=c("sample", "treatment"))
 
-    # capture object creation context
+    ## -- capture object creation environment
     annotation <- list(name=name, dateCreated=date(), 
         sessionInfo=sessionInfo(), call=match.call())
 
-    # conditionally materialize DataMapper
+    ## -- conditionally materialize DataMapper
     longTable <- if (is(treatmentResponse, 'LongTableDataMapper')) {
         metaConstruct(treatmentResponse)
     } else {
         treatmentResponse
     }
 
-    # data integrity
+    ## -- data integrity checks
+    # sample
 
+    # treatment
+
+    #
 
     .CoreSet(
         annotation=annotation,
@@ -689,7 +693,7 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
                 " across data set should be a column of tissue curation slot"))
         }
         if (any(is.na(cSet@cell[,"tissueid"]) || 
-                cSet@cell[,"tissueid"] == "", na.rm=TRUE)) {
+                cSet@cell[, "tissueid"] == "", na.rm=TRUE)) {
             msg <- c(msg, paste0(
                     "There is no tissue type for this cell line(s)",
                     paste(
@@ -722,7 +726,7 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
     if (!is(cSet@cell, "data.frame")) {
         msg <- c(msg, "cell slot class type should be dataframe")
     }
-    return(paste0(msg, collapse="\n"))
+    if (length(msg)) return(paste0(msg, collapse="\n")) else TRUE
 }
 
 #' @importFrom MultiAssayExperiment MultiAssayExperiment
@@ -732,7 +736,7 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
     msg <- character()
     # ---- Make a MutliAssayExperiment, if it isn't one already
     molecProf <- molecularProfilesSlot(object)
-    isSummarizedExperiment <- all(as(lapply(molecProf, is, 
+    isSummarizedExperiment <- all(as(lapply(experiments(molecProf), is, 
         'SummarizedExperiment'), 'List'))
     if (!all(isSummarizedExperiment)) {
         nmsg <- .formatMessage('All molecular profiles must be stored as 

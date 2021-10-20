@@ -7,7 +7,7 @@ constructor will be swapped with the original \code{CoreSet} constructor as
 part of an overhaul of the CoreSet class structure.}
 \usage{
 CoreSet2(
-  name = "EmptySet",
+  name = "emptySet",
   treatment = data.frame(),
   sample = data.frame(),
   molecularProfiles = MultiAssayExperiment(),

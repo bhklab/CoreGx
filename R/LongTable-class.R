@@ -8,7 +8,7 @@
 #' @slot assays See Slots section.
 #' @slot metadata See Slots section.
 #' @slot .intern See Slots section.
-#' 
+#'
 #' @section Slots:
 #' - *rowData*: A `data.table` containing the metadata associated with the
 #'   row dimension of a `LongTable`.
@@ -252,7 +252,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
     ## FIXME:: Function too long. Can I refactor to a helper that prints each slot?
 
     # ---- class descriptions
-    cat(yellow$bold$italic('<LongTable>', '\n'))
+    cat(yellow$bold$italic(paste0("<", class(object), ">"), '\n'))
     cat(yellow$bold('dim: ', .collapse(dim(object)), '\n'))
 
     # --- assays slot
