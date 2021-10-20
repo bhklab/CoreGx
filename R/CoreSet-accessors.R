@@ -383,7 +383,7 @@ setGeneric("cellNames<-", function(object, ..., value)
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_cellNames(class_=.local_class, data_=.local_data)
-setReplaceMethod("cellNames", signature(object="CoreSet",value="character"),
+setReplaceMethod("cellNames", signature(object="CoreSet", value="character"),
         function(object, value) {
     ## TODO: does updateCellId also update slots other than cell?
     object <- updateCellId(object, value)
@@ -1226,10 +1226,10 @@ setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_or_MAE"),
 )
 
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_get_sensitivityInfo(class_=.local_class, data_=.local_data)
-setMethod(sensitivityInfo, signature("CoreSet"),
-    function(object, dimension, ...) 
-{
+#' @eval .docs_CoreSet_get_sensitivityInfo(class_=.local_class,
+#' data_=.local_data)
+setMethod(sensitivityInfo, signature("CoreSet"), 
+        function(object, dimension, ...) {
     funContext <- .funContext('::sensitivityInfo')
     # case where sensitivity slot is a LongTable
     if (is(sensitivitySlot(object), 'LongTable')) {
@@ -1265,7 +1265,8 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 #' @noRd
 .rebuildInfo <- function(longTable) {
 
-    # Extract the information needed to reconstruct the sensitivityInfo data.frame
+    # Extract the information needed to reconstruct the sensitivityInfo
+    #   data.frame
     assayIndexDT <- assay(longTable, 1, key=TRUE)[, .(rowKey, colKey)]
     setkeyv(assayIndexDT, c('rowKey', 'colKey'))
     rowDataDT <- rowData(longTable, key=TRUE)
@@ -1280,8 +1281,12 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     # join the tables into the original data
     infoDT <- merge.data.table(assayIndexDT, rowDataDT, all=TRUE)
     setkeyv(infoDT, 'colKey')
-    infoDT <- merge.data.table(infoDT, colDataDT, all=TRUE)[, -c('rowKey', 'colKey')]
-    infoDT <- infoDT[, .SD, .SDcols=!patterns('drug.*dose$')]
+    infoDT <- merge.data.table(infoDT, colDataDT, all=TRUE)[, 
+        -c('rowKey', 'colKey')
+    ]
+    infoDT <- tryCatch({
+        infoDT[, .SD, .SDcols=!patterns('drug.*dose$')]
+    }, error=function(e) infoDT)
 
     # determine which columns map 1:1 with new identifiers and subset to those
     infoDT_first <- infoDT[, head(.SD, 1), by=rownameCols]
@@ -1324,7 +1329,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     sensitivityInfo({data_}) <- sensitivityInfo({data_})
 
     @md
-    @aliases sensitivityInfo<-,{class_},missing,data.frame-method 
+    @aliases sensitivityInfo<-,{class_},missing,data.frame-method
     sensitvityInfo<-,{class_},character,data.frame-method
     @import data.table
     @exportMethod sensitivityInfo<-

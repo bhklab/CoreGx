@@ -133,7 +133,7 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
 
     .Deprecated("CoreSet2", package=packageName(), msg="The CoreSet class is
         being redesigned. Please use the new constructor to ensure forwards
-        compatibility with future releases.", old="CoreSet")
+        compatibility with future releases!", old="CoreSet")
 
     datasetType <- match.arg(datasetType)
     
@@ -153,7 +153,7 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
                     rownames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE
             ]
             colData(molecularProfiles[[i]]) <- colData(molecularProfiles[[i]])[
-                    colnames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE
+                colnames(assays(molecularProfiles[[i]])[[1]]), , drop=FALSE
             ]
         }
     }
@@ -242,6 +242,7 @@ CoreSet2 <- function(name="EmptySet", treatment=data.frame(),
         sample=data.frame(), molecularProfiles=MultiAssayExperiment(), 
         treatmentResponse=LongTable(), 
         curation=list(sample=data.frame(), treatment=data.frame())) {
+
     # input validation
     assertCharacter(name, len=1)
     assertDataFrame(treatment)
@@ -253,16 +254,20 @@ CoreSet2 <- function(name="EmptySet", treatment=data.frame(),
     )
     assertList(curation, len=2)
     assertSubset(names(curation), choices=c("sample", "treatment"))
-    
+
     # capture object creation context
     annotation <- list(name=name, dateCreated=date(), 
-        sessionInfo=sessionInfo(), cell=match.call())
+        sessionInfo=sessionInfo(), call=match.call())
 
+    # conditionally materialize DataMapper
     longTable <- if (is(treatmentResponse, 'LongTableDataMapper')) {
         metaConstruct(treatmentResponse)
     } else {
         treatmentResponse
     }
+
+    # data integrity
+
 
     .CoreSet(
         annotation=annotation,
@@ -284,36 +289,50 @@ CoreSet2 <- function(name="EmptySet", treatment=data.frame(),
 #' @return Prints the CoreSet object to the output stream, and returns invisible NULL. 
 #' @export
 setMethod("show", signature=signature(object="CoreSet"), function(object) {
+    cat(paste0("<", class(object)[1], ">\n"))
+    space <- "  "
     cat("Name: ", name(object), "\n")
     cat("Date Created: ", dateCreated(object), "\n")
     cat("Number of cell lines: ", nrow(cellInfo(object)), "\n")
-    if ("dna" %in% names(object@molecularProfiles)){
-        cat("DNA: \n")
-        cat("\tDim: ", dim(molecularProfiles(object, mDataType="dna")), "\n")
+    mProfiles <- molecularProfilesSlot(object)
+    mProfileNames <- names(mProfiles)
+    cat("Molecular profiles:\n")
+    if (is(mProfiles, "MultiAssayExperiment")) {
+        showMAE <- capture.output(show(mProfiles))
+        dropAfter <- which(grepl("Functionality", showMAE)) - 1
+        showCompactMAE <- showMAE[1:dropAfter]
+        cat(space, paste0(showCompactMAE, collapse="\n  "), "\n")
+    } else {
+        if (!length(mProfileNames)) cat(space, "None\n")
+        for (item in mProfileNames) {
+            title <- switch(item,
+                "dna"="DNA",
+                "rna"="RNA",
+                "rnaseq"="RNAseq",
+                "snp"="SNP",
+                "cnv"="CNV",
+                item
+            )
+            cat(title, ":\n")
+            cat(space, "Dim: ", dim(molecularProfiles(object, mDataType=item)), 
+                "\n")
+        }
     }
-    if ("rna" %in% names(object@molecularProfiles)) {
-        cat("RNA: \n")
-        cat("\tDim: ", dim(molecularProfiles(object, mDataType="rna")), "\n")
+
+    if (is(sensitivitySlot(object), "LongTable")) {
+        cat("Treatment response:\n")
+        showLT <- capture.output(show(sensitivitySlot(object)))
+        cat(space, paste0(showLT, collapse="\n  "), "\n")
+    } else {
+        cat("Drug pertubation: \n")
+        cat(space, 
+            "Please look at pertNumber(cSet) to determine number of experiments",
+            " for each drug-cell combination.\n")
+        cat("Drug sensitivity: \n")
+        cat(space, "Number of Experiments: ", nrow(sensitivityInfo(object)),"\n")
+        cat(space, "Please look at sensNumber(cSet) to determine number of ",
+            "experiments for each drug-cell combination.\n")
     }
-    if ("rnaseq" %in% names(object@molecularProfiles)) {
-        cat("RNASeq: \n")
-        cat("\tDim: ", dim(molecularProfiles(object, mDataType="rnaseq")), "\n")
-    }
-    if ("snp" %in% names(object@molecularProfiles)) {
-        cat("SNP: \n")
-        cat("\tDim: ", dim(molecularProfiles(object, mDataType="snp")), "\n")
-    }
-    if ("cnv" %in% names(object@molecularProfiles)) {
-        cat("CNV: \n")
-        cat("\tDim: ", dim(molecularProfiles(object, mDataType="cnv")), "\n")
-    }
-    cat("Drug pertubation: \n")
-    cat("\tPlease look at pertNumber(cSet) to determine number of experiments",
-        " for each drug-cell combination.\n")
-    cat("Drug sensitivity: \n")
-    cat("\tNumber of Experiments: ", nrow(sensitivityInfo(object)),"\n")
-    cat("\tPlease look at sensNumber(cSet) to determine number of ",
-        "experiments for each drug-cell combination.\n")
 })
 
 

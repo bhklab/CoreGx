@@ -34,7 +34,7 @@ columns will be pasted together to make up the colnames of the
 \code{LongTable} object.}
 
 \item{assays}{A \code{list} containing one or more objects coercible to a
-\code{data.table}, and keyed by rowID and colID corresponding to the rowID and
+\code{data.table}, and keyed by rowIDs and colIDs corresponding to the rowID and
 colID columns in colData and rowData.}
 
 \item{metadata}{A \code{list} of metadata associated with the \code{LongTable}
