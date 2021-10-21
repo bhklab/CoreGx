@@ -205,8 +205,8 @@ setAs('data.table', 'LongTable', def=function(from) {
 #'   back to a LongTable
 #'
 #' @param x A `data.frame` with the 'longTableDataMapper' attribute, containing
-#'    three lists named assayCols, rowDataCols and colDataCols. This attribute is
-#'    automatically created when coercing from a LongTable to a data.table.
+#'  three lists named assayCols, rowDataCols and colDataCols. This attribute
+#'  is automatically created when coercing from a LongTable to a data.table.
 #'
 #' @return `LongTable` object configured with the longTableDataMapper
 #' @export
@@ -245,7 +245,8 @@ setAs(from='SummarizedExperiment', to='data.table', function(from) {
     # -- add metadata
     metadata <- metadata(from)
     notS4 <- !vapply(metadata, isS4, logical(1))
-    if (!all(notS4)) .warning('Dropped S4 metadata during coercion to data.table!')
+    if (!all(notS4))
+        .warning('Dropped S4 metadata during coercion to data.table!')
     for (name in names(metadata)[notS4]) assayDT[[name]] <- metadata[[name]]
     return(DT)
 })
@@ -266,3 +267,70 @@ setAs(from='SummarizedExperiment', to='data.table', function(from) {
 setAs(from='SummarizedExperiment', to='data.frame', function(from) {
     setDF(as(from, 'data.table'))
 })
+
+
+#' Coerce a `LongTable` into a `SummarizedExperiment`
+#'
+#' @param from `LongTable` object coerce to a `SummarizedExperiment`. Assays
+#'   are converted to `BumpyMatrix`es to allow treatment combination support
+#'   and integration with the `gDR` package.
+#'
+#' @return `SummarizedExperiment` with each assay as a `BumpyMatrix`
+#'
+#' @seealso [`BumpyMatrix::BumpyMatrix`]
+#'
+#' @md
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @export
+setAs("LongTable", "SummarizedExperiment", def=function(from) {
+    .longTableToSummarizedExperiment(from, assay_name=assayNames(from))
+})
+
+
+#' Convert a LongTable assay into a BumpyMatrix object
+#'
+#' @param LT `LongTable` with assay to convert into `BumpyMatrix`
+#' @param assay `character(1)` A valid assay name in `LT`, as returned by
+#'     `assayNames(LT)`.
+#' @param rows `character()` The rownames associated with the assay rowKey
+#' @param cols `character()` The names associated with the assay colKey
+#' @param sparse `logical(1)` Should the `BumpyMatrix` be sparse (i.e., is the
+#'   assay sparse).
+#'
+#' @return `BumpyMatrix` containing the data from `assay`.
+#'
+#' @md
+#' @importFrom data.table data.table
+#' @importFrom BumpyMatrix splitAsBumpyMatrix
+.assayToBumpyMatrix <- function(LT, assay, rows, cols, sparse=TRUE) {
+    assay_data <- assay(LT, assay, key=TRUE)
+    assay_data[, rownames := rows[rowKey]]
+    assay_data[, colnames := cols[colKey]]
+    assay_data[, c('rowKey', 'colKey') := NULL]
+    splitAsBumpyMatrix(assay_data[, -c('rownames', 'colnames')],
+        row=assay_data$rownames, column=assay_data$colnames, sparse)
+}
+
+#' Convert LongTable to gDR Style SummarizedExperiment
+#'
+#' @param LT `LongTable` to convert to gDR `SummarizedExperiment` format.
+#' @param assay_names `character()` Names to rename the assays to. These
+#'   are assumed to be in the same order as `assayNames(LT)`.
+#' 
+#' @return `SummarizedExperiment` object with all assay from `LT` as 
+#'   `BumpyMatrix`es.
+#' 
+#' @md
+#' @importFrom data.table setnames
+#' @importFrom SummarizedExperiment SummarizedExperiment
+.longTableToSummarizedExperiment <- function(LT, assay_names) {
+    assay_list <- lapply(assayNames(LT), FUN=.assayToBumpyMatrix,
+        LT=LT, rows=rownames(LT), cols=colnames(LT))
+    if (!missing(assay_names) && length(assay_names) == length(assayNames(LT))) 
+        names(assay_list) <- assay_names
+    SummarizedExperiment(
+        assays=assay_list, rowData=rowData(LT), colData=colData(LT), 
+            metadata=c(metadata(LT), list(.intern=as.list(getIntern(LT))))
+    )
+}
+

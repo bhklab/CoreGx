@@ -308,7 +308,8 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #'   parameters.
 #'
 #' @export
-setMethod('[', signature('LongTable'), function(x, i, j, assays, ..., drop=FALSE) {
+setMethod('[', signature('LongTable'),
+        function(x, i, j, assays, ..., drop=FALSE) {
     subset(x, i, j, assays)
 })
 
@@ -341,9 +342,8 @@ setMethod('[', signature('LongTable'), function(x, i, j, assays, ..., drop=FALSE
 #' @importFrom crayon cyan magenta
 #' @import data.table
 #' @export
-setMethod('[[', signature('LongTable'),
-    function(x, i, withDimnames=TRUE, metadata=withDimnames, keys=!withDimnames) 
-{
+setMethod('[[', signature('LongTable'), function(x, i, withDimnames=TRUE, 
+        metadata=withDimnames, keys=!withDimnames) {
     funContext <- .S4MethodContext('[[', class(x))
 
     if (metadata && !withDimnames) {

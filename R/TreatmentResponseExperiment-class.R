@@ -120,7 +120,7 @@ TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
 #' @return The data in `object`, as the child-class 
 #'   `TreatmentResponseExperiment`.
 #' 
-#' @seelalso [`TreatmentResponseExperiment`]
+#' @seealso [`TreatmentResponseExperiment`]
 #' 
 #' @md
 #' @export
