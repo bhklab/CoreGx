@@ -76,6 +76,7 @@ Collate:
     'LongTable-utils.R'
     'LongTableDataMapper-class.R'
     'TreatmentResponseExperiment-class.R'
+    'TREDataMapper-class.R'
     'adaptiveMatthewCor.R'
     'callingWaterfall.R'
     'connectivityScore.R'

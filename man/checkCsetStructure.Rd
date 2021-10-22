@@ -4,16 +4,16 @@
 \alias{checkCsetStructure}
 \title{A function to verify the structure of a CoreSet}
 \usage{
-checkCsetStructure(cSet, plotDist = FALSE, result.dir = tempdir())
+checkCsetStructure(object, plotDist = FALSE, result.dir = tempdir())
 }
 \arguments{
-\item{cSet}{A \code{CoreSet} to be verified}
-
 \item{plotDist}{Should the function also plot the distribution of molecular
 data?}
 
 \item{result.dir}{The path to the directory for saving the plots as a string.
 Defaults to this R sessions \code{tempdir()}.}
+
+\item{cSet}{A \code{CoreSet} to be verified}
 }
 \value{
 Prints out messages whenever describing the errors found in the

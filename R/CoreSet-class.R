@@ -137,7 +137,7 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
         compatibility with future releases!", old="CoreSet")
 
     datasetType <- match.arg(datasetType)
-    
+
     annotation <- list()
     annotation$name <- as.character(name)
     annotation$dateCreated <- date()
@@ -222,10 +222,7 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
     @param treatmentResponse A `LongTable` or `LongTableDataMapper` object
         containing all treatment response data associated with the `{class_}`
         object.
-    @param curation A `list(2)` object with two items named `treatment` and
-        `sample` with mappings from publication identifiers to standardized
-        identifiers for both annotations, respectively.
-    @param datasetType A `character(1)` One of 
+    @param curation {cx_} 
 
     @return A `CoreSet` object storing standardized and curated treatment
         response and multiomic profile data associated with a given publication.
@@ -236,7 +233,10 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
 }
 
 #' @eval .docs_CoreSet2_constructor(class_=.local_class, 
-#' tx_="This slot is not implemented for a CoreSet object yet.", sx_="")
+#' tx_="This slot is not implemented for a CoreSet object yet.", sx_="",
+#' cx_="A `list(2)` object with two items named `treatment` and `sample` 
+#' with mappings from publication identifiers to standardized identifiers 
+#' for both annotations, respectively.")
 #' @md
 #' @export
 CoreSet2 <- function(name="emptySet", treatment=data.frame(), 
@@ -246,7 +246,6 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
 ) {
 
     # -- update old curation names
-    # TODO:: Implement this after slot name change
     names(curation) <- gsub("drug|radiation", "treatment", names(curation))
     names(curation) <- gsub("cell", "sample", names(curation))
 
@@ -257,10 +256,9 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
     assertClass(molecularProfiles, "MultiAssayExperiment")
     assert(
         checkClass(treatmentResponse, "LongTable"),
-        checkClass(treatmentResposne, "LongTableDataMapper")
+        checkClass(treatmentResponse, "LongTableDataMapper")
     )
     assertList(curation, min.len=2)
-    ## TODO:: Remove drug and cell after slot name change
     assertSubset(c("sample", "treatment"), choices=names(curation))
 
     ## -- capture object creation environment
@@ -274,6 +272,15 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
         treatmentResponse
     }
 
+    object <- .CoreSet(
+        annotation=annotation,
+        cell=sample,
+        molecularProfiles=molecularProfiles,
+        sensitivity=treatmentResponse,
+        datasetType="sensitivity",
+        curation=curation
+    )
+
     ## -- data integrity checks
     # molecularProfiles
     validProfiles <- .checkMolecularProfiles(object)
@@ -286,15 +293,7 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
         .error(paste0(list(validProfiles, validTreatments)[diagnosis], 
             collapse="\n", sep="\n"))
     }
-
-    .CoreSet(
-        annotation=annotation,
-        cell=sample,
-        molecularProfiles=molecularProfiles,
-        sensitivity=treatmentResponse,
-        datasetType="sensitivity",
-        curation=curation
-    )
+    return(object)
 }
 
 #' Show a CoreSet
@@ -423,11 +422,11 @@ updateCellId <- function(object, new.ids=vector("character")) {
                 sensNumber(object) <- sensNumber(object)[-myx[-1], ]
                 # sensMatch <- sensMatch[-myx[-1]]
         }
-        if (dim(pertNumber(object))[[1]] > 0){
+        if (dim(pertNumber(object))[[1]] > 0) {
             myx <- which(new.ids[pertMatch] == id)
             pertNumber(object)[myx[1], , ] <- apply(pertNumber(object)[myx, , ], 
                 c(1,3), sum)
-            pertNumber(object) <- pertNumber(object)[-myx[-1], , 
+            pertNumber(object) <- pertNumber(object)[-myx[-1], , ]
         }
 
         myx <- which(new.ids[curMatch] == id)
@@ -577,7 +576,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
     celln <- rownames(cellInfo(object))
 
     perturbation.info <- array(0, dim=c(length(celln), length(drugn), 
-        length(molecularProfilesSlot(object))), 
+        length(molecularProfilesSlot(object))),
         dimnames=list(celln, drugn, names((molecularProfilesSlot(object)))))
 
     for (i in seq_len(length(molecularProfilesSlot(object)))) {
@@ -747,10 +746,10 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
     if (length(msg)) return(paste0(msg, collapse="\n")) else TRUE
 }
 
-#' @importFrom MultiAssayExperiment MultiAssayExperiment
+#' @importFrom MultiAssayExperiment MultiAssayExperiment experiments
 #' @importFrom S4Vectors List
 #' @importFrom BiocGenerics %in% match
-.checkMolecularProfilesSlot <- function(object) {
+.checkMolecularProfiles <- function(object) {
     msg <- character()
     # ---- Make a MutliAssayExperiment, if it isn't one already
     molecProf <- molecularProfilesSlot(object)
@@ -763,7 +762,7 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
         msg <- c(msg, nmsg)
     }
     tryCatch({
-        MAE <- if(is(molecProf, 'MultiAssayExperient')) molecProf else 
+        MAE <- if (is(molecProf, 'MultiAssayExperiment')) molecProf else 
             MultiAssayExperiment(molecProf)
     }, error=function(e) msg <- c(msg, paste0('Failed coercing to 
         MultiAssayExperiment: ', as.character(e))))
@@ -809,15 +808,16 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
     return(if (length(msg)) msg else TRUE)
 }
 
-.checkTreatmentResponseSlot <- function(object) {
+.checkTreatmentResponse <- function(object) {
     msg <- character()
     # ---- Extract sensitivity data
     samples <- cellNames(object)
     sensSlot <- sensitivitySlot(object)
-    if (is(sensSlot, 'LongTable')) {
-        
-    } else {
-
+    if (!is(sensSlot, "TreatmentResponseExperiment")) {
+        nmsg <- "The treatmentReponse parameter must be a 
+            TreatmentResponseExperiment!"
+        msg <- c(msg, nmsg)
+        return(msg)
     }
     return(if (length(msg)) msg else TRUE)
 }

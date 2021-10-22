@@ -2,6 +2,7 @@
 
 #' @include LongTableDataMapper-class.R
 #' @include DataMapper-class.R
+#' @include TreatmentResponseExperiment-class.R
 NULL
 
 #' @title LongTable to data.table conversion
@@ -337,3 +338,14 @@ setAs("LongTable", "SummarizedExperiment", def=function(from) {
     )
 }
 
+#' Coerce a `LongTableDataMapper` to a `TREDataMapper`
+#'
+#' @param from A `LongTableDataMapper` to coerce.
+#'
+#' @return A `TREDataMapper` object.
+#'
+#' @md
+#' @export
+setAs("LongTableDataMapper", "TREDataMapper", def=function(from) {
+    TREDataMapper(from)
+})
