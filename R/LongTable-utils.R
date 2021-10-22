@@ -467,17 +467,14 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
 
     # remap the rowKey and colKey columns to the assays
     newAssayData <- lapply(assayDataList,
-                           FUN=.joinDropOn,
-                           DT2=newRowData, on=rowIDCols)
+        FUN=.joinDropOn, DT2=newRowData, on=rowIDCols)
     newAssayData <- lapply(newAssayData,
-                           FUN=.joinDropOn,
-                           DT2=newColData, on=colIDCols)
+        FUN=.joinDropOn, DT2=newColData, on=colIDCols)
     newAssayData <- lapply(newAssayData, setkeyv, cols=c('rowKey', 'colKey'))
 
     return(LongTable(rowData=newRowData, rowIDs=getIntern(object, 'rowIDs'),
-                     colData=newColData, colIDs=getIntern(object, 'colIDs'),
-                     assays=newAssayData, metadata=metadata(object)))
-
+        colData=newColData, colIDs=getIntern(object, 'colIDs'), 
+        assays=newAssayData, metadata=metadata(object)))
 })
 
 

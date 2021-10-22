@@ -44,7 +44,7 @@
     meltedViabDT <- melt.data.table(viabDT, id.vars='rn', 
         variable.name='old_column', value.name='viability')
     meltedViabDT[, viability := as.numeric(viability)]
-    
+
     # -- merge into a single long format data.table
     assayDT <- merge.data.table(meltedDoseDT, meltedViabDT, 
         by=c('rn', 'old_column'))
@@ -54,7 +54,7 @@
     rawdataDT <- merge.data.table(assayDT, profDT, by='rn')
     rawdataDT <- merge.data.table(rawdataDT, infoDT, by='rn')
     # Find any hidden replicates
-    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols[1], colCols, 
+    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols[1], colCols,
         'old_column')]
 
     if (max(rawdataDT$replicate_id) > 1) {
@@ -77,7 +77,7 @@
     # -- build a LongTableDataMapper object
     LTdataMapper <- LongTableDataMapper(rawdata=rawdataDT)
     guess <- guessMapping(LTdataMapper, groups, subset=TRUE)
-    
+
     assayCols <- unlist(assayMap)
 
     # do not steal any assay columns for the row or column data

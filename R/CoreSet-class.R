@@ -125,11 +125,12 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #' @importFrom stats na.omit
 #' @importFrom SummarizedExperiment rowData colData assays
 CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(), 
-        sensitivityInfo=data.frame(), sensitivityRaw=array(dim=c(0,0,0)), 
-        sensitivityProfiles=matrix(), sensitivityN=matrix(nrow=0, ncol=0), 
-        perturbationN=array(NA, dim=c(0,0,0)), curationCell=data.frame(), 
-        curationTissue=data.frame(), 
-        datasetType=c("sensitivity", "perturbation", "both"), verify=TRUE) {
+    sensitivityInfo=data.frame(), sensitivityRaw=array(dim=c(0,0,0)), 
+    sensitivityProfiles=matrix(), sensitivityN=matrix(nrow=0, ncol=0), 
+    perturbationN=array(NA, dim=c(0,0,0)), curationCell=data.frame(), 
+    curationTissue=data.frame(), 
+    datasetType=c("sensitivity", "perturbation", "both"), verify=TRUE
+) {
 
     .Deprecated("CoreSet2", package=packageName(), msg="The CoreSet class is
         being redesigned. Please use the new constructor to ensure forwards
@@ -241,7 +242,13 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
 CoreSet2 <- function(name="emptySet", treatment=data.frame(), 
         sample=data.frame(), molecularProfiles=MultiAssayExperiment(), 
         treatmentResponse=LongTable(), 
-        curation=list(sample=data.frame(), treatment=data.frame())) {
+        curation=list(sample=data.frame(), treatment=data.frame())
+) {
+
+    # -- update old curation names
+    # TODO:: Implement this after slot name change
+    names(curation) <- gsub("drug|radiation", "treatment", names(curation))
+    names(curation) <- gsub("cell", "sample", names(curation))
 
     ## -- input validation
     assertCharacter(name, len=1)
@@ -252,8 +259,9 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
         checkClass(treatmentResponse, "LongTable"),
         checkClass(treatmentResposne, "LongTableDataMapper")
     )
-    assertList(curation, len=2)
-    assertSubset(names(curation), choices=c("sample", "treatment"))
+    assertList(curation, min.len=2)
+    ## TODO:: Remove drug and cell after slot name change
+    assertSubset(c("sample", "treatment"), choices=names(curation))
 
     ## -- capture object creation environment
     annotation <- list(name=name, dateCreated=date(), 
@@ -271,7 +279,6 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
 
     # treatment
 
-    #
 
     .CoreSet(
         annotation=annotation,

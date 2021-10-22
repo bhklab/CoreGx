@@ -83,6 +83,7 @@ setAs('LongTable', 'data.table', def=function(from) {
     return(DT)
 })
 #' @title Coerce a LongTable into a `data.table`
+#' @name as
 #'
 #' @description S3 version of coerce method for convenience.
 #'
@@ -116,6 +117,7 @@ setAs('LongTable', 'data.frame', def=function(from) {
 })
 
 #' @title Coerce a LongTable to a data.frame
+#' @name as
 #'
 #' @examples
 #' as(merckLongTable, 'data.frame')
@@ -253,7 +255,7 @@ setAs(from='SummarizedExperiment', to='data.table', function(from) {
 
 #' @name as
 #' @title Coerce a SummarizedExperiment to a data.frame
-#' 
+#'
 #' @examples 
 #' SE <- molecularProfilesSlot(clevelandSmall_cSet)[[1]]
 #' as(SE, 'data.frame')
@@ -269,7 +271,8 @@ setAs(from='SummarizedExperiment', to='data.frame', function(from) {
 })
 
 
-#' Coerce a `LongTable` into a `SummarizedExperiment`
+#' @title Coerce a `LongTable` into a `SummarizedExperiment`
+#' @name as
 #'
 #' @param from `LongTable` object coerce to a `SummarizedExperiment`. Assays
 #'   are converted to `BumpyMatrix`es to allow treatment combination support
@@ -287,7 +290,7 @@ setAs("LongTable", "SummarizedExperiment", def=function(from) {
 })
 
 
-#' Convert a LongTable assay into a BumpyMatrix object
+#' @title Convert a LongTable assay into a BumpyMatrix object
 #'
 #' @param LT `LongTable` with assay to convert into `BumpyMatrix`
 #' @param assay `character(1)` A valid assay name in `LT`, as returned by
