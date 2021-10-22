@@ -620,7 +620,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
 #' @importFrom grDevices dev.off pdf
 #' @importFrom SummarizedExperiment assay rowData colData
 #' @importFrom S4Vectors metadata
-checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
+checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
 
     msg <- c()
 
@@ -632,9 +632,9 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
     ####
     ## Checking molecularProfiles
     ####
-    for (i in seq_along(molecularProfilesSlot(cSet))) {
-        profile <- molecularProfilesSlot(cSet)[[i]]
-        nn <- names(molecularProfilesSlot(cSet))[i]
+    for (i in seq_along(molecularProfilesSlot(object))) {
+        profile <- molecularProfilesSlot(object)[[i]]
+        nn <- names(molecularProfilesSlot(object))[i]
 
         # Testing plot rendering for rna and rnaseq
         if ((metadata(profile)$annotation == "rna" ||
@@ -679,7 +679,7 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
 
         # Check that all cellids from the cSet are included in molecularProfiles
         if ("cellid" %in% colnames(rowData(profile))) {
-            if (!all(colData(profile)[, "cellid"] %in% rownames(cSet@cell))) {
+            if (!all(colData(profile)[, "cellid"] %in% rownames(cellInfo(object)))) {
                 msg <- c(msg, paste0(nn, " not all the cell lines in this ",
                     "profile are in cell lines slot"))
             }
@@ -692,16 +692,16 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
     #####
     # Checking cell
     #####
-    if ("tissueid" %in% colnames(cSet@cell)) {
-        if ("unique.tissueid" %in% colnames(cSet@curation$tissue)) {
-            if (length(intersect(rownames(cSet@curation$tissue), 
-                    rownames(cSet@cell))) != nrow(cSet@cell)) {
+    if ("tissueid" %in% colnames(cellInfo(object))) {
+        if ("unique.tissueid" %in% colnames(curation(object)$tissue)) {
+            if (length(intersect(rownames(curation(object)$tissue), 
+                    rownames(cellInfo(object)))) != nrow(cellInfo(object))) {
                 msg <- c(msg, paste0("rownames of curation tissue slot should",
                     " be the same as cell slot (curated cell ids)"))
             } else {
-                if (length(intersect(cSet@cell$tissueid, 
-                        cSet@curation$tissue$unique.tissueid)) != 
-                            length(table(cSet@cell$tissueid))) {
+                if (length(intersect(cellInfo(object)$tissueid, 
+                        curation(object)$tissue$unique.tissueid)) != 
+                            length(table(cellInfo(object)$tissueid))) {
                     msg <- c(msg, paste0("tissueid should be the same as unique",
                         " tissue id from tissue curation slot"))
                 }
@@ -710,14 +710,14 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
             msg <- c(msg, paste0("unique.tissueid which is curated tissue id",
                 " across data set should be a column of tissue curation slot"))
         }
-        if (any(is.na(cSet@cell[,"tissueid"]) || 
-                cSet@cell[, "tissueid"] == "", na.rm=TRUE)) {
+        if (any(is.na(cellInfo(object)[,"tissueid"]) || 
+                cellInfo(object)[, "tissueid"] == "", na.rm=TRUE)) {
             msg <- c(msg, paste0(
                     "There is no tissue type for this cell line(s)",
                     paste(
-                        rownames(cSet@cell)[
-                            which(is.na(cSet@cell[,"tissueid"]) | 
-                                cSet@cell[,"tissueid"] == "")
+                        rownames(cellInfo(object))[
+                            which(is.na(cellInfo(object)[,"tissueid"]) | 
+                                cellInfo(object)[,"tissueid"] == "")
                             ], 
                         collapse=" ")))
         }
@@ -725,9 +725,9 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
         msg <- c(msg, "tissueid does not exist in cell slot")
     }
 
-    if("unique.cellid" %in% colnames(cSet@curation$cell)) {
-        if (length(intersect(cSet@curation$cell$unique.cellid, 
-                rownames(cSet@cell))) != nrow(cSet@cell)) {
+    if("unique.cellid" %in% colnames(curation(object)$cell)) {
+        if (length(intersect(curation(object)$cell$unique.cellid, 
+                rownames(cellInfo(object)))) != nrow(cellInfo(object))) {
             msg <- c(msg, "rownames of cell slot should be curated cell ids")
         }
     } else {
@@ -735,13 +735,13 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
             " data set should be a column of cell curation slot"))
     }
 
-    if (length(intersect(rownames(cSet@curation$cell), 
-            rownames(cSet@cell))) != nrow(cSet@cell)) {
+    if (length(intersect(rownames(curation(object)$cell), 
+            rownames(cellInfo(object)))) != nrow(cellInfo(object))) {
         msg <- c(msg, paste0("rownames of curation cell slot should be the",
             " same as cell slot (curated cell ids)"))
     }
 
-    if (!is(cSet@cell, "data.frame")) {
+    if (!is(cellInfo(object), "data.frame")) {
         msg <- c(msg, "cell slot class type should be dataframe")
     }
     if (length(msg)) return(paste0(msg, collapse="\n")) else TRUE
