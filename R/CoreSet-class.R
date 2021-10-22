@@ -277,6 +277,7 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
     ## -- data integrity checks
     # sample
 
+
     # treatment
 
 
@@ -325,21 +326,20 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
                 item
             )
             cat(title, ":\n")
-            cat(space, "Dim: ", dim(molecularProfiles(object, mDataType=item)), 
-                "\n")
+            cat(paste0(space, "Dim: ", dim(molecularProfiles(object, mDataType=item)), 
+                "\n"))
         }
     }
-
+    cat("Treatment response:\n")
     if (is(sensitivitySlot(object), "LongTable")) {
-        cat("Treatment response:\n")
         showLT <- capture.output(show(sensitivitySlot(object)))
         cat(space, paste0(showLT, collapse="\n  "), "\n")
     } else {
-        cat("Drug pertubation: \n")
+        cat("Drug pertubation:\n")
         cat(space, 
             "Please look at pertNumber(cSet) to determine number of experiments",
             " for each drug-cell combination.\n")
-        cat("Drug sensitivity: \n")
+        cat("Drug sensitivity:\n")
         cat(space, "Number of Experiments: ", nrow(sensitivityInfo(object)),"\n")
         cat(space, "Please look at sensNumber(cSet) to determine number of ",
             "experiments for each drug-cell combination.\n")
