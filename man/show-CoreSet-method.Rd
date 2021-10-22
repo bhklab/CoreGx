@@ -7,10 +7,11 @@
 \S4method{show}{CoreSet}(object)
 }
 \arguments{
-\item{object}{\code{CoreSet}}
+\item{object}{\code{CoreSet} object to show via \code{cat}.}
 }
 \value{
-Prints the CoreSet object to the output stream, and returns invisible NULL.
+Prints the CoreSet object to the output stream, and returns
+invisible NULL.
 }
 \description{
 Show a CoreSet
@@ -18,4 +19,7 @@ Show a CoreSet
 \examples{
 show(clevelandSmall_cSet)
 
+}
+\seealso{
+\code{\link{cat}}
 }

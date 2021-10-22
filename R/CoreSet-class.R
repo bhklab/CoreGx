@@ -275,11 +275,17 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
     }
 
     ## -- data integrity checks
-    # sample
+    # molecularProfiles
+    validProfiles <- .checkMolecularProfiles(object)
 
+    # treatmentResponse
+    validTreatments <- .checkTreatmentResponse(object)
 
-    # treatment
-
+    diagnosis <- c(!isTRUE(validProfiles), !isTRUE(validTreatments))
+    if (any(diagnosis)) {
+        .error(paste0(list(validProfiles, validTreatments)[diagnosis], 
+            collapse="\n", sep="\n"))
+    }
 
     .CoreSet(
         annotation=annotation,
@@ -293,12 +299,17 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
 
 #' Show a CoreSet
 #' 
-#' @param object \code{CoreSet}
+#' @param object `CoreSet` object to show via `cat`.
+#' 
+#' @seealso [`cat`]
 #' 
 #' @examples
 #' show(clevelandSmall_cSet)
 #' 
-#' @return Prints the CoreSet object to the output stream, and returns invisible NULL. 
+#' @return Prints the CoreSet object to the output stream, and returns 
+#'   invisible NULL. 
+#' 
+#' @md
 #' @export
 setMethod("show", signature=signature(object="CoreSet"), function(object) {
     cat(paste0("<", class(object)[1], ">\n"))
@@ -367,7 +378,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
         stop("Wrong number of cell identifiers")
     }
 
-    if (object@datasetType == "sensitivity" || object@datasetType=="both") {
+    if (datasetType(object) == "sensitivity" || datasetType(object)=="both") {
         myx <- match(sensitivityInfo(object)[, "cellid"], 
             rownames(cellInfo(object)))
         if (is(sensitivitySlot(object), 'LongTable')) {
@@ -380,7 +391,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
         }
     }
 
-    object@molecularProfiles <- lapply(object@molecularProfiles, function(SE) {
+    molecularProfilesSlot(object) <- lapply(molecularProfilesSlot(object), function(SE) {
         myx <- match(colData(SE)[["cellid"]], 
             rownames(cellInfo(object)))
         colData(SE)[["cellid"]]  <- new.ids[myx]
@@ -400,7 +411,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
                 rownames(cellInfo(object)))
         }
 
-        curMatch <- match(rownames(object@curation$cell), 
+        curMatch <- match(rownames(curation(object)$cell), 
             rownames(cellInfo(object)))  
         duplId <- unique(new.ids[duplicated(new.ids)])
 
@@ -416,16 +427,16 @@ updateCellId <- function(object, new.ids=vector("character")) {
             myx <- which(new.ids[pertMatch] == id)
             pertNumber(object)[myx[1], , ] <- apply(pertNumber(object)[myx, , ], 
                 c(1,3), sum)
-            pertNumber(object) <- pertNumber(object)[-myx[-1],,]
+            pertNumber(object) <- pertNumber(object)[-myx[-1], , 
         }
 
         myx <- which(new.ids[curMatch] == id)
-        object@curation$cell[myx[1],] <- apply(object@curation$cell[myx, ], 2, 
+        curation(object)$cell[myx[1],] <- apply(curation(object)$cell[myx, ], 2, 
             FUN=paste, collapse="///")
-        object@curation$cell <- object@curation$cell[-myx[-1], ]
-        object@curation$tissue[myx[1],] <- apply(object@curation$tissue[myx, ], 
+        curation(object)$cell <- curation(object)$cell[-myx[-1], ]
+        curation(object)$tissue[myx[1],] <- apply(curation(object)$tissue[myx, ], 
             2, FUN=paste, collapse="///")
-        object@curation$tissue <- object@curation$tissue[-myx[-1], ]
+        curation(object)$tissue <- curation(object)$tissue[-myx[-1], ]
         
         myx <- which(new.ids == id)
         cellInfo(object)[myx[1],] <- apply(cellInfo(object)[myx,], 2, 
@@ -440,7 +451,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
             pertMatch <- match(dimnames(pertNumber(object))[[1]], 
                 rownames(cellInfo(object)))
         }
-        curMatch <- match(rownames(object@curation$cell), 
+        curMatch <- match(rownames(curation(object)$cell), 
             rownames(cellInfo(object)))
         }
     } else {
@@ -452,7 +463,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
             sensMatch <- match(rownames(sensNumber(object)), 
                 rownames(cellInfo(object)))
         }
-        curMatch <- match(rownames(object@curation$cell), 
+        curMatch <- match(rownames(curation(object)$cell), 
             rownames(cellInfo(object)))
     } 
     if (dim(pertNumber(object))[[1]] > 0) {
@@ -461,8 +472,8 @@ updateCellId <- function(object, new.ids=vector("character")) {
     if (ncol(sensNumber(object)) > 0) {
         rownames(sensNumber(object)) <- new.ids[sensMatch]
     }
-    rownames(object@curation$cell) <- new.ids[curMatch]
-    rownames(object@curation$tissue) <- new.ids[curMatch]
+    rownames(curation(object)$cell) <- new.ids[curMatch]
+    rownames(curation(object)$tissue) <- new.ids[curMatch]
     rownames(cellInfo(object)) <- new.ids   
     return(object)  
 }
@@ -473,21 +484,21 @@ updateCellId <- function(object, new.ids=vector("character")) {
 #     stop("Wrong number of cell identifiers")
 #   }
 #
-#   if(object@datasetType=="sensitivity"|object@datasetType=="both"){
+#   if(datasetType(object)=="sensitivity"|datasetType(object)=="both"){
 #     myx <- match(sensitivityInfo(object)[,"cellid"],rownames(cellInfo(object)))
 #     sensitivityInfo(object)[,"cellid"] <- new.ids[myx]
 #
 #   }
 #
-#   object@molecularProfiles <- lapply(object@molecularProfiles, function(eset){
+#   molecularProfilesSlot(object) <- lapply(molecularProfilesSlot(object), function(eset){
 #
 #     myx <- match(colData(eset)[["cellid"]],rownames(cellInfo(object)))
 #     colData(eset)[["cellid"]]  <- new.ids[myx]
 #     return(eset)
 #       })
-#   myx <- match(rownames(object@curation$cell),rownames(cellInfo(object)))
-#   rownames(object@curation$cell) <- new.ids[myx]
-#   rownames(object@curation$tissue) <- new.ids[myx]
+#   myx <- match(rownames(curation(object)$cell),rownames(cellInfo(object)))
+#   rownames(curation(object)$cell) <- new.ids[myx]
+#   rownames(curation(object)$tissue) <- new.ids[myx]
 #   if (dim(pertNumber(object))[[1]]>0){
 #     myx <- match(dimnames(pertNumber(object))[[1]], rownames(cellInfo(object)))
 #     dimnames(pertNumber(object))[[1]] <- new.ids[myx]
@@ -503,21 +514,21 @@ updateCellId <- function(object, new.ids=vector("character")) {
 
 .summarizeSensitivityNumbers <- function(object) {
 
-    if (object@datasetType != "sensitivity" && object@datasetType != "both") {
+    if (datasetType(object) != "sensitivity" && datasetType(object) != "both") {
         stop ("Data type must be either sensitivity or both")
     }
 
     ## unique drug identifiers
-    # drugn <- sort(unique(object@sensitivity$info[ , "drugid"]))
+    # drugn <- sort(unique(sensitivitySlot(object)$info[ , "drugid"]))
 
     ## consider all drugs
-    drugn <- rownames(object@drug)
+    drugn <- rownames(drugInfo(object))
 
     ## unique drug identifiers
-    # celln <- sort(unique(object@sensitivity$info[ , "cellid"]))
+    # celln <- sort(unique(sensitivitySlot(object)$info[ , "cellid"]))
 
     ## consider all cell lines
-    celln <- rownames(object@cell)
+    celln <- rownames(cellInfo(object))
 
     sensitivity.info <- matrix(0, nrow=length(celln), ncol=length(drugn), 
         dimnames=list(celln, drugn))
@@ -540,7 +551,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
     mDT <- mDataNames(object)
 
     ## consider all cell lines
-    celln <- rownames(object@cell)
+    celln <- rownames(cellInfo(object))
 
     molecular.info <- matrix(0, nrow=length(celln), ncol=length(mDT), 
         dimnames=list(celln, mDT))
@@ -555,28 +566,28 @@ updateCellId <- function(object, new.ids=vector("character")) {
 #' @importFrom SummarizedExperiment colData rowData
 .summarizePerturbationNumbers <- function(object) {
 
-    if (object@datasetType != "perturbation" && object@datasetType != "both") {
+    if (datasetType(object) != "perturbation" && datasetType(object) != "both") {
         stop ("Data type must be either perturbation or both")
     }
 
     ## consider all drugs
-    drugn <- rownames(object@drug)
+    drugn <- rownames(drugInfo(object))
 
     ## consider all cell lines
-    celln <- rownames(object@cell)
+    celln <- rownames(cellInfo(object))
 
     perturbation.info <- array(0, dim=c(length(celln), length(drugn), 
-        length(object@molecularProfiles)), 
-        dimnames=list(celln, drugn, names((object@molecularProfiles))))
+        length(molecularProfilesSlot(object))), 
+        dimnames=list(celln, drugn, names((molecularProfilesSlot(object)))))
 
-    for (i in seq_len(length(object@molecularProfiles))) {
-        if (nrow(colData(object@molecularProfiles[[i]])) > 0 && 
+    for (i in seq_len(length(molecularProfilesSlot(object)))) {
+        if (nrow(colData(molecularProfilesSlot(object)[[i]])) > 0 && 
                 all(is.element(c("cellid", "drugid"), 
-                    colnames(colData(object@molecularProfiles[[i]]))))) {
-            tt <- table(colData(object@molecularProfiles[[i]])[ , "cellid"],
-                colData(object@molecularProfiles[[i]])[ , "drugid"])
+                    colnames(colData(molecularProfilesSlot(object)[[i]]))))) {
+            tt <- table(colData(molecularProfilesSlot(object)[[i]])[ , "cellid"],
+                colData(molecularProfilesSlot(object)[[i]])[ , "drugid"])
             perturbation.info[rownames(tt), colnames(tt), 
-                names(object@molecularProfiles)[i]] <- tt
+                names(molecularProfilesSlot(object))[i]] <- tt
         }
     }
 
@@ -621,9 +632,9 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
     ####
     ## Checking molecularProfiles
     ####
-    for (i in seq_along(cSet@molecularProfiles)) {
-        profile <- cSet@molecularProfiles[[i]]
-        nn <- names(cSet@molecularProfiles)[i]
+    for (i in seq_along(molecularProfilesSlot(cSet))) {
+        profile <- molecularProfilesSlot(cSet)[[i]]
+        nn <- names(molecularProfilesSlot(cSet))[i]
 
         # Testing plot rendering for rna and rnaseq
         if ((metadata(profile)$annotation == "rna" ||
@@ -756,7 +767,7 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
             MultiAssayExperiment(molecProf)
     }, error=function(e) msg <- c(msg, paste0('Failed coercing to 
         MultiAssayExperiment: ', as.character(e))))
-    
+
     # ---- Check for correct metadata columns
     # -- sample identifiers
     colDataL <- lapply(experiments(MAE), FUN=colData)
@@ -798,7 +809,7 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
     return(if (length(msg)) msg else TRUE)
 }
 
-.checkSensitivitySlot <- function(object) {
+.checkTreatmentResponseSlot <- function(object) {
     msg <- character()
     # ---- Extract sensitivity data
     samples <- cellNames(object)
@@ -808,4 +819,5 @@ checkCsetStructure <- function(cSet, plotDist=FALSE, result.dir=tempdir()) {
     } else {
 
     }
+    return(if (length(msg)) msg else TRUE)
 }
