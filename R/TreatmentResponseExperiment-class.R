@@ -93,12 +93,7 @@ NULL
 #' @return A `TreatmentResponseExperiment` object containing the data for a
 #'   treatment response experiment configured according to the rowIDs and
 #'   colIDs arguments.
-#' 
-#' @examples 
-#' data(clevelandSmall_cSet)
-#' TRE <- as(molecularProfilesSlot(clevelandSmall_cSet), 
-#'     "TreatmentResponseExperiment")
-#' TRE
+#'
 #'
 #' @import data.table
 #' @export
@@ -121,13 +116,19 @@ TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
 
 #' Coerce a `LongTable` to a `TreatmentResponseExperiment`
 #' 
-#' @param object `LongTable` object to coerce to a `TreatmentResponseExperiment`.
+#' @param from `LongTable` object to coerce to a `TreatmentResponseExperiment`.
 #' 
 #' @return The data in `object`, as the child-class 
 #'   `TreatmentResponseExperiment`.
 #' 
 #' @seealso [`TreatmentResponseExperiment`]
 #' 
+#' @examples 
+#' data(clevelandSmall_cSet)
+#' TRE <- as(molecularProfilesSlot(clevelandSmall_cSet), 
+#'     "TreatmentResponseExperiment")
+#' TRE
+#' s
 #' @md
 #' @export
 setAs("LongTable", "TreatmentResponseExperiment", function(from) {

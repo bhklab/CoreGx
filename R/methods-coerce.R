@@ -14,8 +14,6 @@ NULL
 #' @description Coerce a LongTable into a `data.table`.
 #'
 #' @param from `LongTable` Object to coerce.
-#' @param to `character` Class name to coerce to, currently only 'data.table'
-#'   and 'data.frame' are supported
 #'
 #' @return A `data.table` with the data from a LongTable.
 #' 
@@ -102,8 +100,6 @@ as.data.table.long.table <- function(x) as(x, 'data.table')
 #' @description Currently only supports coercing to data.table or data.frame
 #'
 #' @param from `LongTable` Object to coerce.
-#' @param to `character` Class name to coerce to, currently only 'data.table'
-#'   and 'data.frame' are supported
 #'
 #' @return `data.table` containing the data from the LongTable, with the
 #'   `longTableDataMapper' attribute containg the metadata needed to reverse
@@ -287,7 +283,7 @@ setAs(from='SummarizedExperiment', to='data.frame', function(from) {
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @export
 setAs("LongTable", "SummarizedExperiment", def=function(from) {
-    .longTableToSummarizedExperiment(from, assay_name=assayNames(from))
+    .longTableToSummarizedExperiment(from, assay_names=assayNames(from))
 })
 
 

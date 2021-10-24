@@ -23,9 +23,6 @@ row and column names are valid R names. Defaults to TRUE.}
 
 \item{...}{Does nothing.}
 
-\item{to}{\code{character} Class name to coerce to, currently only 'data.table'
-and 'data.frame' are supported}
-
 \item{from}{\code{LongTable} object coerce to a \code{SummarizedExperiment}. Assays
 are converted to \code{BumpyMatrix}es to allow treatment combination support
 and integration with the \code{gDR} package.}

@@ -385,7 +385,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
         stop("Wrong number of cell identifiers")
     }
 
-    if (datasetType(object) == "sensitivity" || datasetType(object)=="both") {
+    if (datasetType(object) == "sensitivity" || datasetType(object) == "both") {
         myx <- match(sensitivityInfo(object)[, "cellid"], 
             rownames(cellInfo(object)))
         if (is(sensitivitySlot(object), 'LongTable')) {
@@ -394,7 +394,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
             colData(LT)$cellid <- new.ids[whichCellIds]
             sensitivitySlot(object) <- LT
         } else {
-            sensitivityInfo(object)[,"cellid"] <- new.ids[myx]
+            sensitivityInfo(object)[, "cellid"] <- new.ids[myx]
         }
     }
 
@@ -611,7 +611,7 @@ updateCellId <- function(object, new.ids=vector("character")) {
 #' @examples
 #' checkCsetStructure(clevelandSmall_cSet)
 #' 
-#' @param cSet A `CoreSet` to be verified
+#' @param object A `CoreSet` to be verified
 #' @param plotDist Should the function also plot the distribution of molecular 
 #'   data?
 #' @param result.dir The path to the directory for saving the plots as a string.
@@ -717,7 +717,7 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
             msg <- c(msg, paste0("unique.tissueid which is curated tissue id",
                 " across data set should be a column of tissue curation slot"))
         }
-        if (any(is.na(cellInfo(object)[,"tissueid"]) || 
+        if (any(is.na(cellInfo(object)[,"tissueid"]) |
                 cellInfo(object)[, "tissueid"] == "", na.rm=TRUE)) {
             msg <- c(msg, paste0(
                     "There is no tissue type for this cell line(s)",
