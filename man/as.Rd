@@ -6,11 +6,15 @@
 \alias{as.data.frame.long.table}
 \title{LongTable to data.table conversion}
 \usage{
-\method{as.data.table}{long.table}(x)
+\method{as.data.table}{long.table}(from)
 
 \method{as.data.frame}{long.table}(x, row.names, optional = TRUE, ...)
 }
 \arguments{
+\item{from}{\code{LongTable} object coerce to a \code{SummarizedExperiment}. Assays
+are converted to \code{BumpyMatrix}es to allow treatment combination support
+and integration with the \code{gDR} package.}
+
 \item{x}{\code{LongTable} to coerce to \code{data.frame}.}
 
 \item{row.names}{An optional \code{character} vector of rownames. We do not
@@ -22,10 +26,6 @@ valid R names? If FALSE will use the make.names function to ensure the
 row and column names are valid R names. Defaults to TRUE.}
 
 \item{...}{Does nothing.}
-
-\item{from}{\code{LongTable} object coerce to a \code{SummarizedExperiment}. Assays
-are converted to \code{BumpyMatrix}es to allow treatment combination support
-and integration with the \code{gDR} package.}
 }
 \value{
 A \code{data.table} with the data from a LongTable.

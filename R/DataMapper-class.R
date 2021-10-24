@@ -58,9 +58,6 @@ setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
     a list-like containing one or more raw data inputs to the
     `{class_}` object.
 
-    @examples
-    print('DataMapper is an abstract class, so there can't be examples!')
-
     @md
     @aliases rawdata,{class_}-method
     @exportMethod rawdata

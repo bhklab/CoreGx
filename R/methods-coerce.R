@@ -86,14 +86,14 @@ setAs('LongTable', 'data.table', def=function(from) {
 #'
 #' @description S3 version of coerce method for convenience.
 #'
-#' @param x `LongTable` to coerce to a `data.table`
+#' @param from `LongTable` to coerce to a `data.table`
 #'
 #' @return A `data.table` containing the data from the LongTable, as well
 #'   as the `longTableDataMapper' attribute which contains the data needed to
 #'   reverse the coercion.
 #'
 #' @export
-as.data.table.long.table <- function(x) as(x, 'data.table')
+as.data.table.long.table <- function(from) as(from, 'data.table')
 #' @title Coerce a LongTable into a `data.frame`
 #' @name as
 #'

@@ -115,15 +115,15 @@ TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
 }
 
 #' Coerce a `LongTable` to a `TreatmentResponseExperiment`
-#' 
+#'
 #' @param from `LongTable` object to coerce to a `TreatmentResponseExperiment`.
-#' 
+#'
 #' @return The data in `object`, as the child-class 
 #'   `TreatmentResponseExperiment`.
-#' 
+#'
 #' @seealso [`TreatmentResponseExperiment`]
-#' 
-#' @examples 
+#'
+#' @examples
 #' data(clevelandSmall_cSet)
 #' TRE <- as(molecularProfilesSlot(clevelandSmall_cSet), 
 #'     "TreatmentResponseExperiment")
