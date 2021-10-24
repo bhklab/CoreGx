@@ -2,36 +2,70 @@
 % Please edit documentation in R/methods-coerce.R
 \name{as}
 \alias{as}
+\alias{as.data.table.long.table}
+\alias{as.data.frame.long.table}
 \title{LongTable to data.table conversion}
-\arguments{
-\item{to}{\code{character} Class name to coerce to, currently only 'data.table'
-and 'data.frame' are supported}
+\usage{
+\method{as.data.table}{long.table}(from)
 
-\item{from}{\code{SummarizedExperiment} object.}
+\method{as.data.frame}{long.table}(x, row.names, optional = TRUE, ...)
+}
+\arguments{
+\item{from}{\code{LongTable} object coerce to a \code{SummarizedExperiment}. Assays
+are converted to \code{BumpyMatrix}es to allow treatment combination support
+and integration with the \code{gDR} package.}
+
+\item{x}{\code{LongTable} to coerce to \code{data.frame}.}
+
+\item{row.names}{An optional \code{character} vector of rownames. We do not
+recommend using this parameter, it is included for S3 method consistency
+with \code{as.data.frame}.}
+
+\item{optional}{\code{logical} Is it optional for row and column names to be
+valid R names? If FALSE will use the make.names function to ensure the
+row and column names are valid R names. Defaults to TRUE.}
+
+\item{...}{Does nothing.}
 }
 \value{
 A \code{data.table} with the data from a LongTable.
 
+A \code{data.table} containing the data from the LongTable, as well
+as the `longTableDataMapper' attribute which contains the data needed to
+reverse the coercion.
+
 \code{data.table} containing the data from the LongTable, with the
 `longTableDataMapper' attribute containg the metadata needed to reverse
 the coercing operation.
+
+\code{data.frame} containing the data from the LongTable, with the
+`longTableDataMapper' attribute containg the metadata needed to reverse
+the coercion operation.
 
 \code{LongTable} object configured with the longTableDataMapper
 
 \code{data.table} with long format of data in \code{from}
 
 \code{data.frame} with long format of data in \code{from}.
+
+\code{SummarizedExperiment} with each assay as a \code{BumpyMatrix}
 }
 \description{
 Coerce a LongTable into a \code{data.table}.
 
+S3 version of coerce method for convenience.
+
 Currently only supports coercing to data.table or data.frame
+
+S3 version of coerce method fro convenience.
 
 Coerce a data.table with the proper configuration attributes
 back to a LongTable
 }
 \examples{
 as(merckLongTable, 'data.table')
+
+as(merckLongTable, 'data.frame')
 
 dataTable <- as(merckLongTable, 'data.table')
 print(attr(dataTable, 'longTableDataMapper')) # Method doesn't work without this
@@ -43,4 +77,7 @@ as(SE, 'data.table')
 SE <- molecularProfilesSlot(clevelandSmall_cSet)[[1]]
 as(SE, 'data.frame')
 
+}
+\seealso{
+\code{\link[BumpyMatrix:BumpyMatrix]{BumpyMatrix::BumpyMatrix}}
 }

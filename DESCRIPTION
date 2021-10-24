@@ -42,6 +42,8 @@ Imports:
     MatrixGenerics,
     piano,
     BiocParallel,
+    BumpyMatrix,
+    checkmate,
     methods,
     stats,
     utils,
@@ -61,7 +63,7 @@ Suggests:
     formatR,
     testthat
 License: GPL-3
-Roxygen: list(markdown = TRUE, r6=FALSE)
+Roxygen: list(markdown=TRUE, r6=FALSE)
 RoxygenNote: 7.1.2
 Collate: 
     'allGenerics.R'
@@ -73,6 +75,8 @@ Collate:
     'LongTable-accessors.R'
     'LongTable-utils.R'
     'LongTableDataMapper-class.R'
+    'TreatmentResponseExperiment-class.R'
+    'TREDataMapper-class.R'
     'adaptiveMatthewCor.R'
     'callingWaterfall.R'
     'connectivityScore.R'
@@ -89,6 +93,7 @@ Collate:
     'methods-guessMapping.R'
     'methods-metaConstruct.R'
     'methods-subsetTo.R'
+    'updateObject-methods.R'
     'utilities.R'
     'utils-iteration.R'
     'utils-messages.R'

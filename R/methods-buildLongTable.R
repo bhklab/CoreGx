@@ -29,8 +29,12 @@
 #' @import data.table
 #' @export
 setMethod('buildLongTable', signature(from='data.frame'),
-          function(from, rowDataCols, colDataCols, assayCols)
-{
+        function(from, rowDataCols, colDataCols, assayCols) {
+
+    .Deprecated("metaConstruct", msg="This method has been deprecated
+        in favour of use of the LongTableDataMapper metadata object
+        with the metaConstruct method to build a LongTable object!")
+
     # -- local helpers
     .unlist <- function(x) unlist(x, recursive=TRUE, use.names=FALSE)
 

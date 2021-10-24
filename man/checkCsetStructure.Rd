@@ -4,17 +4,20 @@
 \alias{checkCsetStructure}
 \title{A function to verify the structure of a CoreSet}
 \usage{
-checkCsetStructure(cSet, plotDist = FALSE, result.dir = ".")
+checkCsetStructure(object, plotDist = FALSE, result.dir = tempdir())
 }
 \arguments{
-\item{cSet}{A \code{CoreSet} to be verified}
+\item{object}{A \code{CoreSet} to be verified}
 
-\item{plotDist}{Should the function also plot the distribution of molecular data?}
+\item{plotDist}{Should the function also plot the distribution of molecular
+data?}
 
-\item{result.dir}{The path to the directory for saving the plots as a string}
+\item{result.dir}{The path to the directory for saving the plots as a string.
+Defaults to this R sessions \code{tempdir()}.}
 }
 \value{
-Prints out messages whenever describing the errors found in the structure of the cSet object passed in.
+Prints out messages whenever describing the errors found in the
+structure of the cSet object passed in.
 }
 \description{
 This function checks the structure of a PharamcoSet, ensuring that the

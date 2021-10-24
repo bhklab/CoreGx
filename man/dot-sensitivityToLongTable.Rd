@@ -17,7 +17,7 @@ necessary to fix the sensititivity data.}
 }
 \value{
 A \code{LongTable} constructed from \code{object@sensitivty}, or a
-\code{LongTableDataMapper} if \code{mapper==TRUE}.
+\code{LongTableDataMapper} if \code{mapper}=TRUE.
 }
 \description{
 Convert the old sensitivity slot format into a \code{LongTable} and update the

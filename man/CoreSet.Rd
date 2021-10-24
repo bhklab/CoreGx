@@ -60,3 +60,8 @@ as creates empty objects for data not provided to the constructor. Only
 objects returned by this constructor are expected to work with the CoreSet
 methods.
 }
+\examples{
+data(clevelandSmall_cSet)
+clevelandSmall_cSet
+
+}

@@ -8,8 +8,8 @@ as.long.table(x)
 }
 \arguments{
 \item{x}{A \code{data.frame} with the 'longTableDataMapper' attribute, containing
-three lists named assayCols, rowDataCols and colDataCols. This attribute is
-automatically created when coercing from a LongTable to a data.table.}
+three lists named assayCols, rowDataCols and colDataCols. This attribute
+is automatically created when coercing from a LongTable to a data.table.}
 }
 \value{
 \code{LongTable} object configured with the longTableDataMapper

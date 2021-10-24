@@ -8,7 +8,7 @@
 #' @slot assays See Slots section.
 #' @slot metadata See Slots section.
 #' @slot .intern See Slots section.
-#' 
+#'
 #' @section Slots:
 #' - *rowData*: A `data.table` containing the metadata associated with the
 #'   row dimension of a `LongTable`.
@@ -76,7 +76,7 @@ setOldClass('long.table', S4Class='LongTable')
 #'   columns will be pasted together to make up the colnames of the
 #'   `LongTable` object.
 #' @param assays A `list` containing one or more objects coercible to a
-#'   `data.table`, and keyed by rowID and colID corresponding to the rowID and
+#'   `data.table`, and keyed by rowIDs and colIDs corresponding to the rowID and
 #'   colID columns in colData and rowData.
 #' @param metadata A `list` of metadata associated with the `LongTable`
 #'   object being constructed
@@ -89,6 +89,10 @@ setOldClass('long.table', S4Class='LongTable')
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
+#' @examples
+#' data(merckLongTable)
+#' merckLongTable
+#' 
 #' @import data.table
 #' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
@@ -98,38 +102,47 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
         colData=missing(colData), assays=missing(assays))
 
-    if (any(isMissing))
+    if (all(isMissing)) {
+        rowData <- data.table(row="1")
+        rowIDs <- "row"
+        colData <- data.table(col="1")
+        colIDs <- "col"
+        assays <- list(measurement=data.table(row="1", col="1",
+            metric=0.123))
+        isMissing <- FALSE
+    } else if (any(isMissing)) {
         stop(.errorMsg('\nRequired parameter(s) missing: ',
             names(isMissing)[isMissing], collapse='\n\t'))
+    }
 
     # check parameter types and coerce or error
-    if (!is(colData, 'data.table'))
-        tryCatch({ 
-            colData <- data.table(colData, keep.rownames=keep.rownames) 
+    if (!is(colData, "data.table"))
+        tryCatch({
+            colData <- data.table(colData, keep.rownames=keep.rownames)
         }, error=function(e)
             stop(.errorMsg("colData must be coercible to a data.frame!"))
         )
 
-    if (!is(rowData, 'data.table'))
-        tryCatch({ 
+    if (!is(rowData, "data.table"))
+        tryCatch({
             rowData <- data.table(rowData, keep.rownames=keep.rownames) },
-        error=function(e) 
-            stop(.errorMsg('rowData must be coerceible to a data.frame!'))
+        error=function(e)
+            stop(.errorMsg("rowData must be coerceible to a data.frame!"))
         )
 
     isDT <- is.items(assays, FUN=is.data.table)
     isDF <- is.items(assays, FUN=is.data.frame) & !isDT
     if (!all(isDT))
         tryCatch({
-            for (i in which(isDF)) 
+            for (i in which(isDF))
                 assays[[i]] <- data.table(assays[[i]], keep.rownames)
         }, error = function(e, assays) {
             message(e)
             types <- lapply(assays, typeof)
             stop(.errorMsg(
-                 '\nList items are types: ',
-                 types, '\nPlease ensure all items in the assays list are ',
-                 'coerceable to a data.frame!'), collapse=', ')
+                '\nList items are types: ',
+                types, '\nPlease ensure all items in the assays list are ',
+                'coerceable to a data.frame!'), collapse=', ')
         })
 
     # Create the row and column keys for LongTable internal mappings
@@ -137,14 +150,15 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     #   join when calling this function from subset,LongTable-method
     if (!('rowKey' %in% colnames(rowData)))
         rowData[, c('rowKey') := .GRP, by=rowIDs]
-    if(!('colKey' %in% colnames(colData)))
+    if (!('colKey' %in% colnames(colData)))
         colData[, c('colKey') := .GRP, by=colIDs]
 
     # initialize the internals object to store private metadata for a LongTable
     internals <- new.env()
 
     # capture row interal metadata
-    if (is.numeric(rowIDs) || is.logical(rowIDs)) rowIDs <- colnames(rowData)[rowIDs]
+    if (is.numeric(rowIDs) || is.logical(rowIDs))
+        rowIDs <- colnames(rowData)[rowIDs]
     if (!all(rowIDs %in% colnames(rowData)))
         stop(.errorMsg('\nRow IDs not in rowData: ',
             setdiff(rowIDs, colnames(rowData)), collapse=', '))
@@ -154,7 +168,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     lockBinding('rowMeta', internals)
 
     # capture column internal metadata
-    if (is.numeric(colIDs) | is.logical(colIDs))
+    if (is.numeric(colIDs) || is.logical(colIDs))
         colIDs <- colnames(colData)[colIDs]
     if (!all(colIDs %in% colnames(colData)))
         stop(.errorMsg('\nColumn IDs not in colData: ',
@@ -165,7 +179,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     lockBinding('colMeta', internals)
 
     # Reorder columns to match the keys, this prevents issues in unit tests
-    # caused by different column orders.
+    # caused by different column orders
     setcolorder(rowData, unlist(mget(c('rowIDs', 'rowMeta'), internals)))
     setcolorder(colData, unlist(mget(c('colIDs', 'colMeta'), internals)))
 
@@ -177,9 +191,22 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
         .SDcols=internals$colIDs]
 
-    return(.LongTable(rowData=rowData, colData=colData,
-                      assays=assays, metadata=metadata,
-                      .intern=internals))
+    # Conditionally key the assay tables
+    for (i in seq_along(assays)) {
+        if (!("rowKey" %in% colnames(assays[[i]]))) {
+            assays[[i]] <- merge.data.table(assays[[i]],
+                rowData[, c("rowKey", rowIDs), with=FALSE],
+                by=rowIDs)[, .SD, .SDcols=!rowIDs]
+        }
+        if (!("colKey" %in% colnames(assays[[i]]))) {
+            assays[[i]] <- merge.data.table(assays[[i]],
+                colData[, c("colKey", colIDs), with=FALSE],
+                by=colIDs)[, .SD, .SDcols=!colIDs]
+        }
+    }
+
+    return(.LongTable(rowData=rowData, colData=colData, assays=assays,
+        metadata=metadata, .intern=internals))
 }
 
 # ---- Class unions for CoreSet slots
@@ -229,7 +256,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
     ## FIXME:: Function too long. Can I refactor to a helper that prints each slot?
 
     # ---- class descriptions
-    cat(yellow$bold$italic('< LongTable >', '\n'))
+    cat(yellow$bold$italic(paste0("<", class(object), ">"), '\n'))
     cat(yellow$bold('dim: ', .collapse(dim(object)), '\n'))
 
     # --- assays slot
@@ -354,8 +381,7 @@ setMethod('rowIDs', signature(object='LongTable'),
 #' @import data.table
 #' @export
 setMethod('rowMeta', signature(object='LongTable'),
-    function(object, data=FALSE, key=FALSE)
-{
+        function(object, data=FALSE, key=FALSE) {
     cols <- getIntern(object, 'rowMeta')
     cols <- cols[!grepl('^\\.', cols)]
     if (key) cols <- c(cols, 'rowKey')
@@ -381,7 +407,7 @@ setMethod('rowMeta', signature(object='LongTable'),
 #' @import data.table
 #' @export
 setMethod('colIDs', signature(object='LongTable'),
-    function(object, data=FALSE, key=FALSE) {
+        function(object, data=FALSE, key=FALSE) {
 
     cols <- getIntern(object, 'colIDs')
     if (key) cols <- c(cols, 'colKey')
