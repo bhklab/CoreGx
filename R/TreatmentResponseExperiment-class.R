@@ -93,6 +93,12 @@ NULL
 #' @return A `TreatmentResponseExperiment` object containing the data for a
 #'   treatment response experiment configured according to the rowIDs and
 #'   colIDs arguments.
+#' 
+#' @examples 
+#' data(clevelandSmall_cSet)
+#' TRE <- as(molecularProfilesSlot(clevelandSmall_cSet), 
+#'     "TreatmentResponseExperiment")
+#' TRE
 #'
 #' @import data.table
 #' @export

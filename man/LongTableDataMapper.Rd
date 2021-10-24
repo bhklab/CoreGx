@@ -57,6 +57,11 @@ assignment method on your \code{LongTableDataMapper}. This metadata will be
 merge with any metadata from \code{metadataMap} and added to the \code{LongTable}
 which this object ultimately constructs.
 }
+\examples{
+data(exampleDataMapper)
+exampleDataMapper
+
+}
 \seealso{
 \code{\link{guessMapping}}
 }

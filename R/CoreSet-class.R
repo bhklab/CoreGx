@@ -6,6 +6,7 @@ NULL
 setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 
 .local_class <- 'CoreSet'
+.local_data <- "ClevelandSmall_cSet"
 
 #' @title
 #' CoreSet - A generic data container for molecular profiles and 
@@ -116,6 +117,10 @@ setClassUnion('list_or_MAE', c('list', 'MultiAssayExperiment'))
 #'   print out any errors it finds after construction?
 #'
 #' @return An object of class CoreSet
+#' 
+#' @examples
+#' data(clevelandSmall_cSet)
+#' clevelandSmall_cSet
 #'
 #' @export
 #'
@@ -207,8 +212,11 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
 
 
 #' @noRd
-.docs_CoreSet2_constructor <- function(...) {
+.docs_CoreSet2_constructor <- function(...) .parseToRoxygen(
     "
+    @title Make a CoreSet with the updated class structure
+
+    @description
     New implementation of the CoreSet constructor to support MAE and TRE. This
     constructor will be swapped with the original `CoreSet` constructor as 
     part of an overhaul of the CoreSet class structure.
@@ -222,27 +230,27 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
     @param treatmentResponse A `LongTable` or `LongTableDataMapper` object
         containing all treatment response data associated with the `{class_}`
         object.
-    @param curation {cx_} 
+    @param curation {cx_}
+
+    @examples
+    data({data_})
+    {data_}
 
     @return A `CoreSet` object storing standardized and curated treatment
         response and multiomic profile data associated with a given publication.
 
-    @md
     @importFrom MultiAssayExperiment MultiAssayExperiment
-    "
-}
+    ",
+    ...
+)
 
-#' @eval .docs_CoreSet2_constructor(class_=.local_class, 
-#' tx_="This slot is not implemented for a CoreSet object yet.", sx_="",
-#' cx_="A `list(2)` object with two items named `treatment` and `sample` 
-#' with mappings from publication identifiers to standardized identifiers 
-#' for both annotations, respectively.")
+#' @eval .docs_CoreSet2_constructor(class_=.local_class, tx_="This slot is not implemented for a CoreSet object yet.", sx_="", cx_="A `list(2)` object with two items named `treatment` and `sample` with mappings from publication identifiers to standardized identifiers for both annotations, respectively.", data_=.local_data)
 #' @md
 #' @export
 CoreSet2 <- function(name="emptySet", treatment=data.frame(), 
-        sample=data.frame(), molecularProfiles=MultiAssayExperiment(), 
-        treatmentResponse=LongTable(), 
-        curation=list(sample=data.frame(), treatment=data.frame())
+    sample=data.frame(), molecularProfiles=MultiAssayExperiment(), 
+    treatmentResponse=LongTable(), 
+    curation=list(sample=data.frame(), treatment=data.frame())
 ) {
 
     # -- update old curation names

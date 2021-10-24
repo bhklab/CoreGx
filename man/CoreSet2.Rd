@@ -2,9 +2,7 @@
 % Please edit documentation in R/CoreSet-class.R
 \name{CoreSet2}
 \alias{CoreSet2}
-\title{New implementation of the CoreSet constructor to support MAE and TRE. This
-constructor will be swapped with the original \code{CoreSet} constructor as
-part of an overhaul of the CoreSet class structure.}
+\title{Make a CoreSet with the updated class structure}
 \usage{
 CoreSet2(
   name = "emptySet",
@@ -15,24 +13,34 @@ CoreSet2(
   curation = list(sample = data.frame(), treatment = data.frame())
 )
 }
-\description{
-\preformatted{@param name A `character(1)` vector with the `\{class_\}` objects name.
-@param treatment A `data.frame` with treatment level metadata. \{tx_\}
-@param sample A `data.frame` with sample level metadata for the union
-    of samples in `treatmentResponse` and `molecularProfiles`. \{sx_\}
-@param molecularProfiles A `MultiAssayExperiment` containing one 
-    `SummarizedExperiment` object for each molecular data type.
-@param treatmentResponse A `LongTable` or `LongTableDataMapper` object
-    containing all treatment response data associated with the `\{class_\}`
-    object.
-@param curation \{cx_\} 
-}
-}
-\details{
-\preformatted{@return A `CoreSet` object storing standardized and curated treatment
-    response and multiomic profile data associated with a given publication.
+\arguments{
+\item{name}{A \code{character(1)} vector with the \code{CoreSet} objects name.}
 
-@md
-@importFrom MultiAssayExperiment MultiAssayExperiment
+\item{treatment}{A \code{data.frame} with treatment level metadata. This slot is not implemented for a CoreSet object yet.}
+
+\item{sample}{A \code{data.frame} with sample level metadata for the union
+of samples in \code{treatmentResponse} and \code{molecularProfiles}.}
+
+\item{molecularProfiles}{A \code{MultiAssayExperiment} containing one
+\code{SummarizedExperiment} object for each molecular data type.}
+
+\item{treatmentResponse}{A \code{LongTable} or \code{LongTableDataMapper} object
+containing all treatment response data associated with the \code{CoreSet}
+object.}
+
+\item{curation}{A \code{list(2)} object with two items named \code{treatment} and \code{sample} with mappings from publication identifiers to standardized identifiers for both annotations, respectively.}
 }
+\value{
+A \code{CoreSet} object storing standardized and curated treatment
+response and multiomic profile data associated with a given publication.
+}
+\description{
+New implementation of the CoreSet constructor to support MAE and TRE. This
+constructor will be swapped with the original \code{CoreSet} constructor as
+part of an overhaul of the CoreSet class structure.
+}
+\examples{
+data(clevelandSmall_cSet)
+clevelandSmall_cSet
+
 }

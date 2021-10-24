@@ -78,6 +78,10 @@ NULL
 #' to the various maps in the `LongTableDataMapper` object.
 #'
 #' @seealso [`guessMapping`]
+#' 
+#' @examples 
+#' data(exampleDataMapper)
+#' exampleDataMapper
 #'
 #' @md
 #' @importFrom data.table setDT

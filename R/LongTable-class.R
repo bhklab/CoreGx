@@ -89,6 +89,10 @@ setOldClass('long.table', S4Class='LongTable')
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
+#' @examples
+#' data(merckLongTable)
+#' merckLongTable
+#' 
 #' @import data.table
 #' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,

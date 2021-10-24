@@ -64,3 +64,8 @@ row but NOT be required to uniquely identify a row in the \code{colData} or
 \code{rowData} objects. Additional metadata can be attached to a \code{LongTable} by
 passing a list to the metadata argument.
 }
+\examples{
+data(merckLongTable)
+merckLongTable
+
+}

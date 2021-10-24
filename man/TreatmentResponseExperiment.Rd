@@ -73,3 +73,10 @@ separate pacakge. We can then specialize the implementation of
 \code{TreatmentResponseExperiment} to better capture the biomedical nature of
 this object.
 }
+\examples{
+data(clevelandSmall_cSet)
+TRE <- as(molecularProfilesSlot(clevelandSmall_cSet), 
+    "TreatmentResponseExperiment")
+TRE
+
+}
