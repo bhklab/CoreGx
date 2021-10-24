@@ -1,5 +1,8 @@
 # CoreGx News File
 
+## v 1.5.8
+* Fixed imports for the CoreSet2 constructor to resolve errors in downstream package PharmacoGx
+
 ## v1.5.7
 * Add TreatmentResponseExperiment class, a simple wrapper around LongTable to make the class syntax more domain specific
 * Add CoreSet2 structure to support creation of CoreSets with the modified class structure introducted in BioC 3.13
