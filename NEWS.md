@@ -1,5 +1,10 @@
 # CoreGx News File
 
+## v1.5.7
+* Add TreatmentResponseExperiment class, a simple wrapper around LongTable to make the class syntax more domain specific
+* Add CoreSet2 structure to support creation of CoreSets with the modified class structure introducted in BioC 3.13
+* CoreSets can now be made with treatment combination experiments via the TreatmentResponseExperiment class!
+
 ## v1.5.6
 - Fix bug in LongTable -> data.table coerce method that was causing rows of some assays to be dropped (closes issue #)
 
