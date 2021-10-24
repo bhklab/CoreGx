@@ -240,6 +240,8 @@ CoreSet <- function(name, molecularProfiles=list(), cell=data.frame(),
         response and multiomic profile data associated with a given publication.
 
     @importFrom MultiAssayExperiment MultiAssayExperiment
+    @importFrom checkmate assertCharacter assertDataFrame assertClass assert
+    assertList assertSubset
     ",
     ...
 )

@@ -132,7 +132,7 @@ setMethod('getIntern', signature(object='LongTable', x='missing'),
 #' @param key `logical` Should the rowKey column also be returned? Defaults
 #'     to FALSE.
 #' @param use.names `logical` This parameter is just here to stop matching
-#'     the posotopoma; argument to use.names from the rowData generic. It 
+#'     the posotopoma; argument to use.names from the rowData generic. It
 #'     doesn't do anything at this time and can be ignored.
 #'
 #' @return A `data.table` containing rowID, row identifiers, and row metadata.

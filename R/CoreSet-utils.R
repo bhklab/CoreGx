@@ -30,12 +30,14 @@ NULL
     @param x A `{class_}` object.
     @param samples `character()` vector of sample names. Must be valid rownames
     from `sampleInfo(x)`.
-    @param features `character()` vector of feature names. Must be valid feature
-    names for a given `mDataType`
     @param treatments `character()` vector of treatment names. Must be valid
     rownames from `treatmentInfo(x)`. This method does not work with
     `CoreSet` objects yet.
-    @param mDataTypes `character()`
+    @param features `character()` vector of feature names. Must be valid feature
+    names for a given `mDataType`
+    @param mDataTypes `character()` One or more molecular data types to
+        to subset features by. Must be valid rownames for the selected
+        SummarizedExperiment mDataTypes.
 
     @return See details.
     ",
