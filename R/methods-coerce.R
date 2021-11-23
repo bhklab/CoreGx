@@ -326,7 +326,7 @@ setAs("LongTable", "SummarizedExperiment", def=function(from) {
 .longTableToSummarizedExperiment <- function(LT, assay_names) {
     assay_list <- lapply(assayNames(LT), FUN=.assayToBumpyMatrix,
         LT=LT, rows=rownames(LT), cols=colnames(LT))
-    if (!missing(assay_names) && length(assay_names) == length(assayNames(LT))) 
+    if (!missing(assay_names) && length(assay_names) == length(assayNames(LT)))
         names(assay_list) <- assay_names
     SummarizedExperiment(
         assays=assay_list, rowData=rowData(LT), colData=colData(LT), 

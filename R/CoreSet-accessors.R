@@ -73,7 +73,7 @@ NULL
 #' @noRd
 .docs_CoreSet_get_annotation <- function(...) .parseToRoxygen(
     "
-    @details 
+    @details
 
     ## @annotation
 
@@ -1228,7 +1228,7 @@ setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_or_MAE"),
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_sensitivityInfo(class_=.local_class,
 #' data_=.local_data)
-setMethod(sensitivityInfo, signature("CoreSet"), 
+setMethod(sensitivityInfo, signature("CoreSet"),
         function(object, dimension, ...) {
     funContext <- .funContext('::sensitivityInfo')
     # case where sensitivity slot is a LongTable
@@ -1279,9 +1279,9 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     rownameCols <- c(rowIDcols, colIDcols)
 
     # join the tables into the original data
-    infoDT <- merge.data.table(assayIndexDT, rowDataDT, all=TRUE)
+    infoDT <- merge.data.table(assayIndexDT, rowDataDT, all.x=TRUE)
     setkeyv(infoDT, 'colKey')
-    infoDT <- merge.data.table(infoDT, colDataDT, all=TRUE)[, 
+    infoDT <- merge.data.table(infoDT, colDataDT, all.x=TRUE)[, 
         -c('rowKey', 'colKey')
     ]
     infoDT <- tryCatch({
@@ -1297,7 +1297,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     infoDT_sub <- unique(infoDT[, ..keepCols])
 
     # rebuld the rownames
-    infoDT_sub[, drugid := drug1id]
+    infoDT_sub[, drugid := .paste_slashes(drug1id, drug2id)]
     infoDT_sub[, drug_uid := Reduce(.paste_colon, mget(..rowIDcols))]
     infoDT_sub[, cell_uid := Reduce(.paste_colon, mget(..colIDcols))]
     infoDT_sub[, exp_id := Reduce(.paste_, .(drug_uid, cell_uid))]

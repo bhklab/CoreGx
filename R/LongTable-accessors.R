@@ -427,6 +427,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
             'of valid assay names.'))
 
     # extract the specified assay
+    time <- Sys.time()
     assayData <- x@assays[[keepAssay]]
 
     # optionally join to rowData and colData
@@ -437,6 +438,8 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         assayData <- rowData(x, key=TRUE)[assayData, on='rowKey']
         assayData <- colData(x, key=TRUE)[assayData, on='colKey']
     }
+    time1 <- Sys.time()
+    time1 - time
 
     # drop any duplicated columns to prevent issues in the setter methods,
     # actually drops any columns prefixed with i.

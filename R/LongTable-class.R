@@ -256,11 +256,11 @@ setMethod('show', signature(object='LongTable'), function(object) {
     ## FIXME:: Function too long. Can I refactor to a helper that prints each slot?
 
     # ---- class descriptions
-    cat(yellow$bold$italic(paste0("<", class(object), ">"), '\n'))
+    cat(yellow$bold$italic(paste0("<", class(object)[1], ">"), '\n'))
     cat(yellow$bold('dim: ', .collapse(dim(object)), '\n'))
 
     # --- assays slot
-    assayLength <- length(assays(object))
+    assayLength <- length(assayNames(object))
     assaysString <- paste0('assays(', assayLength, '): ')
     assayNames <- assayNames(object)
     assayNamesString <-

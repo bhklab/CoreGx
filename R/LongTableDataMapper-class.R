@@ -119,7 +119,7 @@ LongTableDataMapper <- function(rawdata=list(), rowDataMap=list(),
 setMethod('show', signature(object='LongTableDataMapper'), function(object) {
 
     ## -- class
-    cat(yellow$bold$italic('<LongTableDataMapper>', '\n'))
+    cat(yellow$bold$italic(paste0('<', class(object)[1], '>'), '\n'))
 
     missingVal <- ' NA'
 

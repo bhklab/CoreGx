@@ -40,9 +40,8 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 #'
 #' @md
 #' @export
-setMethod('metaConstruct', signature(mapper='LongTableDataMapper'), 
-    function(mapper)
-{
+setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
+        function(mapper) {
     funContext <- paste0('[', .S4MethodContext('metaConstruct', class(mapper)[1]))
     
     # -- get the rawdata
@@ -93,10 +92,20 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         assayDtL[[i]] <- na.omit(assayDT)
     }
 
-    LT <- CoreGx::LongTable(
+    if (is(mapper, "TREDataMapper")) {
+        object <- CoreGx::TreatmentResponseExperiment(
         rowData=rowDataDT, rowIDs=rowIDs,
         colData=colDataDT, colIDs=colIDs,
         assays=assayDtL,
         metadata=metadataL
         )
+    } else {
+        object <- CoreGx::LongTable(
+            rowData=rowDataDT, rowIDs=rowIDs,
+            colData=colDataDT, colIDs=colIDs,
+            assays=assayDtL,
+            metadata=metadataL
+        )
+    }
+    return(object)
 })

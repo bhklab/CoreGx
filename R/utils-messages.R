@@ -123,4 +123,4 @@
 .paste_colon <- function(x, y) paste(x, y, sep=':')
 
 #' @keywords interanl
-.paste_slashes <- function(...) paste(.., sep='///')
+.paste_slashes <- function(...) paste(..., sep='///')
