@@ -282,6 +282,10 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
         treatmentResponse
     }
 
+    ## -- handle missing rownames for sample
+    if (!all(sample$cellid == rownames(sample)))
+        rownames(sample) <- sample$cellid
+
     object <- .CoreSet(
         annotation=annotation,
         cell=sample,
