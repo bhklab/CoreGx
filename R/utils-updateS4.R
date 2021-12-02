@@ -28,34 +28,33 @@
 
     # sensitivityInfo
     infoDT <- as.data.table(oldSensitivity$info, keep.rownames=TRUE)
-    rowCols <- c(drug1id=colnames(infoDT)[3], drug1dose='dose')
-    colCols <- colnames(infoDT)[2]
-    names(colCols) <- 'cellid'
+    rowCols <- c(drug1id="drugid", drug1dose='dose')
+    colCols <- c(cellid="cellid")
 
     # sensitivityProfiles
     profDT <- as.data.table(oldSensitivity$profiles, keep.rownames=TRUE)
 
     # sensitivityRaw
     doseDT <- as.data.table(oldSensitivity$raw[, , 1], keep.rownames=TRUE)
-    meltedDoseDT <- melt.data.table(doseDT, id.vars='rn', 
-        variable.name='old_column', value.name='dose')
+    meltedDoseDT <- na.omit(melt.data.table(doseDT, id.vars='rn', 
+        variable.name='old_column', value.name='dose'))
     meltedDoseDT[, dose := as.numeric(dose)]
     viabDT <- as.data.table(oldSensitivity$raw[, , 2], keep.rownames=TRUE)
-    meltedViabDT <- melt.data.table(viabDT, id.vars='rn', 
-        variable.name='old_column', value.name='viability')
+    meltedViabDT <- na.omit(melt.data.table(viabDT, id.vars='rn', 
+        variable.name='old_column', value.name='viability'))
     meltedViabDT[, viability := as.numeric(viability)]
 
     # -- merge into a single long format data.table
-    assayDT <- merge.data.table(meltedDoseDT, meltedViabDT, 
+    assayDT <- merge.data.table(meltedDoseDT, meltedViabDT,
         by=c('rn', 'old_column'))
     assayMap <- list(sensitivity=c('viability'), 
         profiles=setdiff(colnames(profDT), 'rn'))
 
     rawdataDT <- merge.data.table(assayDT, profDT, by='rn')
     rawdataDT <- merge.data.table(rawdataDT, infoDT, by='rn')
-    # Find any hidden replicates
-    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols[1], colCols,
-        'old_column')]
+    # Find any hidden replicates, order to maintain ordinality of dose replicates
+    setorderv(rawdataDT, cols=rowCols[2])
+    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols[1], colCols)]
 
     if (max(rawdataDT$replicate_id) > 1) {
         # Handle case where there is only 1 drug (i.e., radiation in RadioGx)
@@ -75,8 +74,8 @@
     )
 
     # -- build a LongTableDataMapper object
-    LTdataMapper <- LongTableDataMapper(rawdata=rawdataDT)
-    guess <- guessMapping(LTdataMapper, groups, subset=TRUE)
+    TREdataMapper <- TREDataMapper(rawdata=rawdataDT)
+    guess <- guessMapping(TREdataMapper, groups, subset=TRUE)
 
     assayCols <- unlist(assayMap)
 
@@ -90,12 +89,12 @@
     # set the names correctly
 
     # update the data mapper
-    rowDataMap(LTdataMapper) <- guess$rowDataMap
-    colDataMap(LTdataMapper) <- guess$colDataMap
-    assayMap(LTdataMapper) <- assayMap
-    metadataMap(LTdataMapper) <- 
+    rowDataMap(TREdataMapper) <- guess$rowDataMap
+    colDataMap(TREdataMapper) <- guess$colDataMap
+    assayMap(TREdataMapper) <- assayMap
+    metadataMap(TREdataMapper) <- 
         list(experiment_metadata=guess$metadata$mapped_columns)
 
     # build the object
-    return(if (!mapper) metaConstruct(LTdataMapper) else LTdataMapper)
+    return(if (!mapper) metaConstruct(TREdataMapper) else TREdataMapper)
 }
