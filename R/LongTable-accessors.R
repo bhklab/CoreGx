@@ -487,8 +487,8 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
 #'   the results returned by assay(longTable, 'assayName', withDimnames=TRUE).
 #'   For convenience, both the `[[` and `$` LongTable accessors return an assay
 #'   with the dimnames and metadata already attached. In the case where your
-#'   assay has only some of the row or column indentifiers and the an assay,
-#'   `i`, already exists in `x`, then try join=TRUE to attempt to join with 
+#'   assay has only some of the row or column indentifiers and an assay,
+#'   `i`, already exists in `x`, then try join=TRUE to attempt to join with
 #'   existing data.
 #'
 #' @return `LongTable` With updated assays slot.
