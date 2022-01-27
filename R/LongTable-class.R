@@ -78,6 +78,7 @@ setOldClass('long.table', S4Class='LongTable')
 #' @param assays A `list` containing one or more objects coercible to a
 #'   `data.table`, and keyed by rowIDs and colIDs corresponding to the rowID and
 #'   colID columns in colData and rowData.
+#' @param assayIDs A `character` vector of 
 #' @param metadata A `list` of metadata associated with the `LongTable`
 #'   object being constructed
 #' @param keep.rownames `logical`, `character`

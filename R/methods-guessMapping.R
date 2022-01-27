@@ -67,7 +67,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     idCols <- unique(unlist(groups))
 
     # Map unique columns in the data to the metadata slot
-    metadataColumns <- names(which(vapply(mapData, FUN=.length_unique, 
+    metadataColumns <- names(which(vapply(mapData, FUN=.length_unique,
         numeric(1)) == 1))
     metadataColumns <- setdiff(metadataColumns, idCols)
     metadata <- mapData[, .SD, .SDcols=metadataColumns]
@@ -75,7 +75,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 
     # Check the mappings for each group in groups
     for (i in seq_along(groups)) {
-        message(funContext, paste0('Mapping for group ', names(groups)[i], 
+        message(funContext, paste0('Mapping for group ', names(groups)[i],
             ': ', paste0(groups[[i]], collapse=', ')))
         mappedCols <- checkColumnCardinality(DT, groups[[i]])
         mappedCols <- setdiff(mappedCols, idCols)
@@ -86,11 +86,12 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     # Merge the results
     groups <- c(list(metadata=NA), groups)
     mappings <- mget(names(groups))
-    unmapped <- setdiff(colnames(mapData), 
+    unmapped <- setdiff(colnames(mapData),
         unique(c(unlist(groups), unlist(lapply(mappings, colnames)))))
     if (!data) mappings <- lapply(mappings, colnames)
-    mappings <- mapply(list, groups, mappings, SIMPLIFY=FALSE)
-    mappings <- lapply(mappings, `names<-`, value=c('id_columns', 'mapped_columns'))
+    mappings <- Map(f=list, groups, mappings)
+    mappings <- lapply(mappings, FUN=setNames, 
+        nm=c('id_columns', 'mapped_columns'))
 
     mappings[['unmapped']] <- unmapped
 
@@ -107,8 +108,8 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #' @param cardinality The cardinality of to search for (i.e., 1:`cardinality`)
 #'   relationships with the combination of columns in group. Defaults to 1 
 #'   (i.e., 1:1 mappings).
-#' @param ... Fall through arguments to data.table::`[`. For developer use. 
-#'   One use case is setting verbose=TRUE to diagnose slow data.table 
+#' @param ... Fall through arguments to data.table::`[`. For developer use.
+#'   One use case is setting verbose=TRUE to diagnose slow data.table
 #'   operations.
 #' 
 #' @return A `character` vector with the names of the columns with
@@ -123,9 +124,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #' @md
 #' @export
 checkColumnCardinality <- function(df, group, cardinality=1, ...) {
-    
-    ## FIXME:: Make this faster using logical operators to get a `logical`
-    ##   matrix then using `colAlls` to check for the correct cardinality.
+
     funContext <- '[CoreGx::checkColumnCardinality]\n\t'
 
     # Copy to prevent accidental modify by references
