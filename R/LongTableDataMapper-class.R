@@ -103,7 +103,7 @@ LongTableDataMapper <- function(rawdata=data.frame(),
     if (is(rawdata, 'data.frame') && !is(rawdata, 'data.table')) setDT(rawdata)
     assertDataTable(rawdata)
     assertList(rowDataMap, types="character", len=2)
-    assertList(coLDataMap, types="character", len=2)
+    assertList(colDataMap, types="character", len=2)
     assertList(assayMap, types="list", min.len=1)
     for (i in seq_along(assayMap)) assertList(assayMap[[i]], types="character",
         len=2)
