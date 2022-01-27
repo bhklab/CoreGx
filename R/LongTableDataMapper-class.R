@@ -20,10 +20,12 @@ NULL
 #' The first is column names in `rawdata` needed to uniquely identify each
 #' column, the second is additional columns which map to rows, but are not
 #' required to uniquely identify them. Columns should be samples.
-#' * assayMap: A list-like where each item is a `character` vector of
-#' `rawdata` column names to assign to an assay, where the name of that assay
-#' is the name of the list item. If names are omitted, assays will be numbered
-#' by their index in the list.
+#' * assayMap A list-like where each item is a `list` with two elements
+#' specifying an assay, the first being the identifier columns in `rawdata`
+#' needed to uniquely identify each row an assay, and the second a list of
+#' `rawdata` columns to be mapped to that assay. The names of `assayMap`
+#' will be the names of the assays in the `LongTable` that is created when
+#' calling `metaConstruct` on this `DataMapper` object.
 #' * metadataMap: A list-like where each item is a `character` vector of
 #' `rawdata` column names to assign to the `@metadata` of the `LongTable`,
 #' where the name of that assay is the name of the list item. If names are
@@ -34,11 +36,12 @@ NULL
 .LongTableDataMapper <- setClass('LongTableDataMapper',
     contains=c('DataMapper'),
     slots=list(
-        rowDataMap='list_or_List',
-        colDataMap='list_or_List',
-        assayMap='list_or_List',
-        metadataMap='list_or_List'
+        rowDataMap='list_OR_List',
+        colDataMap='list_OR_List',
+        assayMap='list_OR_List',
+        metadataMap='list_OR_List'
     ))
+
 
 #' Constructor for the `LongTableDataMapper` class, which maps from one or
 #'   more raw experimental data files to the slots of a `LongTable` object.
@@ -51,7 +54,7 @@ NULL
 #'
 #' To attach metadata not associated with `rawdata`, please use the `metadata`
 #' assignment method on your `LongTableDataMapper`. This metadata will be
-#' merge with any metadata from `metadataMap` and added to the `LongTable`
+#' merged with any metadata from `metadataMap` and added to the `LongTable`
 #' which this object ultimately constructs.
 #'
 #' @param rawdata A `data.frame` of raw data from a treatment response
@@ -65,12 +68,13 @@ NULL
 #' The first is column names in `rawdata` needed to uniquely identify each
 #' column, the second is additional columns which map to rows, but are not
 #' required to uniquely identify them. Columns should be samples.
-#' @param assayMap A list-like where each item is a `list` with two items,
-#' the first being the identifier columns in `rawdata` needed to uniquely
-#' identify each row an assay, and the second a list of `rawdata` columns
-#' to be mapped to that assay. The names of `assayMap` will be the names of the
-#' assays in the `LongTable` that is created when calling `metaConstruct` on
-#' this `DataMapper` object.
+#' @param assayMap A list-like where each item is a `list` with two `character`
+#' vectors defining an assay, the first containing the identifier columns in
+#' `rawdata` needed to uniquely identify each row an assay, and the second the
+#' `rawdata` columns to be mapped to that assay. The names of `assayMap`
+#' will be the names of the assays in the `LongTable` that is created when
+#' calling `metaConstruct` on this `DataMapper` object. If the character vectors
+#' have names, the value columns will be renamed accordingly.
 #' @param metadataMap A list-like where each item is a `character` vector of
 #' `rawdata` column names to assign to the `@metadata` of the `LongTable`,
 #' where the name of that assay is the name of the list item. If names are
@@ -86,6 +90,7 @@ NULL
 #' exampleDataMapper
 #'
 #' @md
+#' @importFrom checkmate assertList
 #' @importFrom data.table setDT
 #' @export
 LongTableDataMapper <- function(rawdata=list(), rowDataMap=list(),
@@ -93,6 +98,11 @@ LongTableDataMapper <- function(rawdata=list(), rowDataMap=list(),
     funContext <- '[CoreGx::LongTableDataMapper]\n\t'
 
     if (is(rawdata, 'data.frame') && !is(rawdata, 'data.table')) setDT(rawdata)
+    for (param_ in list(rowDataMap, colDataMap)) assertList(param_,
+        types="character", unique=TRUE, len=2)
+    for (param_ in list(assayMap, metadataMap)) assertList(param_)
+    for (item_ in assayMap) assertList(item_, type="character", unique=TRUE,
+        len=2)
 
     .LongTableDataMapper(rawdata=rawdata, rowDataMap=rowDataMap,
         colDataMap=colDataMap, assayMap=assayMap, metadataMap=metadataMap)
@@ -291,7 +301,8 @@ setMethod('rowDataMap', signature(object='LongTableDataMapper'),
 })
 
 #' @export
-setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowDataMap<-'))
+setGeneric('rowDataMap<-', function(object, ..., value)
+    standardGeneric('rowDataMap<-'))
 
 .docs_LongTableDataMapper_set_dimDataMap <- function(...) .parseToRoxygen(
     "
@@ -320,7 +331,7 @@ setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowData
 #' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_3,
 #' data_=.local_data_3, id_col_='drug_id')
 setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
-    value='list_or_List'), function(object, value) {
+        value='list_OR_List'), function(object, value) {
     funContext <- '[CoreGx::`rowDataMap<-`,LongTableDataMapper-method]\n\t'
     rawdataCols <- colnames(rawdata(object))
 
@@ -386,7 +397,7 @@ setGeneric('colDataMap<-', function(object, ..., value) standardGeneric('colData
 #' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_3,
 #' data_=.local_data_3, id_col_='cell_id')
 setReplaceMethod('colDataMap',
-        signature(object='LongTableDataMapper', value='list_or_List'),
+        signature(object='LongTableDataMapper', value='list_OR_List'),
         function(object, value) {
     funContext <- '[CoreGx::`colDataMap<-`,LongTableDataMapper-method]\n\t'
     rawdataCols <- colnames(rawdata(object))
@@ -492,7 +503,7 @@ setGeneric('assayMap<-', function(object, ..., value) standardGeneric('assayMap<
 #' @rdname LongTableDataMapper-accessors
 #' @eval .docs_LongTableDataMapper_set_assayMap(class_=.local_class_3, data_=.local_data_3)
 setReplaceMethod('assayMap', signature(object='LongTableDataMapper',
-        value='list_or_List'), function(object, value) {
+        value='list_OR_List'), function(object, value) {
     funContext <- '[CoreGx::`assayMap<-,LongTableDataMapper-method`]\n\t'
     rawdataCols <- colnames(rawdata(object))
     if (length(names(value)) == 0) stop(.errorMsg('The value argument must
@@ -573,7 +584,7 @@ setGeneric('metadataMap<-', function(object, ..., value)
 #' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_3,
 #' data_=.local_data_3, col_='metadata')
 setReplaceMethod('metadataMap', signature(object='LongTableDataMapper',
-    value='list_or_List'), function(object, value)
+    value='list_OR_List'), function(object, value)
 {
     funContext <- '[CoreGx::`metadataMap<-,LongTableDataMapper-method`]\n\t'
     rawdataCols <- colnames(rawdata(object))

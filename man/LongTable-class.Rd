@@ -103,7 +103,7 @@ columns to allow correctly mapping the assay keys. We recommend modifying
 the results returned by assay(longTable, 'assayName', withDimnames=TRUE).
 For convenience, both the \code{[[} and \code{$} LongTable accessors return an assay
 with the dimnames and metadata already attached. In the case where your
-assay has only some of the row or column indentifiers and the an assay,
+assay has only some of the row or column indentifiers and an assay,
 \code{i}, already exists in \code{x}, then try join=TRUE to attempt to join with
 existing data.}
 

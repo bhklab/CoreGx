@@ -6,26 +6,26 @@
 \alias{rawdata<-,LongTableDataMapper,list-method}
 \alias{rowDataMap,LongTableDataMapper-method}
 \alias{rowDataMap}
-\alias{rowDataMap<-,LongTableDataMapper,list_or_List-method}
+\alias{rowDataMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{rowDataMap<-,LongTableDataMapper,list-method}
 \alias{rowDataMap<-LongTableDataMapper,List-method}
 \alias{rowDataMap<-}
 \alias{colDataMap,LongTableDataMapper-method}
 \alias{colDataMap}
-\alias{colDataMap<-,LongTableDataMapper,list_or_List-method}
+\alias{colDataMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{colDataMap<-LongTableDataMapper,List-method}
 \alias{colDataMap<-}
 \alias{assayMap,LongTableDataMapper-method}
 \alias{assayMap,LongTableDataMapper,list-method}
 \alias{assayMap,LongTableDataMapper,List-method}
 \alias{assayMap}
-\alias{assayMap<-,LongTableDataMapper,list_or_List-method}
+\alias{assayMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{assayMap<-,LongTableDataMapper,list-method}
 \alias{assayMap<-,LongTableDataMapper,List-methhod}
 \alias{assayMap<-}
 \alias{metadataMap,LongTableDataMapper-method}
 \alias{metadataMap}
-\alias{metadataMap<-,LongTableDataMapper,list_or_List-method}
+\alias{metadataMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{metadataMap<-,LongTableDataMapper-method}
 \alias{metadataMap<-}
 \title{Accessing and modifying data in a \code{LongTableDataMapper} object.}
@@ -34,19 +34,19 @@
 
 \S4method{rowDataMap}{LongTableDataMapper}(object)
 
-\S4method{rowDataMap}{LongTableDataMapper,list_or_List}(object) <- value
+\S4method{rowDataMap}{LongTableDataMapper,list_OR_List}(object) <- value
 
 \S4method{colDataMap}{LongTableDataMapper}(object)
 
-\S4method{colDataMap}{LongTableDataMapper,list_or_List}(object) <- value
+\S4method{colDataMap}{LongTableDataMapper,list_OR_List}(object) <- value
 
 \S4method{assayMap}{LongTableDataMapper}(object)
 
-\S4method{assayMap}{LongTableDataMapper,list_or_List}(object) <- value
+\S4method{assayMap}{LongTableDataMapper,list_OR_List}(object) <- value
 
 \S4method{metadataMap}{LongTableDataMapper}(object)
 
-\S4method{metadataMap}{LongTableDataMapper,list_or_List}(object) <- value
+\S4method{metadataMap}{LongTableDataMapper,list_OR_List}(object) <- value
 }
 \arguments{
 \item{object}{A \code{LongTableDataMapper} object to get or set data from.}

@@ -35,21 +35,16 @@ uniquely identify them. Rows should be drugs.
 The first is column names in \code{rawdata} needed to uniquely identify each
 column, the second is additional columns which map to rows, but are not
 required to uniquely identify them. Columns should be samples.
-\item assayMap: A list-like where each item is a \code{character} vector of
-\code{rawdata} column names to assign to an assay, where the name of that assay
-is the name of the list item. If names are omitted, assays will be numbered
-by their index in the list.
+\item assayMap A list-like where each item is a \code{list} with two elements
+specifying an assay, the first being the identifier columns in \code{rawdata}
+needed to uniquely identify each row an assay, and the second a list of
+\code{rawdata} columns to be mapped to that assay. The names of \code{assayMap}
+will be the names of the assays in the \code{LongTable} that is created when
+calling \code{metaConstruct} on this \code{DataMapper} object.
 \item metadataMap: A list-like where each item is a \code{character} vector of
 \code{rawdata} column names to assign to the \verb{@metadata} of the \code{LongTable},
 where the name of that assay is the name of the list item. If names are
 omitted, assays will be numbered by their index in the list.
-}
-
-
-\itemize{
-\item rawdata: A list-like object containing one or more pieces of raw data
-that will be processed and mapped to the slots of an \code{S4} object.
-\item metadata: A \code{List} of object level metadata.
 }
 }
 

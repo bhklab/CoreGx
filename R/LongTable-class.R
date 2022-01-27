@@ -78,7 +78,7 @@ setOldClass('long.table', S4Class='LongTable')
 #' @param assays A `list` containing one or more objects coercible to a
 #'   `data.table`, and keyed by rowIDs and colIDs corresponding to the rowID and
 #'   colID columns in colData and rowData.
-#' @param assayIDs A `character` vector of 
+#' @param assayIDs A `character` vector of
 #' @param metadata A `list` of metadata associated with the `LongTable`
 #'   object being constructed
 #' @param keep.rownames `logical`, `character`
@@ -90,10 +90,6 @@ setOldClass('long.table', S4Class='LongTable')
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
-#' @examples
-#' data(merckLongTable)
-#' merckLongTable
-#' 
 #' @import data.table
 #' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
@@ -103,6 +99,9 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
         colData=missing(colData), assays=missing(assays))
 
+    # allow creation of empty LongTable
+    ## FIXME:: Can I use null values here and not break the checks?
+    ## FIXME:: Why not just early return
     if (all(isMissing)) {
         rowData <- data.table(row="1")
         rowIDs <- "row"

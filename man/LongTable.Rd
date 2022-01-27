@@ -45,6 +45,8 @@ Logical: whether rownames should be added as a column if coercing to a
 \code{data.table}, default is FALSE. If TRUE, rownames are added to the column
 'rn'.
 Character: specify a custom column name to store the rownames in.}
+
+\item{assayIDs}{A \code{character} vector of}
 }
 \value{
 A \code{LongTable} object containing the data for a treatment response
@@ -63,9 +65,4 @@ columns for either dimension. These should contain information about each
 row but NOT be required to uniquely identify a row in the \code{colData} or
 \code{rowData} objects. Additional metadata can be attached to a \code{LongTable} by
 passing a list to the metadata argument.
-}
-\examples{
-data(merckLongTable)
-merckLongTable
-
 }

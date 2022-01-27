@@ -73,7 +73,7 @@
 \alias{molecularProfilesSlot,CoreSet-method}
 \alias{moleculerProfilesSlot,CoreSet-method}
 \alias{molecularProfilesSlot}
-\alias{molecularProfilesSlot<-,CoreSet,list_or_MAE-method}
+\alias{molecularProfilesSlot<-,CoreSet,list_OR_MAE-method}
 \alias{molecularProfilesSlot<-,CoreSet,list-method}
 \alias{molecularProfilesSlot<-CoreSet,MultiAssayExperiment-method}
 \alias{molecularProfilesSlot<-}
@@ -163,7 +163,7 @@
 
 \S4method{molecularProfilesSlot}{CoreSet}(object)
 
-\S4method{molecularProfilesSlot}{CoreSet,list_or_MAE}(object) <- value
+\S4method{molecularProfilesSlot}{CoreSet,list_OR_MAE}(object) <- value
 
 \S4method{sensitivityInfo}{CoreSet}(object, dimension, ...)
 
@@ -558,7 +558,7 @@ datasetType(clevelandSmall_cSet) <- 'both'
 molecularProfiles(clevelandSmall_cSet, 'rna') <- molecularProfiles(clevelandSmall_cSet, 'rna')
 
 # Specific assay
-molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs') <- 
+molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs') <-
     molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs')
 
 featureInfo(clevelandSmall_cSet, 'rna')
