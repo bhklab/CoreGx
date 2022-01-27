@@ -16,7 +16,6 @@
 #' @return An `S4` object for which the class corresponds to the type of
 #'   the build configuration object passed to this method.
 #'
-#'
 #' @md
 #' @export
 setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct'))

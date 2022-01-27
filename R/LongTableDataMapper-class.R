@@ -40,7 +40,8 @@ NULL
         colDataMap='list_OR_List',
         assayMap='list_OR_List',
         metadataMap='list_OR_List'
-    ))
+    )
+)
 
 
 #' Constructor for the `LongTableDataMapper` class, which maps from one or
@@ -90,19 +91,23 @@ NULL
 #' exampleDataMapper
 #'
 #' @md
-#' @importFrom checkmate assertList
+#' @importFrom checkmate assertList assertDataTable
 #' @importFrom data.table setDT
 #' @export
-LongTableDataMapper <- function(rawdata=list(), rowDataMap=list(),
-        colDataMap=list(), assayMap=list(), metadataMap=list()) {
-    funContext <- '[CoreGx::LongTableDataMapper]\n\t'
+LongTableDataMapper <- function(rawdata=data.frame(),
+        rowDataMap=list(character(), character()),
+        colDataMap=list(character(), character()),
+        assayMap=list(list(character(), character())),
+        metadataMap=list(character())) {
 
     if (is(rawdata, 'data.frame') && !is(rawdata, 'data.table')) setDT(rawdata)
-    for (param_ in list(rowDataMap, colDataMap)) assertList(param_,
-        types="character", unique=TRUE, len=2)
-    for (param_ in list(assayMap, metadataMap)) assertList(param_)
-    for (item_ in assayMap) assertList(item_, type="character", unique=TRUE,
+    assertDataTable(rawdata)
+    assertList(rowDataMap, types="character", len=2)
+    assertList(coLDataMap, types="character", len=2)
+    assertList(assayMap, types="list", min.len=1)
+    for (i in seq_along(assayMap)) assertList(assayMap[[i]], types="character",
         len=2)
+    assertList(metadataMap)
 
     .LongTableDataMapper(rawdata=rawdata, rowDataMap=rowDataMap,
         colDataMap=colDataMap, assayMap=assayMap, metadataMap=metadataMap)

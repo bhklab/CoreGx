@@ -6,11 +6,11 @@
 more raw experimental data files to the slots of a \code{LongTable} object.}
 \usage{
 LongTableDataMapper(
-  rawdata = list(),
-  rowDataMap = list(),
-  colDataMap = list(),
-  assayMap = list(),
-  metadataMap = list()
+  rawdata = data.frame(),
+  rowDataMap = list(character(), character()),
+  colDataMap = list(character(), character()),
+  assayMap = list(list(character(), character())),
+  metadataMap = list(character())
 )
 }
 \arguments{
