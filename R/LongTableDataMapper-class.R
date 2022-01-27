@@ -190,9 +190,11 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
     cat(yellow$bold('\nassayMap:'))
     assayM <- assayMap(object)
     if (length(assayM)) {
-        for (aName in names(assayM))
-            cat('\n ', red(paste0(aName, ':')),
-                paste0(assayM[[aName]], collapse=', '))
+        for (aName in names(assayM)) {
+            cat('\n ', red(paste0(aName, ':')))
+            cat('\n   keyColumns:', paste0(assayM[[aName]][[1]], collapse=', '))
+            cat('\n   valueCols:', paste0(assayM[[aName]][[1]], collapse=', '))
+        }
     } else {
         cat(green(missingVal))
     }
@@ -515,11 +517,12 @@ setReplaceMethod('assayMap', signature(object='LongTableDataMapper',
         be a named list-like of column name character vectors!'))
 
     for (i in seq_along(value)) {
-        hasRawdataCols <- value[[i]] %in% rawdataCols
+        hasRawdataCols <- unlist(value[[i]]) %in% rawdataCols
         if (!all(hasRawdataCols) && length(rawdata(object))) {
             stop(.errorMsg(funContext, 'There are no columns named ',
-                .collapse(value[[i]][!hasRawdataCols]), ' in the rawdata ',
-                'of this ', class(object)[1], ' object. Please ensure item ',
+                .collapse(unlist(value[[i]])[!hasRawdataCols]),
+                ' in the rawdata of this ', class(object)[1],
+                ' object. Please ensure item ',
                 names(value)[i], ' of value has valid column names.'))
         }
     }
