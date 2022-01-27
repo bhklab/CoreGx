@@ -1,4 +1,5 @@
-#' @importClassesFrom S4Vectors list_OR_List
+#' @importClassesFrom S4Vectors Annotated list_OR_List
+NULL
 
 #' An S4 Class For Mapping from Raw Experimental Data to a Specific S4 Object
 #'

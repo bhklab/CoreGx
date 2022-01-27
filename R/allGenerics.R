@@ -90,7 +90,6 @@ setGeneric("sensitivityInfo<-",
 #' Generic function to get the raw data array for a treatment response experiment
 #'   from an S4 class.
 #'
-
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'

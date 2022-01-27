@@ -46,5 +46,12 @@ calling \code{metaConstruct} on this \code{DataMapper} object.
 where the name of that assay is the name of the list item. If names are
 omitted, assays will be numbered by their index in the list.
 }
+
+
+\itemize{
+\item rawdata: A list-like object containing one or more pieces of raw data
+that will be processed and mapped to the slots of an \code{S4} object.
+\item metadata: A \code{List} of object level metadata.
+}
 }
 

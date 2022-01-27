@@ -714,7 +714,7 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
 
     @md
     @aliases molecularProfiles,{class_}-method molecularProfiles
-    @importClassesFrom S4Vectors DataFrame SimpleList
+    @importClassesFrom S4Vectors DataFrame List
     @importFrom S4Vectors DataFrame
     @importFrom SummarizedExperiment colData assay assayNames
     @exportMethod molecularProfiles
