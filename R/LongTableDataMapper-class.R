@@ -192,8 +192,8 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
     if (length(assayM)) {
         for (aName in names(assayM)) {
             cat('\n ', red(paste0(aName, ':')))
-            cat('\n   keyColumns:', paste0(assayM[[aName]][[1]], collapse=', '))
-            cat('\n   valueCols:', paste0(assayM[[aName]][[1]], collapse=', '))
+            cat('\n    keys:', paste0(assayM[[aName]][[1]], collapse=', '))
+            cat('\n    values:', paste0(assayM[[aName]][[2]], collapse=', '))
         }
     } else {
         cat(green(missingVal))
