@@ -949,7 +949,7 @@
         if (trunc == FALSE) {
             
             if (n == 1) {
-                return(sum(diffs^2))
+                return(sum(diffs^2/scale^2))
             }
             
             return(sum(-log(.dmednnormals(diffs, n, scale))))
