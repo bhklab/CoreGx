@@ -341,8 +341,9 @@
     if (x_to_log) {
         x <- log10(x)
     }
-    ### Shouldnt we sort y in same order?????
+    ### Note, if Y is passed in, it is sorted in this same order below. This is not obvious from the code right away. 
     if (is.unsorted(x)) {
+        InputUnsorted <- TRUE
         warning("x-values passed in unsorted. Sorting x-values and corresponding y-values (if passed in).")
         xOrder <- order(x)
         x <- x[xOrder]
@@ -363,7 +364,7 @@
             y <- as.numeric(y[myy])
         }
         
-        if (is.unsorted(x)) {
+        if (InputUnsorted) {
             y <- y[xOrder]
         }
         
