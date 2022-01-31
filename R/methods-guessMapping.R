@@ -23,7 +23,7 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 #'
 #' The function automatically guesses metadata by checking if any columns have
 #' only a single value. This is returned as an additional item in the list.
-#' 
+#'
 #' @param object A `LongTableDataMapper` object.
 #' @param groups A `list` containing one or more vector of column names
 #'   to group-by. The function uses these to determine 1:1 mappings between
@@ -90,7 +90,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
         unique(c(unlist(groups), unlist(lapply(mappings, colnames)))))
     if (!data) mappings <- lapply(mappings, colnames)
     mappings <- Map(f=list, groups, mappings)
-    mappings <- lapply(mappings, FUN=setNames, 
+    mappings <- lapply(mappings, FUN=setNames,
         nm=c('id_columns', 'mapped_columns'))
 
     mappings[['unmapped']] <- unmapped
@@ -100,18 +100,18 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 
 #' Search a data.frame for 1:`cardinality` relationships between a group
 #'   of columns (your identifiers) and all other columns.
-#' 
+#'
 #' @param df A `data.frame` to search for 1:`cardinality` mappings with
 #'   the columns in `group`.
-#' @param group A `character` vector of one or more column names to 
+#' @param group A `character` vector of one or more column names to
 #'   check the cardinality of other columns against.
 #' @param cardinality The cardinality of to search for (i.e., 1:`cardinality`)
-#'   relationships with the combination of columns in group. Defaults to 1 
+#'   relationships with the combination of columns in group. Defaults to 1
 #'   (i.e., 1:1 mappings).
 #' @param ... Fall through arguments to data.table::`[`. For developer use.
 #'   One use case is setting verbose=TRUE to diagnose slow data.table
 #'   operations.
-#' 
+#'
 #' @return A `character` vector with the names of the columns with
 #'    cardinality of 1:`cardinality` with the columns listed in `group`.
 #'
@@ -120,8 +120,10 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #' checkColumnCardinality(df, group='drug_id')
 #'
 #' @aliases cardinality
-#' 
+#'
 #' @md
+#' @importFrom data.table setindexv
+#' @importFrom MatrixGenerics colAlls
 #' @export
 checkColumnCardinality <- function(df, group, cardinality=1, ...) {
 
@@ -132,16 +134,15 @@ checkColumnCardinality <- function(df, group, cardinality=1, ...) {
     if (!is.data.table(df)) setDT(df)
 
     # Intercept slow data.table group by when nrow == .NGRP
-    setindexv(df, cols=group)
-    groupDT <- df[, .(group_index = .GRP), by=group, ...]
-    if (nrow(df) == max(groupDT$group_index)) {
-        if (cardinality != 1) stop(.errorMsg(funContext, 'The group argument 
+    setkeyv(df, cols=group)
+    nrowEqualsNGroup <- df[, .N, by=group, ...][, max(N), ...] == 1
+    if (nrowEqualsNGroup) {
+        if (cardinality != 1) stop(.errorMsg(funContext, 'The group argument
             uniquely identifies each row, so the cardinality is 1:1!'))
         columnsHaveCardinality <- setdiff(colnames(df), group)
     } else {
-        dimDT <- df[, lapply(.SD, FUN=.length_unique), by=group, ...]
-        columnsHaveCardinality <- names(which(
-            vapply(dimDT, .all_equals, y=cardinality, logical(1))))
+        dimDT <- df[, lapply(.SD, FUN=uniqueN), by=group, ...]
+        columnsHaveCardinality <- colnames(dimDT)[colAlls(dimDT == cardinality)]
     }
 
     return(columnsHaveCardinality)

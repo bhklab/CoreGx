@@ -192,8 +192,12 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
     if (length(assayM)) {
         for (aName in names(assayM)) {
             cat('\n ', red(paste0(aName, ':')))
-            cat('\n    keys:', paste0(assayM[[aName]][[1]], collapse=', '))
-            cat('\n    values:', paste0(assayM[[aName]][[2]], collapse=', '))
+            cat('\n    keys:',
+                strwrap(paste0(assayM[[aName]][[1]], collapse=', '), exdent=2)
+            )
+            cat('\n    values:',
+                strwrap(paste0(assayM[[aName]][[2]], collapse=', '), exdent=2)
+            )
         }
     } else {
         cat(green(missingVal))
@@ -263,8 +267,8 @@ setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
         object@rawdata <- value
     } else {
         .error(funContext, "In order to assign to the rawdata slot of ",
-                "a LongTableDataMapper, either all the map slots must be ",
-                "empty or the rawdata slot must be an empty list!")
+            "a LongTableDataMapper, either all the map slots must be ",
+            "empty or the rawdata slot must be an empty list!")
     }
     return(object)
 })
