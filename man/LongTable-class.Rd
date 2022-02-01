@@ -94,7 +94,7 @@ instead of the column names? Default is FALSE.}
 function.}
 
 \item{use.names}{\code{logical} This parameter is just here to stop matching
-the posotopoma; argument to use.names from the rowData generic. It
+the positional argument to use.names from the rowData generic. It
 doesn't do anything at this time and can be ignored.}
 
 \item{value}{A \code{data.frame} or \code{data.table} to update the assay data

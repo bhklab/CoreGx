@@ -127,7 +127,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #' @export
 checkColumnCardinality <- function(df, group, cardinality=1, ...) {
 
-    funContext <- '[CoreGx::checkColumnCardinality]\n\t'
+    funContext <- '\n[CoreGx::checkColumnCardinality]\n\t'
 
     # Copy to prevent accidental modify by references
     df <- copy(df)

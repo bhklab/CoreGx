@@ -231,9 +231,94 @@ setMethod('show', signature(object='LongTableDataMapper'), function(object) {
 #' @param value See details.
 NULL
 
+
 ## =====================================
 ## LongTableDataMapper Accessors Methods
 ## -------------------------------------
+
+
+## ---------------------
+## ---- all slot helpers
+
+#' Method to subset the rawdata with the corresponding dimensions "dimDataMap"
+#'   method.
+#'
+#' @param x `LongTableDataMapper` or inheriting class.
+#' @param key `logical(1)` Should the returned value be keyed by the 'id_columns'
+#'   item of the dimDataMap? Ignored when dim is "meta".
+#' @param dim `character(1)` Which dimension should rawdata to subset for? Options
+#'   are "row", "col" and "meta", corresponding to the associated
+#'   slots of the `LongTableDataMapper`.
+#'
+#' @importFrom checkmate assertClass assertLogical
+#' @importFrom methods getPackageName
+#' @keywords internal
+.get_dimData <- function(x, key, dim=c("row", "col", "meta")) {
+
+    # Input validation
+    assertClass(x, "LongTableDataMapper")
+    assertLogical(key)
+
+    # Determine which slot and accessor function to use
+    dim <- match.arg(dim)
+    dimSlot <- paste0(dim, "DataMap")
+    dimFun <- get(dimSlot)
+
+    # Get method name to simplify debugging from S4 classes
+    funContext <- paste0("\n[", getPackageName(), "::", dimSlot, ",",
+        class(x)[1], "-method\n\t")
+
+    .dimDataMap <- dimFun(x)
+
+    # Ensure required data is present
+    if (length(unlist(.dimDataMap)) < 1) stop(.errorMsg(funContext,
+        "The ", dimSlot, " slot must contain valid data!"))
+
+    return(.get_dimDataFromMap(x=x, key=(key && dim != "meta"),
+        dataMap=.dimDataMap, funContext=funContext))
+}
+
+#' Method to subset the rawdata with the corresponding dimensions "dimDataMap"
+#'   method.
+#'
+#' @param x `LongTableDataMapper` or inheriting class.
+#' @param key `logical(1)` Should the returned value be keyed by the 'id_columns'
+#'   item of the dimDataMap? Default is `TRUE`.
+#' @param dataMap `list` The map of a `LongTableDataMapper` dimension, as
+#'   returned by the '*DataMap' methods.
+#' @param funContext `character(1)` Contextual information about the calling
+#'   function, for debugging. Users don't need to worry about this.
+#'
+#' @importFrom checkmate assertClass assertLogical assertList
+#' @importFrom methods getPackageName
+#' @keywords internal
+.get_dimDataFromMap <- function(x, key=TRUE, dataMap, funContext) {
+
+    if (missing(funContext))
+        funContext <- paste0("\n[", getPackageName(), "::.get_dimDataMap]\n\t")
+
+    # Input validation
+    assertClass(x, "LongTableDataMapper")
+    assertLogical(key)
+    assertList(dataMap, types=c("character"), max.len=2)
+
+    # Extract relevant data
+    .rawdata <- rawdata(x)
+
+    # Ensure required data is present
+    if (length(.rawdata) < 1) .error(funContext,
+        "The rawdata slot must contain valid data!")
+    hasDimDataCols <- unlist(dataMap) %in% colnames(.rawdata)
+    if (!all(hasDimDataCols)) .error(funContext, "Columns ",
+        .collapse(unlist(dataMap)[!hasDimDataCols]),
+        " are missing from rawdata!")
+
+    # Subset rawdata and return
+    .dimData <- unique(.rawdata[, unlist(dataMap), with=FALSE])
+    if (key) setkeyv(.dimData, dataMap$id_columns)
+    return(.dimData)
+}
+
 
 ## ---------------
 ## -- rawdata slot
@@ -381,8 +466,31 @@ setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
     return(object)
 })
 
+
+##
+## -- rowData
+
+
+#' Convenience method to subset the `rowData` out of the `rawdata` slot using
+#'   the assigned `rowDataMap` metadata.
+#'
+#' @param x `LongTableDataMapper` object with valid data in the `rawdata` and
+#'   `colDataMap` slots.
+#' @param key `logical(1)` Should the table be keyed according to the
+#'   `id_columns` of the `rowDataMap` slot? This will sort the table in memory.
+#'   Default is TRUE.
+#'
+#' @return `data.table` The `rowData` as specified in the `rowDataMap` slot.
+#'
+#' @export
+setMethod("rowData", signature("LongTableDataMapper"), function(x, key=TRUE) {
+    .get_dimData(x, key, dim="row")
+})
+
+
 ## --------------------
 ## ---- colDataMap slot
+
 
 ##
 ## -- colDataMap
@@ -414,35 +522,35 @@ setReplaceMethod('colDataMap',
 
     # -- Handle error conditions
     if (length(value) > 2 || !is.list(value)) {
-        stop(.errorMsg(funContext, 'Assignments to colDataMap should be a list ',
+        .error(funContext, 'Assignments to colDataMap should be a list ',
             'of length 2, where the first item is the name of the id columns ',
             'and the second item is the name of the metadata columns which ',
-            'map to those id columns.'))
+            'map to those id columns.')
     }
 
     hasIDcols <- value[[1]] %in% rawdataCols
     if (!all(hasIDcols) && length(rawdata(object))) {
-        stop(.errorMsg(funContext, 'One or more of the id columns specified ',
+        .error(funContext, 'One or more of the id columns specified ',
             'in value[[1]] are not valid column names in the rawdata slot of ',
-            'this ', class(object)[1], ' object!'))
+            'this ', class(object)[1], ' object!')
     }
 
     if (length(value) > 1 && length(value[[2]]) != 0 &&
             length(rawdata(object))) {
         hasMetaCols <- value[[2]] %in% rawdataCols
         if (!all(hasMetaCols)) {
-            stop(.errorMsg(funContext,
+            .error(funContext,
                 'The follow metadata columns in value[[2]] ',
                 'are not present in rawdata(object): ',
-                .collapse(value[[2]][!hasMetaCols]), '!'))
+                .collapse(value[[2]][!hasMetaCols]), '!')
         }
         hasOneToOneRelationship <-
             value[[2]] %in% cardinality(rawdata(object), group=value[[1]])
         if (!all(hasOneToOneRelationship)) {
-            stop(.errorMsg(funContext, 'The columns ',
-                .collapse(value[[2]][!hasOneToOneRelationship],
-                    ' do not have a 1:1 relationship with the specified ID ',
-                    'columns!')))
+            .error(funContext, 'The columns ',
+                .collapse(value[[2]][!hasOneToOneRelationship]),
+                ' do not have a 1:1 relationship with the specified ID ',
+                'columns!')
         }
     }
 
@@ -451,35 +559,27 @@ setReplaceMethod('colDataMap',
     return(object)
 })
 
+
 ##
 ## -- colData
+
 
 #' Convenience method to subset the `colData` out of the `rawdata` slot using
 #'   the assigned `colDataMap` metadata.
 #'
 #' @param x `LongTableDataMapper` object with valid data in the `rawdata` and
 #'   `colDataMap` slots.
+#' @param key `logical(1)` Should the table be keyed according to the
+#'   `id_columns` of the `colDataMap` slot? This will sort the table in memory.
+#'   Default is TRUE.
 #'
 #' @return `data.table` The `colData` as specified in the `colDataMap` slot.
 #'
 #' @export
 setMethod("colData", signature("LongTableDataMapper"), function(x, key=TRUE) {
-    funContext <- "\n[CoreGx::colData,LongTableDataMapper-method\n\t"
-    .rawdata <- rawdata(x)
-    .colDataMap <- colDataMap(x)
-    if (length(rawDT) < 1) stop(.errorMsg(funContext,
-        "The rawdata slot must contain valid data!"))
-    if (length(unlist(.colDataMap) < 1)) stop(.errorMsg(funContext,
-        "The colDataMap slot must contain valid data!"))
-    hasColDataCols <- unlist(.colDataMap) %in% colnames(.rawdata)
-    if (!all(hasColDataCols)) stop(.errorMsg(funContext, "Columns ",
-        paste0(unlist(colDataMap)[!hasColDataCols], collapse=", "),
-        " are missing from rawdata!"))
-
-    keepCols <- if (isTRUE(key)) unlist(colDataMap) else
-        colDataMap$mapped_columns
-    return(unique(rawdata(x)[, .SD, .SDcols=keepCols]))
+    .get_dimData(x, key, dim="col")
 })
+
 
 ## ----------------
 ## ---- assayMap slot
@@ -509,8 +609,8 @@ setGeneric('assayMap', function(object, ...) standardGeneric('assayMap'))
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval .docs_LongTableDataMapper_get_assayMap(class_=.local_class_3, data_=.local_data_3)
-setMethod('assayMap', signature(object='LongTableDataMapper'), function(object)
-{
+setMethod('assayMap', signature(object='LongTableDataMapper'),
+        function(object) {
     object@assayMap
 })
 
@@ -562,6 +662,55 @@ setReplaceMethod('assayMap', signature(object='LongTableDataMapper',
 
     object@assayMap <- value
     return(object)
+})
+
+
+#' Extract the data for an assay from a `LongTableDataMapper`
+#'
+#' @param x `LongTableDataMapper` The object to retrive assay data form according
+#'   to the `assayMap` slot.
+#' @param i `character(1)` Name of an assay in the `assayMap` slot of `x`.
+#' @param withDimNames `logical(1)` For compatibility with
+#'   `SummarizedExperiment::assay` generic. Not used.
+#'
+#' @return `data.table` Data for the specified assay extracted from the
+#'   `rawdata` slot of `x`.
+#'
+#' @importFrom checkmate assertSubset assertCharacter
+#' @keywords internal
+setMethod("assay", signature(x="LongTableDataMapper"),
+        function(x, i, withDimnames=TRUE) {
+
+    # Input validation
+    .assayMap <- assayMap(x)
+    assertCharacter(i, max.len=1)
+    assertSubset(i, names(.assayMap))
+
+    # Execution context
+    funContext <- paste0("\n[", getPackageName(), "::assay,", class(x)[1],
+        "-method]")
+
+    return(.get_dimDataFromMap(x, key=TRUE, .assayMap[[i]],
+        funContext=funContext))
+})
+
+
+#' Extract the data for all assays from a `LongTableDataMapper`
+#'
+#' @param x `LongTableDataMapper` The object to retrive assay data form according
+#'   to the `assayMap` slot.
+#' @param withDimNames `logical(1)` For compatibility with
+#'   `SummarizedExperiment::assay` generic. Not used.
+#'
+#' @return `list` Data for all assays extracted from the
+#'   `rawdata` slot of `x` as a `list` of `data.tables`, where the `keys` for
+#'   each table are their `id_columns`.
+#'
+#' @importFrom checkmate assertSubset assertCharacter
+#' @keywords internal
+setMethod("assays", signature(x="LongTableDataMapper"),
+        function(x, withDimnames=TRUE) {
+    lapply(names(assayMap(x)), FUN=assay, x=x)
 })
 
 # -- metadataMap
