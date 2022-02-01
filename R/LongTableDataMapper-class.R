@@ -260,15 +260,14 @@ setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
     } else if (length(mandatory) && !length(rawdata(object))) {
         hasMandatory <- mandatory %in% colnames(value)
         if (!all(hasMandatory)) {
-            .error(funContext, "One or more map column is missing from value",
-                ": ", paste0(mandatory[!hasMandatory], collapse=', '), '!'
-            )
+            stop(.errorMsg(funContext, "One or more map column is missing from value",
+                ": ", paste0(mandatory[!hasMandatory], collapse=', '), '!'))
         }
         object@rawdata <- value
     } else {
-        .error(funContext, "In order to assign to the rawdata slot of ",
+        stop(.errorMsg(funContext, "In order to assign to the rawdata slot of ",
             "a LongTableDataMapper, either all the map slots must be ",
-            "empty or the rawdata slot must be an empty list!")
+            "empty or the rawdata slot must be an empty list!"))
     }
     return(object)
 })
@@ -450,6 +449,36 @@ setReplaceMethod('colDataMap',
     # -- Function body
     object@colDataMap <- value
     return(object)
+})
+
+##
+## -- colData
+
+#' Convenience method to subset the `colData` out of the `rawdata` slot using
+#'   the assigned `colDataMap` metadata.
+#'
+#' @param x `LongTableDataMapper` object with valid data in the `rawdata` and
+#'   `colDataMap` slots.
+#'
+#' @return `data.table` The `colData` as specified in the `colDataMap` slot.
+#'
+#' @export
+setMethod("colData", signature("LongTableDataMapper"), function(x, key=TRUE) {
+    funContext <- "\n[CoreGx::colData,LongTableDataMapper-method\n\t"
+    .rawdata <- rawdata(x)
+    .colDataMap <- colDataMap(x)
+    if (length(rawDT) < 1) stop(.errorMsg(funContext,
+        "The rawdata slot must contain valid data!"))
+    if (length(unlist(.colDataMap) < 1)) stop(.errorMsg(funContext,
+        "The colDataMap slot must contain valid data!"))
+    hasColDataCols <- unlist(.colDataMap) %in% colnames(.rawdata)
+    if (!all(hasColDataCols)) stop(.errorMsg(funContext, "Columns ",
+        paste0(unlist(colDataMap)[!hasColDataCols], collapse=", "),
+        " are missing from rawdata!"))
+
+    keepCols <- if (isTRUE(key)) unlist(colDataMap) else
+        colDataMap$mapped_columns
+    return(unique(rawdata(x)[, .SD, .SDcols=keepCols]))
 })
 
 ## ----------------

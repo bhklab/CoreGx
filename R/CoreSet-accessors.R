@@ -727,7 +727,7 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
 setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
   funContext <- .funContext('::molecularProlfiles,CoreSet-method')
   ## TODO:: Add an all option that returns a list?
-  if(mDataType %in% names(object@molecularProfiles)){
+  if (mDataType %in% names(object@molecularProfiles)) {
     if (!missing(assay)) {
       if (assay %in% assayNames(object@molecularProfiles[[mDataType]])) {
         return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay))
