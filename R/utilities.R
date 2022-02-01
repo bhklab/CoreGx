@@ -342,7 +342,7 @@
         x <- log10(x)
     }
     ### Note, if Y is passed in, it is sorted in this same order below. This is not obvious from the code right away. 
-    if (is.unsorted(x)) {
+    if (is.unsorted(x, na.rm=TRUE)) {
         InputUnsorted <- TRUE
         warning("x-values passed in unsorted. Sorting x-values and corresponding y-values (if passed in).")
         xOrder <- order(x)
