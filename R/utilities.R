@@ -729,33 +729,42 @@
     
     if (length(guess) > 1) {
         for (par in 2:length(guess)) {
-            periods[par] <- periods[par - 1] * density[par] * (upper_bounds[par] - lower_bounds[par])
+            ## the par-1 is because we want 1 increment of par variable once all previous variables have their values tested once. 
+            periods[par] <- periods[par - 1] * (density[par - 1] * (upper_bounds[par - 1] - lower_bounds[par - 1]) + 1)
         }
     }
-    
+
     currentPars <- lower_bounds
-    for (point in seq_len(prod((upper_bounds - lower_bounds) * density))) {
-        for (par in seq_along(guess)) {
-            if (point%%periods[par] == 0) {
-                if (currentPars[par] >= upper_bounds[par]) {
-                  currentPars[par] <- lower_bounds[par]
-                } else {
-                  currentPars[par] <- currentPars[par] + 1/density[par]
-                }
-            }
-        }
+
+    ## The plus one is because we include endpoints. 
+
+    for (point in seq_len(prod((upper_bounds - lower_bounds) * density+1))) {
+
         test_guess_residual <- .residual(x = x, y = y, n = n, pars = currentPars, f = f, scale = scale, family = family, trunc = trunc)
+        
+        ## Check for something catastrophic going wrong
         if (!length(test_guess_residual) || (!is.finite(test_guess_residual) && test_guess_residual != Inf)) {
             stop(paste0(" Test Guess Residual is: ", test_guess_residual, "\n", "Other Pars:\n", "x: ", paste(x, collapse = ", "), "\n", 
                 "y: ", paste(y, collapse = ", "), "\n", "n: ", n, "\n", "pars: ", pars, "\n", "scale: ", scale, "\n", "family : ", family, 
                 "\n", "Trunc ", trunc))
         }
+        ## save the guess if its an improvement 
         if (test_guess_residual < guess_residual) {
             guess <- currentPars
             guess_residual <- test_guess_residual
         }
+        ## increment the variable(s) that should be incremented this loop
+        for (par in seq_along(guess)) {
+            if (point%%periods[par] == 0) {
+                currentPars[par] <- currentPars[par] + 1/density[par]
+
+                if (currentPars[par] > upper_bounds[par]) {
+                    currentPars[par] <- lower_bounds[par]
+                } 
+            }
+        }
     }
-    
+
     return(guess)
 }
 
