@@ -186,7 +186,7 @@
             stop("y must contain only real numbers, NA-values, and/or -Inf (if y_as_log is set to TRUE).")
         }
         
-        if (min(y) < 0) {
+        if (min(y, na.rm=TRUE) < 0) {
             if (verbose) {
                 warning("Warning: Negative y data.")
                 if (verbose == 2) {
@@ -196,7 +196,7 @@
             }
         }
         
-        if (max(y) > (1 + 99 * y_as_pct)) {
+        if (max(y, na.rm=TRUE) > (1 + 99 * y_as_pct)) {
             if (verbose) {
                 warning("Warning: y data exceeds negative control.")
                 if (verbose == 2) {
