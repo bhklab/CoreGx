@@ -112,7 +112,7 @@
             stop("x must contain only real numbers, NA-values, and/or -Inf (if x_as_log flag is set to TRUE).")
         }
 
-        if (x_as_log == FALSE && min(x) < 0) {
+        if (x_as_log == FALSE && min(x, na.rm=TRUE) < 0) {
             if (verbose == 2) {
                 message("x:")
                 message(x)
@@ -208,7 +208,7 @@
         
         if (missing(pars)) {
             
-            if (y_as_log == FALSE && min(y) < 0) {
+            if (y_as_log == FALSE && min(y, na.rm=TRUE) < 0) {
                 if (verbose) {
                   warning("Negative y-values encountered. y data may be inappropriate, or 'y_as_log' flag may be set incorrectly.")
                   if (verbose == 2) {
@@ -220,7 +220,7 @@
                 }
             }
             
-            if (y_as_pct == TRUE && max(y) < 5) {
+            if (y_as_pct == TRUE && max(y, na.rm=TRUE) < 5) {
                 if (verbose) {
                   warning("Warning: 'y_as_pct' flag may be set incorrectly.")
                   if (verbose == 2) {
@@ -232,7 +232,7 @@
                 }
             }
             
-            if (y_as_pct == FALSE && max(y) > 5) {
+            if (y_as_pct == FALSE && max(y, na.rm=TRUE) > 5) {
                 if (verbose) {
                   warning("Warning: 'y_as_pct' flag may be set incorrectly.")
                   if (verbose == 2) {
@@ -352,6 +352,11 @@
     }
     
     if (!missing(y)) {
+        
+        if (InputUnsorted) {
+            y <- y[xOrder]
+        }
+        
         if (any(is.na(x) & (!is.na(y)))) {
             warning("Missing x-values with non-missing y-values encountered. Removed y-values correspoding to those x-values.")
             myx <- !is.na(x)
@@ -366,10 +371,10 @@
             y <- as.numeric(y[myy])
         }
         
-        if (InputUnsorted) {
-            y <- y[xOrder]
-        }
-        
+        myxy <- complete.cases(x,y)
+        x <- x[myxy]
+        y <- y[myxy]
+                     
         if (trunc) {
             y = pmin(as.numeric(y), ifelse(y_to_frac,100,1))
             y = pmax(as.numeric(y), 0)
@@ -399,7 +404,7 @@
             y <- y/100
         }
         
-        if (length(unique(x)) < 3) {
+         if (length(unique(x)) < 3) {
             stop("Less than 3 unique dose points left after cleaning data, please pass in enough valid measurements.")
             
         }
