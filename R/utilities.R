@@ -369,7 +369,7 @@
         }
         
         if (trunc) {
-            y = pmin(as.numeric(y), 1)
+            y = pmin(as.numeric(y), ifelse(y_to_frac,100,1))
             y = pmax(as.numeric(y), 0)
         }
         
