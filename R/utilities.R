@@ -347,6 +347,8 @@
         warning("x-values passed in unsorted. Sorting x-values and corresponding y-values (if passed in).")
         xOrder <- order(x)
         x <- x[xOrder]
+    } else {
+        InputUnsorted <- FALSE 
     }
     
     if (!missing(y)) {
