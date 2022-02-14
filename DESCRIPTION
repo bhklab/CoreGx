@@ -74,6 +74,7 @@ Collate:
     'DataMapper-class.R'
     'LongTable-accessors.R'
     'LongTable-utils.R'
+    'LongTableDataMapper-accessors.R'
     'LongTableDataMapper-class.R'
     'TreatmentResponseExperiment-class.R'
     'TREDataMapper-class.R'

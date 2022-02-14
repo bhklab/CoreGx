@@ -48,22 +48,10 @@ setOldClass('long.table', S4Class='LongTable')
 #'
 #' @rdname LongTable
 #'
-#' @description Builds a `LongTable` object from rectangular objects. The
-#' `rowData` argument should contain row level metadata, while the `colData`
-#' argument should contain column level metadata, for the experimental assays
-#' in the `assays` list. The `rowIDs` and `colIDs` lists are used to configure
-#' the internal keys mapping rows or columns to rows in the assays. Each list
-#' should contain at minimum one character vector, specifying which columns
-#' in `rowData` or `colData` are required to uniquely identify each row. An
-#' optional second character vector can be included, specifying any metadata
-#' columns for either dimension. These should contain information about each
-#' row but NOT be required to uniquely identify a row in the `colData` or
-#' `rowData` objects. Additional metadata can be attached to a `LongTable` by
-#' passing a list to the metadata argument.
 #'
-#' @param rowData `data.table`, `data.frame`, `matrix` A table like object
-#'   coercible to a `data.table` containing the a unique `rowID` column which
-#'   is used to key assays, as well as additional row metadata to subset on.
+#' @param rowData `data.frame` A table like object coercible to a `data.table`
+#'   containing the unique `rowID` column which is used to key assays, as well
+#'   as additional row metadata to subset on.
 #' @param rowIDs `character`, `integer` A vector specifying
 #'   the names or integer indexes of the row data identifier columns. These
 #'   columns will be pasted together to make up the rownames of the
@@ -90,30 +78,16 @@ setOldClass('long.table', S4Class='LongTable')
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
-#' @import data.table
+#' @importFrom data.table key setkeyv
 #' @export
-LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
+LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayMap,
         metadata=list(), keep.rownames=FALSE) {
 
     # handle missing parameters
-    isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
-        colData=missing(colData), assays=missing(assays))
+    isMissing <- !(ls() %in% names(match.call())[-1])
 
-    # allow creation of empty LongTable
-    ## FIXME:: Can I use null values here and not break the checks?
-    ## FIXME:: Why not just early return
-    if (all(isMissing)) {
-        rowData <- data.table(row="1")
-        rowIDs <- "row"
-        colData <- data.table(col="1")
-        colIDs <- "col"
-        assays <- list(measurement=data.table(row="1", col="1",
-            metric=0.123))
-        isMissing <- FALSE
-    } else if (any(isMissing)) {
-        stop(.errorMsg('\nRequired parameter(s) missing: ',
-            names(isMissing)[isMissing], collapse='\n\t'))
-    }
+    if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
+        names(isMissing)[isMissing], collapse='\n\t'))
 
     # check parameter types and coerce or error
     if (!is(colData, "data.table"))
@@ -156,7 +130,10 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     # initialize the internals object to store private metadata for a LongTable
     internals <- new.env()
 
-    # capture row interal metadata
+    ## FIXME:: Move all validity checks to top of the function to prevent wasted
+    ## computatation or into class validity method
+
+    # capture row internal metadata
     if (is.numeric(rowIDs) || is.logical(rowIDs))
         rowIDs <- colnames(rowData)[rowIDs]
     if (!all(rowIDs %in% colnames(rowData)))
@@ -178,35 +155,56 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
     internals$colMeta <- setdiff(colnames(colData[, -'colKey']), colIDs)
     lockBinding('colMeta', internals)
 
+    # -- capture assays internal metadata
+    # ensure names of assays and assayIDs match
+    hasMatchingAssayNames <- names(assays) == names(assayIDs)
+    if (!all(hasMatchingAssayNames)) stop(.errorMsg(
+        "Mismatched names between assays and assayIDs for:\n\t",
+        paste0(names(assays)[!hasMatchingAssayNames], collapse=", ")),
+        call.=FALSE)
+    # set keys
+    for (i in seq_along(assays)) {
+        setkeyv(assays[[i]], assayIDs[[i]][[1]])
+        assays[[i]][, assayKey := .I]
+    }
+
+    #
+    assayIndex <- lapply(assays, FUN=merge, y=rowData)
+    assayIndex <- lapply(assayIndex, FUN=merge, y=colData, by=colIDs)
+    assayIndex <- lapply(assayIndex, FUN=subset, select=c("rowKey", "colKey", "assayKey"))
+
+
+
     # Reorder columns to match the keys, this prevents issues in unit tests
     # caused by different column orders
     setcolorder(rowData, unlist(mget(c('rowIDs', 'rowMeta'), internals)))
     setcolorder(colData, unlist(mget(c('colIDs', 'colMeta'), internals)))
+    for (i in seq_along(assays)) setcolorder(assays[[i]],
+        unlist(mget("assayMap")[[i]])
+    )
 
     ## Assemble  the pseudo row and column names for the LongTable
     ### TODO:: Is this the slow part of the constructor?
+    ## TODO:: Is it better to sort these so they don't depend on the order of
+    ##  the rowIDs and colIDs column?
     .pasteColons <- function(...) paste(..., collapse=':')
     rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))),
         .SDcols=internals$rowIDs]
     colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
         .SDcols=internals$colIDs]
 
-    # Conditionally key the assay tables
-    for (i in seq_along(assays)) {
-        if (!("rowKey" %in% colnames(assays[[i]]))) {
-            assays[[i]] <- merge.data.table(assays[[i]],
-                rowData[, c("rowKey", rowIDs), with=FALSE],
-                by=rowIDs)[, .SD, .SDcols=!rowIDs]
-        }
-        if (!("colKey" %in% colnames(assays[[i]]))) {
-            assays[[i]] <- merge.data.table(assays[[i]],
-                colData[, c("colKey", colIDs), with=FALSE],
-                by=colIDs)[, .SD, .SDcols=!colIDs]
-        }
-    }
-
     return(.LongTable(rowData=rowData, colData=colData, assays=assays,
         metadata=metadata, .intern=internals))
+}
+
+# NOT RUN: testing code for construtor method
+if (sys.nframe() == 0) {
+    rowData <- rowData(dataMapperLT)
+    rowIDs <- rowDataMap(dataMapperLT)
+    colData <- colData(dataMapperLT)
+    colIDs <- colDataMap(dataMapperLT)
+    assays <- assays(dataMapperLT)
+    assayIDs <- assayMap(dataMapperLT)
 }
 
 # ---- Class unions for CoreSet slots

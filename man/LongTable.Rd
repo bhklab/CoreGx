@@ -10,6 +10,7 @@ LongTable(
   colData,
   colIDs,
   assays,
+  assayIDs,
   metadata = list(),
   keep.rownames = FALSE
 )
@@ -37,6 +38,8 @@ columns will be pasted together to make up the colnames of the
 \code{data.table}, and keyed by rowIDs and colIDs corresponding to the rowID and
 colID columns in colData and rowData.}
 
+\item{assayIDs}{A \code{character} vector of}
+
 \item{metadata}{A \code{list} of metadata associated with the \code{LongTable}
 object being constructed}
 
@@ -45,8 +48,6 @@ Logical: whether rownames should be added as a column if coercing to a
 \code{data.table}, default is FALSE. If TRUE, rownames are added to the column
 'rn'.
 Character: specify a custom column name to store the rownames in.}
-
-\item{assayIDs}{A \code{character} vector of}
 }
 \value{
 A \code{LongTable} object containing the data for a treatment response
