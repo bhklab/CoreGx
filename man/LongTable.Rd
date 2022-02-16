@@ -10,60 +10,15 @@ LongTable(
   colData,
   colIDs,
   assays,
-  assayIDs,
+  assayMap,
   metadata = list(),
   keep.rownames = FALSE
 )
-}
-\arguments{
-\item{rowData}{\code{data.table}, \code{data.frame}, \code{matrix} A table like object
-coercible to a \code{data.table} containing the a unique \code{rowID} column which
-is used to key assays, as well as additional row metadata to subset on.}
-
-\item{rowIDs}{\code{character}, \code{integer} A vector specifying
-the names or integer indexes of the row data identifier columns. These
-columns will be pasted together to make up the rownames of the
-\code{LongTable} object.}
-
-\item{colData}{\code{data.table}, \code{data.frame}, \code{matrix} A table like object
-coercible to a \code{data.table} containing the a unique \code{colID} column which
-is used to key assays, as well as additional column metadata to subset on.}
-
-\item{colIDs}{\code{character}, \code{integer} A vector specifying
-the names or integer indexes of the column data identifier columns. These
-columns will be pasted together to make up the colnames of the
-\code{LongTable} object.}
-
-\item{assays}{A \code{list} containing one or more objects coercible to a
-\code{data.table}, and keyed by rowIDs and colIDs corresponding to the rowID and
-colID columns in colData and rowData.}
-
-\item{assayIDs}{A \code{character} vector of}
-
-\item{metadata}{A \code{list} of metadata associated with the \code{LongTable}
-object being constructed}
-
-\item{keep.rownames}{\code{logical}, \code{character}
-Logical: whether rownames should be added as a column if coercing to a
-\code{data.table}, default is FALSE. If TRUE, rownames are added to the column
-'rn'.
-Character: specify a custom column name to store the rownames in.}
 }
 \value{
 A \code{LongTable} object containing the data for a treatment response
 experiment and configured according to the rowIDs and colIDs arguments.
 }
 \description{
-Builds a \code{LongTable} object from rectangular objects. The
-\code{rowData} argument should contain row level metadata, while the \code{colData}
-argument should contain column level metadata, for the experimental assays
-in the \code{assays} list. The \code{rowIDs} and \code{colIDs} lists are used to configure
-the internal keys mapping rows or columns to rows in the assays. Each list
-should contain at minimum one character vector, specifying which columns
-in \code{rowData} or \code{colData} are required to uniquely identify each row. An
-optional second character vector can be included, specifying any metadata
-columns for either dimension. These should contain information about each
-row but NOT be required to uniquely identify a row in the \code{colData} or
-\code{rowData} objects. Additional metadata can be attached to a \code{LongTable} by
-passing a list to the metadata argument.
+LongTable constructor method
 }

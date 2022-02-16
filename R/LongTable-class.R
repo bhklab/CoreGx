@@ -49,32 +49,6 @@ setOldClass('long.table', S4Class='LongTable')
 #' @rdname LongTable
 #'
 #'
-#' @param rowData `data.frame` A table like object coercible to a `data.table`
-#'   containing the unique `rowID` column which is used to key assays, as well
-#'   as additional row metadata to subset on.
-#' @param rowIDs `character`, `integer` A vector specifying
-#'   the names or integer indexes of the row data identifier columns. These
-#'   columns will be pasted together to make up the rownames of the
-#'   `LongTable` object.
-#' @param colData `data.table`, `data.frame`, `matrix` A table like object
-#'   coercible to a `data.table` containing the a unique `colID` column which
-#'   is used to key assays, as well as additional column metadata to subset on.
-#' @param colIDs `character`, `integer` A vector specifying
-#'   the names or integer indexes of the column data identifier columns. These
-#'   columns will be pasted together to make up the colnames of the
-#'   `LongTable` object.
-#' @param assays A `list` containing one or more objects coercible to a
-#'   `data.table`, and keyed by rowIDs and colIDs corresponding to the rowID and
-#'   colID columns in colData and rowData.
-#' @param assayIDs A `character` vector of
-#' @param metadata A `list` of metadata associated with the `LongTable`
-#'   object being constructed
-#' @param keep.rownames `logical`, `character`
-#'   Logical: whether rownames should be added as a column if coercing to a
-#'   `data.table`, default is FALSE. If TRUE, rownames are added to the column
-#'   'rn'.
-#'   Character: specify a custom column name to store the rownames in.
-#'
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
@@ -123,15 +97,15 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayMap,
     # Currently skipping if row and col key already exist to prevent failed
     #   join when calling this function from subset,LongTable-method
     if (!('rowKey' %in% colnames(rowData)))
-        rowData[, c('rowKey') := .GRP, by=rowIDs]
+        rowData[, c('rowKey') := .GRP, by=c(rowIDs)]
     if (!('colKey' %in% colnames(colData)))
-        colData[, c('colKey') := .GRP, by=colIDs]
+        colData[, c('colKey') := .GRP, by=c(colIDs)]
 
     # initialize the internals object to store private metadata for a LongTable
     internals <- new.env()
 
     ## FIXME:: Move all validity checks to top of the function to prevent wasted
-    ## computatation or into class validity method
+    ## computation or into class validity method
 
     # capture row internal metadata
     if (is.numeric(rowIDs) || is.logical(rowIDs))
@@ -165,23 +139,26 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayMap,
     # set keys
     for (i in seq_along(assays)) {
         setkeyv(assays[[i]], assayIDs[[i]][[1]])
-        assays[[i]][, assayKey := .I]
+        assays[[i]][, (names(assays)[i]) := .I]
     }
 
     #
+    internals$assayKeys <- lapply(assayIDs, `[[`, i=1)
+    lockBinding("assayKeys", internals)
+    #
     assayIndex <- lapply(assays, FUN=merge, y=rowData)
     assayIndex <- lapply(assayIndex, FUN=merge, y=colData, by=colIDs)
-    assayIndex <- lapply(assayIndex, FUN=subset, select=c("rowKey", "colKey", "assayKey"))
-
-
+    keepCols <- lapply(names(assays), FUN=c, c("rowKey", "colKey"))
+    assayIndex <- Map(subset, x=assayIndex, select=keepCols)
+    assayIndexDf <- Reduce(f=\(x, y) merge(x, y, by=c("rowKey", "colKey")),
+        assayIndex)
+    internals$assayIndex <- assayIndexDf
+    lockBinding("assayIndex", internals)
 
     # Reorder columns to match the keys, this prevents issues in unit tests
     # caused by different column orders
     setcolorder(rowData, unlist(mget(c('rowIDs', 'rowMeta'), internals)))
     setcolorder(colData, unlist(mget(c('colIDs', 'colMeta'), internals)))
-    for (i in seq_along(assays)) setcolorder(assays[[i]],
-        unlist(mget("assayMap")[[i]])
-    )
 
     ## Assemble  the pseudo row and column names for the LongTable
     ### TODO:: Is this the slow part of the constructor?
@@ -193,16 +170,16 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayMap,
     colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
         .SDcols=internals$colIDs]
 
-    return(.LongTable(rowData=rowData, colData=colData, assays=assays,
+    return(CoreGx:::.LongTable(rowData=rowData, colData=colData, assays=assays,
         metadata=metadata, .intern=internals))
 }
 
 # NOT RUN: testing code for construtor method
 if (sys.nframe() == 0) {
     rowData <- rowData(dataMapperLT)
-    rowIDs <- rowDataMap(dataMapperLT)
+    rowIDs <- rowDataMap(dataMapperLT)[[1]]
     colData <- colData(dataMapperLT)
-    colIDs <- colDataMap(dataMapperLT)
+    colIDs <- colDataMap(dataMapperLT)[[1]]
     assays <- assays(dataMapperLT)
     assayIDs <- assayMap(dataMapperLT)
 }

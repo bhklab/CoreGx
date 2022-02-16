@@ -480,7 +480,8 @@ setMethod("assay", signature(x="LongTableDataMapper"),
 #' @keywords internal
 setMethod("assays", signature(x="LongTableDataMapper"),
         function(x, withDimnames=TRUE) {
-    lapply(names(assayMap(x)), FUN=assay, x=x)
+    lapply(names(assayMap(x)), FUN=assay, x=x) |>
+        setNames(names(assayMap(x)))
 })
 
 # -- metadataMap
