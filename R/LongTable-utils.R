@@ -5,7 +5,7 @@ NULL
 #### CoreGx dynamic documentation
 ####
 #### Warning: for dynamic docs to work, you must set
-#### Roxygen: list(markdown = TRUE, r6=FALSE)
+#### Roxygen: list(markdown=TRUE, r6=FALSE)
 #### in the DESCRPTION file!
 
 
@@ -23,6 +23,68 @@ NULL
 
 ##
 ## == subset
+
+
+#' Subset a `LongTable` object
+#'
+#' @param x `LongTable`
+#' @param i A valid query to the `i` parameter of the metadata `data.table` for
+#'   the selected dimension.
+#' @param dim `character(1)` Either "row" or "col", depending if you want to
+#'   subset by the first or second table-like dimension of a `x`.
+#' @param ... Fallthrough arguments to the `<dim>Data` function.
+#'
+#' @return `data.table` The dimData, subset with i.
+#'
+.subsetDimData <- function(x, i, dim=c("row", "col"), ...) {
+    if (!is(x, "LongTable")) stop(.errorMsg("x must be a LongTable object!"))
+    dim <- match.arg(dim)
+    FUN <- paste0(dim, "Data")
+    # Using getNamespace to avoid collision with .GlobalEnv variables
+    dimFun <- get(FUN, getNamespace("CoreGx"))
+    if (!is.function(dimFun)) stop(.errorMsg("Can't find dimension accessor",
+        FUN, "in CoreGx!"))
+    isub <- if (!is.call(i)) substitute(i) else i  # prevent double substitute
+    dimFun(x, ...)[eval(isub), ]
+}
+
+
+#'
+#'
+#'
+#'
+#'
+.subsetByDimData <- function(x, i, dim=c("row", "col"), reindex=TRUE) {
+    dim <- match.arg(dim)
+    dimData <- .subsetDimData(x, i, dim, key=TRUE)
+    keyCol <- paste0(dim, "Key")
+    keepKeys <- dimData[[keyCol]]
+
+    # subset the assay index
+    assayIndex <- getIntern(x, "assayIndex")
+
+    # if this confuses you see Programming on data.table vignette:
+    # https://rdatatable.gitlab.io/data.table/articles/datatable-programming.html
+    newIndex <- assayIndex[col %in% value, ,
+        env=list(col=keyCol, value=keepKeys)
+    ]
+
+    # subset the assays
+
+
+    # update the assay index
+    if (reindex) {
+
+    }
+    unlockBinding("assayIndex", getItern(x))
+    getItern(x)$assayIndex <- newIndex
+    lockBinding("assayIndex", getIntern(x))
+
+    return()
+}
+
+
+
 
 
 #' Subset method for a LongTable object.
@@ -342,7 +404,7 @@ setMethod('[', signature('LongTable'),
 #' @importFrom crayon cyan magenta
 #' @import data.table
 #' @export
-setMethod('[[', signature('LongTable'), function(x, i, withDimnames=TRUE, 
+setMethod('[[', signature('LongTable'), function(x, i, withDimnames=TRUE,
         metadata=withDimnames, keys=!withDimnames) {
     funContext <- .S4MethodContext('[[', class(x))
 
@@ -410,7 +472,7 @@ setMethod('$', signature('LongTable'), function(x, name) {
     x[[name]]
 })
 
-#' Update an assay from a LongTable object 
+#' Update an assay from a LongTable object
 #'
 #' @examples
 #' merckLongTable$sensitivity <- merckLongTable$sensitivity
@@ -473,7 +535,7 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     newAssayData <- lapply(newAssayData, setkeyv, cols=c('rowKey', 'colKey'))
 
     return(LongTable(rowData=newRowData, rowIDs=getIntern(object, 'rowIDs'),
-        colData=newColData, colIDs=getIntern(object, 'colIDs'), 
+        colData=newColData, colIDs=getIntern(object, 'colIDs'),
         assays=newAssayData, metadata=metadata(object)))
 })
 

@@ -81,7 +81,7 @@ NULL
 #'     function.
 #'
 #' @return value of x if length(x) == 1 else named list of values for all
-#'     symbols in x
+#'     symbols in x.
 #'
 #' @include LongTable-class.R
 #' @export
@@ -98,7 +98,7 @@ setMethod('getIntern', signature(object='LongTable', x='character'),
                 message(e); get(x, envir=object@.intern) })
 })
 #' @describeIn LongTable Access all structural metadata present within a
-#'   LongTable object. This is mostly for developmer use.
+#'   LongTable object. This is primarily for developmer use.
 #'
 #' @param object `LongTable`
 #' @param x `missing` This argument is excluded from from the function call.
@@ -235,7 +235,7 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
 #'   object.
 #'
 #' @param x A `LongTable` to retrieve column metadata from.
-#' @param key `logical` She the colKey column also be returned? Defaults to
+#' @param key `logical` Should the colKey column also be returned? Defaults to
 #'     FALSE.
 #'
 #' @return A `data.table` containing row identifiers and metadata.
@@ -323,7 +323,7 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 #'
 #' @param x `LongTable` What to extract the assay data from.
 #' @param withDimnames `logical` Should the returned assays be joined to
-#'   the row and column identifiers (i.e., the pseudo dimnames of the object).
+#'   the row and column identifiers (i.e., the pseudo-dimnames of the object).
 #' @param metadata `logical` Should row and column metadata also be joined
 #'   to the returned assays. This is useful for modifying assays before
 #'   reconstructing a new LongTable.
@@ -421,16 +421,21 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
             'assays.')
 
     keepAssay <- if (is.character(i)) which(assayNames(x) == i) else i
+    assayName <- assayNames(x)[keepAssay]
     if (length(keepAssay) < 1)
         stop(.errorMsg('\n[CoreGx::assay] There is no assay ', i,
             ' in this LongTable. Use assayNames(longTable) for a list',
             'of valid assay names.'))
 
     # extract the specified assay
-    time <- Sys.time()
     assayData <- x@assays[[keepAssay]]
 
     # optionally join to rowData and colData
+    assayIndex <- getIntern(x, "assayIndex")[,
+        c("rowKey", "colKey", assayName),
+        with=FALSE
+    ]
+    assayData <- merge.data.table(assayData, assayIndex, by=assayName)
     if (withDimnames && !metadata) {
         assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, on='rowKey']
         assayData <- colIDs(x, data=TRUE, key=TRUE)[assayData, on='colKey']
@@ -438,8 +443,6 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         assayData <- rowData(x, key=TRUE)[assayData, on='rowKey']
         assayData <- colData(x, key=TRUE)[assayData, on='colKey']
     }
-    time1 <- Sys.time()
-    time1 - time
 
     # drop any duplicated columns to prevent issues in the setter methods,
     # actually drops any columns prefixed with i.

@@ -156,7 +156,7 @@ each assay if i is missing, otherwise a \code{character} vector of value column
 names for the selected assay.
 
 value of x if length(x) == 1 else named list of values for all
-symbols in x
+symbols in x.
 
 A named \code{list} with all values in environment object@.intern coerced
 to a list (and therefore copied).
@@ -225,7 +225,7 @@ uniquely identify each row.
 LongTable object. This is mostly for developmer use.
 
 \item \code{getIntern}: Access all structural metadata present within a
-LongTable object. This is mostly for developmer use.
+LongTable object. This is primarily for developmer use.
 
 \item \code{rowData}: Get the row level annotations for a \code{LongTable} object.
 

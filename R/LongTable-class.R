@@ -44,17 +44,37 @@
 #' @export
 setOldClass('long.table', S4Class='LongTable')
 
+
 #' @title LongTable constructor method
 #'
 #' @rdname LongTable
 #'
+#' @param rowData `data.frame` A rectangular object coercible to a `data.table`.
+#' @param rowIDs `character` A vector of `rowData` column names needed to
+#'   uniquely identify each row in a `LongTable`.
+#' @param colData `data.frame` A rectangular object coercible to a `data.table.`
+#' @param colIDs `chacter` A vector of `colData` column names needed to uniquely
+#'   identify each column in a `LongTable`.
+#' @param assays `list` A list of rectangular objects, each coercible to
+#'   a `data.table`. Must be named and item names must match the `assayIDs`
+#'   list.
+#' @param assayIDs `list` A list of `character` vectors specifying the columns
+#'   needed to uniquely identify each row in an `assay`. Names must match the
+#'   `assays` list.
+#' @param metadata `list` A list of one or more metadata items associated with
+#'   a LongTable experiment.
+#' @param keep.rownames `logical(1)` or `character(1)` Should rownames be
+#'   retained when coercing to `data.table` inside the constructor. Default
+#'   is FALSE. If TRUE, adds a `rn` column to each rectangular object that
+#'   gets coerced from `data.frame` to `data.table`. If a string, that becomes
+#'   the name of the rownames column.
 #'
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
 #' @importFrom data.table key setkeyv
 #' @export
-LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayMap,
+LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         metadata=list(), keep.rownames=FALSE) {
 
     # handle missing parameters
@@ -136,16 +156,16 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayMap,
         "Mismatched names between assays and assayIDs for:\n\t",
         paste0(names(assays)[!hasMatchingAssayNames], collapse=", ")),
         call.=FALSE)
-    # set keys
+    # set keys for join with metadata
     for (i in seq_along(assays)) {
-        setkeyv(assays[[i]], assayIDs[[i]][[1]])
+        setkeyv(assays[[i]], assayIDs[[i]])
         assays[[i]][, (names(assays)[i]) := .I]
     }
 
     #
     internals$assayKeys <- lapply(assayIDs, `[[`, i=1)
     lockBinding("assayKeys", internals)
-    #
+
     assayIndex <- lapply(assays, FUN=merge, y=rowData)
     assayIndex <- lapply(assayIndex, FUN=merge, y=colData, by=colIDs)
     keepCols <- lapply(names(assays), FUN=c, c("rowKey", "colKey"))
@@ -154,6 +174,12 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayMap,
         assayIndex)
     internals$assayIndex <- assayIndexDf
     lockBinding("assayIndex", internals)
+
+    # Drop extra assay columns and key by the assay key in the assay index
+    for (i in seq_along(assays)) {
+        assays[[i]][, (assayIDs[[i]]) := NULL]
+        setkeyv(assays[[i]], names(assays)[i])
+    }
 
     # Reorder columns to match the keys, this prevents issues in unit tests
     # caused by different column orders
@@ -181,7 +207,7 @@ if (sys.nframe() == 0) {
     colData <- colData(dataMapperLT)
     colIDs <- colDataMap(dataMapperLT)[[1]]
     assays <- assays(dataMapperLT)
-    assayIDs <- assayMap(dataMapperLT)
+    assayIDs <- lapply(assayMap(dataMapperLT), `[[`, i=1)
 }
 
 # ---- Class unions for CoreSet slots
