@@ -78,10 +78,10 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         metadata=list(), keep.rownames=FALSE) {
 
     # handle missing parameters
-    isMissing <- !(ls() %in% names(match.call())[-1])
+    # isMissing <- !(ls() %in% names(match.call())[-1])
 
-    if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
-        names(isMissing)[isMissing], collapse='\n\t'))
+    # if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
+    #     names(isMissing)[isMissing], collapse='\n\t'))
 
     # check parameter types and coerce or error
     if (!is(colData, "data.table"))
@@ -114,8 +114,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         })
 
     # Create the row and column keys for LongTable internal mappings
-    # Currently skipping if row and col key already exist to prevent failed
-    #   join when calling this function from subset,LongTable-method
     if (!('rowKey' %in% colnames(rowData)))
         rowData[, c('rowKey') := .GRP, by=c(rowIDs)]
     if (!('colKey' %in% colnames(colData)))

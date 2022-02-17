@@ -25,13 +25,13 @@ NULL
 ## == subset
 
 
-#' Subset a `LongTable` object
+#' Subset the `rowData` or `colData` slots of a `LongTable` S4 object
 #'
 #' @param x `LongTable`
 #' @param i A valid query to the `i` parameter of the metadata `data.table` for
 #'   the selected dimension.
 #' @param dim `character(1)` Either "row" or "col", depending if you want to
-#'   subset by the first or second table-like dimension of a `x`.
+#'   subset by the first or second table-like dimension of `x`.
 #' @param ... Fallthrough arguments to the `<dim>Data` function.
 #'
 #' @return `data.table` The dimData, subset with i.
@@ -51,8 +51,14 @@ NULL
 
 #'
 #'
+#' @param x `LongTable`
+#' @param i A valid query to the `i` parameter of the metadata `data.table` for
+#'   the selected dimension.
+#' @param dim `character(1)` Either "row" or "col", depending if you want to
+#'   subset by the first or second table-like dimension of `x`.
+#' @param ... Fallthrough arguments to the `<dim>Data` function.
 #'
-#'
+#' @return `LongTable` with only the dimensions matching the `i` query.
 #'
 .subsetByDimData <- function(x, i, dim=c("row", "col"), reindex=TRUE) {
     dim <- match.arg(dim)
