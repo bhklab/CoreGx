@@ -45,17 +45,23 @@
 
 \S4method{getIntern}{LongTable,missing}(object, x)
 
-\S4method{rowData}{LongTable}(x, key = FALSE, use.names = FALSE)
+\S4method{rowData}{LongTable}(x, key = FALSE, use.names = FALSE, ...)
 
-\S4method{rowData}{LongTable}(x) <- value
+\S4method{rowData}{LongTable}(x, ...) <- value
 
-\S4method{colData}{LongTable}(x, key = FALSE)
+\S4method{colData}{LongTable}(x, key = FALSE, dimnames = FALSE, ...)
 
-\S4method{colData}{LongTable,ANY}(x) <- value
+\S4method{colData}{LongTable,ANY}(x, ...) <- value
 
-\S4method{assays}{LongTable}(x, withDimnames = TRUE, metadata = withDimnames, key = !withDimnames)
+\S4method{assays}{LongTable}(
+  x,
+  withDimnames = TRUE,
+  metadata = withDimnames,
+  key = !withDimnames,
+  ...
+)
 
-\S4method{assays}{LongTable,list}(x) <- value
+\S4method{assays}{LongTable,list}(x, withDimnames = TRUE, ...) <- value
 
 \S4method{assay}{LongTable,ANY}(x, i, withDimnames = FALSE, metadata = withDimnames, key = !withDimnames)
 
@@ -90,8 +96,9 @@ instead of the column names? Default is FALSE.}
 
 \item{x}{The \code{LongTable} object to retrieve the dimnames for.}
 
-\item{...}{\code{pairlist} Addtional arguments to get or mget inside of the
-function.}
+\item{...}{For developer use only! Pass raw=TRUE to modify the slot
+directly. This will corrupt your data if you don't know what you are
+doing!}
 
 \item{use.names}{\code{logical} This parameter is just here to stop matching
 the positional argument to use.names from the rowData generic. It

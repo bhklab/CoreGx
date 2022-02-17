@@ -1,3 +1,6 @@
+#' @include LongTableDataMapper-class.R
+NULL
+
 ## =====================================
 ## LongTableDataMapper Accessors Methods
 ## -------------------------------------

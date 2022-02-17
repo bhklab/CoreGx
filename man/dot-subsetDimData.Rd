@@ -2,7 +2,7 @@
 % Please edit documentation in R/LongTable-utils.R
 \name{.subsetDimData}
 \alias{.subsetDimData}
-\title{Subset a \code{LongTable} object}
+\title{Subset the \code{rowData} or \code{colData} slots of a \code{LongTable} S4 object}
 \usage{
 .subsetDimData(x, i, dim = c("row", "col"), ...)
 }
@@ -13,7 +13,7 @@
 the selected dimension.}
 
 \item{dim}{\code{character(1)} Either "row" or "col", depending if you want to
-subset by the first or second table-like dimension of a \code{x}.}
+subset by the first or second table-like dimension of \code{x}.}
 
 \item{...}{Fallthrough arguments to the \verb{<dim>Data} function.}
 }
@@ -21,5 +21,5 @@ subset by the first or second table-like dimension of a \code{x}.}
 \code{data.table} The dimData, subset with i.
 }
 \description{
-Subset a \code{LongTable} object
+Subset the \code{rowData} or \code{colData} slots of a \code{LongTable} S4 object
 }

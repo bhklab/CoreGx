@@ -134,18 +134,24 @@ setMethod('getIntern', signature(object='LongTable', x='missing'),
 #' @param use.names `logical` This parameter is just here to stop matching
 #'     the positional argument to use.names from the rowData generic. It
 #'     doesn't do anything at this time and can be ignored.
+#' @param ... For developer use only! Pass raw=TRUE to modify the slot
+#'   directly. This will corrupt your data if you don't know what you are
+#'   doing!
 #'
 #' @return A `data.table` containing rowID, row identifiers, and row metadata.
 #'
 #' @importFrom data.table data.table copy
 #' @export
 setMethod('rowData', signature(x='LongTable'),
-        function(x, key=FALSE, use.names=FALSE) {
-    return(
-        if (key) copy(x@rowData[, -'.rownames']) else
-        copy(x@rowData[, -c('.rownames', 'rowKey')])
-    )
+        function(x, key=FALSE, use.names=FALSE, ...) {
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        return(x@rowData)
+    } else {
+        return(if (key) copy(x@rowData[, -'.rownames']) else
+            copy(x@rowData[, -c('.rownames', 'rowKey')]))
+    }
 })
+
 
 #' Updates the `rowData` slot as long as the ID columns are not changed.
 #'
@@ -162,6 +168,9 @@ setMethod('rowData', signature(x='LongTable'),
 # '   the existing `rowData` in `x`.
 #' @param value A `data.table` or `data.frame` to update the `rowData` of
 #'   `x` with.
+#' @param ... For developer use only! Pass raw=TRUE to modify the slot
+#'   directly. This will corrupt your data if you don't know what you are
+#'   doing!
 #'
 #' @return A copy of the `LongTable` object with the `rowData`
 #'   slot updated.
@@ -171,7 +180,12 @@ setMethod('rowData', signature(x='LongTable'),
 #' @importFrom SummarizedExperiment `rowData<-`
 #' @importFrom data.table setDT
 #' @export
-setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
+setReplaceMethod('rowData', signature(x='LongTable'), function(x, ..., value) {
+
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        x@rowData <- value
+        return(x)
+    }
 
     # type check input
     if (is(value, 'data.frame')) setDT(value)
@@ -222,7 +236,6 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
 ## ------------------
 
 
-
 #' Retrieve the column metadata table from a LongTable object
 #'
 #' @examples
@@ -237,12 +250,18 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
 #' @param x A `LongTable` to retrieve column metadata from.
 #' @param key `logical` Should the colKey column also be returned? Defaults to
 #'     FALSE.
+#' @param ... For developer use only! Pass raw=TRUE to return the slot for
+#'   modification by reference.
 #'
 #' @return A `data.table` containing row identifiers and metadata.
 #'
 #' @import data.table
 #' @export
-setMethod('colData', signature(x='LongTable'), function(x, key=FALSE) {
+setMethod('colData', signature(x='LongTable'),
+        function(x, key=FALSE, dimnames=FALSE, ...) {
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        return(x@colData)
+    }
     return(if (key) copy(x@colData[, -'.colnames']) else
         copy(x@colData[, -c('.colnames', 'colKey')]))
 })
@@ -259,6 +278,9 @@ setMethod('colData', signature(x='LongTable'), function(x, key=FALSE) {
 #' @param value A `data.table` or `data.frame` to update with. Must have
 #'   all of the colIDs currently in the `LongTable` object in order to ensure
 #'   assay key mappings are consistent.
+#' @param ... For developer use only! Pass raw=TRUE to modify the slot
+#'   directly. This will corrupt your data if you don't know what you are
+#'   doing!
 #'
 #' @return A copy of the `LongTable` object with the `colData`
 #'   slot updated.
@@ -267,7 +289,13 @@ setMethod('colData', signature(x='LongTable'), function(x, key=FALSE) {
 #' @importFrom SummarizedExperiment colData<-
 #' @importFrom data.table data.table setDT
 #' @export
-setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
+setReplaceMethod('colData', signature(x='LongTable'),
+        function(x, ..., value) {
+
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        x@colData <- value
+        return(x)
+    }
 
     # type check input
     if (is(value, 'data.frame')) setDT(value)
@@ -329,6 +357,8 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 #'   reconstructing a new LongTable.
 #' @param key `logical` Should the key columns also be returned? Defaults
 #'   to !`withDimnames`.
+#' @param ... For developer use only! Pass raw=TRUE to return the slot for
+#'   modification by reference.
 #'
 #' @return A `list` of `data.table` objects, one per assay in the object.
 #'
@@ -337,7 +367,10 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 #' @export
 setMethod('assays', signature(x='LongTable'),
         function(x, withDimnames=TRUE, metadata=withDimnames,
-            key=!withDimnames) {
+            key=!withDimnames, ...) {
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        return(x@assays)
+    }
     return(structure(
         lapply(assayNames(x), FUN=assay, x=x, withDimnames=withDimnames,
             metadata=metadata, key=key),
@@ -359,6 +392,9 @@ setMethod('assays', signature(x='LongTable'),
 #' @param x A `LongTable` to modify the assays in.
 #' @param value A `list` of `data.frame` or `data.table` objects, all of which
 #'   contain the row and column identifiers and metadata.
+#' @param ... For developer use only! Pass raw=TRUE to modify the slot
+#'   directly. This will corrupt your data if you don't know what you are
+#'   doing!
 #'
 #' @return A copy of the `LongTable` with the assays modified.
 #'
@@ -366,10 +402,14 @@ setMethod('assays', signature(x='LongTable'),
 #' @import data.table
 #' @export
 setReplaceMethod('assays', signature(x='LongTable', value='list'),
-        function(x, value) {
-    assay_names <- names(value)
-    for (name in assay_names) {
-        x[[name]] <- value[[name]]
+        function(x, ..., value) {
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        x@assays <- value
+    } else {
+        assay_names <- names(value)
+        for (name in assay_names) {
+            x[[name]] <- value[[name]]
+        }
     }
     return(x)
 })

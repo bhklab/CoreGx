@@ -78,7 +78,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         metadata=list(), keep.rownames=FALSE) {
 
     # handle missing parameters
-    # isMissing <- !(ls() %in% names(match.call())[-1])
+    # isMissing <- do.call(missing, as.symbol(ls()))
 
     # if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
     #     names(isMissing)[isMissing], collapse='\n\t'))
@@ -206,6 +206,10 @@ if (sys.nframe() == 0) {
     colIDs <- colDataMap(dataMapperLT)[[1]]
     assays <- assays(dataMapperLT)
     assayIDs <- lapply(assayMap(dataMapperLT), `[[`, i=1)
+
+    system.time(
+        lt <- LongTable(rowData, rowIDs, colData, colIDs, assays, assayIDs)
+    )
 }
 
 # ---- Class unions for CoreSet slots

@@ -1,4 +1,5 @@
 #' @include LongTable-class.R LongTable-accessors.R
+#' @importFrom checkmate assertClass assertDataFrame
 NULL
 
 
@@ -37,7 +38,7 @@ NULL
 #' @return `data.table` The dimData, subset with i.
 #'
 .subsetDimData <- function(x, i, dim=c("row", "col"), ...) {
-    if (!is(x, "LongTable")) stop(.errorMsg("x must be a LongTable object!"))
+    assertClass(x, "LongTable")
     dim <- match.arg(dim)
     FUN <- paste0(dim, "Data")
     # Using getNamespace to avoid collision with .GlobalEnv variables
@@ -89,8 +90,62 @@ NULL
     return()
 }
 
-
-
+#' Subset a `LongTable` using an "assayIndex" data.frame
+#'
+#' @param x `LongTable`
+#' @param index `data.frame` Table with columns "rowKey", "colKey" and
+#'   ".<assayName>", were <assayName> is the value for each `assayNames(x)`.
+#'   Warning: rownames are dropped internally in coercion to `data.table`,
+#' @param reindex `logical(1)` Should index values be reset such that they
+#'   are the smallest possible set of consecutive integers. Modifies the
+#'   "rowKey", "colKey", and all assayKey columns.
+#'
+#' @return `LongTable` subset according to the provide index.
+#'
+.subsetByIndex <- function(x, index, reindex=FALSE) {
+    assertClass(x, "LongTable")
+    assertDataFrame(index)
+    if (!is.data.table(index)) setDT(index)
+    rData <- rowData(x, key=TRUE)[rowKey %in% index$rowKey, ]
+    cData <- colData(x, key=TRUE)[colKey %in% index$colKey, ]
+    assays <- Map(
+        f=\(col, dt, value) dt[col %in% value, , env=list(col=col, value=value)],
+        col=assayNames(x),
+        dt=assays(x, withDimnames=FALSE),
+        value=index[, assayNames(x), with=FALSE]
+    )
+    metaKeys <- c("rowKey", "colKey")
+    if (reindex) {
+        # update assay keys first
+        for (i in seq_along(assays)) {
+            aKey <- names(assays)[i]
+            setkeyv(assays[[i]], metaKeys)
+            assays[[i]][, (aKey) := .I]
+            setkeyv(index, c("rowKey", "colKey"))
+            index[assays[[i]],
+                col := value,
+                env=list(col=aKey, value=paste0("i.", aKey))
+            ]
+        }
+        # update rowKey and colKey
+        rData[, .rowKey := .I]
+        cData[, .colKey := .I]
+        index[rData, rowKey := .rowKey]
+        setkeyv(index, "colKey")
+        index[cData, colKey := .colKey]
+        rData[, `:=`(rowKey=.rowKey, .rowKey=NULL)]
+        cData[, `:=`(colKey=.colKey, .colKey=NULL)]
+    }
+    # delete row-/colKeys by reference
+    for (a in assays) a[, (metaKeys) := NULL]
+    x@rowData <- rData
+    x@colData <- cData
+    x@assays <- assays
+    unlockBinding("assayIndex", x@.intern)
+    getIntern(x)$assayIndex <- index
+    lockBinding("assayIndex", x@.intern)
+    return(x)
+}
 
 
 #' Subset method for a LongTable object.
