@@ -168,8 +168,10 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     assayIndex <- lapply(assayIndex, FUN=merge, y=colData, by=colIDs)
     keepCols <- lapply(names(assays), FUN=c, c("rowKey", "colKey"))
     assayIndex <- Map(subset, x=assayIndex, select=keepCols)
-    assayIndexDf <- Reduce(f=\(x, y) merge(x, y, by=c("rowKey", "colKey")),
+    assayIndexDf <- Reduce(
+        f=\(x, y) merge.data.table(x, y, by=c("rowKey", "colKey")),
         assayIndex)
+    setkeyv(assayIndexDf, c("rowKey", "colKey"))
     internals$assayIndex <- assayIndexDf
     lockBinding("assayIndex", internals)
 

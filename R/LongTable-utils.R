@@ -77,17 +77,9 @@ NULL
     ]
 
     # subset the assays
+    x <- .subsetByIndex(x, newIndex, reindex=reindex)
 
-
-    # update the assay index
-    if (reindex) {
-
-    }
-    unlockBinding("assayIndex", getItern(x))
-    getItern(x)$assayIndex <- newIndex
-    lockBinding("assayIndex", getIntern(x))
-
-    return()
+    return(x)
 }
 
 #' Subset a `LongTable` using an "assayIndex" data.frame
@@ -100,21 +92,24 @@ NULL
 #'   are the smallest possible set of consecutive integers. Modifies the
 #'   "rowKey", "colKey", and all assayKey columns.
 #'
-#' @return `LongTable` subset according to the provide index.
+#' @return `LongTable` subset according to the provided index.
 #'
 .subsetByIndex <- function(x, index, reindex=FALSE) {
     assertClass(x, "LongTable")
     assertDataFrame(index)
     if (!is.data.table(index)) setDT(index)
-    rData <- rowData(x, key=TRUE)[rowKey %in% index$rowKey, ]
-    cData <- colData(x, key=TRUE)[colKey %in% index$colKey, ]
-    assays <- Map(
-        f=\(col, dt, value) dt[col %in% value, , env=list(col=col, value=value)],
-        col=assayNames(x),
-        dt=assays(x, withDimnames=FALSE),
-        value=index[, assayNames(x), with=FALSE]
-    )
+    x <- copy(x)
+    rData <- rowData(x, raw=TRUE)[rowKey %in% index$rowKey, ]
+    setkeyv(rData, "rowKey")
+    cData <- colData(x, raw=TRUE)[colKey %in% index$colKey, ]
+    setkeyv(cData, "colKey")
+    assays <- assays(x, withDimnames=FALSE)
     metaKeys <- c("rowKey", "colKey")
+    for (i in seq_along(assays)) {
+        # join based subsets use binary-search, O(log(n)) vs O(n) for vector-scan
+        # see https://rdatatable.gitlab.io/data.table/articles/datatable-keys-fast-subset.html
+        assays[[i]] <- assays[[i]][index[, metaKeys, with=FALSE], ]
+    }
     if (reindex) {
         # update assay keys first
         for (i in seq_along(assays)) {
@@ -126,27 +121,76 @@ NULL
                 col := value,
                 env=list(col=aKey, value=paste0("i.", aKey))
             ]
+            setkeyv(assays[[i]], names(assays)[i])
         }
         # update rowKey and colKey
         rData[, .rowKey := .I]
         cData[, .colKey := .I]
+        setkeyv(rData, "rowKey")
         index[rData, rowKey := .rowKey]
         setkeyv(index, "colKey")
+        setkeyv(cData, "colKey")
         index[cData, colKey := .colKey]
         rData[, `:=`(rowKey=.rowKey, .rowKey=NULL)]
         cData[, `:=`(colKey=.colKey, .colKey=NULL)]
     }
     # delete row-/colKeys by reference
     for (a in assays) a[, (metaKeys) := NULL]
-    x@rowData <- rData
-    x@colData <- cData
-    x@assays <- assays
-    unlockBinding("assayIndex", x@.intern)
-    getIntern(x)$assayIndex <- index
-    lockBinding("assayIndex", x@.intern)
+    # raw=TRUE allows direct modification of slots
+    rowData(x, raw=TRUE) <- rData
+    colData(x, raw=TRUE) <- cData
+    assays(x, raw=TRUE) <- assays
+    unlockBinding("assayIndex", getIntern(x))
+    assign("assayIndex", index, envir=getIntern(x))
+    lockBinding("assayIndex", getIntern(x))
     return(x)
 }
 
+#'
+#'
+#'
+#'
+#'
+.subsetByRowData <- function(x, keys, reindex=FALSE) {
+    assertClass(x, "LongTable")
+    assertIntegerish(keys)
+    x <- copy(x)
+    rData <- rowData(x, raw=TRUE)[rowKey %in% index$rowKey, ]
+    assays <- assays(x, withDimnames=FALSE)
+    metaKeys <- c("rowKey", "colKey")
+    for (i in seq_along(assays)) {
+        setkeyv(assays[[i]], "rowKey")
+        assays[[i]] <- assays[[i]][keys, ]
+    }
+    if (reindex) {
+        # update assay keys first
+        for (i in seq_along(assays)) {
+            aKey <- names(assays)[i]
+            setkeyv(assays[[i]], metaKeys)
+            assays[[i]][, (aKey) := .I]
+            setkeyv(index, metaKeys)
+            index[assays[[i]],
+                col := value,
+                env=list(col=aKey, value=paste0("i.", aKey))
+            ]
+            setkeyv(assays[[i]], names(assay)[i])
+        }
+        # update rowKey and colKey
+        rData[, .rowKey := .I]
+        setkeyv(rData, "rowKey")
+        index[rData, rowKey := .rowKey]
+        rData[, `:=`(rowKey=.rowKey, .rowKey=NULL)]
+    }
+    # delete row-/colKeys by reference
+    for (a in assays) a[, (metaKeys) := NULL]
+    # raw=TRUE allows direct modification of slots
+    rowData(x, raw=TRUE) <- rData
+    assays(x, raw=TRUE) <- assays
+    unlockBinding("assayIndex", getIntern(x))
+    assign("assayIndex", index, envir=getIntern(x))
+    lockBinding("assayIndex", getIntern(x))
+    return(x)
+}
 
 #' Subset method for a LongTable object.
 #'
