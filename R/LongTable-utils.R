@@ -25,15 +25,29 @@ NULL
 ##
 ## == subset
 
+
+#' Subset a `LongTable` using <dim>Key column
 #'
+#' @param x `LongTable`
+#' @param keys `integer` Inte
+#' @param dim `character(1)` One of "row" or "col", corresponding to "rowKey" or
+#'   "colKey" columns in rowData or colData.
+#' @param reindex `logical(1)` Should index values be reset such that they
+#'   are the smallest possible set of consecutive integers. Modifies the
+#'   "rowKey", "colKey", and all assayKey columns. Initial benchmarks indicate
+#'   rindex=FALSE save 35% of execution time.
 #'
+#' @details
+#' Initial benchmarks indicate this is marginally faster than .subsetByIndex
+#' when only using a single selector. ~7% faster when reindex=TRUE, ~4% faster
+#' when reindex=FALSE. Probably not worth using, but I already wrote it.
 #'
-#'
-#'
+#' @noRd
 .subsetByDimData <- function(x, keys, dim=c("row", "col"), reindex=FALSE) {
     # -- parse dimension to subset on
     dim <- match.arg(dim)
-    dimData <- get(paste0(dim, "Data"))
+    dimData <- get(paste0(dim, "Data"), getNamespace("CoreGx"))
+    setDimData <- get(paste0(dim, "Data<-"), getNamespace("CoreGx"))
     dimKey <- paste0(dim, "Key")
     # -- validate input
     assertClass(x, "LongTable")
@@ -65,17 +79,18 @@ NULL
             setkeyv(assays[[i]], names(assays)[i])
         }
         # update rowKey and colKey
-        oldKey <- paste0(".", dimKey)
-        dData[, .rowKey := .I]
-        index[rData, rowKey := .rowKey]
+        newKey <- paste0(".", dimKey)
+        dData[, newKey := .I, env=list(newKey=newKey)]
+        index[dData, oldKey := newKey, env=list(newKey=newKey, oldKey=dimKey)]
         setkeyv(index, metaKeys)
-        cData[, `:=`(colKey=.colKey, .colKey=NULL)]
+        dData[, `:=`(oldKey=newKey, newKey=NULL),
+            env=list(newKey=newKey, oldKey=dimKey)]
     }
     # -- update object and return
     # delete row-/colKeys by reference
     for (a in assays) a[, (metaKeys) := NULL]
     # raw=TRUE allows direct modification of slots
-    dimData(x, raw=TRUE) <- rData
+    setDimData(x, raw=TRUE, value=dData)
     assays(x, raw=TRUE) <- assays
     unlockBinding("assayIndex", getIntern(x))
     assign("assayIndex", index, envir=getIntern(x))
@@ -97,6 +112,7 @@ NULL
 #'
 #' @return `LongTable` subset according to the provided index.
 #'
+#' @noRd
 .subsetByIndex <- function(x, index, reindex=FALSE) {
     # -- validate input
     assertClass(x, "LongTable")
