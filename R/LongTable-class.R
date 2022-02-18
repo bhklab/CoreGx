@@ -183,6 +183,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
 
     # Reorder columns to match the keys, this prevents issues in unit tests
     # caused by different column orders
+    setkeyv(rowData, "rowKey")
+    setkeyv(colData, "colKey")
     setcolorder(rowData, unlist(mget(c('rowIDs', 'rowMeta'), internals)))
     setcolorder(colData, unlist(mget(c('colIDs', 'colMeta'), internals)))
 
