@@ -66,7 +66,7 @@ NULL
         # see https://rdatatable.gitlab.io/data.table/articles/datatable-keys-fast-subset.html
         assays[[i]] <- assays[[i]][index[, metaKeys, with=FALSE], ]
     }
-    # -- optinally reindex the table
+    # -- optionally reindex the table
     if (reindex) {
         # update assay keys first
         for (i in seq_along(assays)) {

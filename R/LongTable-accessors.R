@@ -475,13 +475,15 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         c("rowKey", "colKey", assayName),
         with=FALSE
     ]
-    assayData <- merge.data.table(assayData, assayIndex, by=assayName)
+    setkeyv(assayIndex, assayName)
+    assayData <- assayData[assayIndex, ]
+    setkeyv(assayData, c("rowKey", "colKey"))
     if (withDimnames && !metadata) {
-        assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, on='rowKey']
-        assayData <- colIDs(x, data=TRUE, key=TRUE)[assayData, on='colKey']
+        assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, ]
+        assayData <- colIDs(x, data=TRUE, key=TRUE)[assayData, ]
     } else if (withDimnames && metadata) {
-        assayData <- rowData(x, key=TRUE)[assayData, on='rowKey']
-        assayData <- colData(x, key=TRUE)[assayData, on='colKey']
+        assayData <- rowData(x, key=TRUE)[assayData, ]
+        assayData <- colData(x, key=TRUE)[assayData, ]
     }
 
     # drop any duplicated columns to prevent issues in the setter methods,
