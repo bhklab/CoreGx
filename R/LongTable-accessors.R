@@ -365,16 +365,33 @@ setReplaceMethod('colData', signature(x='LongTable'),
 #' @importMethodsFrom SummarizedExperiment assays
 #' @import data.table
 #' @export
-setMethod('assays', signature(x='LongTable'),
-        function(x, withDimnames=TRUE, metadata=withDimnames,
-            key=!withDimnames, ...) {
+setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
+        metadata=withDimnames, key=!withDimnames, ...) {
     if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
         return(x@assays)
     }
-    return(structure(
-        lapply(assayNames(x), FUN=assay, x=x, withDimnames=withDimnames,
-            metadata=metadata, key=key),
-        .Names=assayNames(x)))
+    assayIndex <- copy(getIntern(x, "assayIndex"))
+    if (metadata) {
+        rData <- rowData(x, key=TRUE)
+        cData <- colData(x, key=TRUE)
+    } else {
+        rData <- rowIDs(x, data=TRUE, key=TRUE)
+        cData <- colIDs(x, data=TRUE, key=TRUE)
+    }
+    if (withDimnames) {
+        setkeyv(assayIndex, "rowKey")
+        assayIndex <- rData[assayIndex, , on="rowKey"]
+        setkeyv(assayIndex, "colKey")
+        assayIndex <- cData[assayIndex, , on="colKey"]
+    }
+    aList <- copy(x@assays)
+    for (i in seq_along(aList)) {
+        setkeyv(assayIndex, names(aList)[i])
+        aList[[i]] <- assayIndex[aList[[i]], ]
+        aList[[i]][, (names(aList)) := NULL]
+        if (!key) aList[[i]][, (c("rowKey", "colKey")) := NULL]
+    }
+    return(aList)
 })
 
 
@@ -468,37 +485,26 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
             'of valid assay names.'))
 
     # extract the specified assay
-    assayData <- x@assays[[keepAssay]]
+    assayData <- copy(x@assays[[keepAssay]])
 
     # optionally join to rowData and colData
-    assayIndex <- getIntern(x, "assayIndex")[,
+    assayIndex <- unique(na.omit(getIntern(x, "assayIndex")[,
         c("rowKey", "colKey", assayName),
         with=FALSE
-    ]
+    ]))
     setkeyv(assayIndex, assayName)
     assayData <- assayData[assayIndex, ]
-    setkeyv(assayData, c("rowKey", "colKey"))
+    setkeyv(assayData, "rowKey")
     if (withDimnames && !metadata) {
         assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, ]
+        setkev(assayData, "colKey")
         assayData <- colIDs(x, data=TRUE, key=TRUE)[assayData, ]
     } else if (withDimnames && metadata) {
         assayData <- rowData(x, key=TRUE)[assayData, ]
+        setkeyv(assayData, "colKey")
         assayData <- colData(x, key=TRUE)[assayData, ]
     }
-
-    # drop any duplicated columns to prevent issues in the setter methods,
-    # actually drops any columns prefixed with i.
-    duplicates <- grep('^i\\..*', colnames(assayData), value=TRUE)
-    ## TODO:: Is there any situation where ignoring duplicated keys could break the object?
-    ## TODO:: Maybe add equality test for duplicate columns?
-    warnDuplicates <- setdiff(duplicates, c('i.drug_cell_rep', 'i.rowKey', 'i.colKey'))
-    if (length(duplicates) > 0) {
-        if (length(warnDuplicates) > 0)
-            warning(.warnMsg('\n[CoreGx::assay] Dropping columns duplicated when ',
-                'joining assays with from ', i, 'when joining with rowData and ',
-                'colData: ', .collapse(warnDuplicates)))
-        assayData <- assayData[, -duplicates, with=FALSE]
-    }
+    assayData <- assayData[, .SD, .SDcols=!names(assays)[i]]
 
     if (!key) assayData <- assayData[, -c('rowKey', 'colKey')]
 
@@ -506,7 +512,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
             ' withDimnames=FALSE. Ignoring the metadata argument.'))
 
-    assayData
+    return(assayData)
 })
 
 

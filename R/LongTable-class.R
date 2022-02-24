@@ -185,6 +185,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         assayIndex[assays[[i]], col := col,
             env=list(col=names(assays)[i])]
     }
+    assayIndex[, (c(rowIDs, colIDs)) := NULL]
+    setkeyv(assayIndex, names(assays))
     internals$assayIndex <- assayIndex
     lockBinding("assayIndex", internals)
 
