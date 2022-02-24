@@ -65,7 +65,7 @@ setOldClass('long.table', S4Class='LongTable')
 #'   a LongTable experiment.
 #' @param keep.rownames `logical(1)` or `character(1)` Should rownames be
 #'   retained when coercing to `data.table` inside the constructor. Default
-#'   is FALSE. If TRUE, adds a `rn` column to each rectangular object that
+#'   is FALSE. If TRUE, adds a 'rn' column to each rectangular object that
 #'   gets coerced from `data.frame` to `data.table`. If a string, that becomes
 #'   the name of the rownames column.
 #'
@@ -78,10 +78,12 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         metadata=list(), keep.rownames=FALSE) {
 
     # handle missing parameters
-    # isMissing <- do.call(missing, as.symbol(ls()))
+    isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
+        colIDs=missing(colIDs), assays=missing(assays),
+        assayIDs=missing(assayIDs))
 
-    # if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
-    #     names(isMissing)[isMissing], collapse='\n\t'))
+    if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
+        names(isMissing)[isMissing], collapse='\n\t'))
 
     # check parameter types and coerce or error
     if (!is(colData, "data.table"))
@@ -160,19 +162,30 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         assays[[i]][, (names(assays)[i]) := .I]
     }
 
-    #
+    # assay keys
     internals$assayKeys <- lapply(assayIDs, `[[`, i=1)
     lockBinding("assayKeys", internals)
 
-    assayIndex <- lapply(assays, FUN=merge, y=rowData)
-    assayIndex <- lapply(assayIndex, FUN=merge, y=colData, by=colIDs)
-    keepCols <- lapply(names(assays), FUN=c, c("rowKey", "colKey"))
-    assayIndex <- Map(subset, x=assayIndex, select=keepCols)
-    assayIndexDf <- Reduce(
-        f=\(x, y) merge.data.table(x, y, by=c("rowKey", "colKey")),
-        assayIndex)
-    setkeyv(assayIndexDf, c("rowKey", "colKey"))
-    internals$assayIndex <- assayIndexDf
+    # build the index mapping assay rows to rowKey and colKey
+    assayIndex <- expand.grid(rowKey=rowData$rowKey, colKey=colData$colKey)
+    setDT(assayIndex)
+    setkeyv(assayIndex, c("rowKey", "colKey"))
+    setkeyv(rowData, "rowKey")
+    assayIndex <- assayIndex[
+        rowData[, c(rowIDs, "rowKey"), with=FALSE], ,
+        on="rowKey"
+    ]
+    setkeyv(colData, "colKey")
+    assayIndex <- assayIndex[
+        colData[, c(colIDs, "colKey"), with=FALSE], ,
+        on="colKey"
+    ]
+    setkeyv(assayIndex, c(colIDs, rowIDs))
+    for (i in seq_along(assays)) {
+        assayIndex[assays[[i]], col := col,
+            env=list(col=names(assays)[i])]
+    }
+    internals$assayIndex <- assayIndex
     lockBinding("assayIndex", internals)
 
     # Drop extra assay columns and key by the assay key in the assay index

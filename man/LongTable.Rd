@@ -39,7 +39,7 @@ a LongTable experiment.}
 
 \item{keep.rownames}{\code{logical(1)} or \code{character(1)} Should rownames be
 retained when coercing to \code{data.table} inside the constructor. Default
-is FALSE. If TRUE, adds a \code{rn} column to each rectangular object that
+is FALSE. If TRUE, adds a 'rn' column to each rectangular object that
 gets coerced from \code{data.frame} to \code{data.table}. If a string, that becomes
 the name of the rownames column.}
 }
