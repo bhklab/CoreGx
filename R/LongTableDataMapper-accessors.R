@@ -548,8 +548,7 @@ setGeneric('metadataMap<-', function(object, ..., value)
 #' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_3,
 #' data_=.local_data_3, col_='metadata')
 setReplaceMethod('metadataMap', signature(object='LongTableDataMapper',
-    value='list_OR_List'), function(object, value)
-{
+    value='list_OR_List'), function(object, value) {
     funContext <- '[CoreGx::`metadataMap<-,LongTableDataMapper-method`]\n\t'
     rawdataCols <- colnames(rawdata(object))
     if (length(names(value)) == 0) stop(.errorMsg('The value argument must
