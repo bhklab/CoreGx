@@ -109,7 +109,7 @@ will be the assay in a \code{LongTableDataMapper} object that the columns in the
 \code{character} vector will be assigned to. Column renaming occurs automatically
 when the character vectors have names (from the value to the name).
 
-\strong{assayMap<-}: Updates the \verb{@assaMap} slot of a \code{LongTableDataMapper} object,
+\strong{assayMap<-}: Updates the \verb{@assayMap} slot of a \code{LongTableDataMapper} object,
 returning an invisible NULL. Arguments:
 \itemize{
 \item value:  A \code{list} of character vectors, where the name of each list

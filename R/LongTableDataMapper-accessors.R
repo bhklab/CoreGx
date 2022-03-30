@@ -395,7 +395,7 @@ setGeneric('assayMap<-', function(object, ..., value) standardGeneric('assayMap<
 .docs_LongTableDataMapper_set_assayMap <- function(...) .parseToRoxygen(
     "
     @details
-    __assayMap<-__: Updates the `@assaMap` slot of a `{class_}` object,
+    __assayMap<-__: Updates the `@assayMap` slot of a `{class_}` object,
     returning an invisible NULL. Arguments:
     - value:  A `list` of character vectors, where the name of each list
     item is the name of an assay and the values of each character vector
