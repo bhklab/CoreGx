@@ -12,7 +12,7 @@ to the \code{assayMap} slot.}
 
 \item{i}{\code{character(1)} Name of an assay in the \code{assayMap} slot of \code{x}.}
 
-\item{withDimNames}{\code{logical(1)} For compatibility with
+\item{withDimnames}{\code{logical(1)} For compatibility with
 \code{SummarizedExperiment::assay} generic. Not used.}
 }
 \value{

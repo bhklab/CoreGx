@@ -52,10 +52,13 @@ NULL
 #'   method.
 #'
 #' @param x `LongTableDataMapper` or inheriting class.
+#' @param dataMap `list` The map of a `LongTableDataMapper` dimension, as
+#'   returned by the '*DataMap' methods. Can also be used with a single assay
+#'   from the `assayMap` method, but not the entire list of assays.
 #' @param key `logical(1)` Should the returned value be keyed by the 'id_columns'
 #'   item of the dimDataMap? Default is `TRUE`.
-#' @param dataMap `list` The map of a `LongTableDataMapper` dimension, as
-#'   returned by the '*DataMap' methods.
+#' @param rename `logical(1)` Should columns be renamed from their value to
+#'   their name, if the item has a name in the `dataMap`. Default is `TRUE`.
 #' @param funContext `character(1)` Contextual information about the calling
 #'   function, for debugging. Users don't need to worry about this.
 #'
@@ -63,7 +66,7 @@ NULL
 #' @importFrom methods getPackageName
 #' @importFrom data.table setkeyv
 #' @keywords internal
-.get_dimDataFromMap <- function(x, key=TRUE, dataMap, funContext) {
+.get_dimDataFromMap <- function(x, dataMap, key=TRUE, rename=TRUE, funContext) {
 
     if (missing(funContext))
         funContext <- paste0("\n[", getPackageName(), "::.get_dimDataMap]\n\t")
@@ -84,9 +87,18 @@ NULL
         .collapse(unlist(dataMap)[!hasDimDataCols]),
         " are missing from rawdata!")
 
-    # Subset rawdata and return
+    # Subset rawdata, optionally keying table and/or renaming columns
     .dimData <- unique(.rawdata[, unlist(dataMap), with=FALSE])
     if (key) setkeyv(.dimData, dataMap$id_columns)
+    if (rename) {
+        old <- unlist(unname(dataMap))
+        new <- names(old)
+        if (!is.null(new)) {
+            names_idx <- new != "" & !is.na(new)
+            data.table::setnames(.dimData, old[names_idx], new[names_idx])
+        }
+    }
+
     return(.dimData)
 }
 
@@ -443,7 +455,7 @@ setReplaceMethod('assayMap', signature(object='LongTableDataMapper',
 #' @param x `LongTableDataMapper` The object to retrive assay data form according
 #'   to the `assayMap` slot.
 #' @param i `character(1)` Name of an assay in the `assayMap` slot of `x`.
-#' @param withDimNames `logical(1)` For compatibility with
+#' @param withDimnames `logical(1)` For compatibility with
 #'   `SummarizedExperiment::assay` generic. Not used.
 #'
 #' @return `data.table` Data for the specified assay extracted from the

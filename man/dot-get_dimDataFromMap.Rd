@@ -5,16 +5,20 @@
 \title{Method to subset the rawdata with the corresponding dimensions "dimDataMap"
 method.}
 \usage{
-.get_dimDataFromMap(x, key = TRUE, dataMap, funContext)
+.get_dimDataFromMap(x, dataMap, key = TRUE, rename = TRUE, funContext)
 }
 \arguments{
 \item{x}{\code{LongTableDataMapper} or inheriting class.}
 
+\item{dataMap}{\code{list} The map of a \code{LongTableDataMapper} dimension, as
+returned by the '*DataMap' methods. Can also be used with a single assay
+from the \code{assayMap} method, but not the entire list of assays.}
+
 \item{key}{\code{logical(1)} Should the returned value be keyed by the 'id_columns'
 item of the dimDataMap? Default is \code{TRUE}.}
 
-\item{dataMap}{\code{list} The map of a \code{LongTableDataMapper} dimension, as
-returned by the '*DataMap' methods.}
+\item{rename}{\code{logical(1)} Should columns be renamed from their value to
+their name, if the item has a name in the \code{dataMap}. Default is \code{TRUE}.}
 
 \item{funContext}{\code{character(1)} Contextual information about the calling
 function, for debugging. Users don't need to worry about this.}
