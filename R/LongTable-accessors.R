@@ -504,7 +504,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         setkeyv(assayData, "colKey")
         assayData <- colData(x, key=TRUE)[assayData, ]
     }
-    assayData <- assayData[, .SD, .SDcols=!names(assays)[i]]
+    assayData <- assayData[, .SD, .SDcols=!assayName]
 
     if (!key) assayData <- assayData[, -c('rowKey', 'colKey')]
 
