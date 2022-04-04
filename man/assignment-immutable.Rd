@@ -20,7 +20,19 @@
 \usage{
 subset.immutable(object, ...) <- value
 
+\method{[}{immutable}(object, ...) <- value
+
+\method{[[}{immutable}(object, ...) <- value
+
+\method{$}{immutable}(object, ...) <- value
+
 \method{names}{immutable}(x) <- value
+
+\method{dimnames}{immutable}(x) <- value
+
+colnames.immutable(x) <- value
+
+rownames.immutable(x) <- value
 }
 \arguments{
 \item{object}{An R object inherting from the "immutable" S3-class.}

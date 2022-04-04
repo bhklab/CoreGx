@@ -114,22 +114,31 @@ c.immutable <- function(x, ...) {
 #' @md
 #' @aliases subset.immutable, [.immutable, [[.immutable, $.immutable
 #' @export
-subset.immutable <- `[.immutable` <- `[[.immutable` <- `$.immutable` <- function(x, ...) {
+subset.immutable <- function(x, ...) {
     sub_obj <- NextMethod()
     immutable(sub_obj)
 }
 #' @name [.immutable
 #' @rdname setOps-immutable
 #' @export
-`[.immutable`
+`[.immutable` <- function(x, ...) {
+    sub_obj <- NextMethod()
+    immutable(sub_obj)
+}
 #' @name [[.immutable
 #' @rdname setOps-immutable
 #' @export
-`[[.immutable`
+`[[.immutable` <- function(x, ...) {
+    sub_obj <- NextMethod()
+    immutable(sub_obj)
+}
 #' @name $.immutable
 #' @rdname setOps-immutable
 #' @export
-`$.immutable`
+`$.immutable` <- function(x, ...) {
+    sub_obj <- NextMethod()
+    immutable(sub_obj)
+}
 
 # -- Intercept assignment to prevent modification
 
@@ -157,44 +166,57 @@ subset.immutable <- `[.immutable` <- `[[.immutable` <- `$.immutable` <- function
 #' @md
 #' @aliases subset<-.immutable, [<-.immutable, [[<-.immutable, $<-.immutable
 #' @export
-`subset<-.immutable` <- `[<-.immutable` <- `[[<-.immutable` <- `$<-.immutable` <-
-        function(object, ..., value) {
+`subset<-.immutable` <- function(object, ..., value) {
     stop("Object is immutable! Use `mutable(object)` to allow modification.",
         call.=FALSE)
 }
 #' @name [<-.immutable
 #' @rdname assignment-immutable
 #' @export
-`[<-.immutable`
+`[<-.immutable` <- function(object, ..., value) {
+    stop("Object is immutable! Use `mutable(object)` to allow modification.",
+        call.=FALSE)
+}
 #' @name [[<-.immutable
 #' @rdname assignment-immutable
 #' @export
-`[[<-.immutable`
+`[[<-.immutable` <- function(object, ..., value) {
+    stop("Object is immutable! Use `mutable(object)` to allow modification.",
+        call.=FALSE)
+}
 #' @name $<-.immutable
 #' @rdname assignment-immutable
 #' @export
-`$<-.immutable`
+`$<-.immutable` <- function(object, ..., value) {
+    stop("Object is immutable! Use `mutable(object)` to allow modification.",
+        call.=FALSE)
+}
 
 #' @rdname assignment-immutable
 #' @aliases names<-.immutable, dimnames<-.immutable, colnames<-.immutable,
 #' rownames<-.immutable
 #' @export
-`names<-.immutable` <- `dimnames<-.immutable` <- `colnames<-.immutable` <-
-        `rownames<-.immutable` <- function(x, value)
+`names<-.immutable` <- function(x, value)
     stop("Object is immutable! Use `mutable(object)` to allow modification.",
         call.=FALSE)
 #' @name dimnames<-.immutable
 #' @rdname assignment-immutable
 #' @export
-`dimnames<-.immutable`
+`dimnames<-.immutable` <- function(x, value)
+    stop("Object is immutable! Use `mutable(object)` to allow modification.",
+        call.=FALSE)
 #' @name colnames<-.immutable
 #' @rdname assignment-immutable
 #' @export
-`colnames<-.immutable`
+`colnames<-.immutable` <- function(x, value)
+    stop("Object is immutable! Use `mutable(object)` to allow modification.",
+        call.=FALSE)
 #' @name rownames<-.immutable
 #' @rdname assignment-immutable
 #' @export
-`rownames<-.immutable`
+`rownames<-.immutable` <- function(x, value)
+    stop("Object is immutable! Use `mutable(object)` to allow modification.",
+        call.=FALSE)
 
 # -- Remove immutability from an R object
 

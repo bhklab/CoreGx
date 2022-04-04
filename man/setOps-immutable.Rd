@@ -12,6 +12,12 @@
 \title{Subset an immutable object, returning another immutable object.}
 \usage{
 subset.immutable(x, ...)
+
+\method{[}{immutable}(x, ...)
+
+\method{[[}{immutable}(x, ...)
+
+\method{$}{immutable}(x, ...)
 }
 \arguments{
 \item{x}{An R object inheriting from the "immutable" S3-class.}
