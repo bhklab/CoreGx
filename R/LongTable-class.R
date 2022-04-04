@@ -122,7 +122,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         colData[, c('colKey') := .GRP, by=c(colIDs)]
 
     # initialize the internals object to store private metadata for a LongTable
-    internals <- new.env()
+    # NOTE: assign parent as emptyenv to prevent leaving parent.frame on the stack
+    internals <- new.env(parent=emptyenv())
 
     ## FIXME:: Move all validity checks to top of the function to prevent wasted
     ## computation or into class validity method

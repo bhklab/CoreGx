@@ -82,7 +82,7 @@ NULL
 #' @param assays A `list` containing one or more objects coercible to a
 #'   `data.table`, and keyed by rowIDs and colIDs corresponding to the rowID and
 #'   colID columns in colData and rowData.
-#' @param metadata A `list` of metadata associated with the 
+#' @param metadata A `list` of metadata associated with the
 #'   `TreatmentResponseExperiment` object being constructed
 #' @param keep.rownames `logical`, `character`
 #'   Logical: whether rownames should be added as a column if coercing to a
@@ -118,14 +118,14 @@ TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
 #'
 #' @param from `LongTable` object to coerce to a `TreatmentResponseExperiment`.
 #'
-#' @return The data in `object`, as the child-class 
+#' @return The data in `object`, as the child-class
 #'   `TreatmentResponseExperiment`.
 #'
 #' @seealso [`TreatmentResponseExperiment`]
 #'
 #' @examples
 #' data(clevelandSmall_cSet)
-#' TRE <- as(molecularProfilesSlot(clevelandSmall_cSet), 
+#' TRE <- as(molecularProfilesSlot(clevelandSmall_cSet),
 #'     "TreatmentResponseExperiment")
 #' TRE
 #' s

@@ -54,6 +54,7 @@ NULL
     assertIntegerish(keys)
     keys <- sort(unique(keys))
     x <- copy(x)
+    getIntern(x) <- new.env(getIntern(x), parent=emptyenv())  # copy object environment to prevent modify by reference
     # -- subset slots
     dData <- dimData(x, raw=TRUE)[keys, ]
     index <- getIntern(x, "assayIndex")
