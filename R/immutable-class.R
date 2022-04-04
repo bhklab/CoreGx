@@ -1,3 +1,6 @@
+#' @importMethodsFrom BiocGenerics cbind rbind
+NULL
+
 #' @title Constructor for "immutable" S3-class property
 #'
 #' @description
@@ -36,7 +39,8 @@
 #'
 #' @export
 immutable <- function(object) {
-    structure(object, class=c("immutable", class(object)))
+    if (isS4(object)) stop("Can only set immutability for base and S3 classes!")
+    structure(object, class=c("immutable", attributes(object)$class))
 }
 
 
@@ -62,11 +66,14 @@ is.immutable <- function(object) {
 #' @md
 #' @export
 print.immutable <- function(x) {
-    other_cls <- setdiff(class(x), "immutable")
-    cat("Immutable class:", other_cls, "\n")
+    other_cls <- setdiff(attributes(x)$class, "immutable")
     class(x) <- other_cls
+    cat("Immutable class:", class(x), "\n")
     print(x)
 }
+
+#' @export
+show.immutable <- function(x) print(x)
 
 
 # -- Intercept subset and concatentate operations to return another "immutable"
@@ -78,8 +85,8 @@ print.immutable <- function(x) {
 #' Ensures that `c` and `append` to an "immutable" class object return an
 #' immutable class object.
 #'
-#' @param x
-#' @param ...
+#' @param x An R object inheriting from the "immutable" S3-clas
+#' @param ... Objects to concatenate to `x`.
 #'
 #' @md
 #' @export
@@ -89,40 +96,115 @@ c.immutable <- function(x, ...) {
 }
 
 
+#' @name setOps-immutable
+#' @rdname setOps-immutable
+#'
 #' @title Subset an immutable object, returning another immutable object.
 #'
 #' @param x An R object inheriting from the "immutable" S3-class.
 #' @param ... Catch any additional parameters. Lets objects with arbitrary
 #' dimensions be made immutable.
 #'
+#' @return An immutable subset of `x`.
+#'
+#' @examples
+#' immut_mat <- immutable(matrix(1:100, 10, 10))
+#' immut_mat[1:5, 1:5]
+#'
 #' @md
+#' @aliases subset.immutable, [.immutable, [[.immutable, $.immutable
 #' @export
-subset.immutable <- function(x, ...) {
+subset.immutable <- `[.immutable` <- `[[.immutable` <- `$.immutable` <- function(x, ...) {
     sub_obj <- NextMethod()
     immutable(sub_obj)
 }
-
+#' @name [.immutable
+#' @rdname setOps-immutable
+#' @export
+`[.immutable`
+#' @name [[.immutable
+#' @rdname setOps-immutable
+#' @export
+`[[.immutable`
+#' @name $.immutable
+#' @rdname setOps-immutable
+#' @export
+`$.immutable`
 
 # -- Intercept assignment to prevent modification
 
-#' @title
+#' @name assignment-immutable
+#' @rdname assignment-immutable
+#'
+#' @title Intercept assignment operations for "immutable" S3 objects.
+#'
+#' @description
+#' Prevents modification of objects labelled with the "immutable" S3-class by
+#' intercepting assignment during S3-method dispatch and returning an error.
 #'
 #' @param object An R object inherting from the "immutable" S3-class.
 #' @param ... Catch subset arguments for various dimensions.
 #'
-#' @aliases `[<-.immutable`, `[[<-.immutable`, `$<-.immutable`
+#' @return None, throws an error.
 #'
-`[<-.immutable` <- `[[<-.immutable` <- `$<-.immutable` <- function(object, ..., value)
+#' @examples
+#' immutable_df <- immutable(data.frame(a=1:5, b=letters[1:5]))
+#' # return immutable data.frame
+#' immutable_df[1:4, ]
+#' # return immutable vector
+#' immutable_df$a
+#'
+#' @md
+#' @aliases subset<-.immutable, [<-.immutable, [[<-.immutable, $<-.immutable
+#' @export
+`subset<-.immutable` <- `[<-.immutable` <- `[[<-.immutable` <- `$<-.immutable` <-
+        function(object, ..., value) {
     stop("Object is immutable! Use `mutable(object)` to allow modification.",
         call.=FALSE)
+}
+#' @name [<-.immutable
+#' @rdname assignment-immutable
+#' @export
+`[<-.immutable`
+#' @name [[<-.immutable
+#' @rdname assignment-immutable
+#' @export
+`[[<-.immutable`
+#' @name $<-.immutable
+#' @rdname assignment-immutable
+#' @export
+`$<-.immutable`
+
+#' @rdname assignment-immutable
+#' @aliases names<-.immutable, dimnames<-.immutable, colnames<-.immutable,
+#' rownames<-.immutable
+#' @export
+`names<-.immutable` <- `dimnames<-.immutable` <- `colnames<-.immutable` <-
+        `rownames<-.immutable` <- function(x, value)
+    stop("Object is immutable! Use `mutable(object)` to allow modification.",
+        call.=FALSE)
+#' @name dimnames<-.immutable
+#' @rdname assignment-immutable
+#' @export
+`dimnames<-.immutable`
+#' @name colnames<-.immutable
+#' @rdname assignment-immutable
+#' @export
+`colnames<-.immutable`
+#' @name rownames<-.immutable
+#' @rdname assignment-immutable
+#' @export
+`rownames<-.immutable`
 
 # -- Remove immutability from an R object
 
-#' @title Mutable S3-generic definition.
+
+#' @title Remove the "immutable" S3-class from an R object, allowing it to be
+#' modified normally again.
 #'
-#' @param object An R object.
+#' @param object An R object inheriting from the "immutable" class.
 #'
-#' @return The `object`
+#' @return The `object` with the "immutable" class stripped from it.
 #'
 #' @md
 #' @export
@@ -131,5 +213,14 @@ mutable <- function(object) UseMethod("mutable", object)
 #' @md
 #' @export
 mutable.default <- function(object) {
-    structure(object, class=setdiff("immutable", class(object)))
+    new_class <- setdiff(attributes(x)$class, "immutable")
+    structure(object, class=new_class)
+}
+
+
+# -- Make comparisons work for immutable objects
+
+#' @export
+Ops.immutable <- function(e1, e2) {
+    get(.Generic)(mutable(e1), mutable(e2))
 }
