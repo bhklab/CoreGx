@@ -31,10 +31,10 @@ to the copy-by-reference semantics, such that normal R assignment, which
 users assume makes a copy of the object, actually references the same
 environment in both the original and copy of the object.
 
-WARNING: This method has only been tested with \code{list} and \code{data.frame}.
-Developers should check that it behaves as expected for your class of
-interest. It is likely this will not work for \code{S4} object or objects which
-have modify by reference semantics such as a \code{data.table} or \code{environment}.
+WARNING: This implementation is unable to intercept modifications to a
+\code{data.table} via the \verb{set*} group of methods. This is because these methods
+are not S3 generics and therefore no mechanism exists for hooking into them
+to extend their functionality.
 }
 \examples{
 immutable_list <- immutable(as.list(1:5))

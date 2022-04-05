@@ -19,10 +19,10 @@
 #' users assume makes a copy of the object, actually references the same
 #' environment in both the original and copy of the object.
 #'
-#' WARNING: This method has only been tested with `list` and `data.frame`.
-#' Developers should check that it behaves as expected for your class of
-#' interest. It is likely this will not work for `S4` object or objects which
-#' have modify by reference semantics such as a `data.table` or `environment`.
+#' WARNING: This implementation is unable to intercept modifications to a
+#' `data.table` via the `set*` group of methods. This is because these methods
+#' are not S3 generics and therefore no mechanism exists for hooking into them
+#' to extend their functionality.
 #'
 #' @param object Any R object
 #'

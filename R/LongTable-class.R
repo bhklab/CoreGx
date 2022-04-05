@@ -162,7 +162,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     }
 
     # assay keys
-    internals$assayKeys <- lapply(assayIDs, `[[`, i=1)
+    internals$assayKeys <- assayIDs
 
     # build the index mapping assay rows to rowKey and colKey
     assayIndex <- expand.grid(rowKey=rowData$rowKey, colKey=colData$colKey)
