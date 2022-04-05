@@ -1,6 +1,3 @@
-#' @importMethodsFrom BiocGenerics cbind rbind
-NULL
-
 #' @title Constructor for "immutable" S3-class property
 #'
 #' @description
@@ -40,7 +37,8 @@ NULL
 #' @export
 immutable <- function(object) {
     if (isS4(object)) stop("Can only set immutability for base and S3 classes!")
-    structure(object, class=c("immutable", attributes(object)$class))
+    # call mutable to prevent assigning immutable class twice
+    structure(mutable(object), class=c("immutable", attributes(object)$class))
 }
 
 
@@ -68,7 +66,7 @@ is.immutable <- function(object) {
 print.immutable <- function(x) {
     other_cls <- setdiff(attributes(x)$class, "immutable")
     class(x) <- other_cls
-    cat("Immutable class:", class(x), "\n")
+    cat("immutable", class(x), "\n")
     print(x)
 }
 
@@ -95,6 +93,7 @@ c.immutable <- function(x, ...) {
     immutable(new_obj)
 }
 
+.immutable_emsg <- "Object is immutable! Use `mutable(object)` to return a mutable copy."
 
 #' @name setOps-immutable
 #' @rdname setOps-immutable
@@ -122,6 +121,13 @@ subset.immutable <- function(x, ...) {
 #' @rdname setOps-immutable
 #' @export
 `[.immutable` <- function(x, ...) {
+    if (is.data.table(x)) {
+        j_idx <- which(...names() %in% "j")
+        if (!length(j_idx)) j_idx <- 2
+        j_expr <- substitute(...elt(j_idx), x)
+        j_txt <- deparse(j_expr)
+        if (grepl(":=|let[ ]*(", j_txt)) stop(.immutable_emsg)
+    }
     sub_obj <- NextMethod()
     immutable(sub_obj)
 }
@@ -167,29 +173,25 @@ subset.immutable <- function(x, ...) {
 #' @aliases subset<-.immutable, [<-.immutable, [[<-.immutable, $<-.immutable
 #' @export
 `subset<-.immutable` <- function(object, ..., value) {
-    stop("Object is immutable! Use `mutable(object)` to allow modification.",
-        call.=FALSE)
+    stop(.immutable_emsg, call.=FALSE)
 }
 #' @name [<-.immutable
 #' @rdname assignment-immutable
 #' @export
 `[<-.immutable` <- function(object, ..., value) {
-    stop("Object is immutable! Use `mutable(object)` to allow modification.",
-        call.=FALSE)
+    stop(.immutable_emsg, call.=FALSE)
 }
 #' @name [[<-.immutable
 #' @rdname assignment-immutable
 #' @export
 `[[<-.immutable` <- function(object, ..., value) {
-    stop("Object is immutable! Use `mutable(object)` to allow modification.",
-        call.=FALSE)
+    stop(.immutable_emsg, call.=FALSE)
 }
 #' @name $<-.immutable
 #' @rdname assignment-immutable
 #' @export
 `$<-.immutable` <- function(object, ..., value) {
-    stop("Object is immutable! Use `mutable(object)` to allow modification.",
-        call.=FALSE)
+    stop(.immutable_emsg, call.=FALSE)
 }
 
 #' @rdname assignment-immutable
@@ -197,26 +199,23 @@ subset.immutable <- function(x, ...) {
 #' rownames<-.immutable
 #' @export
 `names<-.immutable` <- function(x, value)
-    stop("Object is immutable! Use `mutable(object)` to allow modification.",
-        call.=FALSE)
+    stop(.immutable_emsg, call.=FALSE)
 #' @name dimnames<-.immutable
 #' @rdname assignment-immutable
 #' @export
 `dimnames<-.immutable` <- function(x, value)
-    stop("Object is immutable! Use `mutable(object)` to allow modification.",
-        call.=FALSE)
+    stop(.immutable_emsg, call.=FALSE)
 #' @name colnames<-.immutable
 #' @rdname assignment-immutable
 #' @export
 `colnames<-.immutable` <- function(x, value)
-    stop("Object is immutable! Use `mutable(object)` to allow modification.",
-        call.=FALSE)
+    stop(.immutable_emsg, call.=FALSE)
 #' @name rownames<-.immutable
 #' @rdname assignment-immutable
 #' @export
 `rownames<-.immutable` <- function(x, value)
-    stop("Object is immutable! Use `mutable(object)` to allow modification.",
-        call.=FALSE)
+    stop(.immutable_emsg, call.=FALSE)
+
 
 # -- Remove immutability from an R object
 
@@ -235,7 +234,7 @@ mutable <- function(object) UseMethod("mutable", object)
 #' @md
 #' @export
 mutable.default <- function(object) {
-    new_class <- setdiff(attributes(x)$class, "immutable")
+    new_class <- setdiff(attributes(object)$class, "immutable")
     structure(object, class=new_class)
 }
 
