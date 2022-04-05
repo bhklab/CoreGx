@@ -77,25 +77,15 @@ NULL
 #' @param object `LongTable`
 #' @param x `character` One or more symbol name strings to retrieve from
 #'     the object@.intern environment.
-#' @param ... `pairlist` Addtional arguments to get or mget inside of the
-#'     function.
 #'
-#' @return value of x if length(x) == 1 else named list of values for all
-#'     symbols in x.
+#' @return `immutable` value of x if length(x) == 1 else named list of values
+#'     for all symbols in x.
 #'
 #' @include LongTable-class.R
 #' @export
 setMethod('getIntern', signature(object='LongTable', x='character'),
-    function(object, x, ...) {
-
-    if (length(x) > 1)
-        tryCatch({ mget(x, envir=object@.intern, ...) },
-            error=function(e) {
-                message(e); mget(x, envir=object@.intern) })
-    else
-        tryCatch({ get(x, envir=object@.intern, ...) },
-            error=function(e) {
-                message(e); get(x, envir=object@.intern) })
+        function(object, x) {
+    return(if (length(x) == 1) object@.intern[[x]] else object@.intern[x])
 })
 #' @describeIn LongTable Access all structural metadata present within a
 #'   LongTable object. This is primarily for developmer use.
@@ -103,8 +93,7 @@ setMethod('getIntern', signature(object='LongTable', x='character'),
 #' @param object `LongTable`
 #' @param x `missing` This argument is excluded from from the function call.
 #'
-#' @return A named `list` with all values in environment object@.intern coerced
-#' to a list (and therefore copied).
+#' @return An `immutable` list.
 #'
 #' @examples
 #' getIntern(merckLongTable)

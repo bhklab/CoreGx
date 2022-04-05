@@ -1,3 +1,6 @@
+#' @include immutable-class.R
+NULL
+
 #' @title LongTable class definition
 #'
 #' @description Define a private constructor method to be used to build a
@@ -18,11 +21,9 @@
 #'   `LongTable`.
 #' - *metadata*: An optional `list` of additional metadata for a `LongTable`
 #'   which doesn't map to one of the dimensions.
-#' - *.intern*: An `environment` that holds internal structural metadata
+#' - *.intern*: An `immutable` `list` that holds internal structural metadata
 #'   about a LongTable object, such as which columns are required to key
-#'   the object. An environment has been used to allow locking items, which
-#'   can prevent accidental modification of a property required for the class
-#'   to work.
+#'   the object.
 #'
 #' @return `LongTable` object containing the assay data from a treatment
 #'   response experiment
@@ -39,7 +40,7 @@
         colData='data.table',
         assays='list',
         metadata='list',
-        .intern='environment')
+        .intern='immutable')
 )
 #' @export
 setOldClass('long.table', S4Class='LongTable')
@@ -123,7 +124,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
 
     # initialize the internals object to store private metadata for a LongTable
     # NOTE: assign parent as emptyenv to prevent leaving parent.frame on the stack
-    internals <- new.env(parent=emptyenv())
+    internals <- vector("list", length=6) |>
+        setNames(c("rowIDs", "rowMeta", "colIDs", "colMeta", "assayKeys", "assayIndex"))
 
     ## FIXME:: Move all validity checks to top of the function to prevent wasted
     ## computation or into class validity method
@@ -135,9 +137,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         stop(.errorMsg('\nRow IDs not in rowData: ',
             setdiff(rowIDs, colnames(rowData)), collapse=', '))
     internals$rowIDs <- rowIDs
-    lockBinding('rowIDs', internals)
     internals$rowMeta <- setdiff(colnames(rowData[, -'rowKey']), rowIDs)
-    lockBinding('rowMeta', internals)
 
     # capture column internal metadata
     if (is.numeric(colIDs) || is.logical(colIDs))
@@ -146,9 +146,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         stop(.errorMsg('\nColumn IDs not in colData: ',
             setdiff(colIDs, colnames(colData)), collapse=', '))
     internals$colIDs <- colIDs
-    lockBinding('colIDs', internals)
     internals$colMeta <- setdiff(colnames(colData[, -'colKey']), colIDs)
-    lockBinding('colMeta', internals)
 
     # -- capture assays internal metadata
     # ensure names of assays and assayIDs match
@@ -165,7 +163,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
 
     # assay keys
     internals$assayKeys <- lapply(assayIDs, `[[`, i=1)
-    lockBinding("assayKeys", internals)
 
     # build the index mapping assay rows to rowKey and colKey
     assayIndex <- expand.grid(rowKey=rowData$rowKey, colKey=colData$colKey)
@@ -189,7 +186,9 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     assayIndex[, (c(rowIDs, colIDs)) := NULL]
     setkeyv(assayIndex, names(assays))
     internals$assayIndex <- assayIndex
-    lockBinding("assayIndex", internals)
+
+    # make internals immutable to prevent users from modifying structural metadata
+    internals <- immutable(internals)
 
     # Drop extra assay columns and key by the assay key in the assay index
     for (i in seq_along(assays)) {
@@ -201,8 +200,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     # caused by different column orders
     setkeyv(rowData, "rowKey")
     setkeyv(colData, "colKey")
-    setcolorder(rowData, unlist(mget(c('rowIDs', 'rowMeta'), internals)))
-    setcolorder(colData, unlist(mget(c('colIDs', 'colMeta'), internals)))
+    setcolorder(rowData, unlist(internals[c("rowIDs", "rowMeta")]))
+    setcolorder(colData, unlist(internals[c('colIDs', 'colMeta')]))
 
     ## Assemble  the pseudo row and column names for the LongTable
     ### TODO:: Is this the slow part of the constructor?

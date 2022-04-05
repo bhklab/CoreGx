@@ -41,6 +41,10 @@ immutable <- function(object) {
     structure(mutable(object), class=c("immutable", attributes(object)$class))
 }
 
+# register the new S3 class, so it can be used in S4 method dispatch
+#' @export
+setOldClass("immutable")
+
 
 #' @title Check if an R object inherits from the immutable S3-class.
 #'

@@ -67,6 +67,7 @@ Roxygen: list(markdown=TRUE, r6=FALSE)
 RoxygenNote: 7.1.2
 Collate: 
     'allGenerics.R'
+    'immutable-class.R'
     'LongTable-class.R'
     'CoreSet-class.R'
     'CoreSet-accessors.R'
@@ -85,7 +86,6 @@ Collate:
     'datasets.R'
     'globals.R'
     'gwc.R'
-    'immutable-class.R'
     'matthewCor.R'
     'methods-buildLongTable.R'
     'methods-coerce.R'

@@ -41,7 +41,7 @@
 
 \S4method{assayCols}{LongTable}(object, i)
 
-\S4method{getIntern}{LongTable,character}(object, x, ...)
+\S4method{getIntern}{LongTable,character}(object, x)
 
 \S4method{getIntern}{LongTable,missing}(object, x)
 
@@ -96,13 +96,13 @@ instead of the column names? Default is FALSE.}
 
 \item{x}{The \code{LongTable} object to retrieve the dimnames for.}
 
-\item{...}{For developer use only! Pass raw=TRUE to modify the slot
-directly. This will corrupt your data if you don't know what you are
-doing!}
-
 \item{use.names}{\code{logical} This parameter is just here to stop matching
 the positional argument to use.names from the rowData generic. It
 doesn't do anything at this time and can be ignored.}
+
+\item{...}{For developer use only! Pass raw=TRUE to modify the slot
+directly. This will corrupt your data if you don't know what you are
+doing!}
 
 \item{value}{A \code{data.frame} or \code{data.table} to update the assay data
 with. This must at minumum contain the row and column data identifier
@@ -162,11 +162,10 @@ A \code{list} of \code{character} vectors containing the value column names for
 each assay if i is missing, otherwise a \code{character} vector of value column
 names for the selected assay.
 
-value of x if length(x) == 1 else named list of values for all
-symbols in x.
+\code{immutable} value of x if length(x) == 1 else named list of values
+for all symbols in x.
 
-A named \code{list} with all values in environment object@.intern coerced
-to a list (and therefore copied).
+An \code{immutable} list.
 
 A \code{data.table} containing rowID, row identifiers, and row metadata.
 
@@ -313,11 +312,9 @@ column dimension of a \code{LongTable}.
 \code{LongTable}.
 \item \emph{metadata}: An optional \code{list} of additional metadata for a \code{LongTable}
 which doesn't map to one of the dimensions.
-\item \emph{.intern}: An \code{environment} that holds internal structural metadata
+\item \emph{.intern}: An \code{immutable} \code{list} that holds internal structural metadata
 about a LongTable object, such as which columns are required to key
-the object. An environment has been used to allow locking items, which
-can prevent accidental modification of a property required for the class
-to work.
+the object.
 }
 }
 
