@@ -40,7 +40,7 @@ NULL
         colData='data.table',
         assays='list',
         metadata='list',
-        .intern='immutable')
+        .intern='immutable_list')
 )
 #' @export
 setOldClass('long.table', S4Class='LongTable')

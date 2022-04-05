@@ -45,6 +45,9 @@ immutable <- function(object) {
 #' @export
 setOldClass("immutable")
 
+#' @export
+setClassUnion("immutable_list", c("immutable", "list"))
+
 
 #' @title Check if an R object inherits from the immutable S3-class.
 #'
