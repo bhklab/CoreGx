@@ -550,73 +550,71 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
 
     if (!is.data.table(value)) setDT(value)
 
-    ## TODO:: Do we want to support mutating the row and column metadata?
+    # -- extract strucutral metadata form .intern slot
+    mutable_intern <- mutable(getIntern(x))
+    aIndex <- mutable_intern$assayIndex
+    aKeys <- mutable_intern$assayKeys
 
-    # Extract identifier columns
-    idColumns <- idCols(x)
-    valueColumns <- setdiff(colnames(value), idColumns)
-    metaColumns <- unique(c(rowMeta(x), colMeta(x)))
+    # -- determine if the assay already exists
+    assayExists <- i %in% assayNames(x)
 
-    # Determine if assigning new assay or updating existing assay
-    existingAssay <- i %in% assayNames(x)
-
-    # Handle missing mandatory identifiers in rowData and colData
-    missingRowCols <- setdiff(rowIDs(x), colnames(value))
-    missingRowTypes <- vapply(rowData(x)[, ..missingRowCols], FUN=typeof,
-        FUN.VALUE=character(1))
-    missingColCols <- setdiff(colIDs(x), colnames(value))
-    missingColTypes <- vapply(colData(x)[, ..missingColCols], FUN=typeof,
-        FUN.VALUE=character(1))
-    missingColumns <- c(missingRowCols, missingColCols)
-    missingTypes <- c(missingRowTypes, missingColTypes)
-
-    if (existingAssay && length(missingColumns) > 0) {
-            tryCatch({
-                value <- merge.data.table(
-                    assay(x, i, withDimnames=TRUE, metadata=FALSE),
-                    value,
-                    on=intersect(idColumns, colnames(value)),
-                    all.x=TRUE)
-            }, error=function(e) .error(funContext, 'Failed to map missing ',
-                'id columns via join with existing assay: ', e))
+    # -- determine the id columns if the assay doesn't already exits
+    if (!any(assayExists)) {
+        assayKey <- key(value)
+        if (is.null(assayKey)) assayKey <- intersect(idCols(x), colnames(value))
     } else {
-        # Pad missing id columns and sort
-        for (idx in seq_along(missingColumns))
-            set(value, j=missingColumns[idx], value=as(NA, missingTypes[idx]))
-        setcolorder(value, idColumns)
-        # Add new identifiers to be to the metadata
-        newRowData <- fsetdiff(value[, .SD, .SDcols=rowIDs(x)],
-            rowData(x)[, .SD, .SDcols=rowIDs(x)]
-        )
-        rowData(x) <- rbind(rowData(x), newRowData,
-            use.names=TRUE, fill=TRUE)
-        newColData <- fsetdiff(value[, .SD, .SDcols=colIDs(x)],
-            colData(x)[, .SD, .SDcols=colIDs(x)]
-        )
-        colData(x) <- rbind(colData(x), newColData,
-            use.names=TRUE, fill=TRUE)
+        if (sum(assayExists) > 1)
+            .error(funContext, "Only one assay can be modified as a time.",
+                " Please set i to be a character(1) vector.")
+        assayKey <- aKeys[i]
     }
+    # -- add assayKey column to the value
+    setkeyv(value, assayKey)
+    value[, col := .I, env=list(col=i)]
 
-    # Determine what joins need to be done
-    hasKeyColumns <- all(c('rowKey', 'colKey') %in% colnames(value))
-    hasIdColumns <- all(idColumns %in% colnames(value))
-    hasMetaColumns <- all(metaColumns %in% colnames(value))
+    # -- join assay with existing metadata
+    rKeys <- intersect(rowIDs(x), assayKey)
+    cKeys <- intersect(colIDs(x), assayKey)
+    rIndex <- rowIDs(x, data=TRUE, key=TRUE)[, .SD, .SDcols=c("rowKey", rKeys)]
+    setkeyv(rIndex, rKeys)
+    cIndex <- colIDs(x, data=TRUE, key=TRUE)[, .SD, .SDcols=c("colKey", cKeys)]
+    setkeyv(cIndex, cKeys)
 
-    # Join to fetch the key columns if they are missing
-    if (hasIdColumns && !hasKeyColumns) {
-        value <- colData(x, key=TRUE)[value, on=colIDs(x)]
-        value <- rowData(x, key=TRUE)[value, on=rowIDs(x)]
-        value <- value[, .SD, .SDcols=c('rowKey', 'colKey', valueColumns)]
-    } else if (!hasKeyColumns) {
-        stop("The assay has insufficient information to be retrieve",
-            " the row or column keys. Please ensure either the rowKey",
-            " and colKey columns are present, or all of idCols(x)!")
-    }
+    # -- add an index to the assay
+    setkeyv(rIndex, "rowKey")
+    setkeyv(cIndex, "colKey")
+    setkeyv(aIndex, "rowKey")
+    annotatedIndex <- merge.data.table(aIndex, rIndex, all=TRUE)
+    setkeyv(annotatedIndex, "colKey")
+    annotatedIndex <- merge.data.table(annotatedIndex, cIndex, all=TRUE)
 
-    x@assays[[i]] <- value
+    # -- update assayIndex based with the new assay
+    setkeyv(annotatedIndex, assayKey)
+    annotatedIndex[value, col := col, env=list(col=i)]
+    annotatedIndex[, (assayKey) := NULL]
+    setkeyv(annotatedIndex, unique(c(assayNames(x), i)))
+
+    # -- remove metadata columns for the assay
+    ## TODO:: Do we want to allow mutating rowData and colData via assay method?
+    throwAwayCols <- c(idCols(x), rowMeta(x), colMeta(x))
+    keepCols <- setdiff(colnames(value), throwAwayCols)
+    assayValue <- value[, keepCols, with=FALSE]
+    setkeyv(assayValue, i)
+
+    # -- update the object
+    mutable_intern$assayIndex <- annotatedIndex
+    mutable_intern$assayKeys[[i]] <- assayKey
+    x@.intern <- immutable(mutable_intern)
+    x@assays[[i]] <- assayValue
+
     return(x)
 })
 
+if (sys.nframe() == 0) {
+    x <- copy(lt)
+    rData <- copy(rowData(x, raw=TRUE))
+    cData <- copy(colData(x, raw=TRUE))
+}
 
 ##
 ## == assayNames

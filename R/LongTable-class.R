@@ -42,8 +42,6 @@ NULL
         metadata='list',
         .intern='immutable_list')
 )
-#' @export
-setOldClass('long.table', S4Class='LongTable')
 
 
 #' @title LongTable constructor method
