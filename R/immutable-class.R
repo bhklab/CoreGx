@@ -127,7 +127,9 @@ subset.immutable <- function(x, ...) {
         if (is.null(j_expr)) j_expr <- dots[[2 + 1]]  # index plus one due to alist call
         j_txt <- deparse(j_expr)
         if (grepl(":=|let[ ]*\\(|set[ ]*\\(", j_txt))
-            stop("This data.table is immutable! No assign by reference allowed.")
+            stop("This data.table is immutable! No assignment by reference ",
+                "allowed. Use `mutable(x)` to return a mutable copy.",
+                call.=FALSE)
     }
     sub_obj <- NextMethod()
     immutable(sub_obj)
