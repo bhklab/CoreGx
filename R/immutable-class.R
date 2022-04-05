@@ -122,11 +122,12 @@ subset.immutable <- function(x, ...) {
 #' @export
 `[.immutable` <- function(x, ...) {
     if (is.data.table(x)) {
-        j_idx <- which(...names() %in% "j")
-        if (!length(j_idx)) j_idx <- 2
-        j_expr <- substitute(...elt(j_idx), x)
+        dots <- substitute(alist(...))
+        j_expr <- dots[["j"]]
+        if (is.null(j_expr)) j_expr <- dots[[2 + 1]]  # index plus one due to alist call
         j_txt <- deparse(j_expr)
-        if (grepl(":=|let[ ]*(", j_txt)) stop(.immutable_emsg)
+        if (grepl(":=|let[ ]*\\(|set[ ]*\\(", j_txt))
+            stop("This data.table is immutable! No assign by reference allowed.")
     }
     sub_obj <- NextMethod()
     immutable(sub_obj)
