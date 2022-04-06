@@ -590,32 +590,49 @@ setReplaceMethod('$', signature('LongTable'), function(x, name, value) {
 #'
 #' @param object The `LongTable` object to recalcualte indexes (rowKey and
 #'     colKey values) for.
+#' @param ... [DEVELOPER] Allow object slots to be passed in, which skips
+#'     calling accesors on object again. Unnamed arguments to dots are ignored.
+#'
+#' @details
+#' # DEVELOPER DETAILS
+#' To skip reaccessing the slots of `object`, the `...` argument is parsed
+#' and named values are assigned to the local environment. Objects should be
+#' named as follows (slot: name):
+#' - .intern$assayIndex: index
+#' - rowData: rData, as returned by rowData(x, raw=TRUE)
+#' - colData: cData, as retured by colData(x, raw=TRUE)
+#' - assays: aList, as returned by assays(x, withDimnames=FALSE)
 #'
 #' @return A copy of the `LongTable` with all keys as the smallest set of
 #'     contiguous integers possible given the current data.
 #'
 #' @export
-setMethod('reindex', signature(object='LongTable'), function(object) {
+setMethod('reindex', signature(object='LongTable'), function(object, ...) {
+    # -- get any preaccessed slots via ... and assign to functon environment
+    for (nm in ...names()) {
+        assign(nm, ...elt(which(...names() == nm)))
+    }
     # -- copy to prevent modify by reference
     object <- copy(object)
-    # -- extract object data
-    index <- mutable(getIntern(object)$assayIndex)
-    rData <- rowData(object, raw=TRUE)
-    cData <- colData(object, raw=TRUE)
-    assays <- assays(object, withDimnames=FALSE)
+    # -- extract object data, if no passed via ...
+    .exists <- function(...) exists(..., inherits=FALSE)
+    if (!.exists("index")) index <- mutable(getIntern(object)$assayIndex)
+    if (!.exists("rData")) rData <- rowData(object, raw=TRUE)
+    if (!.exists("cData")) cData <- colData(object, raw=TRUE)
+    if (!.exists("aList")) aList <- assays(object, withDimnames=FALSE)
     metaKeys <- c("rowKey", "colKey")
     setkeyv(index, metaKeys)
     # -- compute the new index
     # update assay keys first
-    for (i in seq_along(assays)) {
-        setkeyv(assays[[i]], metaKeys)
-        aKey <- names(assays)[i]
-        assays[[i]][, (aKey) := .I]
-        index[assays[[i]],
+    for (i in seq_along(aList)) {
+        setkeyv(aList[[i]], metaKeys)
+        aKey <- names(aList)[i]
+        aList[[i]][, (aKey) := .I]
+        index[aList[[i]],
             col := value,
             env=list(col=aKey, value=paste0("i.", aKey))
         ]
-        setkeyv(assays[[i]], names(assays)[i])
+        setkeyv(aList[[i]], names(aList)[i])
     }
     # update rowKey and colKey
     rData[, .rowKey := .I]
@@ -628,14 +645,15 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     cData[, `:=`(colKey=.colKey, .colKey=NULL)]
     # -- update object and return
     # delete row-/colKeys by reference
-    for (a in assays) a[, (metaKeys) := NULL]
+    for (a in aList) a[, (metaKeys) := NULL]
     # raw=TRUE allows direct modification of slots, for developer use
     setkeyv(rData, "rowKey")
     setkeyv(cData, "colKey")
     rowData(object, raw=TRUE) <- rData
     colData(object, raw=TRUE) <- cData
-    assays(object, raw=TRUE) <- assays
+    assays(object, raw=TRUE) <- aList
     mutableIntern <- mutable(getIntern(object))
+    setkeyv(index, assayNames(object))
     mutableIntern$assayIndex <- index
     object@.intern <- immutable(mutableIntern)
     return(object)
