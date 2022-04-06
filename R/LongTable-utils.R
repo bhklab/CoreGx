@@ -109,7 +109,8 @@ NULL
 #' @param reindex `logical(1)` Should index values be reset such that they
 #'   are the smallest possible set of consecutive integers. Modifies the
 #'   "rowKey", "colKey", and all assayKey columns. Initial benchmarks indicate
-#'   rindex=FALSE save 35% of execution time.
+#'   `reindex=FALSE` saves ~20% of both execution time and memory allocation. The
+#'   cost of reindexing decreases the smaller your subet gets.
 #'
 #' @return `LongTable` subset according to the provided index.
 #'
@@ -595,28 +596,49 @@ setReplaceMethod('$', signature('LongTable'), function(x, name, value) {
 #'
 #' @export
 setMethod('reindex', signature(object='LongTable'), function(object) {
-
-    # extract assays joined to row/colData
-    assayDataList <- assays(object, withDimnames=TRUE, metadata=TRUE)
-
-    # find names of ID columns
-    rowIDCols <- colnames(rowData(object))
-    colIDCols <- colnames(colData(object))
-
-    # extract the ID columns from the assay data
-    newRowData <- .extractIDData(assayDataList, rowIDCols, 'rowKey')
-    newColData <- .extractIDData(assayDataList, colIDCols, 'colKey')
-
-    # remap the rowKey and colKey columns to the assays
-    newAssayData <- lapply(assayDataList,
-        FUN=.joinDropOn, DT2=newRowData, on=rowIDCols)
-    newAssayData <- lapply(newAssayData,
-        FUN=.joinDropOn, DT2=newColData, on=colIDCols)
-    newAssayData <- lapply(newAssayData, setkeyv, cols=c('rowKey', 'colKey'))
-
-    return(LongTable(rowData=newRowData, rowIDs=getIntern(object, 'rowIDs'),
-        colData=newColData, colIDs=getIntern(object, 'colIDs'),
-        assays=newAssayData, metadata=metadata(object)))
+    # -- copy to prevent modify by reference
+    object <- copy(object)
+    # -- extract object data
+    index <- mutable(getIntern(object)$assayIndex)
+    rData <- rowData(object, raw=TRUE)
+    cData <- colData(object, raw=TRUE)
+    assays <- assays(object, withDimnames=FALSE)
+    metaKeys <- c("rowKey", "colKey")
+    setkeyv(index, metaKeys)
+    # -- compute the new index
+    # update assay keys first
+    for (i in seq_along(assays)) {
+        setkeyv(assays[[i]], metaKeys)
+        aKey <- names(assays)[i]
+        assays[[i]][, (aKey) := .I]
+        index[assays[[i]],
+            col := value,
+            env=list(col=aKey, value=paste0("i.", aKey))
+        ]
+        setkeyv(assays[[i]], names(assays)[i])
+    }
+    # update rowKey and colKey
+    rData[, .rowKey := .I]
+    cData[, .colKey := .I]
+    index[rData, rowKey := .rowKey]
+    setkeyv(index, "colKey")
+    index[cData, colKey := .colKey]
+    setkeyv(index, metaKeys)
+    rData[, `:=`(rowKey=.rowKey, .rowKey=NULL)]
+    cData[, `:=`(colKey=.colKey, .colKey=NULL)]
+    # -- update object and return
+    # delete row-/colKeys by reference
+    for (a in assays) a[, (metaKeys) := NULL]
+    # raw=TRUE allows direct modification of slots, for developer use
+    setkeyv(rData, "rowKey")
+    setkeyv(cData, "colKey")
+    rowData(object, raw=TRUE) <- rData
+    colData(object, raw=TRUE) <- cData
+    assays(object, raw=TRUE) <- assays
+    mutableIntern <- mutable(getIntern(object))
+    mutableIntern$assayIndex <- index
+    object@.intern <- immutable(mutableIntern)
+    return(object)
 })
 
 
