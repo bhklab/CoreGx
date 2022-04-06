@@ -125,13 +125,14 @@ NULL
     cData <- colData(x, raw=TRUE)[sort(unique(sort(index$colKey))), ]
     assays <- assays(x, withDimnames=FALSE)
     metaKeys <- c("rowKey", "colKey")
+    setkeyv(index, metaKeys)
     for (i in seq_along(assays)) {
         setkeyv(assays[[i]], metaKeys)
         # join based subsets use binary-search, O(log(n)) vs O(n) for vector-scan
         # see https://rdatatable.gitlab.io/data.table/articles/datatable-keys-fast-subset.html
         assays[[i]] <- assays[[i]][index[, metaKeys, with=FALSE], ]
     }
-    # -- optinally reindex the table
+    # -- optionally reindex the table
     if (reindex) {
         # update assay keys first
         for (i in seq_along(assays)) {
@@ -160,9 +161,9 @@ NULL
     rowData(x, raw=TRUE) <- rData
     colData(x, raw=TRUE) <- cData
     assays(x, raw=TRUE) <- assays
-    unlockBinding("assayIndex", getIntern(x))
-    assign("assayIndex", index, envir=getIntern(x))
-    lockBinding("assayIndex", getIntern(x))
+    mutableIntern <- mutable(getIntern(x))
+    mutableIntern$assayIndex <- index
+    x@.intern <- immutable(mutableIntern)
     return(x)
 }
 

@@ -104,6 +104,20 @@ setMethod('getIntern', signature(object='LongTable', x='missing'),
     function(object, x) object@.intern
 )
 
+#' Set the .intern slot of a LongTable
+#'
+#' @param object `LongTable`
+#' @param value An `immutable_list` object, being a class union between `list`
+#'   and `immutable` S3 classes.
+#'
+#' @return Updates the object and returns invisibly.
+#'
+#' @keywords internal
+setReplaceMethod("getIntern", signature(object="LongTable",
+    value="immutable_list"), function(object, value) {
+        object@.intern <- value
+        return(object)
+})
 
 ## ==================
 ## ---- rowData Slot
@@ -359,7 +373,7 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
     if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
         return(x@assays)
     }
-    assayIndex <- copy(getIntern(x, "assayIndex"))
+    assayIndex <- mutable(getIntern(x)$assayIndex)
     if (metadata) {
         rData <- rowData(x, key=TRUE)
         cData <- colData(x, key=TRUE)
@@ -564,9 +578,9 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
         if (is.null(assayKey)) assayKey <- intersect(idCols(x), colnames(value))
     } else {
         if (sum(assayExists) > 1)
-            .error(funContext, "Only one assay can be modified as a time.",
+            .error(funContext, "Only one assay can be modified at a time.",
                 " Please set i to be a character(1) vector.")
-        assayKey <- aKeys[i]
+        assayKey <- aKeys[[i]]
     }
     # -- add assayKey column to the value
     setkeyv(value, assayKey)
