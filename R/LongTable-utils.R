@@ -616,10 +616,11 @@ setMethod('reindex', signature(object='LongTable'), function(object, ...) {
     object <- copy(object)
     # -- extract object data, if no passed via ...
     .exists <- function(...) exists(..., inherits=FALSE)
-    if (!.exists("index")) index <- mutable(getIntern(object)$assayIndex)
+    mutableIntern <- mutable(getIntern(object))
+    index <- copy(mutableIntern$assayIndex)
     if (!.exists("rData")) rData <- rowData(object, raw=TRUE)
     if (!.exists("cData")) cData <- colData(object, raw=TRUE)
-    if (!.exists("aList")) aList <- assays(object, withDimnames=FALSE)
+    if (!.exists("aList")) aList <- assays(object, raw=TRUE)
     metaKeys <- c("rowKey", "colKey")
     setkeyv(index, metaKeys)
     # -- compute the new index
@@ -652,7 +653,6 @@ setMethod('reindex', signature(object='LongTable'), function(object, ...) {
     rowData(object, raw=TRUE) <- rData
     colData(object, raw=TRUE) <- cData
     assays(object, raw=TRUE) <- aList
-    mutableIntern <- mutable(getIntern(object))
     setkeyv(index, assayNames(object))
     mutableIntern$assayIndex <- index
     object@.intern <- immutable(mutableIntern)

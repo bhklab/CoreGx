@@ -3,7 +3,7 @@
 #' @description
 #' This method should allow any S3 object in R to become immutable by
 #' intercepting `[<-`, `[[<-`, `$<-` and `c` during S3-method dispatch and
-#' returning an error. Also intercepts `cbind` and `rbind`.
+#' returning an error.
 #'
 #' Reverse with call to the `mutable` function.
 #'
@@ -15,7 +15,7 @@
 #' S3 objects.
 #'
 #' An environment was not suitable for this case due
-#' to the copy-by-reference semantics, such that normal R assignment, which
+#' to the 'copy-by-reference' semantics, such that normal R assignment, which
 #' users assume makes a copy of the object, actually references the same
 #' environment in both the original and copy of the object.
 #'
@@ -131,12 +131,14 @@ subset.immutable <- function(x, ...) {
     if (is.data.table(x)) {
         dots <- substitute(alist(...))
         j_expr <- dots[["j"]]
-        if (is.null(j_expr)) j_expr <- dots[[2 + 1]]  # index plus one due to alist call
-        j_txt <- deparse(j_expr)
-        if (grepl(":=|let[ ]*\\(|set[ ]*\\(", j_txt))
-            stop("This data.table is immutable! No assignment by reference ",
+        if (is.null(j_expr) && length(dots) > 2)
+            j_expr <- dots[[2 + 1]]  # index plus one due to alist call
+        if (!is.null(j_expr))
+            j_txt <- deparse(j_expr)
+            if (grepl(":=|let[ ]*\\(|set[ ]*\\(", j_txt))
+                stop("This data.table is immutable! No assignment by reference ",
                 "allowed. Use `mutable(x)` to return a mutable copy.",
-                call.=FALSE)
+                    call.=FALSE)
     }
     sub_obj <- NextMethod()
     immutable(sub_obj)
@@ -242,10 +244,11 @@ subset.immutable <- function(x, ...) {
 mutable <- function(object) UseMethod("mutable", object)
 #'
 #' @md
+#' @importFrom data.table copy
 #' @export
 mutable.default <- function(object) {
     new_class <- setdiff(attributes(object)$class, "immutable")
-    structure(object, class=new_class)
+    structure(copy(object), class=new_class)
 }
 
 

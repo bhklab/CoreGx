@@ -15,7 +15,7 @@ The \code{object} with "immutable" prepended to its class attribute.
 \description{
 This method should allow any S3 object in R to become immutable by
 intercepting \verb{[<-}, \verb{[[<-}, \verb{$<-} and \code{c} during S3-method dispatch and
-returning an error. Also intercepts \code{cbind} and \code{rbind}.
+returning an error.
 
 Reverse with call to the \code{mutable} function.
 }
@@ -27,7 +27,7 @@ operate with 'copy-on-modify' semantics, including most base R functions and
 S3 objects.
 
 An environment was not suitable for this case due
-to the copy-by-reference semantics, such that normal R assignment, which
+to the 'copy-by-reference' semantics, such that normal R assignment, which
 users assume makes a copy of the object, actually references the same
 environment in both the original and copy of the object.
 
