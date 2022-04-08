@@ -81,6 +81,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         colIDs=missing(colIDs), assays=missing(assays),
         assayIDs=missing(assayIDs))
 
+
     if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
         names(isMissing)[isMissing], collapse='\n\t'))
 
@@ -124,9 +125,9 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
 
     # Create the row and column keys for LongTable internal mappings
     if (!('rowKey' %in% colnames(rowData)))
-        rowData[, c('rowKey') := .GRP, by=c(rowIDs)]
+        rowData[, c('rowKey') := .GRP, keyby=c(rowIDs)]
     if (!('colKey' %in% colnames(colData)))
-        colData[, c('colKey') := .GRP, by=c(colIDs)]
+        colData[, c('colKey') := .GRP, keyby=c(colIDs)]
 
     # initialize the internals object to store private metadata for a LongTable
     # NOTE: assign parent as emptyenv to prevent leaving parent.frame on the stack
@@ -210,14 +211,10 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     setcolorder(colData, unlist(internals[c('colIDs', 'colMeta')]))
 
     ## Assemble  the pseudo row and column names for the LongTable
-    ### TODO:: Is this the slow part of the constructor?
-    ## TODO:: Is it better to sort these so they don't depend on the order of
-    ##  the rowIDs and colIDs column?
-    .pasteColons <- function(...) paste(..., collapse=':')
-    rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))),
-        .SDcols=internals$rowIDs]
-    colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
-        .SDcols=internals$colIDs]
+    rowData[, .rownames := paste0(rows, collapse=":"), by=.I,
+        env=list(rows=as.list(rowIDs))]
+    colData[, .colnames := paste0(cols, collapse=":"), by=.I,
+        env=list(cols=as.list(colIDs))]
 
     return(CoreGx:::.LongTable(rowData=rowData, colData=colData, assays=assays,
         metadata=metadata, .intern=internals))
