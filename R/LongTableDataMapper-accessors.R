@@ -88,7 +88,7 @@ NULL
         " are missing from rawdata!")
 
     # Subset rawdata, optionally keying table and/or renaming columns
-    .dimData <- .rawdata[, unique(.SD), .SDcols=unlist(dataMap)]
+    .dimData <- .rawdata[, .SD, .SDcols=unlist(dataMap)]
     if (key) setkeyv(.dimData, dataMap$id_columns)
     if (rename) {
         old <- unlist(unname(dataMap))

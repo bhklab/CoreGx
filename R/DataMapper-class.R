@@ -1,4 +1,5 @@
 #' @importClassesFrom S4Vectors Annotated list_OR_List
+#' @importFrom data.table copy
 NULL
 
 #' An S4 Class For Mapping from Raw Experimental Data to a Specific S4 Object
@@ -69,7 +70,7 @@ setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
 #' @aliases rawdata
 #' @eval .docs_DataMapper_get_rawdata(class_=.local_class_2)
 setMethod('rawdata', signature(object='DataMapper'), function(object) {
-    object@rawdata
+    copy(object@rawdata)
 })
 
 #' @export
