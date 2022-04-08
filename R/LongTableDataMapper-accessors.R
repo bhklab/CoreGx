@@ -99,7 +99,7 @@ NULL
         }
     }
 
-    return(.dimData)
+    return(unique(.dimData))
 }
 
 

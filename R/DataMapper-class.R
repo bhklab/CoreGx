@@ -70,7 +70,8 @@ setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
 #' @aliases rawdata
 #' @eval .docs_DataMapper_get_rawdata(class_=.local_class_2)
 setMethod('rawdata', signature(object='DataMapper'), function(object) {
-    copy(object@rawdata)
+    rawdata_ <- object@rawdata
+    return(data.table::copy(rawdata_))
 })
 
 #' @export
