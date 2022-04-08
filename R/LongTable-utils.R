@@ -590,72 +590,48 @@ setReplaceMethod('$', signature('LongTable'), function(x, name, value) {
 #'
 #' @param object The `LongTable` object to recalcualte indexes (rowKey and
 #'     colKey values) for.
-#' @param ... [DEVELOPER] Allow object slots to be passed in, which skips
-#'     calling accesors on object again. Unnamed arguments to dots are ignored.
-#'
-#' @details
-#' # DEVELOPER DETAILS
-#' To skip reaccessing the slots of `object`, the `...` argument is parsed
-#' and named values are assigned to the local environment. Objects should be
-#' named as follows (slot: name):
-#' - .intern$assayIndex: index
-#' - rowData: rData, as returned by rowData(x, raw=TRUE)
-#' - colData: cData, as retured by colData(x, raw=TRUE)
-#' - assays: aList, as returned by assays(x, withDimnames=FALSE)
 #'
 #' @return A copy of the `LongTable` with all keys as the smallest set of
 #'     contiguous integers possible given the current data.
 #'
 #' @export
-setMethod('reindex', signature(object='LongTable'), function(object, ...) {
-    # -- get any preaccessed slots via ... and assign to functon environment
-    for (nm in ...names()) {
-        assign(nm, ...elt(which(...names() == nm)))
-    }
-    # -- copy to prevent modify by reference
-    object <- copy(object)
-    # -- extract object data, if no passed via ...
-    .exists <- function(...) exists(..., inherits=FALSE)
+setMethod('reindex', signature(object='LongTable'), function(object) {
     mutableIntern <- mutable(getIntern(object))
-    index <- copy(mutableIntern$assayIndex)
-    if (!.exists("rData")) rData <- rowData(object, raw=TRUE)
-    if (!.exists("cData")) cData <- colData(object, raw=TRUE)
-    if (!.exists("aList")) aList <- assays(object, raw=TRUE)
-    metaKeys <- c("rowKey", "colKey")
-    setkeyv(index, metaKeys)
-    # -- compute the new index
-    # update assay keys first
-    for (i in seq_along(aList)) {
-        setkeyv(aList[[i]], metaKeys)
-        aKey <- names(aList)[i]
-        aList[[i]][, (aKey) := .I]
-        index[aList[[i]],
-            col := value,
-            env=list(col=aKey, value=paste0("i.", aKey))
-        ]
-        setkeyv(aList[[i]], names(aList)[i])
-    }
-    # update rowKey and colKey
-    rData[, .rowKey := .I]
-    cData[, .colKey := .I]
+    index <- mutableIntern$assayIndex
+    rData <- copy(rowData(object, raw=TRUE))
+    cData <- copy(colData(object, raw=TRUE))
+    aList <- assays(object, raw=TRUE)
+    # -- sort metadata tables by their keys and update the index
+    rData[, .rowKey := .I, by=c(rowIDs(object))]
+    cData[, .colKey := .I, by=c(colIDs(object))]
+    # -- make a new assayIndex with the keys
     index[rData, rowKey := .rowKey]
-    setkeyv(index, "colKey")
     index[cData, colKey := .colKey]
-    setkeyv(index, metaKeys)
-    rData[, `:=`(rowKey=.rowKey, .rowKey=NULL)]
-    cData[, `:=`(colKey=.colKey, .colKey=NULL)]
-    # -- update object and return
-    # delete row-/colKeys by reference
-    for (a in aList) a[, (metaKeys) := NULL]
-    # raw=TRUE allows direct modification of slots, for developer use
+    setkeyv(index, c("rowKey", "colKey"))
+    # -- add new indices for assayKeys to index
+    for (nm in setdiff(colnames(index), c("rowKey", "colKey"))) {
+        index[!is.na(col), paste0(".", nm) := .I, env=list(col=nm)]
+    }
+    # -- update the assayKey in assays
+    for (nm in names(aList)) {
+        setkeyv(index, nm)
+        aList[[nm]][index, col := dotcol,
+            env=list(col=nm, dotcol=paste0(".", nm))]
+        setkeyv(aList[[nm]], nm)
+        index[, (nm) := col, env=list(col=nm)]
+    }
+    index[, paste0(".", names(aList)) := NULL]
+    setkeyv(index, assayNames(object))
+    rData[, let(rowKey=.rowKey, .rowKey=NULL)]
     setkeyv(rData, "rowKey")
+    cData[, let(colKey=.colKey, .colKey=NULL)]
     setkeyv(cData, "colKey")
     rowData(object, raw=TRUE) <- rData
     colData(object, raw=TRUE) <- cData
     assays(object, raw=TRUE) <- aList
-    setkeyv(index, assayNames(object))
     mutableIntern$assayIndex <- index
     object@.intern <- immutable(mutableIntern)
+
     return(object)
 })
 

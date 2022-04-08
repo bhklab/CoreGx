@@ -4,14 +4,11 @@
 \alias{reindex,LongTable-method}
 \title{Redo indexing for a LongTable object to remove any gaps in integer indexes}
 \usage{
-\S4method{reindex}{LongTable}(object, ...)
+\S4method{reindex}{LongTable}(object)
 }
 \arguments{
 \item{object}{The \code{LongTable} object to recalcualte indexes (rowKey and
 colKey values) for.}
-
-\item{...}{\link{DEVELOPER} Allow object slots to be passed in, which skips
-calling accesors on object again. Unnamed arguments to dots are ignored.}
 }
 \value{
 A copy of the \code{LongTable} with all keys as the smallest set of
@@ -24,15 +21,3 @@ will no longer be contiguous integers. This method will calcualte a new
 set of rowKey and colKey values such that integer indexes are the smallest
 set of contiguous integers possible for the data.
 }
-\section{DEVELOPER DETAILS}{
-To skip reaccessing the slots of \code{object}, the \code{...} argument is parsed
-and named values are assigned to the local environment. Objects should be
-named as follows (slot: name):
-\itemize{
-\item .intern$assayIndex: index
-\item rowData: rData, as returned by rowData(x, raw=TRUE)
-\item colData: cData, as retured by colData(x, raw=TRUE)
-\item assays: aList, as returned by assays(x, withDimnames=FALSE)
-}
-}
-

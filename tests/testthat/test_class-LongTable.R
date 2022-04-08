@@ -7,11 +7,12 @@ library(data.table)
 test_that("`reindex,LongTable-method` does not corrupt data relationships", {
     nlt <- reindex(lt)
     for (i in seq_along(assayNames(lt))) {
+        print(i)
         assay1 <- assay(lt, i, withDimnames=TRUE)
-        setindexv(assay1, idCols(lt))
+        setkeyv(assay1, idCols(lt))
         assay2 <- assay(nlt, i, withDimnames=TRUE)
-        setindexv(assay2, idCols(lt))
-        expect_true(all.equal(assay1, assay2))
+        setkeyv(assay2, idCols(lt))
+        testthat::expect_true(all.equal(assay1, assay2))
     }
     assayL1 <- assays(lt)
     assayL2 <- assays(nlt)
@@ -31,5 +32,7 @@ test_that("`assay,LongTable-method` and `assays,LongTable-method` return equival
 })
 
 # see https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation for
-# explanatiojn
-test_that("`rowData,LongTable-method` orders data correctly")
+# explanation
+test_that("`rowData,LongTable-method` orders data correctly", {
+
+})
