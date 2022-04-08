@@ -92,7 +92,7 @@ NULL
 #'
 #' @md
 #' @importFrom checkmate assertList assertDataTable
-#' @importFrom data.table setDT
+#' @importFrom data.table setDT copy
 #' @export
 LongTableDataMapper <- function(rawdata=data.frame(),
         rowDataMap=list(character(), character()),
@@ -109,7 +109,7 @@ LongTableDataMapper <- function(rawdata=data.frame(),
         len=2)
     assertList(metadataMap)
 
-    .LongTableDataMapper(rawdata=rawdata, rowDataMap=rowDataMap,
+    .LongTableDataMapper(rawdata=copy(rawdata), rowDataMap=rowDataMap,
         colDataMap=colDataMap, assayMap=assayMap, metadataMap=metadataMap)
 }
 

@@ -72,9 +72,9 @@ NULL
         funContext <- paste0("\n[", getPackageName(), "::.get_dimDataMap]\n\t")
 
     # Input validation
-    assertClass(x, "LongTableDataMapper")
-    assertLogical(key)
-    assertList(dataMap, types=c("character"), max.len=2)
+    checkmate::assertClass(x, "LongTableDataMapper")
+    checkmate::assertLogical(key)
+    checkmate::assertList(dataMap, types=c("character"), max.len=2)
 
     # Extract relevant data
     .rawdata <- rawdata(x)
@@ -88,7 +88,7 @@ NULL
         " are missing from rawdata!")
 
     # Subset rawdata, optionally keying table and/or renaming columns
-    .dimData <- unique(.rawdata[, unlist(dataMap), with=FALSE])
+    .dimData <- .rawdata[, unique(.SD), .SDcols=unlist(dataMap)]
     if (key) setkeyv(.dimData, dataMap$id_columns)
     if (rename) {
         old <- unlist(unname(dataMap))

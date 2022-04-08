@@ -225,14 +225,14 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
 
 # NOT RUN: testing code for construtor method
 if (sys.nframe() == 0) {
-    rowData <- rowData(dataMapperLT)
-    rowIDs <- rowDataMap(dataMapperLT)[[1]]
-    colData <- colData(dataMapperLT)
-    colIDs <- colDataMap(dataMapperLT)[[1]]
-    assays <- assays(dataMapperLT)
-    assayIDs <- lapply(assayMap(dataMapperLT), `[[`, i=1)
+    bench::system_time(rowData <- rowData(dataMapperLT))
+    bench::system_time(rowIDs <- rowDataMap(dataMapperLT)[[1]])
+    bench::system_time(colData <- colData(dataMapperLT))
+    bench::system_time(colIDs <- colDataMap(dataMapperLT)[[1]])
+    bench::system_time(assays <- assays(dataMapperLT))
+    bench::system_time(assayIDs <- lapply(assayMap(dataMapperLT), `[[`, i=1))
 
-    system.time(
+    bench::system_time(
         lt <- LongTable(rowData, rowIDs, colData, colIDs, assays, assayIDs)
     )
 }
