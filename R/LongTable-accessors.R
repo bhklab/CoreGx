@@ -370,6 +370,7 @@ setReplaceMethod('colData', signature(x='LongTable'),
 #' @export
 setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
         metadata=withDimnames, key=!withDimnames, ...) {
+    # secret arguments for internal use
     if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
         return(x@assays)
     }
@@ -392,7 +393,10 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
         setkeyv(assayIndex, names(aList)[i])
         aList[[i]] <- assayIndex[aList[[i]], ]
         aList[[i]][, (names(aList)) := NULL]
-        if (!key) aList[[i]][, (c("rowKey", "colKey")) := NULL]
+        if (!key) {
+            aList[[i]][, (c("rowKey", "colKey")) := NULL]
+            if (withDimnnames) setkeyv(aList[[i]], idCols(x))
+        }
     }
     return(aList)
 })
