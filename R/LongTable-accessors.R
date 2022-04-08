@@ -395,7 +395,7 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
         aList[[i]][, (names(aList)) := NULL]
         if (!key) {
             aList[[i]][, (c("rowKey", "colKey")) := NULL]
-            if (withDimnnames) setkeyv(aList[[i]], idCols(x))
+            if (withDimnames) setkeyv(aList[[i]], idCols(x))
         }
     }
     return(aList)

@@ -85,23 +85,29 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         names(isMissing)[isMissing], collapse='\n\t'))
 
     # check parameter types and coerce or error
-    if (!is(colData, "data.table"))
+    if (!is(colData, "data.table")) {
         tryCatch({
             colData <- data.table(colData, keep.rownames=keep.rownames)
         }, error=function(e)
             stop(.errorMsg("colData must be coercible to a data.frame!"))
         )
+    } else {
+        colData <- copy(colData)
+    }
 
-    if (!is(rowData, "data.table"))
+    if (!is(rowData, "data.table")) {
         tryCatch({
             rowData <- data.table(rowData, keep.rownames=keep.rownames) },
         error=function(e)
             stop(.errorMsg("rowData must be coerceible to a data.frame!"))
         )
+    } else {
+        rowData <- copy(rowData)
+    }
 
     isDT <- is.items(assays, FUN=is.data.table)
     isDF <- is.items(assays, FUN=is.data.frame) & !isDT
-    if (!all(isDT))
+    if (!all(isDT)) {
         tryCatch({
             for (i in which(isDF))
                 assays[[i]] <- data.table(assays[[i]], keep.rownames)
@@ -113,6 +119,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
                 types, '\nPlease ensure all items in the assays list are ',
                 'coerceable to a data.frame!'), collapse=', ')
         })
+    }
+    assays <- copy(assays)
 
     # Create the row and column keys for LongTable internal mappings
     if (!('rowKey' %in% colnames(rowData)))
