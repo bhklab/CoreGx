@@ -596,7 +596,6 @@ setReplaceMethod('$', signature('LongTable'), function(x, name, value) {
 #'
 #' @export
 setMethod('reindex', signature(object='LongTable'), function(object) {
-    ## FIXME:: Do I want to allow passing slots via ...? bench: 44ms
     # -- extract the requisite data
     mutableIntern <- mutable(getIntern(object))
     index <- mutableIntern$assayIndex
@@ -606,18 +605,21 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     # -- sort metadata tables by their id columns and update the index
     rData[, .rowKey := .I, by=c(rowIDs(object))]
     cData[, .colKey := .I, by=c(colIDs(object))]
-    # -- update rowKey and colKey in the asssayIndex
-    if (!(rData[, all(rowKey == .rowKey)] || cData[, all(colKey == .colKey)])) {
+    # -- update rowKey and colKey in the asssayIndex, if they have changed
+    if (rData[, any(rowKey != .rowKey)]) {
         index[rData, rowKey := .rowKey]
-        index[cData, colKey := .colKey]
+        rData[, let(rowKey=.rowKey)]
+        setkeyv(rData, "rowKey")
     }
-    rData[, let(rowKey=.rowKey, .rowKey=NULL)]
-    setkeyv(rData, "rowKey")
-    cData[, let(colKey=.colKey, .colKey=NULL)]
-    setkeyv(cData, "colKey")
+    if (cData[, any(colKey != .colKey)]) {
+        index[cData, colKey := .colKey]
+        cData[, let(colKey=.colKey)]
+        setkeyv(cData, "colKey")
+    }
+    rData[, .rowKey := NULL]
+    cData[, .colKey := NULL]
     # -- add new indices for assayKeys to index
-    ## TODO:: maybe this sort isn't worth it?
-    setkeyv(index, c("rowKey", "colKey"))
+    setkeyv(index, c("rowKey", "colKey"))  #
     assays_ <- setdiff(colnames(index), c("rowKey", "colKey"))
     assayEqualKeys <- setNames(vector("logical", length(assays_)), assays_)
     for (nm in assays_) {
@@ -625,7 +627,7 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
         assayEqualKeys[nm] <- index[!is.na(col), all(dotcol == col),
             env=list(dotcol=paste0(".", nm), col=nm)]
     }
-    # -- check equality and update assayKeys in assays where not equal
+    # -- check equality and update assayKeys in assays if they have changed
     for (nm in names(which(!assayEqualKeys))) {
         setkeyv(index, nm)
         aList[[nm]][index, col := dotcol,
@@ -641,7 +643,6 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     assays(object, raw=TRUE) <- aList
     mutableIntern$assayIndex <- index
     object@.intern <- immutable(mutableIntern)
-
     return(object)
 })
 

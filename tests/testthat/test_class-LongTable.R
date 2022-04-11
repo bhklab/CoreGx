@@ -2,9 +2,17 @@ library(testthat)
 library(data.table)
 
 
-# ==== Accessors
+# ==== LongTable-acessors.R
 
-test_that("`reindex,LongTable-method` does not corrupt data relationships", {
+# see https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation for
+# explanation
+test_that("`rowData,LongTable-method` orders data correctly", {
+
+})
+
+# ==== LongTable-utils.R
+
+testthat::test_that("`reindex,LongTable-method` does not corrupt data relationships", {
     nlt <- reindex(lt)
     for (i in seq_along(assayNames(lt))) {
         print(i)
@@ -22,7 +30,7 @@ test_that("`reindex,LongTable-method` does not corrupt data relationships", {
     }
 })
 
-test_that("`reindex,LongTale-method` does not mutate by reference", {
+testthat::test_that("`reindex,LongTale-method` does not mutate by reference", {
     .lt <- copy(lt)
     nlt <- reindex(lt)
     testthat::expect_true(all.equal(.lt, lt))
@@ -36,10 +44,4 @@ test_that("`assay,LongTable-method` and `assays,LongTable-method` return equival
         print(i)
         expect_true(all.equal(assay_list[[i]], assays_[[i]]))
     }
-})
-
-# see https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation for
-# explanation
-test_that("`rowData,LongTable-method` orders data correctly", {
-
 })
