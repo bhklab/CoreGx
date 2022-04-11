@@ -17,7 +17,7 @@ test_that("`reindex,LongTable-method` does not corrupt data relationships", {
     assayL1 <- assays(lt)
     assayL2 <- assays(nlt)
     for (i in seq_along(assayL1)) {
-        expect_true(all.equal(assayL1[[i]], assayL2[[i]]))
+        testthat::expect_true(all.equal(assayL1[[i]], assayL2[[i]]))
     }
 })
 

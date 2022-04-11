@@ -596,36 +596,46 @@ setReplaceMethod('$', signature('LongTable'), function(x, name, value) {
 #'
 #' @export
 setMethod('reindex', signature(object='LongTable'), function(object) {
+    ## FIXME:: Do I want to allow passing slots via ...? bench: 44ms
+    # -- extract the requisite data
     mutableIntern <- mutable(getIntern(object))
     index <- mutableIntern$assayIndex
     rData <- copy(rowData(object, raw=TRUE))
     cData <- copy(colData(object, raw=TRUE))
-    aList <- assays(object, raw=TRUE)
-    # -- sort metadata tables by their keys and update the index
+    aList <- copy(assays(object, raw=TRUE))
+    # -- sort metadata tables by their id columns and update the index
     rData[, .rowKey := .I, by=c(rowIDs(object))]
     cData[, .colKey := .I, by=c(colIDs(object))]
-    # -- make a new assayIndex with the keys
-    index[rData, rowKey := .rowKey]
-    index[cData, colKey := .colKey]
-    setkeyv(index, c("rowKey", "colKey"))
-    # -- add new indices for assayKeys to index
-    for (nm in setdiff(colnames(index), c("rowKey", "colKey"))) {
-        index[!is.na(col), paste0(".", nm) := .I, env=list(col=nm)]
+    # -- update rowKey and colKey in the asssayIndex
+    if (!(rData[, all(rowKey == .rowKey)] || cData[, all(colKey == .colKey)])) {
+        index[rData, rowKey := .rowKey]
+        index[cData, colKey := .colKey]
     }
-    # -- update the assayKey in assays
-    for (nm in names(aList)) {
-        setkeyv(index, nm)
-        aList[[nm]][index, col := dotcol,
-            env=list(col=nm, dotcol=paste0(".", nm))]
-        setkeyv(aList[[nm]], nm)
-        index[, (nm) := col, env=list(col=nm)]
-    }
-    index[, paste0(".", names(aList)) := NULL]
-    setkeyv(index, assayNames(object))
     rData[, let(rowKey=.rowKey, .rowKey=NULL)]
     setkeyv(rData, "rowKey")
     cData[, let(colKey=.colKey, .colKey=NULL)]
     setkeyv(cData, "colKey")
+    # -- add new indices for assayKeys to index
+    ## TODO:: maybe this sort isn't worth it?
+    setkeyv(index, c("rowKey", "colKey"))
+    assays_ <- setdiff(colnames(index), c("rowKey", "colKey"))
+    assayEqualKeys <- setNames(vector("logical", length(assays_)), assays_)
+    for (nm in assays_) {
+        index[!is.na(col), paste0(".", nm) := .I, env=list(col=nm)]
+        assayEqualKeys[nm] <- index[!is.na(col), all(dotcol == col),
+            env=list(dotcol=paste0(".", nm), col=nm)]
+    }
+    # -- check equality and update assayKeys in assays where not equal
+    for (nm in names(which(!assayEqualKeys))) {
+        setkeyv(index, nm)
+        aList[[nm]][index, col := dotcol,
+            env=list(col=nm, dotcol=paste0(".", nm))]
+        setkeyv(aList[[nm]], nm)
+        index[, (nm) := dotcol, env=list(dotcol=paste0(".", nm))]
+    }
+    index[, paste0(".", assays_) := NULL]
+    setkeyv(index, assayNames(object))
+    # -- update the object with the reindexed tables and return
     rowData(object, raw=TRUE) <- rData
     colData(object, raw=TRUE) <- cData
     assays(object, raw=TRUE) <- aList
