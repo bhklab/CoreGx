@@ -81,7 +81,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         colIDs=missing(colIDs), assays=missing(assays),
         assayIDs=missing(assayIDs))
 
-
     if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
         names(isMissing)[isMissing], collapse='\n\t'))
 
@@ -131,8 +130,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
 
     # initialize the internals object to store private metadata for a LongTable
     # NOTE: assign parent as emptyenv to prevent leaving parent.frame on the stack
-    internals <- vector("list", length=6) |>
-        setNames(c("rowIDs", "rowMeta", "colIDs", "colMeta", "assayKeys", "assayIndex"))
+    internals <- setNames(vector("list", length=6),
+        c("rowIDs", "rowMeta", "colIDs", "colMeta", "assayKeys", "assayIndex"))
 
     ## FIXME:: Move all validity checks to top of the function to prevent wasted
     ## computation or into class validity method
@@ -156,6 +155,15 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     internals$colMeta <- setdiff(colnames(colData[, -'colKey']), colIDs)
 
     # -- capture assays internal metadata
+    # sort such that rowIDs are first, then colIDs; ensures reindex returns
+    # the same order as construtor
+    for (i in seq_along(assayIDs)) {
+        rids <- intersect(rowIDs, assayIDs[[i]])
+        cids <- intersect(colIDs, assayIDs[[i]])
+        assayIDs[[i]] <- c(rids, cids)
+    }
+    internals$assayKeys <- assayIDs
+
     # ensure names of assays and assayIDs match
     hasMatchingAssayNames <- names(assays) == names(assayIDs)
     if (!all(hasMatchingAssayNames)) stop(.errorMsg(
@@ -163,13 +171,10 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         paste0(names(assays)[!hasMatchingAssayNames], collapse=", ")),
         call.=FALSE)
     # set keys for join with metadata
-    for (i in seq_along(assays)) {
-        setkeyv(assays[[i]], assayIDs[[i]])
-        assays[[i]][, (names(assays)[i]) := .I]
+    for (nm in names(assays)) {
+        setkeyv(assays[[nm]], assayIDs[[nm]])
+        assays[[nm]][, (nm) := .I]
     }
-
-    # assay keys
-    internals$assayKeys <- assayIDs
 
     # build the index mapping assay rows to rowKey and colKey
     assayIndex <- expand.grid(rowKey=rowData$rowKey, colKey=colData$colKey)
@@ -185,7 +190,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         colData[, c(colIDs, "colKey"), with=FALSE], ,
         on="colKey"
     ]
-    setkeyv(assayIndex, c(colIDs, rowIDs))
+    setkeyv(assayIndex, c(rowIDs, colIDs))
     for (i in seq_along(assays)) {
         assayIndex[assays[[i]], col := col,
             env=list(col=names(assays)[i])]
