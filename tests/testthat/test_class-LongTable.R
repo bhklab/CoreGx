@@ -17,8 +17,15 @@ test_that("`reindex,LongTable-method` does not corrupt data relationships", {
     assayL1 <- assays(lt)
     assayL2 <- assays(nlt)
     for (i in seq_along(assayL1)) {
+        print(i)
         testthat::expect_true(all.equal(assayL1[[i]], assayL2[[i]]))
     }
+})
+
+test_that("`reindex,LongTale-method` does not mutate by reference", {
+    .lt <- copy(lt)
+    nlt <- reindex(lt)
+    testthat::expect_true(all.equal(.lt, lt))
 })
 
 test_that("`assay,LongTable-method` and `assays,LongTable-method` return equivalent data", {
