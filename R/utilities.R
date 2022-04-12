@@ -445,6 +445,15 @@
 # medncauchys -------------------------------------------------------------
 
 ## TODO:: Add documentation to these functions
+
+#' A random sample distributed as the median of N Cauchy distributed variables 
+#' 
+#' Naming follows R conventions.  
+#' 
+#' @param N How many samples to sample
+#' @param n The number of Cauchy distributions to take the median of
+#' @param scale the scale of the Cauchy distribution. 
+#' 
 #' @importFrom stats rcauchy
 #' @export
 #' @keywords internal
@@ -457,6 +466,15 @@
     return(x)
 }
 
+#' PDF of the median of N Cauchy distributed variables 
+#' 
+#' This function calculates the PDF/density for a variable distributed as the median value of n IID Cauchy variables. Naming follows R conventions.  
+#' 
+#' @param x Where to evaluate the density function
+#' @param n The number of Cauchy distributions to take the median of
+#' @param scale the scale of the Cauchy distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#' 
 #' @importFrom stats dcauchy pcauchy integrate
 #' @export
 #' @keywords internal
@@ -489,6 +507,16 @@
     return(y)
 }
 
+
+#' CDF of the median of N Cauchy distributed variables 
+#' 
+#' This function calculates the CDF/distribution for a variable distributed as the median value of n IID Cauchy variables. Naming follows R conventions.  
+#' 
+#' @param x Where to evaluate the distribution function
+#' @param n The number of Cauchy distributions to take the median of
+#' @param scale the scale of the Cauchy distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#' 
 #' @importFrom stats pcauchy integrate
 #' @export
 #' @keywords internal
@@ -525,6 +553,11 @@
 #' This increases robustness to extreme outliers while not completely ignoring the fact that points are truncated, and seems to work well in practice. The name of the function follows:
 #' e(xpectation)d(istribution)med(ian)ncauchys - following R conventions. 
 #' 
+#' @param x Where the truncation occurred 
+#' @param n The number of Cauchy distributions to take the median of
+#' @param scale the scale of the Cauchy distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#' 
 #' @importFrom stats integrate
 #' @keywords internal
 #' @export
@@ -554,6 +587,14 @@
 
 #### mednnormals -------------------------------------------------------------
 
+#' A random sample distributed as the median of N Normally distributed variables 
+#' 
+#' Naming follows R conventions.  
+#' 
+#' @param N How many samples to sample
+#' @param n The number of normal distributions to take the median of
+#' @param scale the SD of the normal distribution. 
+#' 
 #' @export
 #' @keywords internal
 #' @noRd
@@ -565,6 +606,15 @@
     return(x)
 }
 
+#' PDF of the median of N Normally distributed variables 
+#' 
+#' This function calculates the PDF/density for a variable distributed as the median value of n IID Normal variables. Naming follows R conventions.  
+#' 
+#' @param x where to evaluate the density
+#' @param n The number of normal distributions to take the median of
+#' @param scale the SD of the normal distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#'  
 #' @importFrom stats rnorm  dnorm
 #' @export
 #' @keywords internal
@@ -602,6 +652,16 @@
     return(y)
 }
 
+
+#' CDF of the median of N Normally distributed variables 
+#' 
+#' This function calculates the CDF/distribution for a variable distributed as the median value of n IID Normal variables. Naming follows R conventions.  
+#' 
+#' @param x Where to evaluate the Distribution
+#' @param n The number of normal distributions to take the median of
+#' @param scale the SD of the normal distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#' 
 #' @importFrom stats integrate
 #' @export
 #' @keywords internal
@@ -637,6 +697,11 @@
 #' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value. 
 #' This increases robustness to extreme outliers while not completely ignoring the fact that points are truncated, and seems to work well in practice. The name of the function follows:
 #' e(xpectation)d(istribution)med(ian)nnormals - following R conventions. 
+#' 
+#' @param x Where the truncation occurred 
+#' @param n The number of normal distributions to take the median of
+#' @param scale the SD of the normal distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
 #' 
 #' @importFrom stats integrate
 #' @export
