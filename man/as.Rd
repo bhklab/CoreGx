@@ -6,7 +6,7 @@
 \alias{as.data.frame.long.table}
 \title{LongTable to data.table conversion}
 \usage{
-as.data.table.long.table(from)
+\method{as.data.table}{long.table}(from)
 
 \method{as.data.frame}{long.table}(x, row.names, optional = TRUE, ...)
 }

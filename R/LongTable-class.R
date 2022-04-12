@@ -388,7 +388,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #' @export
 setMethod('rowIDs', signature(object='LongTable'),
         function(object, data=FALSE, key=FALSE) {
-    cols <- getIntern(object, 'rowIDs')
+    cols <- mutable(getIntern(object, 'rowIDs'))
     if (key) cols <- c(cols, 'rowKey')
     if (data) rowData(object, key=key)[, ..cols] else cols
 })
@@ -412,7 +412,7 @@ setMethod('rowIDs', signature(object='LongTable'),
 #' @export
 setMethod('rowMeta', signature(object='LongTable'),
         function(object, data=FALSE, key=FALSE) {
-    cols <- getIntern(object, 'rowMeta')
+    cols <- mutable(getIntern(object, 'rowMeta'))
     cols <- cols[!grepl('^\\.', cols)]
     if (key) cols <- c(cols, 'rowKey')
     if (data) rowData(object, key=key)[, ..cols] else cols
@@ -439,7 +439,7 @@ setMethod('rowMeta', signature(object='LongTable'),
 setMethod('colIDs', signature(object='LongTable'),
         function(object, data=FALSE, key=FALSE) {
 
-    cols <- getIntern(object, 'colIDs')
+    cols <- mutable(getIntern(object, 'colIDs'))
     if (key) cols <- c(cols, 'colKey')
     if (data) colData(object, key=TRUE)[, ..cols] else cols
 
@@ -466,7 +466,7 @@ setMethod('colIDs', signature(object='LongTable'),
 setMethod('colMeta', signature(object='LongTable'),
     function(object, data=FALSE, key=FALSE) {
 
-    cols <- getIntern(object, 'colMeta')
+    cols <- mutable(getIntern(object, 'colMeta'))
     cols <- cols[!grepl('^\\.', cols)]
     if (key) cols <- c(cols, 'colKey')
     if (data) colData(object, key=TRUE)[, ..cols] else cols
