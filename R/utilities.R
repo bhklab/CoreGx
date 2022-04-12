@@ -518,6 +518,13 @@
     return(y)
 }
 
+#' Expectation of the likelihood of the median of N Cauchy distributions for truncated data
+#' 
+#' This function calculates the expected value of the PDF of a median of N Cauchy with given scale parameter, calculated over the region from x to infinity if x>0, and -infinity to x otherwise. 
+#' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value. 
+#' This increases robustness to extreme outliers while not completely ignoring the fact that points are truncated, and seems to work well in practice. The name of the function follows:
+#' e(xpectation)d(istribution)med(ian)ncauchys - following R conventions. 
+#' 
 #' @importFrom stats integrate
 #' @keywords internal
 #' @export
@@ -583,8 +590,13 @@
                   tseq, sd = scale[g]) * dnorm(x[g] - tseq, sd = scale[g])/(cos(aseq))^2 * wseq) * (aseq[2] - aseq[1])/6)
             })
         } else {
-            y[g] <- .multinom(n[g], c((n[g] - 1)/2, (n[g] - 1)/2)) * (pnorm(x[g], sd = scale[g]))^((n[g] - 1)/2) * (1 - pnorm(x[g], sd = scale[g]))^((n[g] - 
-                1)/2) * dnorm(x[g], sd = scale[g])
+            if(n[g]==1){
+                y[g] <- dnorm(x[g], sd = scale[g]) ## This reduces to the simple case for n equals 1 below, but we can save many calls to pnorm, which just get raised to a power of 0.
+            } else {
+                y[g] <- .multinom(n[g], c((n[g] - 1)/2, (n[g] - 1)/2)) * (pnorm(x[g], sd = scale[g]))^((n[g] - 1)/2) * (1 - pnorm(x[g], sd = scale[g]))^((n[g] - 
+                                                                                                                                                              1)/2) * dnorm(x[g], sd = scale[g])               
+            }
+
         }
     }
     return(y)
@@ -619,29 +631,45 @@
     return(y)
 }
 
+#' Expectation of the likelihood of the median of N normal distributions for truncated data
+#' 
+#' This function calculates the expected value of the PDF of a median of N normals with SD=scale, calculated over the region from x to infinity if x>0, and -infinity to x otherwise. 
+#' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value. 
+#' This increases robustness to extreme outliers while not completely ignoring the fact that points are truncated, and seems to work well in practice. The name of the function follows:
+#' e(xpectation)d(istribution)med(ian)nnormals - following R conventions. 
+#' 
 #' @importFrom stats integrate
 #' @export
-#' @keywords intenral
+#' @keywords internal
 #' @noRd
 .edmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
     scale <- rep(scale, times = length(x)/length(scale))
     y <- numeric(length(x))
     for (g in seq_along(y)) {
-        if (x[g] > 0) {
-            upper <- Inf
-            lower <- x[g]
+        if(n[g]==1){ ## The n=1 case is called very often, and there are significant savings (20x) to not calling numerical integration. 
+            if(x[g]>0){
+                pnorm(x[g], sd=scale[g]/sqrt(2), lower.tail = F)/(scale*2*sqrt(pi))
+            } else {
+                pnorm(x[g], sd=scale[g]/sqrt(2), lower.tail = T)/(scale*2*sqrt(pi))
+            }
         } else {
-            upper <- x[g]
-            lower <- -Inf
+            if (x[g] > 0) {
+                upper <- Inf
+                lower <- x[g]
+            } else {
+                upper <- x[g]
+                lower <- -Inf
+            }
+            y[g] <- tryCatch(integrate(f = function(k) {
+                (.dmednnormals(k, n[g], scale[g]))^2
+            }, lower = lower, upper = upper, subdivisions = divisions)[[1]], error = function(e) {
+                wseq <- c(1, 4, rep(c(2, 4), times = divisions - 1), 1)
+                aseq <- seq(from = atan(lower), to = atan(upper), length.out = 2 * divisions + 1)
+                return(sum((.dmednnormals(tan(aseq), n[g], scale[g]))^2 * wseq/(cos(aseq))^2) * (aseq[3] - aseq[1])/6)
+            })
         }
-        y[g] <- tryCatch(integrate(f = function(k) {
-            (.dmednnormals(k, n[g], scale[g]))^2
-        }, lower = lower, upper = upper, subdivisions = divisions)[[1]], error = function(e) {
-            wseq <- c(1, 4, rep(c(2, 4), times = divisions - 1), 1)
-            aseq <- seq(from = atan(lower), to = atan(upper), length.out = 2 * divisions + 1)
-            return(sum((.dmednnormals(tan(aseq), n[g], scale[g]))^2 * wseq/(cos(aseq))^2) * (aseq[3] - aseq[1])/6)
-        })
+        
     }
     return(y)
 }
