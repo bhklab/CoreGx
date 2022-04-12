@@ -112,7 +112,7 @@
             stop("x must contain only real numbers, NA-values, and/or -Inf (if x_as_log flag is set to TRUE).")
         }
 
-        if (x_as_log == FALSE && min(x) < 0) {
+        if (x_as_log == FALSE && min(x, na.rm=TRUE) < 0) {
             if (verbose == 2) {
                 message("x:")
                 message(x)
@@ -186,7 +186,7 @@
             stop("y must contain only real numbers, NA-values, and/or -Inf (if y_as_log is set to TRUE).")
         }
         
-        if (min(y) < 0) {
+        if (min(y, na.rm=TRUE) < 0) {
             if (verbose) {
                 warning("Warning: Negative y data.")
                 if (verbose == 2) {
@@ -196,7 +196,7 @@
             }
         }
         
-        if (max(y) > (1 + 99 * y_as_pct)) {
+        if (max(y, na.rm=TRUE) > (1 + 99 * y_as_pct)) {
             if (verbose) {
                 warning("Warning: y data exceeds negative control.")
                 if (verbose == 2) {
@@ -208,7 +208,7 @@
         
         if (missing(pars)) {
             
-            if (y_as_log == FALSE && min(y) < 0) {
+            if (y_as_log == FALSE && min(y, na.rm=TRUE) < 0) {
                 if (verbose) {
                   warning("Negative y-values encountered. y data may be inappropriate, or 'y_as_log' flag may be set incorrectly.")
                   if (verbose == 2) {
@@ -220,7 +220,7 @@
                 }
             }
             
-            if (y_as_pct == TRUE && max(y) < 5) {
+            if (y_as_pct == TRUE && max(y, na.rm=TRUE) < 5) {
                 if (verbose) {
                   warning("Warning: 'y_as_pct' flag may be set incorrectly.")
                   if (verbose == 2) {
@@ -232,7 +232,7 @@
                 }
             }
             
-            if (y_as_pct == FALSE && max(y) > 5) {
+            if (y_as_pct == FALSE && max(y, na.rm=TRUE) > 5) {
                 if (verbose) {
                   warning("Warning: 'y_as_pct' flag may be set incorrectly.")
                   if (verbose == 2) {
@@ -341,14 +341,22 @@
     if (x_to_log) {
         x <- log10(x)
     }
-    ### Shouldnt we sort y in same order?????
-    if (is.unsorted(x)) {
+    ### Note, if Y is passed in, it is sorted in this same order below. This is not obvious from the code right away. 
+    if (is.unsorted(x, na.rm=TRUE)) {
+        InputUnsorted <- TRUE
         warning("x-values passed in unsorted. Sorting x-values and corresponding y-values (if passed in).")
         xOrder <- order(x)
         x <- x[xOrder]
+    } else {
+        InputUnsorted <- FALSE 
     }
     
     if (!missing(y)) {
+        
+        if (InputUnsorted) {
+            y <- y[xOrder]
+        }
+        
         if (any(is.na(x) & (!is.na(y)))) {
             warning("Missing x-values with non-missing y-values encountered. Removed y-values correspoding to those x-values.")
             myx <- !is.na(x)
@@ -363,12 +371,12 @@
             y <- as.numeric(y[myy])
         }
         
-        if (is.unsorted(x)) {
-            y <- y[xOrder]
-        }
-        
+        myxy <- complete.cases(x,y)
+        x <- x[myxy]
+        y <- y[myxy]
+                     
         if (trunc) {
-            y = pmin(as.numeric(y), 1)
+            y = pmin(as.numeric(y), ifelse(y_to_frac,100,1))
             y = pmax(as.numeric(y), 0)
         }
         
@@ -396,7 +404,7 @@
             y <- y/100
         }
         
-        if (length(unique(x)) < 3) {
+         if (length(unique(x)) < 3) {
             stop("Less than 3 unique dose points left after cleaning data, please pass in enough valid measurements.")
             
         }
@@ -437,6 +445,15 @@
 # medncauchys -------------------------------------------------------------
 
 ## TODO:: Add documentation to these functions
+
+#' A random sample distributed as the median of N Cauchy distributed variables 
+#' 
+#' Naming follows R conventions.  
+#' 
+#' @param N How many samples to sample
+#' @param n The number of Cauchy distributions to take the median of
+#' @param scale the scale of the Cauchy distribution. 
+#' 
 #' @importFrom stats rcauchy
 #' @export
 #' @keywords internal
@@ -449,6 +466,15 @@
     return(x)
 }
 
+#' PDF of the median of N Cauchy distributed variables 
+#' 
+#' This function calculates the PDF/density for a variable distributed as the median value of n IID Cauchy variables. Naming follows R conventions.  
+#' 
+#' @param x Where to evaluate the density function
+#' @param n The number of Cauchy distributions to take the median of
+#' @param scale the scale of the Cauchy distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#' 
 #' @importFrom stats dcauchy pcauchy integrate
 #' @export
 #' @keywords internal
@@ -481,6 +507,16 @@
     return(y)
 }
 
+
+#' CDF of the median of N Cauchy distributed variables 
+#' 
+#' This function calculates the CDF/distribution for a variable distributed as the median value of n IID Cauchy variables. Naming follows R conventions.  
+#' 
+#' @param x Where to evaluate the distribution function
+#' @param n The number of Cauchy distributions to take the median of
+#' @param scale the scale of the Cauchy distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#' 
 #' @importFrom stats pcauchy integrate
 #' @export
 #' @keywords internal
@@ -510,6 +546,18 @@
     return(y)
 }
 
+#' Expectation of the likelihood of the median of N Cauchy distributions for truncated data
+#' 
+#' This function calculates the expected value of the PDF of a median of N Cauchy with given scale parameter, calculated over the region from x to infinity if x>0, and -infinity to x otherwise. 
+#' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value. 
+#' This increases robustness to extreme outliers while not completely ignoring the fact that points are truncated, and seems to work well in practice. The name of the function follows:
+#' e(xpectation)d(istribution)med(ian)ncauchys - following R conventions. 
+#' 
+#' @param x Where the truncation occurred 
+#' @param n The number of Cauchy distributions to take the median of
+#' @param scale the scale of the Cauchy distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#' 
 #' @importFrom stats integrate
 #' @keywords internal
 #' @export
@@ -539,6 +587,14 @@
 
 #### mednnormals -------------------------------------------------------------
 
+#' A random sample distributed as the median of N Normally distributed variables 
+#' 
+#' Naming follows R conventions.  
+#' 
+#' @param N How many samples to sample
+#' @param n The number of normal distributions to take the median of
+#' @param scale the SD of the normal distribution. 
+#' 
 #' @export
 #' @keywords internal
 #' @noRd
@@ -550,6 +606,15 @@
     return(x)
 }
 
+#' PDF of the median of N Normally distributed variables 
+#' 
+#' This function calculates the PDF/density for a variable distributed as the median value of n IID Normal variables. Naming follows R conventions.  
+#' 
+#' @param x where to evaluate the density
+#' @param n The number of normal distributions to take the median of
+#' @param scale the SD of the normal distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#'  
 #' @importFrom stats rnorm  dnorm
 #' @export
 #' @keywords internal
@@ -575,13 +640,28 @@
                   tseq, sd = scale[g]) * dnorm(x[g] - tseq, sd = scale[g])/(cos(aseq))^2 * wseq) * (aseq[2] - aseq[1])/6)
             })
         } else {
-            y[g] <- .multinom(n[g], c((n[g] - 1)/2, (n[g] - 1)/2)) * (pnorm(x[g], sd = scale[g]))^((n[g] - 1)/2) * (1 - pnorm(x[g], sd = scale[g]))^((n[g] - 
-                1)/2) * dnorm(x[g], sd = scale[g])
+            if(n[g]==1){
+                y[g] <- dnorm(x[g], sd = scale[g]) ## This reduces to the simple case for n equals 1 below, but we can save many calls to pnorm, which just get raised to a power of 0.
+            } else {
+                y[g] <- .multinom(n[g], c((n[g] - 1)/2, (n[g] - 1)/2)) * (pnorm(x[g], sd = scale[g]))^((n[g] - 1)/2) * (1 - pnorm(x[g], sd = scale[g]))^((n[g] - 
+                                                                                                                                                              1)/2) * dnorm(x[g], sd = scale[g])               
+            }
+
         }
     }
     return(y)
 }
 
+
+#' CDF of the median of N Normally distributed variables 
+#' 
+#' This function calculates the CDF/distribution for a variable distributed as the median value of n IID Normal variables. Naming follows R conventions.  
+#' 
+#' @param x Where to evaluate the Distribution
+#' @param n The number of normal distributions to take the median of
+#' @param scale the SD of the normal distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#' 
 #' @importFrom stats integrate
 #' @export
 #' @keywords internal
@@ -611,29 +691,50 @@
     return(y)
 }
 
+#' Expectation of the likelihood of the median of N normal distributions for truncated data
+#' 
+#' This function calculates the expected value of the PDF of a median of N normals with SD=scale, calculated over the region from x to infinity if x>0, and -infinity to x otherwise. 
+#' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value. 
+#' This increases robustness to extreme outliers while not completely ignoring the fact that points are truncated, and seems to work well in practice. The name of the function follows:
+#' e(xpectation)d(istribution)med(ian)nnormals - following R conventions. 
+#' 
+#' @param x Where the truncation occurred 
+#' @param n The number of normal distributions to take the median of
+#' @param scale the SD of the normal distribution.
+#' @param divisions How many maximum divisions to use in numerical integration
+#' 
 #' @importFrom stats integrate
 #' @export
-#' @keywords intenral
+#' @keywords internal
 #' @noRd
 .edmednnormals = function(x, n, scale, divisions = 100) {
     n <- rep(n, times = length(x)/length(n))
     scale <- rep(scale, times = length(x)/length(scale))
     y <- numeric(length(x))
     for (g in seq_along(y)) {
-        if (x[g] > 0) {
-            upper <- Inf
-            lower <- x[g]
+        if(n[g]==1){ ## The n=1 case is called very often, and there are significant savings (20x) to not calling numerical integration. 
+            if(x[g]>0){
+                pnorm(x[g], sd=scale[g]/sqrt(2), lower.tail = F)/(scale*2*sqrt(pi))
+            } else {
+                pnorm(x[g], sd=scale[g]/sqrt(2), lower.tail = T)/(scale*2*sqrt(pi))
+            }
         } else {
-            upper <- x[g]
-            lower <- -Inf
+            if (x[g] > 0) {
+                upper <- Inf
+                lower <- x[g]
+            } else {
+                upper <- x[g]
+                lower <- -Inf
+            }
+            y[g] <- tryCatch(integrate(f = function(k) {
+                (.dmednnormals(k, n[g], scale[g]))^2
+            }, lower = lower, upper = upper, subdivisions = divisions)[[1]], error = function(e) {
+                wseq <- c(1, 4, rep(c(2, 4), times = divisions - 1), 1)
+                aseq <- seq(from = atan(lower), to = atan(upper), length.out = 2 * divisions + 1)
+                return(sum((.dmednnormals(tan(aseq), n[g], scale[g]))^2 * wseq/(cos(aseq))^2) * (aseq[3] - aseq[1])/6)
+            })
         }
-        y[g] <- tryCatch(integrate(f = function(k) {
-            (.dmednnormals(k, n[g], scale[g]))^2
-        }, lower = lower, upper = upper, subdivisions = divisions)[[1]], error = function(e) {
-            wseq <- c(1, 4, rep(c(2, 4), times = divisions - 1), 1)
-            aseq <- seq(from = atan(lower), to = atan(upper), length.out = 2 * divisions + 1)
-            return(sum((.dmednnormals(tan(aseq), n[g], scale[g]))^2 * wseq/(cos(aseq))^2) * (aseq[3] - aseq[1])/6)
-        })
+        
     }
     return(y)
 }
@@ -721,33 +822,42 @@
     
     if (length(guess) > 1) {
         for (par in 2:length(guess)) {
-            periods[par] <- periods[par - 1] * density[par] * (upper_bounds[par] - lower_bounds[par])
+            ## the par-1 is because we want 1 increment of par variable once all previous variables have their values tested once. 
+            periods[par] <- periods[par - 1] * (density[par - 1] * (upper_bounds[par - 1] - lower_bounds[par - 1]) + 1)
         }
     }
-    
+
     currentPars <- lower_bounds
-    for (point in seq_len(prod((upper_bounds - lower_bounds) * density))) {
-        for (par in seq_along(guess)) {
-            if (point%%periods[par] == 0) {
-                if (currentPars[par] >= upper_bounds[par]) {
-                  currentPars[par] <- lower_bounds[par]
-                } else {
-                  currentPars[par] <- currentPars[par] + 1/density[par]
-                }
-            }
-        }
+
+    ## The plus one is because we include endpoints. 
+
+    for (point in seq_len(prod((upper_bounds - lower_bounds) * density+1))) {
+
         test_guess_residual <- .residual(x = x, y = y, n = n, pars = currentPars, f = f, scale = scale, family = family, trunc = trunc)
+        
+        ## Check for something catastrophic going wrong
         if (!length(test_guess_residual) || (!is.finite(test_guess_residual) && test_guess_residual != Inf)) {
             stop(paste0(" Test Guess Residual is: ", test_guess_residual, "\n", "Other Pars:\n", "x: ", paste(x, collapse = ", "), "\n", 
                 "y: ", paste(y, collapse = ", "), "\n", "n: ", n, "\n", "pars: ", pars, "\n", "scale: ", scale, "\n", "family : ", family, 
                 "\n", "Trunc ", trunc))
         }
+        ## save the guess if its an improvement 
         if (test_guess_residual < guess_residual) {
             guess <- currentPars
             guess_residual <- test_guess_residual
         }
+        ## increment the variable(s) that should be incremented this loop
+        for (par in seq_along(guess)) {
+            if (point%%periods[par] == 0) {
+                currentPars[par] <- currentPars[par] + 1/density[par]
+
+                if (currentPars[par] > upper_bounds[par]) {
+                    currentPars[par] <- lower_bounds[par]
+                } 
+            }
+        }
     }
-    
+
     return(guess)
 }
 
@@ -949,7 +1059,7 @@
         if (trunc == FALSE) {
             
             if (n == 1) {
-                return(sum(diffs^2))
+                return(sum(diffs^2/scale^2))
             }
             
             return(sum(-log(.dmednnormals(diffs, n, scale))))
