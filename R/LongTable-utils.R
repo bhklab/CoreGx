@@ -623,8 +623,8 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     assays_ <- setdiff(colnames(index), c("rowKey", "colKey"))
     assayEqualKeys <- setNames(vector("logical", length(assays_)), assays_)
     for (nm in assays_) {
-        index[!is.na(col), paste0(".", nm) := .I, env=list(col=nm)]
-        assayEqualKeys[nm] <- index[!is.na(col), all(dotcol == col),
+        index[!is.na(get(nm)), paste0(".", nm) := .I]
+        assayEqualKeys[nm] <- index[!is.na(get(nm)), all(dotcol == col),
             env=list(dotcol=paste0(".", nm), col=nm)]
     }
     # -- check equality and update assayKeys in assays if they have changed
