@@ -42,6 +42,7 @@ Imports:
     MatrixGenerics,
     piano,
     BiocParallel,
+    parallel,
     BumpyMatrix,
     checkmate,
     methods,
@@ -66,7 +67,7 @@ License: GPL-3
 Config/testthat/edition: 3
 Roxygen: list(markdown=TRUE, r6=FALSE)
 RoxygenNote: 7.1.2
-Collate:
+Collate: 
     'allGenerics.R'
     'immutable-class.R'
     'LongTable-class.R'
@@ -96,6 +97,7 @@ Collate:
     'methods-guessMapping.R'
     'methods-metaConstruct.R'
     'methods-subsetTo.R'
+    'optimizeCoreGx.R'
     'updateObject-methods.R'
     'utilities.R'
     'utils-iteration.R'

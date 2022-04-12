@@ -393,10 +393,7 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
         setkeyv(assayIndex, names(aList)[i])
         aList[[i]] <- assayIndex[aList[[i]], ]
         aList[[i]][, (names(aList)) := NULL]
-        if (!key) {
-            aList[[i]][, (c("rowKey", "colKey")) := NULL]
-            if (withDimnames) setkeyv(aList[[i]], idCols(x))
-        }
+        if (!key) aList[[i]][, c("rowKey", "colKey") := NULL]
     }
     return(aList)
 })
