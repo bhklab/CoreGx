@@ -73,6 +73,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
         annotation="list",
         molecularProfiles="list_OR_MAE",
         sample="data.frame",
+        treatment="data.frame",
         datasetType="character",
         perturbation="list",
         curation="list"
@@ -134,7 +135,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     sensitivityInfo=data.frame(), sensitivityRaw=array(dim=c(0,0,0)),
     sensitivityProfiles=matrix(), sensitivityN=matrix(nrow=0, ncol=0),
     perturbationN=array(NA, dim=c(0,0,0)), curationSample=data.frame(),
-    curationTissue=data.frame(),
+    curationTissue=data.frame(), treatment=data.frame(),
     datasetType=c("sensitivity", "perturbation", "both"), verify=TRUE
 ) {
 
@@ -197,7 +198,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
         molecularProfiles=molecularProfiles,
         sample=as.data.frame(sample), datasetType=datasetType,
         sensitivity=sensitivity, perturbation=perturbation,
-        curation=curation)
+        curation=curation, treatment=treatment)
     if (verify) { checkCsetStructure(object)}
 
     if(length(sensitivityN) == 0 &&
@@ -247,7 +248,11 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     ...
 )
 
-#' @eval .docs_CoreSet2_constructor(class_=.local_class, tx_="This slot is not implemented for a CoreSet object yet.", sx_="", cx_="A `list(2)` object with two items named `treatment` and `sample` with mappings from publication identifiers to standardized identifiers for both annotations, respectively.", data_=.local_data)
+#' @eval .docs_CoreSet2_constructor(class_=.local_class,
+#' tx_="This slot is not implemented for a CoreSet object yet.",
+#' sx_="",
+#' cx_="A `list(2)` object with two items named `treatment` and `sample` with mappings from publication identifiers to standardized identifiers for both annotations, respectively.",
+#' data_=.local_data)
 #' @md
 #' @export
 CoreSet2 <- function(name="emptySet", treatment=data.frame(),
@@ -290,6 +295,7 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
     object <- .CoreSet(
         annotation=annotation,
         sample=sample,
+        treatment=treatment,
         molecularProfiles=molecularProfiles,
         sensitivity=treatmentResponse,
         datasetType="sensitivity",

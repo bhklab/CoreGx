@@ -15,6 +15,7 @@ CoreSet(
   perturbationN = array(NA, dim = c(0, 0, 0)),
   curationSample = data.frame(),
   curationTissue = data.frame(),
+  treatment = data.frame(),
   datasetType = c("sensitivity", "perturbation", "both"),
   verify = TRUE
 )
