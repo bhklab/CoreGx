@@ -38,10 +38,10 @@ NULL
 #' # Numeric
 #' subset(merckLongTable, 1, c(1, 2))
 #' # Logical
-#' subset(merckLongTable, , colData(merckLongTable)$cellid == 'A2058')
+#' subset(merckLongTable, , colData(merckLongTable)$sampleid == 'A2058')
 #' # Call
 #' subset(merckLongTable, drug1id == 'Dasatinib' & drug2id != '5-FU',
-#'     cellid == 'A2058')
+#'     sampleid == 'A2058')
 #'
 #' @param x `LongTable` The object to subset.
 #' @param i `character`, `numeric`, `logical` or `expression`
@@ -172,7 +172,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #'   `[`, where they will be evaluated in the correct context.
 #'
 #' @examples
-#' .(cell_line1 == 'A2058')
+#' .(sample_line1 == 'A2058')
 #'
 #' @param ... `pairlist` One or more R expressions to convert to calls.
 #'
@@ -269,11 +269,11 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #' # Numeric
 #' merckLongTable[1, c(1, 2)]
 #' # Logical
-#' merckLongTable[, colData(merckLongTable)$cellid == 'A2058']
+#' merckLongTable[, colData(merckLongTable)$sampleid == 'A2058']
 #' # Call
 #' merckLongTable[
 #'      .(drug1id == 'Dasatinib' & drug2id != '5-FU'),
-#'      .(cellid == 'A2058'),
+#'      .(sampleid == 'A2058'),
 #'  ]
 #'
 #' @param x `LongTable` The object to subset.
@@ -342,7 +342,7 @@ setMethod('[', signature('LongTable'),
 #' @importFrom crayon cyan magenta
 #' @import data.table
 #' @export
-setMethod('[[', signature('LongTable'), function(x, i, withDimnames=TRUE, 
+setMethod('[[', signature('LongTable'), function(x, i, withDimnames=TRUE,
         metadata=withDimnames, keys=!withDimnames) {
     funContext <- .S4MethodContext('[[', class(x))
 
@@ -410,7 +410,7 @@ setMethod('$', signature('LongTable'), function(x, name) {
     x[[name]]
 })
 
-#' Update an assay from a LongTable object 
+#' Update an assay from a LongTable object
 #'
 #' @examples
 #' merckLongTable$sensitivity <- merckLongTable$sensitivity
@@ -473,7 +473,7 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     newAssayData <- lapply(newAssayData, setkeyv, cols=c('rowKey', 'colKey'))
 
     return(LongTable(rowData=newRowData, rowIDs=getIntern(object, 'rowIDs'),
-        colData=newColData, colIDs=getIntern(object, 'colIDs'), 
+        colData=newColData, colIDs=getIntern(object, 'colIDs'),
         assays=newAssayData, metadata=metadata(object)))
 })
 

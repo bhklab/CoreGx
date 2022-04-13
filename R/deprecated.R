@@ -1,3 +1,35 @@
+#' List of `deprecated` or `defunct` methods in the `CoreGx` R package.
+#'
+#' @details
+#' ## deprecated
+#'
+#'
+#' ## defunct
+#' `buildLongTable`: This function no longer works as building a `LongTable` or
+#' `TreatmentResponseExperiment` now uses a `DataMapper` and the `metaConstruct`
+#' method. See `vignette("")`
+#'
+#' @rdname CoreGx-deprecated
+#' @aliases
+#' CoreGx-defunct
+#' @export
+NULL
+
+
+# ===== Deprecated
+
+
+
+
+
+
+
+
+
+# ===== Defunct
+
+# -- buildLongTableClass
+
 # ==== LongTable Class
 
 #' LongTable build method
@@ -31,7 +63,7 @@
 setMethod('buildLongTable', signature(from='data.frame'),
         function(from, rowDataCols, colDataCols, assayCols) {
 
-    .Deprecated("metaConstruct", msg="This method has been deprecated
+    .Defunct("metaConstruct", msg="This method has been deprecated
         in favour of use of the LongTableDataMapper metadata object
         with the metaConstruct method to build a LongTable object!")
 
@@ -184,13 +216,13 @@ setMethod('buildLongTable', signature(from='character'),
 #' @importFrom crayon magenta cyan
 #' @export
 setMethod('buildLongTable', signature(from='list'),
-          function(from, rowDataCols, colDataCols, assayCols) {
+        function(from, rowDataCols, colDataCols, assayCols) {
 
     # Prevent modify by reference for data.tables in list
     from <- copy(from)
 
     # local helpers
-    ##FIXME:: This is exactly what the Map function is (an alias for mapply with 
+    ##FIXME:: This is exactly what the Map function is (an alias for mapply with
     ##   SIMPLIFY=FALSE)
     .mapply <- function(...) mapply(..., SIMPLIFY=FALSE)
 
@@ -208,7 +240,7 @@ setMethod('buildLongTable', signature(from='list'),
     if (any(isDF)) for (i in which(isDF)) from[[i]] <- data.table(from[[i]])
 
     # validate mappings
-    ## TODO:: Ensure there is no case where joining on rowMeta or colMeta gives 
+    ## TODO:: Ensure there is no case where joining on rowMeta or colMeta gives
     #  different results than just ids
     joinCols <- unique(unlist(c(rowDataCols, colDataCols)))
     dataColNames <- lapply(from, FUN=colnames)
@@ -282,7 +314,6 @@ setMethod('buildLongTable', signature(from='list'),
 #' @keywords internal
 #' @noRd
 .selectDataTable <- function(colNames, DT, keep.rownames=FALSE) {
-
     # validate input
     if (!is.data.table(DT)) {
         tryCatch({

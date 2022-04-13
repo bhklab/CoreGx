@@ -1,10 +1,10 @@
 # Navigating this file:
 # - Slot section names start with ----
 # - Method section names start with ==
-# 
+#
 # As a result, you can use Ctrl + f to find the slot or method you are looking
 # for quickly, assuming you know its name.
-# 
+#
 # For example Ctrl + f '== molecularProfiles' would take you the molecularProfiles
 # method, while Ctrl + f '---- molecularProfiles' would take you to the slot
 # section.
@@ -105,7 +105,7 @@ setMethod('getIntern', signature(object='LongTable', x='character'),
 #'
 #' @return A named `list` with all values in environment object@.intern coerced
 #' to a list (and therefore copied).
-#' 
+#'
 #' @examples
 #' getIntern(merckLongTable)
 #'
@@ -139,7 +139,7 @@ setMethod('getIntern', signature(object='LongTable', x='missing'),
 #'
 #' @importFrom data.table data.table copy
 #' @export
-setMethod('rowData', signature(x='LongTable'), 
+setMethod('rowData', signature(x='LongTable'),
         function(x, key=FALSE, use.names=FALSE) {
     return(
         if (key) copy(x@rowData[, -'.rownames']) else
@@ -197,7 +197,7 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
     equalRowIDs <- rowIDCols %in% sharedRowIDCols
     if (!all(equalRowIDs)) .warning('\n[CoreGx::rowData<-] The ID columns ',
         rowIDCols[!equalRowIDs], ' are not present in value. The function ',
-        'will attempt to join with existing rowIDs, but this may fail!', 
+        'will attempt to join with existing rowIDs, but this may fail!',
         collapse=', ')
 
     rowIDs <- rowIDs(x, data=TRUE, key=TRUE)
@@ -353,7 +353,7 @@ setMethod('assays', signature(x='LongTable'),
 #' @describeIn LongTable Update the assays in a LongTable object. The rowIDs
 #'   and colIDs must be present in all assays to allow successfully remapping
 #'   the keys. We recommend modifying the list returned by
-#'   assays(longTable, withDimnames=TRUE) and the reassigning to the 
+#'   assays(longTable, withDimnames=TRUE) and the reassigning to the
 #'   `LongTable`.
 #'
 #' @param x A `LongTable` to modify the assays in.
@@ -446,7 +446,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
     duplicates <- grep('^i\\..*', colnames(assayData), value=TRUE)
     ## TODO:: Is there any situation where ignoring duplicated keys could break the object?
     ## TODO:: Maybe add equality test for duplicate columns?
-    warnDuplicates <- setdiff(duplicates, c('i.drug_cell_rep', 'i.rowKey', 'i.colKey'))
+    warnDuplicates <- setdiff(duplicates, c('i.drug_sample_rep', 'i.rowKey', 'i.colKey'))
     if (length(duplicates) > 0) {
         if (length(warnDuplicates) > 0)
             warning(.warnMsg('\n[CoreGx::assay] Dropping columns duplicated when ',

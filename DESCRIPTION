@@ -65,7 +65,7 @@ Suggests:
 License: GPL-3
 Roxygen: list(markdown=TRUE, r6=FALSE)
 RoxygenNote: 7.1.2
-Collate:
+Collate: 
     'allGenerics.R'
     'LongTable-class.R'
     'CoreSet-class.R'
@@ -82,10 +82,10 @@ Collate:
     'connectivityScore.R'
     'cosinePerm.R'
     'datasets.R'
+    'deprecated.R'
     'globals.R'
     'gwc.R'
     'matthewCor.R'
-    'methods-buildLongTable.R'
     'methods-coerce.R'
     'methods-dim.R'
     'methods-dimnames.R'

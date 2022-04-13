@@ -28,7 +28,7 @@ library(data.table)
 
 # Why Do We Need A New Class?
 
-The current implementation for the `@sensitivity` slot in a `PharmacoSet` has 
+The current implementation for the `@sensitivity` slot in a `PharmacoSet` has
 some limitations.
 
 Firstly, it does not natively support dose-response experiments with
@@ -44,9 +44,9 @@ computations on such data can be completed in a timely manner.
 
 The current use case is supporting drug and cell-line combinations in
 `PharmacoGx`, but we wanted to create something flexible enough to fit
-other use cases. As such, the current class makes no mention of drugs or 
-cell-lines, nor anything specifically related to Bioinformatics or Computation 
-Biology. Rather, we tried to design a general purpose data structure which 
+other use cases. As such, the current class makes no mention of drugs or
+cell-lines, nor anything specifically related to Bioinformatics or Computation
+Biology. Rather, we tried to design a general purpose data structure which
 could support high dimensional data for any use case.
 
 Our design takes the best aspects
@@ -64,7 +64,7 @@ knitr::include_graphics('LongTableClassDiagram.png')
 
 We have borrowed directly from the `SummarizedExperiment` class
 for the `rowData`, `colData`, `metadata` and `assays` slot names.
-We also implemented the `SummarizedExperiment` accessor generics for the 
+We also implemented the `SummarizedExperiment` accessor generics for the
 `LongTable`.
 
 ## Object Structure and Cardinality
@@ -79,12 +79,12 @@ knitr::include_graphics('LongTableStructure.png')
 Unlike a `SummarizedExperiment`, there are three distinct
 classes of columns in `rowData` and `colData`.
 
-The first is the `rowKey` or `colKey`, these are implemented internally to keep 
-mappings between each assay and the associated samples or drugs; these will not 
-be returned by the accessors by default. The second is the `rowIDs` and 
-`colIDs`, these hold all of the information necessary to uniquely identify a 
+The first is the `rowKey` or `colKey`, these are implemented internally to keep
+mappings between each assay and the associated samples or drugs; these will not
+be returned by the accessors by default. The second is the `rowIDs` and
+`colIDs`, these hold all of the information necessary to uniquely identify a
 row or column and are used to generate the `rowKey` and `colKey`. Finally, there
-are the `rowMeta` and `colMeta` columns, which store any additional data about 
+are the `rowMeta` and `colMeta` columns, which store any additional data about
 samples or drugs not required to uniquely identify a row in either table.
 
 Within the assays the `rowKey` and `colKey` are combined to form a primary key
@@ -105,7 +105,7 @@ row in an assay become a composite key which uniquely identify an observation.
 
 To deal with the complex kinds of experimental designs which can be stored
 in a `LongTable`, we have engineered a new object to help document and validate
-the way data is mapped from raw data files, as a single large `data.frame` or 
+the way data is mapped from raw data files, as a single large `data.frame` or
 `data.table`, to the various slots of a `LongTable` object.
 
 ## The DataMapper Class
@@ -114,25 +114,25 @@ The `DataMapper` is an abstract class, which means in cannot be instatiated.
 Its purpose is to provide a description of the concept of a DataMapper and
 define a basic interface for any classes inheriting from it. A DataMapper is
 simply a way to map columns from some raw data file to the slots of an S4 class.
-It is similar to a schema in SQL in that it defines the valid parts of an 
-object (analogously a SQL table), but differs in that no types are specified or 
+It is similar to a schema in SQL in that it defines the valid parts of an
+object (analogously a SQL table), but differs in that no types are specified or
 enforced at this time.
 
 This object is not important for general users, but may be useful for other
 developers who want to map from some raw data to some `S4` class. In this case,
-any derived data mapper should inherit from the `DataMapper` abstract class. 
-Only one slot is defined by default, a `list` or `List` in the `@rawdata` slot. 
+any derived data mapper should inherit from the `DataMapper` abstract class.
+Only one slot is defined by default, a `list` or `List` in the `@rawdata` slot.
 An accessor method, `rawdata(DataMapper)`, is defined to assign and retrieve
 the raw data from your mapper object.
 
 ## The LongTableDataMapper Class
 
-The `LongTableDataMapper` class is the first concrete sub-class of a 
-`DataMapper`. It is the object which defines how to go from a single 
-`data.frame` or `data.table` of raw experimental data to a properly formatted 
-and valid `LongTable` object. This is accomplished by defining various mappings, 
-which let the the user decide which columns from `rawdata` should go into which 
-slots of the object. Each slot mapping is implemented as a list of character 
+The `LongTableDataMapper` class is the first concrete sub-class of a
+`DataMapper`. It is the object which defines how to go from a single
+`data.frame` or `data.table` of raw experimental data to a properly formatted
+and valid `LongTable` object. This is accomplished by defining various mappings,
+which let the the user decide which columns from `rawdata` should go into which
+slots of the object. Each slot mapping is implemented as a list of character
 vectors specifying the column names from `rawdata` to assign to each slot.
 
 Additionally, a helper method has been included, `guessMapping`, that will
@@ -142,15 +142,15 @@ to which slots, and therefore which maps.
 To get started making a `LongTable` lets have a look at some rawdata which is
 a subset of the data from Oneil *et al.*, 2016. The full set of rawdata is
 available for exploration and download from
-[SynergxDB.ca](https://www.synergxdb.ca/), a free and open source web-app and 
-database of publicly available drug combination sensitivity experiments which we 
+[SynergxDB.ca](https://www.synergxdb.ca/), a free and open source web-app and
+database of publicly available drug combination sensitivity experiments which we
 created and released (Seo *et al.*, 2019).
 
-The data was generated as part of the commercial activities of the 
+The data was generated as part of the commercial activities of the
 pharmaceutical company Merck, and is thus named according.
 
 ```{r head_data, echo=TRUE}
-filePath <- system.file('extdata', 'merckLongTable.csv', package='CoreGx', 
+filePath <- system.file('extdata', 'merckLongTable.csv', package='CoreGx',
   mustWork=TRUE)
 merckDT <- fread(filePath, na.strings=c('NULL'))
 colnames(merckDT)
@@ -163,7 +163,7 @@ knitr::kable(head(merckDT)[, 1:5])
 ```{r sample_data2, fig.width=80}
 knitr::kable(head(merckDT)[, 5:ncol(merckDT)])
 ```
-We can see that all the data related to the treatment response experiment is 
+We can see that all the data related to the treatment response experiment is
 contained within this table.
 
 To get an idea of where in a `LongTable` this data should go, lets come up
@@ -186,7 +186,7 @@ subsets <- c(FALSE, TRUE, FALSE, TRUE, FALSE, TRUE)
 # First we put our data in the `LongTableDataMapper`
 LTdataMapper <- LongTableDataMapper(rawdata=merckDT)
 
-# Then we can test our hypotheses, subset=FALSE means we don't remove mapped 
+# Then we can test our hypotheses, subset=FALSE means we don't remove mapped
 #   columns after each group is mapped
 guess <- guessMapping(LTdataMapper, groups=groups, subset=subsets)
 guess
@@ -194,7 +194,7 @@ guess
 
 Since we want our `LongTable` to have drugs as rows and samples as columns,
 we see that both `justDrug` and `drugsAndDoses` yield the same result. So we
-do not yet prefer one over the other. Looking at `justCells` and 
+do not yet prefer one over the other. Looking at `justCells` and
 `cellsAndBatches`, we see one column maps to each of them and therefore still
 have no preference. For `assay1` however, we see that no columns mapped, while
 `assay2` maps many of raw data columns.
@@ -202,7 +202,7 @@ have no preference. For `assay1` however, we see that no columns mapped, while
 Since assays will be subset based on the `rowKey` and `colKey`, we know that
 the rowIDs must be `drugsAndDose` and the the colIDs must be `cellsAndBatches`.
 Therefore, to uniquely identify an observation in any given assay we need
-all of these columns. We can use this information to assign maps to our 
+all of these columns. We can use this information to assign maps to our
 `LongTableDataMapper`.
 
 ```{r mappings_to_datamapper, echo=TRUE}
@@ -212,9 +212,9 @@ colDataMap(LTdataMapper) <- guess$cellsAndBatches
 
 Looking at our mapped columns for `assay2`, we must decide if we want these
 to go into more than one assay. If we do, we should name each item of our
-`assayMap` for the `LongTableDataMapper` and specify it in a list of 
+`assayMap` for the `LongTableDataMapper` and specify it in a list of
 `character` vectors, one for each assay. Since viability is the raw experimental
-measurement and the final two columns are summaries of it, we will assign them 
+measurement and the final two columns are summaries of it, we will assign them
 to two assays:sensitivity and profiles.
 
 ```{r split_assays, echo=TRUE}
@@ -252,8 +252,8 @@ As mentioned previously, a `LongTable` has both list and table like behaviours.
 For table like operations, a given `LongTable` can be thought of as a `rowKey`
 by `colKey` rectangular object.
 
-To support `data.frame` like sub-setting for this object, the constructor makes 
-pseudo row and column names, which are the ID columns for each row of 
+To support `data.frame` like sub-setting for this object, the constructor makes
+pseudo row and column names, which are the ID columns for each row of
 `rowData` or `colData` pasted together with a ':'. The ordering of these
 columns is preserved in the pseudo-dim names, so be sure to arrange them
 as desirged before creating the `LongTable`.
@@ -301,7 +301,7 @@ For example, if we want to get all instance where '5-FU' is the drug:
 longTable['5-FU', ]
 ```
 
-This has matched all colnames where 5-FU was in either drug1 or drug2. If we 
+This has matched all colnames where 5-FU was in either drug1 or drug2. If we
 only want to match drug1, we have several options:
 
 ```{r column_specific_regex, echo=TRUE}
@@ -315,8 +315,8 @@ command-line users are familiar with.
 ## `data.table` Subsetting
 
 In addition to regex queries, a `LongTable` object supports arbitrarily complex
-subset queries using the `data.table` API. To access this API, you will need to 
-use the `.` function, which allows you to pass raw R expressions to be evaluated 
+subset queries using the `data.table` API. To access this API, you will need to
+use the `.` function, which allows you to pass raw R expressions to be evaluated
 inside the `i` and `j` arguments for `dataTable[i, j]`.
 
 For example if we want to subset to rows where the cell line is VCAP and columns
@@ -341,9 +341,9 @@ subLongTable <-
 To show that it works as expected:
 
 ```{r echo=TRUE}
-print(paste0('drug2id: ', paste0(unique(rowData(subLongTable)$drug2id), 
+print(paste0('drug2id: ', paste0(unique(rowData(subLongTable)$drug2id),
     collapse=', ')))
-print(paste0('batchid: ', paste0(unique(colData(subLongTable)$batchid), 
+print(paste0('batchid: ', paste0(unique(colData(subLongTable)$batchid),
     collapse=', ')))
 ```
 
@@ -412,16 +412,16 @@ assay(longTable, 'sensitivity', withDimnames=TRUE)
 
 # References
 
-1. O'Neil J, Benita Y, Feldman I, Chenard M, Roberts B, Liu Y, Li J, Kral A, 
-Lejnine S, Loboda A, Arthur W, Cristescu R, Haines BB, Winter C, Zhang T, 
-Bloecher A, Shumway SD. An Unbiased Oncology Compound Screen to Identify Novel 
-Combination Strategies. Mol Cancer Ther. 2016 Jun;15(6):1155-62. 
+1. O'Neil J, Benita Y, Feldman I, Chenard M, Roberts B, Liu Y, Li J, Kral A,
+Lejnine S, Loboda A, Arthur W, Cristescu R, Haines BB, Winter C, Zhang T,
+Bloecher A, Shumway SD. An Unbiased Oncology Compound Screen to Identify Novel
+Combination Strategies. Mol Cancer Ther. 2016 Jun;15(6):1155-62.
 doi: 10.1158/1535-7163.MCT-15-0843. Epub 2016 Mar 16. PMID: 26983881.
 
-2. Heewon Seo, Denis Tkachuk, Chantal Ho, Anthony Mammoliti, Aria Rezaie, 
-Seyed Ali Madani Tonekaboni, Benjamin Haibe-Kains, SYNERGxDB: an integrative 
-pharmacogenomic portal to identify synergistic drug combinations for precision 
-oncology, Nucleic Acids Research, Volume 48, Issue W1, 02 July 2020, Pages 
+2. Heewon Seo, Denis Tkachuk, Chantal Ho, Anthony Mammoliti, Aria Rezaie,
+Seyed Ali Madani Tonekaboni, Benjamin Haibe-Kains, SYNERGxDB: an integrative
+pharmacogenomic portal to identify synergistic drug combinations for precision
+oncology, Nucleic Acids Research, Volume 48, Issue W1, 02 July 2020, Pages
 W494–W501, https://doi.org/10.1093/nar/gkaa421
 
 # sessionInfo

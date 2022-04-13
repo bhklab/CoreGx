@@ -136,7 +136,7 @@ rowDataMap(exampleDataMapper) <- list(c('drug_id'), c())
 
 colDataMap(exampleDataMapper)
 
-colDataMap(exampleDataMapper) <- list(c('cell_id'), c())
+colDataMap(exampleDataMapper) <- list(c('sample_id'), c())
 
 assayMap(exampleDataMapper)
 

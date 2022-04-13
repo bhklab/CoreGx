@@ -727,7 +727,7 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
         if (any(is.na(sampleInfo(object)[,"tissueid"]) |
                 sampleInfo(object)[, "tissueid"] == "", na.rm=TRUE)) {
             msg <- c(msg, paste0(
-                    "There is no tissue type for this sample line(s)",
+                    "There is no tissue type for these samples",
                     paste(
                         rownames(sampleInfo(object))[
                             which(is.na(sampleInfo(object)[,"tissueid"]) |
@@ -786,11 +786,11 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
     # -- sample identifiers
     colDataL <- lapply(experiments(MAE), FUN=colData)
     colColNameL <- as(lapply(colDataL, FUN=colnames), 'List')
-    hassampleId <- any(colColNameL %in% 'sampleid')
-    if (!all(hassampleId)) {
+    hasSampleId <- any(colColNameL %in% 'sampleid')
+    if (!all(hasSampleId)) {
         nmsg <- .formatMessage('All SummarizedExperiments must have a sampleid
             column. This is not the case for ',
-            paste(names(which(!hassampleId)), collapse=', '), '!')
+            paste(names(which(!hasSampleId)), collapse=', '), '!')
         msg <- c(msg, nmsg)
     }
     hasBatchId <- any(colColNameL %in% 'batchid')

@@ -7,13 +7,13 @@
 CoreSet(
   name,
   molecularProfiles = list(),
-  cell = data.frame(),
+  sample = data.frame(),
   sensitivityInfo = data.frame(),
   sensitivityRaw = array(dim = c(0, 0, 0)),
   sensitivityProfiles = matrix(),
   sensitivityN = matrix(nrow = 0, ncol = 0),
   perturbationN = array(NA, dim = c(0, 0, 0)),
-  curationCell = data.frame(),
+  curationSample = data.frame(),
   curationTissue = data.frame(),
   datasetType = c("sensitivity", "perturbation", "both"),
   verify = TRUE
@@ -25,8 +25,8 @@ CoreSet(
 \item{molecularProfiles}{A \code{list} of SummarizedExperiment objects containing
 molecular profiles for each molecular data type.}
 
-\item{cell}{A \code{data.frame} containing the annotations for all the cell
-lines profiled in the data set, across all data types}
+\item{sample}{A \code{data.frame} containing the annotations for all the sample
+profiled in the data set, across all data types}
 
 \item{sensitivityInfo}{A \code{data.frame} containing the information for the
 sensitivity experiments}
@@ -40,8 +40,8 @@ statistics such as IC50 and AUC}
 \item{sensitivityN, perturbationN}{A \code{data.frame} summarizing the
 available sensitivity/perturbation data}
 
-\item{curationCell, curationTissue}{A \code{data.frame} mapping
-the names for cells and tissues used in the data set to universal
+\item{curationSample, curationTissue}{A \code{data.frame} mapping
+the names for samples and tissues used in the data set to universal
 identifiers used between different CoreSet objects}
 
 \item{datasetType}{A \code{character} string of 'sensitivity',
