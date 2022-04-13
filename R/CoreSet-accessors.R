@@ -451,7 +451,7 @@ setMethod('treatmentInfo', signature('CoreSet'), function(object) {
         'PharmacoSet'='drug',
         'ToxicoSet'='drug',
         'RadioSet'='radiation',
-        'CoreSet'=return(data.frame())
+        'CoreSet'=object@treatment
     )
     package <- gsub('Set', 'Gx', class(object)[1])
     treatmentInfo <- get(paste0(treatmentType, 'Info'),
@@ -1802,7 +1802,7 @@ setGeneric("sensitivitySlot<-", function(object, ..., value)
 #' @rdname CoreSet-accessors
 #' @include LongTable-class.R
 #' @eval .docs_CoreSet_set_sensitivitySlot(class_=.local_class, data_=.local_data)
-setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_or_LongTable"),
+setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_OR_LongTable"),
     function(object, value)
 {
     # funContext <- .S4MethodContext('sensitivitySlot<-', class(object), class(value))

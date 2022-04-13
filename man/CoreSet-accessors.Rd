@@ -95,7 +95,7 @@
 \alias{sensitivityRaw<-,CoreSet,array-method}
 \alias{sensitivitySlot,CoreSet-method}
 \alias{sensitivitySlot}
-\alias{sensitivitySlot<-,CoreSet,list_or_LongTable-method}
+\alias{sensitivitySlot<-,CoreSet,list_OR_LongTable-method}
 \alias{sensitivitySlot<-}
 \alias{sensitivitySlot<-,CoreSet,list-method}
 \alias{sensitivitySlot<-,CoreSet,LongTable-method}
@@ -187,7 +187,7 @@
 
 \S4method{sensitivitySlot}{CoreSet}(object)
 
-\S4method{sensitivitySlot}{CoreSet,list_or_LongTable}(object) <- value
+\S4method{sensitivitySlot}{CoreSet,list_OR_LongTable}(object) <- value
 
 \S4method{sensNumber}{CoreSet}(object)
 

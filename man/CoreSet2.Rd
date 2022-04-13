@@ -10,6 +10,8 @@ CoreSet2(
   sample = data.frame(),
   molecularProfiles = MultiAssayExperiment(),
   treatmentResponse = LongTable(),
+  perturbation = list(),
+  datasetType = "sensitivity",
   curation = list(sample = data.frame(), treatment = data.frame())
 )
 }

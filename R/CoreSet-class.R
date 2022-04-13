@@ -69,7 +69,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' @exportClass CoreSet
 .CoreSet <- setClass("CoreSet",
     slots=list(
-        sensitivity="list_or_LongTable",
+        sensitivity="list_OR_LongTable",
         annotation="list",
         molecularProfiles="list_OR_MAE",
         sample="data.frame",
@@ -257,7 +257,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
 #' @export
 CoreSet2 <- function(name="emptySet", treatment=data.frame(),
     sample=data.frame(), molecularProfiles=MultiAssayExperiment(),
-    treatmentResponse=LongTable(),
+    treatmentResponse=LongTable(), perturbation=list(), datasetType="sensitivity",
     curation=list(sample=data.frame(), treatment=data.frame())
 ) {
 
@@ -282,11 +282,9 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
         sessionInfo=sessionInfo(), call=match.call())
 
     ## -- conditionally materialize DataMapper
-    longTable <- if (is(treatmentResponse, 'LongTableDataMapper')) {
-        metaConstruct(treatmentResponse)
-    } else {
-        treatmentResponse
-    }
+    if (is(treatmentResponse, 'LongTableDataMapper'))
+        treatmentResponse <- metaConstruct(treatmentResponse)
+
 
     ## -- handle missing rownames for sample
     if (!all(sample$sampleid == rownames(sample)))
@@ -298,8 +296,9 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
         treatment=treatment,
         molecularProfiles=molecularProfiles,
         sensitivity=treatmentResponse,
-        datasetType="sensitivity",
-        curation=curation
+        datasetType=datasetType,
+        curation=curation,
+        perturbation=perturbation
     )
 
     ## -- data integrity checks
