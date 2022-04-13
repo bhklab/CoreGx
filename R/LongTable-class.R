@@ -92,7 +92,7 @@ setOldClass('long.table', S4Class='LongTable')
 #' @examples
 #' data(merckLongTable)
 #' merckLongTable
-#' 
+#'
 #' @import data.table
 #' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,

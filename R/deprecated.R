@@ -1,4 +1,4 @@
-#' List of `deprecated` or `defunct` methods in the `CoreGx` R package.
+#' @title List of `deprecated` or `defunct` methods in the `CoreGx` R package.
 #'
 #' @details
 #' ## deprecated
@@ -7,23 +7,16 @@
 #' ## defunct
 #' `buildLongTable`: This function no longer works as building a `LongTable` or
 #' `TreatmentResponseExperiment` now uses a `DataMapper` and the `metaConstruct`
-#' method. See `vignette("")`
+#' method. See `vignette("LongTable")` for a detailed description of how
+#' to create a LongTable object.
 #'
-#' @rdname CoreGx-deprecated
+#' @name CoreGx-deprecated
 #' @aliases
 #' CoreGx-defunct
-#' @export
 NULL
 
 
 # ===== Deprecated
-
-
-
-
-
-
-
 
 
 # ===== Defunct
@@ -34,7 +27,7 @@ NULL
 
 #' LongTable build method
 #'
-#' @describeIn LongTable Create a LongTable object from a single data.table or
+#' @description Create a LongTable object from a single data.table or
 #'   data.frame object.
 #'
 #' @param from `character` Path to the .csv file containing the data and
@@ -145,7 +138,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
 
 #' LongTable build method from character
 #'
-#' @describeIn LongTable Create a LongTable object from a single .csv file
+#' @description LongTable Create a LongTable object from a single .csv file
 #'
 #' @param from `character` Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.
@@ -185,7 +178,7 @@ setMethod('buildLongTable', signature(from='character'),
 
 #' LongTable build method from list
 #'
-#' @describeIn Create a LongTable object from a list containing file paths,
+#' @description Create a LongTable object from a list containing file paths,
 #'   data.frames and data.tables.
 #'
 #' @examples
