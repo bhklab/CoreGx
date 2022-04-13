@@ -99,7 +99,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' @param molecularProfiles A \code{list} of SummarizedExperiment objects containing
 #'   molecular profiles for each molecular data type.
 #' @param sample A \code{data.frame} containing the annotations for all the sample
-#'   lines profiled in the data set, across all data types
+#'   profiled in the data set, across all data types
 #' @param sensitivityInfo A \code{data.frame} containing the information for the
 #'   sensitivity experiments
 #' @param sensitivityRaw A 3 Dimensional \code{array} contaning the raw drug
@@ -108,7 +108,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #'   statistics such as IC50 and AUC
 #' @param sensitivityN,perturbationN A \code{data.frame} summarizing the
 #'   available sensitivity/perturbation data
-#' @param curationsample,curationTissue A \code{data.frame} mapping
+#' @param curationSample,curationTissue A \code{data.frame} mapping
 #'   the names for samples and tissues used in the data set to universal
 #'   identifiers used between different CoreSet objects
 #' @param datasetType A \code{character} string of 'sensitivity',
@@ -133,7 +133,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     sensitivityInfo=data.frame(), sensitivityRaw=array(dim=c(0,0,0)),
     sensitivityProfiles=matrix(), sensitivityN=matrix(nrow=0, ncol=0),
-    perturbationN=array(NA, dim=c(0,0,0)), curationsample=data.frame(),
+    perturbationN=array(NA, dim=c(0,0,0)), curationSample=data.frame(),
     curationTissue=data.frame(),
     datasetType=c("sensitivity", "perturbation", "both"), verify=TRUE
 ) {
@@ -179,7 +179,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     sensitivity$n <- sensitivityN
 
     curation <- list()
-    curation$sample <- as.data.frame(curationsample, stringsAsFactors=FALSE)
+    curation$sample <- as.data.frame(curationSample, stringsAsFactors=FALSE)
     curation$tissue <- as.data.frame(curationTissue, stringsAsFactors=FALSE)
 
     perturbation <- list()
@@ -258,7 +258,7 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
 
     # -- update old curation names
     names(curation) <- gsub("drug|radiation", "treatment", names(curation))
-    names(curation) <- gsub("sample", "sample", names(curation))
+    names(curation) <- gsub("cell", "sample", names(curation))
 
     ## -- input validation
     assertCharacter(name, len=1)
@@ -330,7 +330,7 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
     space <- "  "
     cat("Name: ", name(object), "\n")
     cat("Date Created: ", dateCreated(object), "\n")
-    cat("Number of sample lines: ", nrow(sampleInfo(object)), "\n")
+    cat("Number of samples: ", nrow(sampleInfo(object)), "\n")
     mProfiles <- molecularProfilesSlot(object)
     mProfileNames <- names(mProfiles)
     cat("Molecular profiles:\n")
@@ -375,7 +375,7 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
 #' Update the sample ids in a cSet object
 #'
 #' @examples
-#' updatesampleId(clevelandSmall_cSet, sampleNames(clevelandSmall_cSet))
+#' updateSampleId(clevelandSmall_cSet, sampleNames(clevelandSmall_cSet))
 #'
 #' @param object The object for which the sample ids will be updated
 #' @param new.ids The new ids to assign to the object
@@ -386,7 +386,7 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
 #' @importFrom S4Vectors endoapply
 #' @importFrom SummarizedExperiment colData rowData
 #' @export
-updatesampleId <- function(object, new.ids=vector("character")) {
+updateSampleId <- function(object, new.ids=vector("character")) {
 
     if (length(new.ids) != nrow(sampleInfo(object))){
         stop("Wrong number of sample identifiers")
@@ -397,8 +397,8 @@ updatesampleId <- function(object, new.ids=vector("character")) {
             rownames(sampleInfo(object)))
         if (is(sensitivitySlot(object), 'LongTable')) {
             LT <- sensitivitySlot(object)
-            whichsampleIds <- which(colData(LT)$sampleid %in% sampleNames(object))
-            colData(LT)$sampleid <- new.ids[whichsampleIds]
+            whichSampleIds <- which(colData(LT)$sampleid %in% sampleNames(object))
+            colData(LT)$sampleid <- new.ids[whichSampleIds]
             sensitivitySlot(object) <- LT
         } else {
             sensitivityInfo(object)[, "sampleid"] <- new.ids[myx]
@@ -413,7 +413,7 @@ updatesampleId <- function(object, new.ids=vector("character")) {
     })
 
     if (any(duplicated(new.ids))) {
-        warning("Duplicated ids passed to updatesampleId. Merging old ids into",
+        warning("Duplicated ids passed to updateSampleId. Merging old ids into",
             " the same identifier")
 
         if(ncol(sensNumber(object)) > 0) {
@@ -541,7 +541,7 @@ updatesampleId <- function(object, new.ids=vector("character")) {
     ## unique drug identifiers
     # samplen <- sort(unique(sensitivitySlot(object)$info[ , "sampleid"]))
 
-    ## consider all sample lines
+    ## consider all sample
     samplen <- rownames(sampleInfo(object))
 
     sensitivity.info <- matrix(0, nrow=length(samplen), ncol=length(drugn),
@@ -664,7 +664,7 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
                 "different from SummarizedExperiment slots"))
         }
         if (nrow(colData(profile)) != ncol(assays(profile)$exprs)) {
-            msg <- c(msg, paste0(nn, "number of sample lines in colData is ",
+            msg <- c(msg, paste0(nn, "number of samples in colData is ",
                 "different from expression slots", nn))
         }
 
