@@ -1320,7 +1320,9 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     infoDT_sub <- unique(infoDT[, ..keepCols])
 
     # rebuld the rownames
-    infoDT_sub[, drugid := .paste_slashes(drug1id, drug2id)]
+    idCols <- lapply(grep("^drug[0-9]*id", colnames(infoDT_sub), value=TRUE),
+        FUN=as.symbol)
+    infoDT_sub[, drugid := .paste_slashes(substitute(..idCols))]
     infoDT_sub[, drug_uid := Reduce(.paste_colon, mget(..rowIDcols))]
     infoDT_sub[, sample_uid := Reduce(.paste_colon, mget(..colIDcols))]
     infoDT_sub[, exp_id := Reduce(.paste_, .(drug_uid, sample_uid))]

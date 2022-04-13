@@ -27,6 +27,22 @@ setMethod('updateObject', signature(object="CoreSet"),
         treatmentResponse <- object@treatmentResponse
     }
 
+    if (is(treatmentResponse, "LongTable")) {
+        unlockBinding("colIDs", getIntern(treatmentResponse))
+        assign("colIDs",
+            setNames(gsub("cellid", "sampleid", colIDs(treatmentResponse)),
+                gsub("cellid", "sampleid", colIDs(treatmentResponse))),
+            envir=getIntern(treatmentResponse)
+        )
+        lockBinding("colIDs", getIntern(treatmentResponse))
+        colData_ <- colData(treatmentResponse)
+        data.table::setnames(colData_, "cellid", "sampleid")
+        colData(treatmentResponse) <- colData_
+    } else {
+        colnames(treatmentResponse$info) <- gsub("cellid", "sampleid",
+            colnames(treatmentResponse$info))
+    }
+
     mProf <- object@molecularProfiles
     for (i in seq_along(mProf)) {
         colnames(colData(mProf[[i]])) <- gsub("cellid", "sampleid",
