@@ -6,6 +6,7 @@
 #'
 #' @md
 #'
+#' @importFrom MultiAssayExperiment MultiAssayExperiment
 #' @importMethodsFrom BiocGenerics updateObject
 #' @export
 setMethod('updateObject', signature(object="CoreSet"),
@@ -57,6 +58,8 @@ setMethod('updateObject', signature(object="CoreSet"),
         colnames(colData(mProf[[i]])) <- gsub("cellid", "sampleid",
             colnames(colData(mProf[[i]])))
     }
+    if (!is(mProf, "MultiAssayExperiment")) mProf <- MultiAssayExperiment(mProf)
+
     curation_ <- object@curation
     names(curation_) <- gsub("cell", "sample", names(curation_))
     colnames(curation_$sample) <- gsub("cellid", "sampleid", names(curation_))
