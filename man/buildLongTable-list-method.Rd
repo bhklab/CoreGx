@@ -33,10 +33,12 @@ Create a LongTable object from a list containing file paths,
 data.frames and data.tables.
 }
 \examples{
+\dontrun{
 assayList <- assays(merckLongTable, withDimnames=TRUE)
 rowDataCols <- list(rowIDs(merckLongTable), rowMeta(merckLongTable))
 colDataCols <- list(colIDs(merckLongTable), colMeta(merckLongTable))
 assayCols <- assayCols(merckLongTable)
 longTable <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)
+}
 
 }

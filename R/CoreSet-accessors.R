@@ -451,9 +451,10 @@ setMethod('treatmentInfo', signature('CoreSet'), function(object) {
         'PharmacoSet'='drug',
         'ToxicoSet'='drug',
         'RadioSet'='radiation',
-        'CoreSet'=object@treatment
+        'CoreSet'='treatment'
     )
     package <- gsub('Set', 'Gx', class(object)[1])
+    if ("treatment" %in% slotNames(object)) return(object@treatment)
     treatmentInfo <- get(paste0(treatmentType, 'Info'),
         envir=asNamespace(package))
     treatmentInfo(object)

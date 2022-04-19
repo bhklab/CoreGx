@@ -2,7 +2,10 @@
 #'
 #' @details
 #' ## deprecated
-#'
+#' `CoreSet`: The `CoreSet` constructor is being updated to have a new API. This
+#' API is currently available via the `CoreSet2` constructor. In Bioconductor
+#' 3.16, the old constructor will be renamed `CoreSet2` and the new constructor
+#' will be renamed `CoreSet`.
 #'
 #' ## defunct
 #' `buildLongTable`: This function no longer works as building a `LongTable` or
@@ -182,11 +185,13 @@ setMethod('buildLongTable', signature(from='character'),
 #'   data.frames and data.tables.
 #'
 #' @examples
+#' \dontrun{
 #' assayList <- assays(merckLongTable, withDimnames=TRUE)
 #' rowDataCols <- list(rowIDs(merckLongTable), rowMeta(merckLongTable))
 #' colDataCols <- list(colIDs(merckLongTable), colMeta(merckLongTable))
 #' assayCols <- assayCols(merckLongTable)
 #' longTable <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)
+#' }
 #'
 #' @param from `list` A list containing any combination of character file paths,
 #'  data.tables and data.frames which will be used to construct the LongTable.

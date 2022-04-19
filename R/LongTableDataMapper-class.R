@@ -316,7 +316,7 @@ setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowData
 #' @rdname LongTableDataMapper-accessors
 #' @eval
 #' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_3,
-#' data_=.local_data_3, id_col_='drug_id')
+#' data_=.local_data_3, id_col_='treatment_id')
 setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
     value='list_or_List'), function(object, value) {
     funContext <- '[CoreGx::`rowDataMap<-`,LongTableDataMapper-method]\n\t'

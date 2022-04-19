@@ -9,6 +9,11 @@ List of \code{deprecated} or \code{defunct} methods in the \code{CoreGx} R packa
 }
 \details{
 \subsection{deprecated}{
+
+\code{CoreSet}: The \code{CoreSet} constructor is being updated to have a new API. This
+API is currently available via the \code{CoreSet2} constructor. In Bioconductor
+3.16, the old constructor will be renamed \code{CoreSet2} and the new constructor
+will be renamed \code{CoreSet}.
 }
 
 \subsection{defunct}{

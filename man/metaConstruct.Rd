@@ -33,8 +33,8 @@ containers in the Bioconductor community and beyond.
 }
 \examples{
 data(exampleDataMapper)
-rowDataMap(exampleDataMapper) <- list(c('drug_id'), c())
-colDataMap(exampleDataMapper) <- list(c('cell_id'), c())
+rowDataMap(exampleDataMapper) <- list(c('treatment_id'), c())
+colDataMap(exampleDataMapper) <- list(c('sample_id'), c())
 assayMap(exampleDataMapper) <- list(sensitivity=c('viability'))
 metadataMap(exampleDataMapper) <- list(study_metadata=c('metadata'))
 longTable <- metaConstruct(exampleDataMapper)
