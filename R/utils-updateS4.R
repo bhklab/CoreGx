@@ -13,7 +13,7 @@
 #' @keywords internal
 #' @importFrom data.table data.table as.data.table merge.data.table
 #' melt.data.table
-.sensitivityToLongTable <- function(object, mapper=FALSE) {
+.sensitivityToTRE <- function(object, mapper=FALSE) {
 
     # -- validate input
     funContext <- .funContext(':::.sensitivitySlotToLongTable')
@@ -104,7 +104,7 @@
 
 
 #' Compare the valus of sensitivityInfo before and after use of
-#' .sensitivityToLongTable
+#' .sensitivityToTRE
 #'
 #' @param object `CoreSet` to be updated to the new
 #' `TreatmentResponseExperiment` sensitivity format.
@@ -117,7 +117,7 @@
 #' melt.data.table
 .compareSensitivityInfo <- function(object) {
     new_object <- object
-    tre <- .sensitivityToLongTable(object)
+    tre <- .sensitivityToTRE(object)
     new_object@sensitivity <- tre
 
     si <- sensitivityInfo(object)
