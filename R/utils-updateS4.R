@@ -11,6 +11,7 @@
 #' `LongTableDataMapper` if `mapper`=TRUE.
 #'
 #' @keywords internal
+#' @noRd
 #' @importFrom data.table data.table as.data.table merge.data.table
 #' melt.data.table
 .sensitivityToTRE <- function(object, mapper=FALSE) {
@@ -113,15 +114,16 @@
 #'   the columns which should be conserved.
 #'
 #' @keywords internal
+#' @noRd
 #' @importFrom data.table data.table as.data.table merge.data.table
 #' melt.data.table
 .compareSensitivityInfo <- function(object) {
-    new_object <- object
+    new_object <- copy(object)
     tre <- .sensitivityToTRE(object)
     new_object@sensitivity <- tre
 
-    si <- sensitivityInfo(object)
-    nsi <- sensitivityInfo(npset)
+    si <- copy(sensitivityInfo(object))
+    nsi <- copy(sensitivityInfo(new_object))
 
     setDT(si, keep.rownames="rownames")
     setDT(nsi, keep.rownames="rownames")

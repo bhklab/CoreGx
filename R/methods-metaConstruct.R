@@ -72,6 +72,7 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
     # -- extract LongTable level metadata
     metadataL <- lapply(metadataMap(mapper),
         function(j, x) as.list(unique(x[, j, with=FALSE])), x=DT)
+    metadataL <- c(metadataL, metadata(mapper))
 
     # --
     assayIDs <- c(rowIDs, colIDs)

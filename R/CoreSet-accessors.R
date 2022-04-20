@@ -1291,7 +1291,9 @@ setMethod(sensitivityInfo, signature("CoreSet"),
 
     # Extract the information needed to reconstruct the sensitivityInfo
     #   data.frame
-    assayIndexDT <- assay(longTable, 1, key=TRUE)[, .(rowKey, colKey)]
+    aidx <- which(assayNames(longTable) %in% "assay_metadata")
+    if (length(aidx) != 1) aidx <- 1
+    assayIndexDT <- assay(longTable, aidx, key=TRUE)
     setkeyv(assayIndexDT, c('rowKey', 'colKey'))
     rowDataDT <- rowData(longTable, key=TRUE)
     setkeyv(rowDataDT, 'rowKey')
