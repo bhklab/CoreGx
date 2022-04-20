@@ -94,7 +94,7 @@
         list(experiment_metadata=guess$metadata$mapped_columns)
     metadata(TREdataMapper) <- list(
         assay_metadata=as.list(
-            unique(rowDataDT[, .SD, .SDcols=guess$metadata$mapped_columns])
+            unique(rawDataDT[, .SD, .SDcols=guess$metadata$mapped_columns])
         )
     )
 
