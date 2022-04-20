@@ -7,7 +7,7 @@
 #' fails or corrupts your data. You can then modify the `DataMapper` as
 #' necessary to fix the sensititivity data.
 #'
-#' @return A `LongTable` constructed from `object@sensitivty`, or a
+#' @return A `LongTable` constructed from `object@sensitivity`, or a
 #' `LongTableDataMapper` if `mapper`=TRUE.
 #'
 #' @keywords internal
@@ -100,4 +100,35 @@
 
     # build the object
     return(if (!mapper) metaConstruct(TREdataMapper) else TREdataMapper)
+}
+
+
+#' Compare the valus of sensitivityInfo before and after use of
+#' .sensitivityToLongTable
+#'
+#' @param object `CoreSet` to be updated to the new
+#' `TreatmentResponseExperiment` sensitivity format.
+#'
+#' @return None, displays results of `all.equal` on the sensitivityInfo for
+#'   the columns which should be conserved.
+#'
+#' @keywords internal
+#' @importFrom data.table data.table as.data.table merge.data.table
+#' melt.data.table
+.compareSensitivityInfo <- function(object) {
+    new_object <- object
+    tre <- .sensitivityToLongTable(object)
+    new_object@sensitivity <- tre
+
+    si <- sensitivityInfo(object)
+    nsi <- sensitivityInfo(npset)
+
+    setDT(si, keep.rownames="rownames")
+    setDT(nsi, keep.rownames="rownames")
+
+    equal_columns <- setdiff(colnames(si), "rownames")
+    all.equal(
+        si[order(drugid, cellid), .SD, .SDcols=equal_columns],
+        nsi[order(drugid, cellid), .SD, .SDcols=equal_columns]
+    )
 }
