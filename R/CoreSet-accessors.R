@@ -1292,7 +1292,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     # Extract the information needed to reconstruct the sensitivityInfo
     #   data.frame
     aidx <- which(assayNames(longTable) %in% "assay_metadata")
-    if (length(aidx) != 1) aidx <- 1
+    if (!length(aidx)) stop("No assay_metadata assay?!")
     assayIndexDT <- assay(longTable, aidx, key=TRUE)
     setkeyv(assayIndexDT, c('rowKey', 'colKey'))
     rowDataDT <- rowData(longTable, key=TRUE)
@@ -1322,10 +1322,23 @@ setMethod(sensitivityInfo, signature("CoreSet"),
         ]
     infoDT_sub <- unique(infoDT[, ..keepCols])
 
-    # rebuld the rownames
-    idCols <- lapply(grep("^drug[0-9]*id", colnames(infoDT_sub), value=TRUE),
-        FUN=as.symbol)
-    infoDT_sub[, drugid := .paste_slashes(substitute(..idCols))]
+    # pad the dropped NA values
+    na_info <- copy(metadata(longTable)$sensitivityInfo_NA)
+    setnames(na_info, "drugid", "drug1id")
+    na_info <- cbind(
+        na_info,
+        unique(infoDT_sub[, .SD, .SDcols=!patterns("^drug1id$|^cellid$|^replicate_id$|^rn$")])
+    )
+    na_info[, replicate_id := seq_len(.N), by=.(drug1id, cellid)]
+    infoDT_sub <- rbind(infoDT_sub, na_info)
+    infoDT_sub <- cbind(
+        infoDT_sub,
+        as.data.table(metadata(longTable)$experiment_metadata)
+    )
+
+    # rebuild the rownames
+    idCols <- grep("^drug[0-9]*id", colnames(infoDT_sub), value=TRUE)
+    infoDT_sub[, drugid := Reduce(.paste_slashes, mget(..idCols))]
     infoDT_sub[, drug_uid := Reduce(.paste_colon, mget(..rowIDcols))]
     infoDT_sub[, sample_uid := Reduce(.paste_colon, mget(..colIDcols))]
     infoDT_sub[, exp_id := Reduce(.paste_, .(drug_uid, sample_uid))]

@@ -72,6 +72,10 @@
         assayMap=c(rowCols, colCols)
     )
 
+    # -- capute the na rownames to make recreation easier in .rebuildInfo
+    missing_rows <- setdiff(infoDT$rn, rawdataDT$rn)
+    na_index <- infoDT[rn %in% missing_rows, .(rn, drugid, cellid)]
+
     # -- build a LongTableDataMapper object
     TREdataMapper <- TREDataMapper(rawdata=rawdataDT)
     guess <- guessMapping(TREdataMapper, groups, subset=TRUE)
@@ -93,6 +97,7 @@
     assayMap(TREdataMapper) <- assayMap
     metadataMap(TREdataMapper) <-
         list(experiment_metadata=guess$metadata$mapped_columns)
+    metadata(TREdataMapper) <- list(sensitivityInfo_NA=na_index)
 
     # build the object
     return(if (!mapper) metaConstruct(TREdataMapper) else TREdataMapper)
