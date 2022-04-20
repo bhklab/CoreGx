@@ -1,22 +1,22 @@
-## Utility function for the Gx suite packages ------------------------------ 
+## Utility function for the Gx suite packages ------------------------------
 ## FIXME:: Put these functions in sections based on similar purposes
 
 # ExpressionSet to SummarizedExperiment -----------------------------------
 
 #' CSet molecularProfiles from ESets to SEs
 #'
-#' Converts all ExpressionSet objects within the molecularProfiles slot of a 
+#' Converts all ExpressionSet objects within the molecularProfiles slot of a
 #'   CoreSet to SummarizedExperiments
 #'
 #' @param cSet \code{S4} A CoreSet containing molecular data in ExpressionSets
 #'
-#' @return \code{S4} A CoreSet containing molecular data in a 
+#' @return \code{S4} A CoreSet containing molecular data in a
 #'   SummarizedExperiments
-#' 
+#'
 #' @importFrom BiocParallel bplapply
-#' @importFrom SummarizedExperiment SummarizedExperiment Assays assay 
+#' @importFrom SummarizedExperiment SummarizedExperiment Assays assay
 #'   assayNames assayNames<-
-#' @importFrom Biobase exprs fData pData annotation protocolData 
+#' @importFrom Biobase exprs fData pData annotation protocolData
 #'   assayDataElementNames
 #' @importFrom S4Vectors SimpleList DataFrame
 #' @importFrom stats setNames
@@ -24,17 +24,17 @@
 .convertCSetMolecularProfilesToSE <- function(cSet) {
 
     eSets <- molecularProfilesSlot(cSet)  # Extract eSet data
-    
+
     molecularProfilesSlot(cSet) <- lapply(eSets, function(eSet) {
-        
+
         # Change rownames from probes to EnsemblGeneId for rna data type
         if (grepl("^rna$", Biobase::annotation(eSet))) {
             rownames(eSet) <- Biobase::fData(eSet)$EnsemblGeneId
         }
-        
+
         # Build summarized experiment from eSet TODO:: Do we want to pass an environment for better memory efficiency?
-        SE <- SummarizedExperiment::SummarizedExperiment(assays = SimpleList(as.list(Biobase::assayData(eSet))), rowData = S4Vectors::DataFrame(Biobase::fData(eSet), 
-            rownames = rownames(Biobase::fData(eSet))), colData = S4Vectors::DataFrame(Biobase::pData(eSet), rownames = rownames(Biobase::pData(eSet))), 
+        SE <- SummarizedExperiment::SummarizedExperiment(assays = SimpleList(as.list(Biobase::assayData(eSet))), rowData = S4Vectors::DataFrame(Biobase::fData(eSet),
+            rownames = rownames(Biobase::fData(eSet))), colData = S4Vectors::DataFrame(Biobase::pData(eSet), rownames = rownames(Biobase::pData(eSet))),
             metadata = list(experimentData = eSet@experimentData, annotation = Biobase::annotation(eSet), protocolData = Biobase::protocolData(eSet)))
         ## TODO:: Determine if this can be done in the SE constructor?  Extract names from expression set
         assayNames(SE) <- assayDataElementNames(eSet)
@@ -51,7 +51,7 @@
 ## TODO:: Add documentation!
 #' @export
 #' @noRd
-.sanitizeInput <- function(x, y, lower, upper, pars, x_as_log, y_as_log, 
+.sanitizeInput <- function(x, y, lower, upper, pars, x_as_log, y_as_log,
         y_as_pct, trunc, verbose = FALSE) {
     # Set to 2 to see debug printouts
 
@@ -130,7 +130,7 @@
         if (missing(pars)) {
             stop("Both 'pars' and 'y' missing, please pass in some data!")
         } else {
-            
+
             if (pars[[1]] < 0 || pars[[2]] < 0) {
                 # HS or alpha
                 if (verbose == 2) {
@@ -139,7 +139,7 @@
                 }
                 warning("Curve parameters may be inappropriately set to negative values.")
             }
-            
+
             if (length(pars) == 3) {
                 # and thus we are in PharmacoGx
                 if (x_as_log == FALSE && pars[[3]] < 0) {
@@ -149,7 +149,7 @@
                   message(x_as_log)
                   stop("'x_as_log' flag may be set incorrectly, as the EC50 is negative when a positive value is expected.")
                 }
-                
+
                 if (y_as_pct == FALSE) {
                   if (pars[[2]] > 1) {
                     if (verbose == 2) {
@@ -175,9 +175,9 @@
                 stop("Pars does not have the correct length.")
             }
         }
-        
+
     } else {
-        
+
         if (!all(is.finite(y) | is.na(y)) || (y_as_log && any(y == -Inf))) {
             if (verbose == 2) {
                 message("y:")
@@ -185,7 +185,7 @@
             }
             stop("y must contain only real numbers, NA-values, and/or -Inf (if y_as_log is set to TRUE).")
         }
-        
+
         if (min(y, na.rm=TRUE) < 0) {
             if (verbose) {
                 warning("Warning: Negative y data.")
@@ -195,7 +195,7 @@
                 }
             }
         }
-        
+
         if (max(y, na.rm=TRUE) > (1 + 99 * y_as_pct)) {
             if (verbose) {
                 warning("Warning: y data exceeds negative control.")
@@ -205,9 +205,9 @@
                 }
             }
         }
-        
+
         if (missing(pars)) {
-            
+
             if (y_as_log == FALSE && min(y, na.rm=TRUE) < 0) {
                 if (verbose) {
                   warning("Negative y-values encountered. y data may be inappropriate, or 'y_as_log' flag may be set incorrectly.")
@@ -219,7 +219,7 @@
                   }
                 }
             }
-            
+
             if (y_as_pct == TRUE && max(y, na.rm=TRUE) < 5) {
                 if (verbose) {
                   warning("Warning: 'y_as_pct' flag may be set incorrectly.")
@@ -231,7 +231,7 @@
                   }
                 }
             }
-            
+
             if (y_as_pct == FALSE && max(y, na.rm=TRUE) > 5) {
                 if (verbose) {
                   warning("Warning: 'y_as_pct' flag may be set incorrectly.")
@@ -243,7 +243,7 @@
                   }
                 }
             }
-            
+
             if (!missing(x) && length(x) != length(y)) {
                 if (verbose == 2) {
                   message("x:")
@@ -253,12 +253,12 @@
                 }
                 stop("Vector of x-values is not of same length as vector of y-values.")
             }
-            
+
         } else {
             stop("Please pass in only one of 'pars' and 'y', as it is unclear which to use in the computation.")
         }
     }
-    
+
     if (!missing(lower) && !missing(upper)) {
         if (!(is.double(lower))) {
             if (verbose == 2) {
@@ -267,7 +267,7 @@
             }
             stop("The lower bound must be a positive real number.")
         }
-        
+
         if (!(is.double(lower))) {
             if (verbose == 2) {
                 message("upper:")
@@ -275,7 +275,7 @@
             }
             stop("The upper bound must be a positive real number.")
         }
-        
+
         if (lower >= upper) {
             if (verbose == 2) {
                 message("lower:")
@@ -285,7 +285,7 @@
             }
             stop("The lower bound of the range of allowed x-values must be less than the upper bound.")
         }
-        
+
         if (lower < 0) {
             if (verbose == 2) {
                 message("lower:")
@@ -293,7 +293,7 @@
             }
             stop("The lower bound of the range of allowed x-values must be nonnegative.")
         }
-        
+
         if (upper < 0) {
             if (verbose == 2) {
                 message("upper:")
@@ -308,13 +308,13 @@
 # getSupportVec -----------------------------------------------------------
 
 ## get vector of interpolated concentrations for graphing purposes
-#' .getSupportVec 
+#' .getSupportVec
 #'
 #' @param x An input vector of dosages
 #' @param output_length The length of the returned support vector
-#' 
+#'
 #' @return \code{numeric} A numeric vector of interpolated concentrations
-#' 
+#'
 #' @export
 #' @noRd
 .getSupportVec <- function(x, output_length = 1001) {
@@ -329,57 +329,57 @@
     if (!(is.logical(x_to_log))) {
         stop("x_to_log must be a logical.")
     }
-    
+
     if (!(is.logical(y_to_log))) {
         stop("y_to_log must be a logical.")
     }
-    
+
     if (!(is.logical(y_to_frac))) {
         stop("y_to_frac must be a logical.")
     }
-    
+
     if (x_to_log) {
         x <- log10(x)
     }
-    ### Note, if Y is passed in, it is sorted in this same order below. This is not obvious from the code right away. 
+    ### Note, if Y is passed in, it is sorted in this same order below. This is not obvious from the code right away.
     if (is.unsorted(x, na.rm=TRUE)) {
         InputUnsorted <- TRUE
         warning("x-values passed in unsorted. Sorting x-values and corresponding y-values (if passed in).")
         xOrder <- order(x)
         x <- x[xOrder]
     } else {
-        InputUnsorted <- FALSE 
+        InputUnsorted <- FALSE
     }
-    
+
     if (!missing(y)) {
-        
+
         if (InputUnsorted) {
             y <- y[xOrder]
         }
-        
+
         if (any(is.na(x) & (!is.na(y)))) {
             warning("Missing x-values with non-missing y-values encountered. Removed y-values correspoding to those x-values.")
             myx <- !is.na(x)
             x <- as.numeric(x[myx])
             y <- as.numeric(y[myx])
         }
-        
+
         if (any((!is.na(x)) & is.na(y))) {
             warning("Missing y-values with non-missing x-values encountered. Removed x values correspoding to those y-values.")
             myy <- !is.na(y)
             x <- as.numeric(x[myy])
             y <- as.numeric(y[myy])
         }
-        
+
         myxy <- complete.cases(x,y)
         x <- x[myxy]
         y <- y[myxy]
-                     
+
         if (trunc) {
             y = pmin(as.numeric(y), ifelse(y_to_frac,100,1))
             y = pmax(as.numeric(y), 0)
         }
-        
+
         if (x_to_log) {
             x0s <- which(x == -Inf)
             if (length(x0s) > 0) {
@@ -387,7 +387,7 @@
                 y <- y[-x0s]
             }
         }
-        
+
         if (y_to_log) {
             if (any(y <= 0)) {
                 warning("Transforming y to log with non-positive y values present, therefore removing.")
@@ -399,29 +399,29 @@
             }
             y <- log(y)
         }
-        
+
         if (y_to_frac) {
             y <- y/100
         }
-        
+
          if (length(unique(x)) < 3) {
             stop("Less than 3 unique dose points left after cleaning data, please pass in enough valid measurements.")
-            
+
         }
-        
+
         return(list(x = x, y = y))
     }
-    
+
     if (!missing(pars)) {
-        
+
         if (x_to_log && length(pars) == 3) {
             pars[[3]] <- log10(pars[[3]])
         }
-        
+
         if (y_to_frac && length(pars) == 3) {
             pars[[2]] <- pars[[2]]/100
         }
-        
+
         return(list(x = x, pars = pars))
     }
 }
@@ -446,19 +446,19 @@
 
 ## TODO:: Add documentation to these functions
 
-#' A random sample distributed as the median of N Cauchy distributed variables 
-#' 
-#' Naming follows R conventions.  
-#' 
+#' A random sample distributed as the median of N Cauchy distributed variables
+#'
+#' Naming follows R conventions.
+#'
 #' @param N How many samples to sample
 #' @param n The number of Cauchy distributions to take the median of
-#' @param scale the scale of the Cauchy distribution. 
-#' 
+#' @param scale the scale of the Cauchy distribution.
+#'
 #' @importFrom stats rcauchy
 #' @export
 #' @keywords internal
 #' @noRd
-.rmedncauchys = function(N, n, scale) {
+.rmedncauchys <- function(N, n, scale) {
     x <- matrix(NA, nrow = 1, ncol = N)
     for (i in seq_len(N)) {
         x[i] <- median(rcauchy(n, scale = scale))
@@ -466,15 +466,15 @@
     return(x)
 }
 
-#' PDF of the median of N Cauchy distributed variables 
-#' 
-#' This function calculates the PDF/density for a variable distributed as the median value of n IID Cauchy variables. Naming follows R conventions.  
-#' 
+#' PDF of the median of N Cauchy distributed variables
+#'
+#' This function calculates the PDF/density for a variable distributed as the median value of n IID Cauchy variables. Naming follows R conventions.
+#'
 #' @param x Where to evaluate the density function
 #' @param n The number of Cauchy distributions to take the median of
 #' @param scale the scale of the Cauchy distribution.
 #' @param divisions How many maximum divisions to use in numerical integration
-#' 
+#'
 #' @importFrom stats dcauchy pcauchy integrate
 #' @export
 #' @keywords internal
@@ -486,7 +486,7 @@
     for (g in seq_along(x)) {
         if (n[g]%%2 == 0) {
             y[g] <- 2 * .multinom(n[g], c(n[g]/2 - 1, n[g]/2 - 1)) * tryCatch(integrate(f = function(j) {
-                (pcauchy(x[g] - j/2, scale = scale[g]))^(n[g]/2 - 1) * (1 - pcauchy(x[g] + j/2, scale = scale[g]))^(n[g]/2 - 1) * dcauchy(x[g] - 
+                (pcauchy(x[g] - j/2, scale = scale[g]))^(n[g]/2 - 1) * (1 - pcauchy(x[g] + j/2, scale = scale[g]))^(n[g]/2 - 1) * dcauchy(x[g] -
                   j/2, scale = scale[g]) * dcauchy(x[g] + j/2, scale = scale[g])
             }, lower = 0, upper = Inf, subdivisions = divisions)[[1]], error = function(e) {
                 if (divisions == 1) {
@@ -496,11 +496,11 @@
                 }
                 aseq <- seq(from = 0, to = pi/2, length.out = 2 * divisions + 1)
                 tseq <- tan(aseq)/2
-                return(sum((pcauchy(x[g] + tseq, scale = scale[g]))^(n[g]/2 - 1) * (pcauchy(x[g] - tseq, scale = scale[g]))^(n[g]/2 - 1) * 
+                return(sum((pcauchy(x[g] + tseq, scale = scale[g]))^(n[g]/2 - 1) * (pcauchy(x[g] - tseq, scale = scale[g]))^(n[g]/2 - 1) *
                   dcauchy(x[g] + tseq, scale = scale[g]) * dcauchy(x[g] - tseq, scale = scale[g])/(cos(aseq))^2 * wseq) * (aseq[2] - aseq[1])/6)
             })
         } else {
-            y[g] <- .multinom(n[g], c((n[g] - 1)/2, (n[g] - 1)/2)) * (pcauchy(x[g], scale = scale[g]))^((n[g] - 1)/2) * (1 - pcauchy(x[g], 
+            y[g] <- .multinom(n[g], c((n[g] - 1)/2, (n[g] - 1)/2)) * (pcauchy(x[g], scale = scale[g]))^((n[g] - 1)/2) * (1 - pcauchy(x[g],
                 scale = scale[g]))^((n[g] - 1)/2) * dcauchy(x[g], scale = scale[g])
         }
     }
@@ -508,15 +508,15 @@
 }
 
 
-#' CDF of the median of N Cauchy distributed variables 
-#' 
-#' This function calculates the CDF/distribution for a variable distributed as the median value of n IID Cauchy variables. Naming follows R conventions.  
-#' 
+#' CDF of the median of N Cauchy distributed variables
+#'
+#' This function calculates the CDF/distribution for a variable distributed as the median value of n IID Cauchy variables. Naming follows R conventions.
+#'
 #' @param x Where to evaluate the distribution function
 #' @param n The number of Cauchy distributions to take the median of
 #' @param scale the scale of the Cauchy distribution.
 #' @param divisions How many maximum divisions to use in numerical integration
-#' 
+#'
 #' @importFrom stats pcauchy integrate
 #' @export
 #' @keywords internal
@@ -547,17 +547,17 @@
 }
 
 #' Expectation of the likelihood of the median of N Cauchy distributions for truncated data
-#' 
-#' This function calculates the expected value of the PDF of a median of N Cauchy with given scale parameter, calculated over the region from x to infinity if x>0, and -infinity to x otherwise. 
-#' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value. 
+#'
+#' This function calculates the expected value of the PDF of a median of N Cauchy with given scale parameter, calculated over the region from x to infinity if x>0, and -infinity to x otherwise.
+#' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value.
 #' This increases robustness to extreme outliers while not completely ignoring the fact that points are truncated, and seems to work well in practice. The name of the function follows:
-#' e(xpectation)d(istribution)med(ian)ncauchys - following R conventions. 
-#' 
-#' @param x Where the truncation occurred 
+#' e(xpectation)d(istribution)med(ian)ncauchys - following R conventions.
+#'
+#' @param x Where the truncation occurred
 #' @param n The number of Cauchy distributions to take the median of
 #' @param scale the scale of the Cauchy distribution.
 #' @param divisions How many maximum divisions to use in numerical integration
-#' 
+#'
 #' @importFrom stats integrate
 #' @keywords internal
 #' @export
@@ -587,14 +587,14 @@
 
 #### mednnormals -------------------------------------------------------------
 
-#' A random sample distributed as the median of N Normally distributed variables 
-#' 
-#' Naming follows R conventions.  
-#' 
+#' A random sample distributed as the median of N Normally distributed variables
+#'
+#' Naming follows R conventions.
+#'
 #' @param N How many samples to sample
 #' @param n The number of normal distributions to take the median of
-#' @param scale the SD of the normal distribution. 
-#' 
+#' @param scale the SD of the normal distribution.
+#'
 #' @export
 #' @keywords internal
 #' @noRd
@@ -606,15 +606,15 @@
     return(x)
 }
 
-#' PDF of the median of N Normally distributed variables 
-#' 
-#' This function calculates the PDF/density for a variable distributed as the median value of n IID Normal variables. Naming follows R conventions.  
-#' 
+#' PDF of the median of N Normally distributed variables
+#'
+#' This function calculates the PDF/density for a variable distributed as the median value of n IID Normal variables. Naming follows R conventions.
+#'
 #' @param x where to evaluate the density
 #' @param n The number of normal distributions to take the median of
 #' @param scale the SD of the normal distribution.
 #' @param divisions How many maximum divisions to use in numerical integration
-#'  
+#'
 #' @importFrom stats rnorm  dnorm
 #' @export
 #' @keywords internal
@@ -626,7 +626,7 @@
     for (g in seq_along(x)) {
         if (n[g]%%2 == 0) {
             y[g] <- 2 * .multinom(n[g], c(n[g]/2 - 1, n[g]/2 - 1)) * tryCatch(integrate(f = function(j) {
-                (pnorm(x[g] - j/2, sd = scale[g]))^(n[g]/2 - 1) * (1 - pnorm(x[g] + j/2, sd = scale[g]))^(n[g]/2 - 1) * dnorm(x[g] - j/2, 
+                (pnorm(x[g] - j/2, sd = scale[g]))^(n[g]/2 - 1) * (1 - pnorm(x[g] + j/2, sd = scale[g]))^(n[g]/2 - 1) * dnorm(x[g] - j/2,
                   sd = scale[g]) * dnorm(x[g] + j/2, sd = scale[g])
             }, lower = 0, upper = Inf, subdivisions = divisions)[[1]], error = function(e) {
                 if (divisions == 1) {
@@ -636,15 +636,15 @@
                 }
                 aseq <- seq(from = 0, to = pi/2, length.out = 2 * divisions + 1)
                 tseq <- tan(aseq)/2
-                return(sum((pnorm(x[g] + tseq, sd = scale[g]))^(n[g]/2 - 1) * (pnorm(x[g] - tseq, sd = scale[g]))^(n[g]/2 - 1) * dnorm(x[g] + 
+                return(sum((pnorm(x[g] + tseq, sd = scale[g]))^(n[g]/2 - 1) * (pnorm(x[g] - tseq, sd = scale[g]))^(n[g]/2 - 1) * dnorm(x[g] +
                   tseq, sd = scale[g]) * dnorm(x[g] - tseq, sd = scale[g])/(cos(aseq))^2 * wseq) * (aseq[2] - aseq[1])/6)
             })
         } else {
             if(n[g]==1){
                 y[g] <- dnorm(x[g], sd = scale[g]) ## This reduces to the simple case for n equals 1 below, but we can save many calls to pnorm, which just get raised to a power of 0.
             } else {
-                y[g] <- .multinom(n[g], c((n[g] - 1)/2, (n[g] - 1)/2)) * (pnorm(x[g], sd = scale[g]))^((n[g] - 1)/2) * (1 - pnorm(x[g], sd = scale[g]))^((n[g] - 
-                                                                                                                                                              1)/2) * dnorm(x[g], sd = scale[g])               
+                y[g] <- .multinom(n[g], c((n[g] - 1)/2, (n[g] - 1)/2)) * (pnorm(x[g], sd = scale[g]))^((n[g] - 1)/2) * (1 - pnorm(x[g], sd = scale[g]))^((n[g] -
+                                                                                                                                                              1)/2) * dnorm(x[g], sd = scale[g])
             }
 
         }
@@ -653,15 +653,15 @@
 }
 
 
-#' CDF of the median of N Normally distributed variables 
-#' 
-#' This function calculates the CDF/distribution for a variable distributed as the median value of n IID Normal variables. Naming follows R conventions.  
-#' 
+#' CDF of the median of N Normally distributed variables
+#'
+#' This function calculates the CDF/distribution for a variable distributed as the median value of n IID Normal variables. Naming follows R conventions.
+#'
 #' @param x Where to evaluate the Distribution
 #' @param n The number of normal distributions to take the median of
 #' @param scale the SD of the normal distribution.
 #' @param divisions How many maximum divisions to use in numerical integration
-#' 
+#'
 #' @importFrom stats integrate
 #' @export
 #' @keywords internal
@@ -692,17 +692,17 @@
 }
 
 #' Expectation of the likelihood of the median of N normal distributions for truncated data
-#' 
-#' This function calculates the expected value of the PDF of a median of N normals with SD=scale, calculated over the region from x to infinity if x>0, and -infinity to x otherwise. 
-#' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value. 
+#'
+#' This function calculates the expected value of the PDF of a median of N normals with SD=scale, calculated over the region from x to infinity if x>0, and -infinity to x otherwise.
+#' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value.
 #' This increases robustness to extreme outliers while not completely ignoring the fact that points are truncated, and seems to work well in practice. The name of the function follows:
-#' e(xpectation)d(istribution)med(ian)nnormals - following R conventions. 
-#' 
-#' @param x Where the truncation occurred 
+#' e(xpectation)d(istribution)med(ian)nnormals - following R conventions.
+#'
+#' @param x Where the truncation occurred
 #' @param n The number of normal distributions to take the median of
 #' @param scale the SD of the normal distribution.
 #' @param divisions How many maximum divisions to use in numerical integration
-#' 
+#'
 #' @importFrom stats integrate
 #' @export
 #' @keywords internal
@@ -712,7 +712,7 @@
     scale <- rep(scale, times = length(x)/length(scale))
     y <- numeric(length(x))
     for (g in seq_along(y)) {
-        if(n[g]==1){ ## The n=1 case is called very often, and there are significant savings (20x) to not calling numerical integration. 
+        if(n[g]==1){ ## The n=1 case is called very often, and there are significant savings (20x) to not calling numerical integration.
             if(x[g]>0){
                 pnorm(x[g], sd=scale[g]/sqrt(2), lower.tail = F)/(scale*2*sqrt(pi))
             } else {
@@ -734,7 +734,7 @@
                 return(sum((.dmednnormals(tan(aseq), n[g], scale[g]))^2 * wseq/(cos(aseq))^2) * (aseq[3] - aseq[1])/6)
             })
         }
-        
+
     }
     return(y)
 }
@@ -744,36 +744,36 @@
 
 ## TODO:: Add function documentation
 #' .fitCurve
-#' 
-#' Curve optimization from 1 variable to 1 variable, using L-BFSG-B from optim, 
-#' with fallback to pattern search if optimization fails to converge. 
-#' 
+#'
+#' Curve optimization from 1 variable to 1 variable, using L-BFSG-B from optim,
+#' with fallback to pattern search if optimization fails to converge.
+#'
 #' @param x `numeric` input/x values for function
 #' @param y `numeric` output/y values for function
-#' @param f `function` function f, parameterized by parameters to optimize 
-#' @param density `numeric` how many points in the dimension of each parameter should 
+#' @param f `function` function f, parameterized by parameters to optimize
+#' @param density `numeric` how many points in the dimension of each parameter should
 #'   be evaluated (density of the grid)
 #' @param step initial step size for pattern search.
 #' @param precision `numeric` smallest step size used in pattern search, once step size drops below this value,
-#'   the search terminates.  
+#'   the search terminates.
 #' @param lower_bounds `numeric` lower bounds for the paramater search space
 #' @param upper_bounds `numeric` upper bounds for the parameter search space
-#' @param median_n `integer` number of technical replicates per measured point in x. Used to 
+#' @param median_n `integer` number of technical replicates per measured point in x. Used to
 #'   evaluate the proper median distribution for the normal and cauchy error models
 #' @param scale `numeric` scale on which to measure probability for the error model (roughly SD of error)
 #' @param family `character` which error family to use. Currently, `normal` and `cauchy` are implemented
 #' @param trunc `logical` Whether or not to truncate the values at 100% (1.0)
 #' @param verbose `logical` should diagnostic messages be printed?
 #' @param gritty_guess `numeric` intitial, uninformed guess on parameter values (usually heuristic)
-#' @param span ['numeric'] can be safely kept at 1, multiplicative ratio for initial step size in pattern search. 
-#'   Must be larger than precision. 
+#' @param span ['numeric'] can be safely kept at 1, multiplicative ratio for initial step size in pattern search.
+#'   Must be larger than precision.
 #' @importFrom stats optim var
 #' @export
 #' @keywords internal
 #' @noRd
-.fitCurve <- function(x, y, f, density, step, precision, lower_bounds, upper_bounds, scale, family, median_n, trunc, verbose, gritty_guess, 
+.fitCurve <- function(x, y, f, density, step, precision, lower_bounds, upper_bounds, scale, family, median_n, trunc, verbose, gritty_guess,
     span = 1) {
-    
+
     guess <- tryCatch(optim(par = gritty_guess, fn = function(t) {
         .residual(x = x, y = y, n = median_n, pars = t, f = f, scale = scale, family = family, trunc = trunc)
     }, lower = lower_bounds, upper = upper_bounds, control = list(factr = 1e-08, trace = 0), method = "L-BFGS-B"), error = function(e) {
@@ -781,24 +781,24 @@
     })
     failed = guess[["convergence"]] != 0
     guess <- guess[["par"]]
-    
+
     guess_residual <- .residual(x = x, y = y, n = median_n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
     gritty_guess_residual <- .residual(x = x, y = y, n = median_n, pars = gritty_guess, f = f, scale = scale, family = family, trunc = trunc)
-    
+
     if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
-        guess <- .meshEval(x = x, y = y, f = f, guess = gritty_guess, lower_bounds = lower_bounds, upper_bounds = upper_bounds, density = density, 
+        guess <- .meshEval(x = x, y = y, f = f, guess = gritty_guess, lower_bounds = lower_bounds, upper_bounds = upper_bounds, density = density,
             n = median_n, scale = scale, family = family, trunc = trunc)
         guess_residual <- .residual(x = x, y = y, n = median_n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
-        
-        guess <- .patternSearch(x = x, y = y, f = f, guess = guess, n = median_n, guess_residual = guess_residual, lower_bounds = lower_bounds, 
+
+        guess <- .patternSearch(x = x, y = y, f = f, guess = guess, n = median_n, guess_residual = guess_residual, lower_bounds = lower_bounds,
             upper_bounds = upper_bounds, span = span, precision = precision, step = step, scale = scale, family = family, trunc = trunc)
     }
-    
+
     y_hat <- do.call(f, list(x, guess))
-    
+
     Rsqr <- 1 - var(y - y_hat)/var(y)
     attr(guess, "Rsquare") <- Rsqr
-    
+
     return(guess)
 }
 
@@ -815,33 +815,33 @@
 .meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
     pars <- NULL
     guess_residual <- .residual(x = x, y = y, n = n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
-    
+
     periods <- matrix(NA, nrow = length(guess), ncol = 1)
     names(periods) <- names(guess)
     periods[1] <- 1
-    
+
     if (length(guess) > 1) {
         for (par in 2:length(guess)) {
-            ## the par-1 is because we want 1 increment of par variable once all previous variables have their values tested once. 
+            ## the par-1 is because we want 1 increment of par variable once all previous variables have their values tested once.
             periods[par] <- periods[par - 1] * (density[par - 1] * (upper_bounds[par - 1] - lower_bounds[par - 1]) + 1)
         }
     }
 
     currentPars <- lower_bounds
 
-    ## The plus one is because we include endpoints. 
+    ## The plus one is because we include endpoints.
 
     for (point in seq_len(prod((upper_bounds - lower_bounds) * density+1))) {
 
         test_guess_residual <- .residual(x = x, y = y, n = n, pars = currentPars, f = f, scale = scale, family = family, trunc = trunc)
-        
+
         ## Check for something catastrophic going wrong
         if (!length(test_guess_residual) || (!is.finite(test_guess_residual) && test_guess_residual != Inf)) {
-            stop(paste0(" Test Guess Residual is: ", test_guess_residual, "\n", "Other Pars:\n", "x: ", paste(x, collapse = ", "), "\n", 
-                "y: ", paste(y, collapse = ", "), "\n", "n: ", n, "\n", "pars: ", pars, "\n", "scale: ", scale, "\n", "family : ", family, 
+            stop(paste0(" Test Guess Residual is: ", test_guess_residual, "\n", "Other Pars:\n", "x: ", paste(x, collapse = ", "), "\n",
+                "y: ", paste(y, collapse = ", "), "\n", "n: ", n, "\n", "pars: ", pars, "\n", "scale: ", scale, "\n", "family : ", family,
                 "\n", "Trunc ", trunc))
         }
-        ## save the guess if its an improvement 
+        ## save the guess if its an improvement
         if (test_guess_residual < guess_residual) {
             guess <- currentPars
             guess_residual <- test_guess_residual
@@ -853,7 +853,7 @@
 
                 if (currentPars[par] > upper_bounds[par]) {
                     currentPars[par] <- lower_bounds[par]
-                } 
+                }
             }
         }
     }
@@ -865,19 +865,19 @@
 # Set Operations ----------------------------------------------------------
 
 ## TODO:: Can we implement this as an extension of the BiocGenerics::setdiff?
-#' Utility to find the symmetric set difference of a list of two or more 
+#' Utility to find the symmetric set difference of a list of two or more
 #' vectors or lists
-#' 
-#' The function finds the symmetric set differnces between all the arguments, 
+#'
+#' The function finds the symmetric set differnces between all the arguments,
 #' defined as Union(args)-Intersection(args)
-#' 
-#' @examples 
+#'
+#' @examples
 #' list1 <- list('a', 'b', 'c')
 #' list2 <- list('a', 'c')
 #' list3 <- list('a', 'c', 'd')
 #' listAll <- .symSetDiffList(list1, list2, list3)
 #' listAll
-#' 
+#'
 #' @param ... A list of or any number of vector like objects of the same mode,
 #'   which could also be operated on by the native R set operations
 #'
@@ -894,22 +894,22 @@
 #' Intersect A List of More Than Two Vectors
 #'
 #' Utility to find the intersection between a list of more than two vectors or
-#'   lists This function extends the native intersect function to work on two 
+#'   lists This function extends the native intersect function to work on two
 #'   or more arguments.
-#' 
-#' @examples 
+#'
+#' @examples
 #' list1 <- list('a', 'b', 'c')
 #' list2 <- list('a', 'c')
 #' list3 <- list('a', 'c', 'd')
 #' listAll <- .intersectList(list1, list2, list3)
 #' listAll
-#' 
+#'
 #' @param ... A list of or any number of vector like objects of the same mode,
 #'   which could also be operated on by the native R set operations
-#'   
+#'
 #' @return A vector like object of the same mode as the first argument,
 #'   containing only the intersection common to all arguments to the function
-#'   
+#'
 #' @export
 #' @keywords internal
 .intersectList <- function(...) {
@@ -935,23 +935,23 @@
 ## FIXME:: This should be implemented as an extension of the union generic from BiocGenerics
 #' Utility to find the union between a list of more than two vectors or
 #' lists
-#' 
+#'
 #' This function extends the native union function to work on two or more
 #' arguments.
-#' 
-#' @examples 
+#'
+#' @examples
 #' list1 <- list('a', 'b')
 #' list2 <- list('a', 'c')
 #' list3 <- list('c', 'd')
 #' listAll <- .unionList(list1, list2, list3)
 #' listAll
-#' 
+#'
 #' @param ... A list of or any number of vector like objects of the same mode,
 #'   which could also be operated on by the native R set operations
-#'   
+#'
 #' @return A vector like object of the same mode as the first argument,
 #'   containing all the elements of all arguments passed to the function
-#'   
+#'
 #' @export
 #' @keywords internal
 .unionList <- function(...) {
@@ -996,7 +996,7 @@
 .patternSearch <- function(x, y, f, guess, n, guess_residual, lower_bounds, upper_bounds, span, precision, step, scale, family, trunc) {
     neighbours <- matrix(nrow = 2 * length(guess), ncol = length(guess))
     neighbour_residuals <- matrix(NA, nrow = 1, ncol = nrow(neighbours))
-    
+
     while (span > precision) {
         for (neighbour in seq_len(nrow(neighbours))) {
             neighbours[neighbour, ] <- guess
@@ -1006,11 +1006,11 @@
             } else {
                 neighbours[neighbour, dimension] <- pmax(guess[dimension] - span * step[dimension], lower_bounds[dimension])
             }
-            
-            neighbour_residuals[neighbour] <- .residual(x = x, y = y, f = f, pars = neighbours[neighbour, ], n = n, scale = scale, family = family, 
+
+            neighbour_residuals[neighbour] <- .residual(x = x, y = y, f = f, pars = neighbours[neighbour, ], n = n, scale = scale, family = family,
                 trunc = trunc)
         }
-        
+
         if (min(neighbour_residuals) < guess_residual) {
             guess <- neighbours[which.min(neighbour_residuals)[1], ]
             guess_residual <- min(neighbour_residuals)
@@ -1018,7 +1018,7 @@
             span <- span/2
         }
     }
-    
+
     return(guess)
 }
 
@@ -1054,19 +1054,19 @@
 .residual <- function(x, y, n, pars, f, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
     family <- match.arg(family)
     diffs <- do.call(f, list(x, pars)) - y
-    
+
     if (family != "Cauchy") {
         if (trunc == FALSE) {
-            
+
             if (n == 1) {
                 return(sum(diffs^2/scale^2))
             }
-            
+
             return(sum(-log(.dmednnormals(diffs, n, scale))))
         } else {
             down_truncated <- abs(y) >= 1
             up_truncated <- abs(y) <= 0
-            return(sum(-log(.dmednnormals(diffs[!(down_truncated | up_truncated)], n, scale))) + sum(-log(.edmednnormals(-diffs[up_truncated | 
+            return(sum(-log(.dmednnormals(diffs[!(down_truncated | up_truncated)], n, scale))) + sum(-log(.edmednnormals(-diffs[up_truncated |
                 down_truncated], n, scale))))
         }
     } else {
@@ -1075,7 +1075,7 @@
         } else {
             down_truncated <- abs(y) >= 1
             up_truncated <- abs(y) <= 0
-            return(sum(-log(.dmedncauchys(diffs[!(down_truncated | up_truncated)], n, scale))) + sum(-log(.edmedncauchys(-diffs[up_truncated | 
+            return(sum(-log(.dmedncauchys(diffs[!(down_truncated | up_truncated)], n, scale))) + sum(-log(.edmedncauchys(-diffs[up_truncated |
                 down_truncated], n, scale))))
         }
     }
@@ -1234,7 +1234,7 @@ is.items <- function(list, ..., FUN=is)
         context <- gsub('\\(.*\\)', '', context)
         # deal with S4 lapply calls (e.g., endoapply)
         if (grepl('.*match.fun.*', context)) {
-            context <- tryCatch({ 
+            context <- tryCatch({
                 deparse(callStack[[length(callStack) - (n + 6)]][3])
             }, error=function(e) 'context_failed')
             context <- gsub('\\(.*\\)', '', context)

@@ -36,25 +36,23 @@
 
     # sensitivityRaw
     doseDT <- as.data.table(oldSensitivity$raw[, , 1], keep.rownames=TRUE)
-    meltedDoseDT <- na.omit(melt.data.table(doseDT, id.vars='rn', 
+    meltedDoseDT <- na.omit(melt.data.table(doseDT, id.vars='rn',
         variable.name='old_column', value.name='dose'))
     meltedDoseDT[, dose := as.numeric(dose)]
     viabDT <- as.data.table(oldSensitivity$raw[, , 2], keep.rownames=TRUE)
-    meltedViabDT <- na.omit(melt.data.table(viabDT, id.vars='rn', 
+    meltedViabDT <- na.omit(melt.data.table(viabDT, id.vars='rn',
         variable.name='old_column', value.name='viability'))
     meltedViabDT[, viability := as.numeric(viability)]
 
     # -- merge into a single long format data.table
     assayDT <- merge.data.table(meltedDoseDT, meltedViabDT,
         by=c('rn', 'old_column'))
-    assayMap <- list(sensitivity=c('viability'), 
+    assayMap <- list(sensitivity=c('viability'),
         profiles=setdiff(colnames(profDT), 'rn'))
 
     rawdataDT <- merge.data.table(assayDT, profDT, by='rn')
     rawdataDT <- merge.data.table(rawdataDT, infoDT, by='rn')
-    # Find any hidden replicates, order to maintain ordinality of dose replicates
-    setorderv(rawdataDT, cols=rowCols[2])
-    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols[1], colCols)]
+    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols, colCols)]
 
     if (max(rawdataDT$replicate_id) > 1) {
         # Handle case where there is only 1 drug (i.e., radiation in RadioGx)
@@ -82,7 +80,7 @@
     # do not steal any assay columns for the row or column data
     guess$rowDataMap[[2]] <- setdiff(guess$rowDataMap[[2]], assayCols)
     guess$colDataMap[[2]] <- setdiff(guess$colDataMap[[2]], assayCols)
-    guess$metadata[[2]] <- setdiff(guess$metadata[[2]], 
+    guess$metadata[[2]] <- setdiff(guess$metadata[[2]],
         c(assayCols, guess$rowDataMap[[2]], guess$colDataMap[[2]]))
     assayMap$assay_metadata <- setdiff(guess$assayMap$mapped_columns, assayCols)
 
@@ -92,8 +90,13 @@
     rowDataMap(TREdataMapper) <- guess$rowDataMap
     colDataMap(TREdataMapper) <- guess$colDataMap
     assayMap(TREdataMapper) <- assayMap
-    metadataMap(TREdataMapper) <- 
+    metadataMap(TREdataMapper) <-
         list(experiment_metadata=guess$metadata$mapped_columns)
+    metadata(TREdataMapper) <- list(
+        assay_metadata=as.list(
+            unique(rowDataDT[, .SD, .SDcols=guess$metadata$mapped_columns])
+        )
+    )
 
     # build the object
     return(if (!mapper) metaConstruct(TREdataMapper) else TREdataMapper)
