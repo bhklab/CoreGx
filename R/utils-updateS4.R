@@ -93,11 +93,6 @@
     assayMap(TREdataMapper) <- assayMap
     metadataMap(TREdataMapper) <-
         list(experiment_metadata=guess$metadata$mapped_columns)
-    metadata(TREdataMapper) <- list(
-        assay_metadata=as.list(
-            unique(rawdataDT[, .SD, .SDcols=guess$metadata$mapped_columns])
-        )
-    )
 
     # build the object
     return(if (!mapper) metaConstruct(TREdataMapper) else TREdataMapper)
