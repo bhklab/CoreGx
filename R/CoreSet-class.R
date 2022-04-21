@@ -135,13 +135,31 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     sensitivityInfo=data.frame(), sensitivityRaw=array(dim=c(0,0,0)),
     sensitivityProfiles=matrix(), sensitivityN=matrix(nrow=0, ncol=0),
     perturbationN=array(NA, dim=c(0,0,0)), curationSample=data.frame(),
-    curationTissue=data.frame(), treatment=data.frame(),
-    datasetType=c("sensitivity", "perturbation", "both"), verify=TRUE
+    curationTissue=data.frame(), curationTreatment=data.frame(),
+    treatment=data.frame(), datasetType=c("sensitivity", "perturbation", "both"),
+    verify=TRUE
 ) {
 
     .Deprecated("CoreSet2", package=packageName(), msg="The CoreSet class is
         being redesigned. Please use the new constructor to ensure forwards
-        compatibility with future releases!", old="CoreSet")
+        compatibility with future releases! Old objects can be updated with
+        the updateObject method.", old="CoreSet")
+
+    # ensure new sampleid and treatmentid identifiers are honoured
+    sample <- .checkForSampleId(sample)
+    treatment <- .checkForTreatmentId(treatment)
+    sensitivityInfo <- .checkForSampleId(sensitivityInfo)
+    sensitivityInfo <- .checkForTreatmentId(sensitivityInfo)
+    curationSample <- .checkForSampleId(curationSample)
+    curationTreatment <- .checkForTreatmentId(curationTreatment)
+    for (nm in names(molecularProfiles)) {
+        colData(molecularProfiles[[nm]]) <- .checkForSampleId(
+            colData(molecularProfiles[[nm]]))
+        # handle perturbation case
+        colData(molecularProfiles[[nm]]) <- .checkForIdColumns(
+            colData(molecularProfiles[[nm]]), "treatmentid", "drugid",
+            error=FALSE)
+    }
 
     datasetType <- match.arg(datasetType)
 
@@ -211,6 +229,40 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     }
     return(object)
 }
+
+
+#' Utility to help identify and fix deprecated identifiers
+#'
+#' @param new_col `character(1)` The new identifier.
+#' @param old_col `character(1)` A regex matching any old identifers to
+#' replace.
+#'
+#' @return `rectangular` object, with old_col updated to new_col if it exists.
+#'
+#' @noRd
+.checkForIdColumn <- function(df, new_col, old_col, error=TRUE) {
+    if (nrow(df) == 0 || ncol(df) == 0) return(df)
+    name <- as.character(substitute(df))
+    if (!(new_col) %in% colnames(df)) {
+        if (old_col %in% colnames(df)) {
+            .warning("The ", old_col, "identifier is deprecated, updating to",
+                new_col, " in ", name, "!")
+            colnames(df) <- gsub(new_col, col_col, colnames(df))
+        } else {
+            if (error)
+                .error("The ", new_col, " identifier is mandatory in ", name, "!")
+        }
+        return(df)
+    }
+}
+
+#' @noRd
+.checkForTreatmentId <- function(df)
+    .checkForIdColumn(df, new_col="treatmentid", old_col="drugid")
+
+#' @noRd
+.checkForSampleId <- function(df)
+    .checkForIdColumn(df, new_col="sampleid", old_col="cellid")
 
 
 #' @noRd
@@ -356,8 +408,10 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
                 item
             )
             cat(title, ":\n")
-            cat(paste0(space, "Dim: ", dim(molecularProfiles(object, mDataType=item)),
+            cat(paste0(space, "Dim: ",
+                paste0(dim(molecularProfiles(object, mDataType=item), collapse=", "),
                 "\n"))
+            )
         }
     }
     cat("Treatment response:\n")
@@ -370,7 +424,7 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
             "Please look at pertNumber(cSet) to determine number of experiments",
             " for each drug-sample combination.\n")
         cat("Drug sensitivity:\n")
-        cat(space, "Number of Experiments: ", nrow(sensitivityInfo(object)),"\n")
+        cat(space, "Number of Experiments: ", nrow(sensitivityInfo(object)), "\n")
         cat(space, "Please look at sensNumber(cSet) to determine number of ",
             "experiments for each drug-sample combination.\n")
     }

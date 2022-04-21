@@ -339,8 +339,7 @@ setReplaceMethod("sampleInfo", signature(object="CoreSet", value="data.frame"),
 
 ## TODO: Implement an actual @sample slot instead of using @sample  and aliases
 
-#' @export
-setGeneric("sampleNames", function(object, ...) standardGeneric("sampleNames"))
+
 
 #' @noRd
 .docs_CoreSet_get_sampleNames <- function(...) .parseToRoxygen(
@@ -362,7 +361,7 @@ setGeneric("sampleNames", function(object, ...) standardGeneric("sampleNames"))
     ...
 )
 
-
+#' @importMethodsFrom Biobase sampleNames
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_sampleNames(class_=.local_class, data_=.local_data,
 #' sample_=.local_sample)
@@ -372,10 +371,6 @@ setMethod("sampleNames", signature("CoreSet"), function(object) {
 #' @export
 cellNames <- function(...) sampleNames(...)
 
-
-#' @export
-setGeneric("sampleNames<-", function(object, ..., value)
-    standardGeneric("sampleNames<-"))
 
 #' @noRd
 .docs_CoreSet_set_sampleNames <- function(...) .parseToRoxygen(
@@ -400,7 +395,7 @@ setGeneric("sampleNames<-", function(object, ..., value)
 )
 
 
-
+#' @importMethodsFrom Biobase sampleNames<-
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_sampleNames(class_=.local_class, data_=.local_data,
 #' sample_=.local_sample)

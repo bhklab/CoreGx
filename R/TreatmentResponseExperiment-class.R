@@ -1,4 +1,5 @@
 #' @include LongTable-class.R
+#' @noRd
 NULL
 
 #' @title TreatmentResponseExperiment class definition
