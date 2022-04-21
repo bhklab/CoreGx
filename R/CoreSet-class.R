@@ -583,9 +583,10 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
             pertMatch <- match(dimnames(pertNumber(object))[[2]],
                 rownames(treatmentInfo(object)))
         }
-        curMatch <- match(rownames(curation(object)$treatment),
-            rownames(treatmentInfo(object)))
-
+        if ("treatment" %in% names(curation(object))) {
+            curMatch <- match(rownames(curation(object)$treatment),
+                rownames(treatmentInfo(object)))
+        }
         duplId <- unique(new.ids[duplicated(new.ids)])
         for(id in duplId) {
             if (ncol(sensNumber(object))>0){
@@ -601,13 +602,14 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
                 pertNumber(object) <- pertNumber(object)[,-myx[-1], ]
                 # pertMatch <- pertMatch[-myx[-1]]
             }
-
-            myx <- which(new.ids[curMatch] == id)
-            curation(object)$treatment[myx[1], ] <-
-                apply(curation(object)$treatment[myx, ], 2, paste,
-                    collapse='///')
-            curation(object)$treatment <- curation(object)$treatment[-myx[-1], ]
-            # curMatch <- curMatch[-myx[-1]]
+            if ("treatment" %in% names(curation(object))) {
+                myx <- which(new.ids[curMatch] == id)
+                curation(object)$treatment[myx[1], ] <-
+                    apply(curation(object)$treatment[myx, ], 2, paste,
+                        collapse='///')
+                curation(object)$treatment <- curation(object)$treatment[-myx[-1], ]
+                # curMatch <- curMatch[-myx[-1]]
+            }
 
             myx <- which(new.ids == id)
             treatmentInfo(object)[myx[1],] <- apply(treatmentInfo(object)[myx,],
@@ -622,8 +624,10 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
                 pertMatch <- match(dimnames(pertNumber(object))[[2]],
                     rownames(treatmentInfo(object)))
             }
-            curMatch <- match(rownames(curation(object)$treatment),
-                rownames(treatmentInfo(object)))
+            if ("treatment" %in% names(curation(object))) {
+                curMatch <- match(rownames(curation(object)$treatment),
+                    rownames(treatmentInfo(object)))
+            }
         }
     } else {
         if (dim(pertNumber(object))[[2]]>0){
@@ -634,8 +638,10 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
             sensMatch <- match(colnames(sensNumber(object)),
                 rownames(treatmentInfo(object)))
         }
-        curMatch <- match(rownames(curation(object)$treatment),
-            rownames(treatmentInfo(object)))
+        if ("treatment" %in% names(curation(object))) {
+            curMatch <- match(rownames(curation(object)$treatment),
+                rownames(treatmentInfo(object)))
+        }
     }
     if (dim(pertNumber(object))[[2]]>0){
         dimnames(pertNumber(object))[[2]] <- new.ids[pertMatch]
@@ -643,7 +649,9 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
     if (ncol(sensNumber(object))>0){
         colnames(sensNumber(object)) <- new.ids[sensMatch]
     }
-    rownames(curation(object)$treatment) <- new.ids[curMatch]
+    if ("treatment" %in% names(curation(object))) {
+        rownames(curation(object)$treatment) <- new.ids[curMatch]
+    }
     rownames(treatmentInfo(object)) <- new.ids
     return(object)
 }
