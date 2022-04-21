@@ -1206,13 +1206,13 @@ setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_OR_MAE"),
     "
     @details
 
-    ## @sensitivity
+    ## @treatmentResponse
 
     ### Arguments:
     - `dimension`: Optional `character(1)` One of 'treatment', 'sample' or
     'assay' to retrieve `rowData`, `colData` or the 'assay_metadata' assay from
     the `{class_}` `@sensitvity` `LongTable` object, respectively. Ignored with
-    warning if `@sensitivity` is not a `LongTable` object.
+    warning if `@treatmentResponse` is not a `LongTable` object.
     -  `...`: Additional arguments to the `rowData` or `colData`.
     `LongTable` methods. Only used if the sensitivity slot contains a
     `LongTable` object instead of a `list` and the `dimension` argument is
@@ -1223,7 +1223,7 @@ setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_OR_MAE"),
     __sensitivityInfo__: `DataFrame` or `data.frame` of sensitivity drug combo
     by sample metadata for the `{class_}` object. When the `dimension`
     parameter is used, it allows retrieval of the dimension specific metadata
-    from the `LongTable` object in `@sensitivity` of a {class_} object.
+    from the `LongTable` object in `@treatmentResponse` of a {class_} object.
 
     @examples
     sensitivityInfo({data_})
@@ -1345,9 +1345,9 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     "
     @details
 
-    __sensitivityInfo__<-: Update the `@sensitivity` slot metadata for a
+    __sensitivityInfo__<-: Update the `@treatmentResponse` slot metadata for a
     `{class_}` object. When used without the `dimension` argument is behaves
-    similar to the old {class_} implementation, where the `@sensitivity` slot
+    similar to the old {class_} implementation, where the `@treatmentResponse` slot
     contained a list with a `$info` `data.frame` item. When the `dimension`
     arugment is used, more complicated assignments can occur where 'sample'
     modifies the `@sensitvity` `LongTable` colData, 'drug' the rowData and
@@ -1355,7 +1355,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     Arguments:
     - value: A `data.frame` of treatment response experiment metadata,
     documenting experiment level metadata (mapping to drugs and samples). If
-    the `@sensitivity` slot doesn't contain a `LongTable` and `dimension` is
+    the `@treatmentResponse` slot doesn't contain a `LongTable` and `dimension` is
     not specified, you can only modify existing columns as returned by
     `sensitivityInfo(object)`.
     @examples
@@ -1382,26 +1382,26 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
         if (missing(dimension)) {
             valueCols <- colnames(value)
             # get existing column names
-            rowDataCols <- colnames(rowData(object@sensitivity))
-            colDataCols <- colnames(colData(object@sensitivity))
+            rowDataCols <- colnames(rowData(object@treatmentResponse))
+            colDataCols <- colnames(colData(object@treatmentResponse))
             # drop any value columns that don't already exist
             hasValueCols <- valueCols %in% c(rowDataCols, colDataCols)
             if (!all(hasValueCols))
                 .message(funContext, 'Dropping columns ',
                     .collapse(valueCols[!hasValueCols]), ' from value. Currently
                     this setter only allows modifying existing columns when
-                    @sensitivity is a LongTable. For more fine grained updates
+                    @treatmentResponse is a LongTable. For more fine grained updates
                     please use the dimension argument.')
             # update the object
-            rowData(object@sensitivity, ...) <-
+            rowData(object@treatmentResponse, ...) <-
                 unique(value[, .SD, .SDcols=valueCols %in% rowDataCols])
-            colData(object@sensitivity, ...) <-
+            colData(object@treatmentResponse, ...) <-
                 unique(value[, .SD, .SDcols=valueCols %in% colDataCols])
         } else {
             switch(dimension,
-                drug={ rowData(object@sensitivity, ...) <- value },
-                sample={ colData(object@sensitivity, ...) <- value },
-                assay={ assay(object@sensitivity, 'assay_metadata') <- value },
+                drug={ rowData(object@treatmentResponse, ...) <- value },
+                sample={ colData(object@treatmentResponse, ...) <- value },
+                assay={ assay(object@treatmentResponse, 'assay_metadata') <- value },
                 .error(funContext, 'Invalid argument to dimension parameter.
                     Please choose one of "sample", "drug" or "assay"'))
         }
@@ -1410,7 +1410,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
             .warning(funContext, 'The dimension argument is only valid if the
                 sensitivity slot contains a LongTable object. Ignoring dimension
                 and ... parameters.')
-        object@sensitivity$info <- value
+        object@treatmentResponse$info <- value
     }
     return(object)
 })
@@ -1508,7 +1508,7 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
             .rebuildProfiles(sensitivitySlot(object))
         }
     } else {
-        return(object@sensitivity$profiles)
+        return(object@treatmentResponse$profiles)
     }
 })
 
@@ -1554,7 +1554,7 @@ setReplaceMethod("sensitivityProfiles",
         LT <- sensitivitySlot(object)
 
     else
-        object@sensitivity$profiles <- value
+        object@treatmentResponse$profiles <- value
     return(object)
 })
 
@@ -1586,10 +1586,10 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     if (is(sensitivitySlot(object), 'LongTable'))
         return(.rebuildRaw(sensitivitySlot(object)))
     else
-        return(object@sensitivity$raw)
+        return(object@treatmentResponse$raw)
 })
 
-#' Replicate the $raw slot in the old @sensitivity list from a LongTable
+#' Replicate the $raw slot in the old @treatmentResponse list from a LongTable
 #'
 #' @param longTable `LongTable`
 #'
@@ -1609,7 +1609,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     if (!('sensitivity' %in% assayNames(longTable)))
         .error(funContext, 'There is no assay named sensitivity. Not sure
             how to retrieve sensitivityRaw without a sensitivity assay. Try
-            renaming your assays in the @sensitivity LongTable object?')
+            renaming your assays in the @treatmentResponse LongTable object?')
 
     # Extract the information needed to reconstruct the sensitivityRaw array
     viability <- longTable$sensitivity
@@ -1741,7 +1741,7 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
         if (!is.array(value)) .error(funContext, "Values assigned to the
             sensitivityRaw slot must be an array of experiment by dose by
             value!")
-        object@sensitivity$raw <- value
+        object@treatmentResponse$raw <- value
         object
     }
     return(object)
@@ -1758,7 +1758,7 @@ setGeneric("sensitivitySlot", function(object, ...) standardGeneric("sensitivity
 #' @noRd
 .docs_CoreSet_get_sensitivitySlot <- function(...) .parseToRoxygen(
     "
-    __sensitivitySlot__: Retrive the contents of `@sensitivity` from a `{class_}`
+    __sensitivitySlot__: Retrive the contents of `@treatmentResponse` from a `{class_}`
     object.
 
     @examples
@@ -1775,7 +1775,7 @@ setGeneric("sensitivitySlot", function(object, ...) standardGeneric("sensitivity
 #' @eval .docs_CoreSet_get_sensitivitySlot(class_=.local_class,
 #'   data_=.local_data)
 setMethod("sensitivitySlot", signature("CoreSet"), function(object) {
-    object@sensitivity
+    object@treatmentResponse
 })
 
 
@@ -1785,14 +1785,14 @@ setGeneric("sensitivitySlot<-", function(object, ..., value)
 
 .docs_CoreSet_set_sensitivitySlot <- function(...) .parseToRoxygen(
     "
-    __sensitivitySlot<-__: Assign data to the `@sensitivity` slot of a
+    __sensitivitySlot<-__: Assign data to the `@treatmentResponse` slot of a
     `{class_}` object.
     - value: Either a `LongTable` class object, or a list with an 'info'
     `data.frame` of experiment metadata, 'profiles' `data.frame` with
     summary statistics from the sensitivity experiment and a 'raw' 3D array
     where rows are experiments, columns are replicates and pages are 'Dose'
     or 'Viability' containing their respective values for that drug by sample
-    experiment. The type of `value` must match type of the current `@sensitivity`
+    experiment. The type of `value` must match type of the current `@treatmentResponse`
     slot of the `{class_}` object.
 
     @examples
@@ -1815,10 +1815,10 @@ setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_OR_L
 {
     # funContext <- .S4MethodContext('sensitivitySlot<-', class(object), class(value))
     # ## TODO:: Maybe try coercing the list to a LongTable and vice versa?
-    if (!is(object@sensitivity, class(value)[1])) .error(funContext, 'The types
-        of the current and @sensitivity slot and the value parameter must be
+    if (!is(object@treatmentResponse, class(value)[1])) .error(funContext, 'The types
+        of the current and @treatmentResponse slot and the value parameter must be
         the same!')
-    object@sensitivity <- value
+    object@treatmentResponse <- value
     return(object)
 })
 
@@ -1851,10 +1851,10 @@ setGeneric("sensNumber", function(object, ...) standardGeneric("sensNumber"))
 #' @eval .docs_CoreSet_get_sensNumber(class_=.local_class, data_=.local_data)
 setMethod(sensNumber, "CoreSet", function(object){
     return(
-        if (is(object@sensitivity, 'LongTable'))
-            .rebuildSensNumber(object@sensitivity)
+        if (is(object@treatmentResponse, 'LongTable'))
+            .rebuildSensNumber(object@treatmentResponse)
         else
-            object@sensitivity$n
+            object@treatmentResponse$n
     )
 })
 
@@ -1897,7 +1897,7 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
     "
     @details
     __sensNumber<-__: Update the 'n' item, which holds a matrix with a count
-    of drug by sample-line experiment counts, in the `list` in `@sensitivity`
+    of drug by sample-line experiment counts, in the `list` in `@treatmentResponse`
     slot of a `{class_}` object. Will error when `@sensitviity` contains
     a `LongTable` object, since the counts are computed on the fly. Arguments:
     - value: A `matrix` where rows are samples and columns are drugs, with a
@@ -1921,7 +1921,7 @@ setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"),
     if (is(sensitivitySlot(object), 'LongTable')) {
         object
     } else {
-        object@sensitivity$n <- value
+        object@treatmentResponse$n <- value
         object
     }
 })

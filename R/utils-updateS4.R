@@ -7,7 +7,7 @@
 #' fails or corrupts your data. You can then modify the `DataMapper` as
 #' necessary to fix the sensititivity data.
 #'
-#' @return A `LongTable` constructed from `object@sensitivity`, or a
+#' @return A `LongTable` constructed from `object@treatmentResponse`, or a
 #' `LongTableDataMapper` if `mapper`=TRUE.
 #'
 #' @keywords internal
@@ -120,7 +120,7 @@
 .compareSensitivityInfo <- function(object) {
     new_object <- copy(object)
     tre <- .sensitivityToTRE(object)
-    new_object@sensitivity <- tre
+    new_object@treatmentResponse <- tre
 
     si <- copy(sensitivityInfo(object))
     nsi <- copy(sensitivityInfo(new_object))

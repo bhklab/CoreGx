@@ -81,7 +81,7 @@ setMethod('updateObject', signature(object="CoreSet"),
     cSet <- .CoreSet(
         sample=sample_,
         treatment=treatment,
-        sensitivity=treatmentResponse,
+        treatmentResponse=treatmentResponse,
         molecularProfiles=mProf,
         annotation=object@annotation,
         curation=curation_,

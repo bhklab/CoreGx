@@ -34,7 +34,7 @@ packages to apply the correct model for the given data.
 
 \item{\code{treatment}}{See Slots section.}
 
-\item{\code{sensitivity}}{See Slots section.}
+\item{\code{treatmentResponse}}{See Slots section.}
 
 \item{\code{perturbation}}{See Slots section.}
 
@@ -57,9 +57,9 @@ treatment response experiments.
 \item treatment: A \code{data.frame} containing the annotations for all treatments
 in the dataset, including the mandatory 'treatmentid' column to uniquely
 identify each treatment.
-\item sensitivity: A \code{list} or \code{LongTable} containing all the data for the
-sensitivity experiments, including \verb{$info}, a \code{data.frame} containing the
-experimental info, \verb{$raw} a 3D \code{array} containing raw data,
+\item treatmentResponse: A \code{list} or \code{LongTable} containing all the data for the
+treatment response experiment, including \verb{$info}, a \code{data.frame}
+containing the experimental info, \verb{$raw} a 3D \code{array} containing raw data,
 \verb{$profiles}, a \code{data.frame} containing sensitivity profiles
 statistics, and \verb{$n}, a \code{data.frame} detailing the number of
 experiments for each sample-drug/radiationInfo pair

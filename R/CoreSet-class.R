@@ -16,7 +16,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' @slot molecularProfiles See Slots section.
 #' @slot sample See Slots section.
 #' @slot treatment See Slots section.
-#' @slot sensitivity See Slots section.
+#' @slot treatmentResponse See Slots section.
 #' @slot perturbation See Slots section.
 #' @slot curation See Slots section.
 #' @slot datasetType See Slots section.
@@ -47,9 +47,9 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' * treatment: A `data.frame` containing the annotations for all treatments
 #'   in the dataset, including the mandatory 'treatmentid' column to uniquely
 #'   identify each treatment.
-#' * sensitivity: A `list` or `LongTable` containing all the data for the
-#'   sensitivity experiments, including `$info`, a `data.frame` containing the
-#'   experimental info, `$raw` a 3D `array` containing raw data,
+#' * treatmentResponse: A `list` or `LongTable` containing all the data for the
+#'   treatment response experiment, including `$info`, a `data.frame`
+#'   containing the experimental info, `$raw` a 3D `array` containing raw data,
 #'   `$profiles`, a `data.frame` containing sensitivity profiles
 #'   statistics, and `$n`, a `data.frame` detailing the number of
 #'   experiments for each sample-drug/radiationInfo pair
@@ -71,7 +71,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' @exportClass CoreSet
 .CoreSet <- setClass("CoreSet",
     slots=list(
-        sensitivity="list_OR_LongTable",
+        treatmentResponse="list_OR_LongTable",
         annotation="list",
         molecularProfiles="list_OR_MAE",
         sample="data.frame",
@@ -224,7 +224,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     object  <- .CoreSet(annotation=annotation,
         molecularProfiles=molecularProfiles,
         sample=as.data.frame(sample), datasetType=datasetType,
-        sensitivity=sensitivity, perturbation=perturbation,
+        treatmentResponse=sensitivity, perturbation=perturbation,
         curation=curation, treatment=treatment)
     if (verify) { checkCsetStructure(object)}
 
@@ -362,7 +362,7 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
         sample=sample,
         treatment=treatment,
         molecularProfiles=molecularProfiles,
-        sensitivity=treatmentResponse,
+        treatmentResponse=treatmentResponse,
         datasetType=datasetType,
         curation=curation,
         perturbation=perturbation

@@ -419,13 +419,13 @@ slot of a \code{CoreSet} object. Arguemnts:
 \code{SummarizedExperiment}.
 }
 
-\subsection{@sensitivity}{
+\subsection{@treatmentResponse}{
 \subsection{Arguments:}{
 \itemize{
 \item \code{dimension}: Optional \code{character(1)} One of 'treatment', 'sample' or
 'assay' to retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from
 the \code{CoreSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
-warning if \verb{@sensitivity} is not a \code{LongTable} object.
+warning if \verb{@treatmentResponse} is not a \code{LongTable} object.
 \item \code{...}: Additional arguments to the \code{rowData} or \code{colData}.
 \code{LongTable} methods. Only used if the sensitivity slot contains a
 \code{LongTable} object instead of a \code{list} and the \code{dimension} argument is
@@ -438,14 +438,14 @@ specified.
 \strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity drug combo
 by sample metadata for the \code{CoreSet} object. When the \code{dimension}
 parameter is used, it allows retrieval of the dimension specific metadata
-from the \code{LongTable} object in \verb{@sensitivity} of a CoreSet object.
+from the \code{LongTable} object in \verb{@treatmentResponse} of a CoreSet object.
 }
 
 }
 
-\strong{sensitivityInfo}<-: Update the \verb{@sensitivity} slot metadata for a
+\strong{sensitivityInfo}<-: Update the \verb{@treatmentResponse} slot metadata for a
 \code{CoreSet} object. When used without the \code{dimension} argument is behaves
-similar to the old CoreSet implementation, where the \verb{@sensitivity} slot
+similar to the old CoreSet implementation, where the \verb{@treatmentResponse} slot
 contained a list with a \verb{$info} \code{data.frame} item. When the \code{dimension}
 arugment is used, more complicated assignments can occur where 'sample'
 modifies the \verb{@sensitvity} \code{LongTable} colData, 'drug' the rowData and
@@ -454,7 +454,7 @@ Arguments:
 \itemize{
 \item value: A \code{data.frame} of treatment response experiment metadata,
 documenting experiment level metadata (mapping to drugs and samples). If
-the \verb{@sensitivity} slot doesn't contain a \code{LongTable} and \code{dimension} is
+the \verb{@treatmentResponse} slot doesn't contain a \code{LongTable} and \code{dimension} is
 not specified, you can only modify existing columns as returned by
 \code{sensitivityInfo(object)}.
 }
@@ -501,7 +501,7 @@ dose or viability measurement for that experiment_id and replicate.
 object for each drug-combo by sample combination.
 
 \strong{sensNumber<-}: Update the 'n' item, which holds a matrix with a count
-of drug by sample-line experiment counts, in the \code{list} in \verb{@sensitivity}
+of drug by sample-line experiment counts, in the \code{list} in \verb{@treatmentResponse}
 slot of a \code{CoreSet} object. Will error when \verb{@sensitviity} contains
 a \code{LongTable} object, since the counts are computed on the fly. Arguments:
 \itemize{
