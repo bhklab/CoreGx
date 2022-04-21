@@ -30,6 +30,7 @@ setMethod('updateObject', signature(object="CoreSet"),
     } else {
         treatment <- object@treatment
     }
+    colnames(treatment) <- gsub("drugid|radiationid", "treatmentid", colnames(treatment))
 
     if (!.hasSlot(object, "treatmentResponse")) {
         treatmentResponse <- object@sensitivity
