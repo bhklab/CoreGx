@@ -54,7 +54,8 @@ setMethod('updateObject', signature(object="CoreSet"),
     }
     curation_ <- object@curation
     names(curation_) <- gsub("cell", "sample", names(curation_))
-    colnames(curation_$sample) <- gsub("cellid", "sampleid", names(curation_))
+    colnames(curation_$sample) <- gsub("cellid", "sampleid",
+        colnames(curation_$sample))
 
     ## TODO:: change any occurance of cellid to sample id in the old sensitivity
     ## slot list
