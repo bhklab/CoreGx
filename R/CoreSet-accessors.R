@@ -487,16 +487,7 @@ setGeneric('treatmentInfo<-', function(object, ..., value)
 #' @eval .docs_CoreSet_set_treatmentInfo(class_=.local_class, data_=.local_data)
 setReplaceMethod('treatmentInfo', signature(object='CoreSet',
         value='data.frame'), function(object, value) {
-    treatmentType <- switch(class(object)[1],
-        'PharmacoSet'='drug',
-        'ToxicoSet'='drug',
-        'RadioSet'='radiation',
-        'CoreSet'=return(invisible(object))
-    )
-    package <- gsub('Set', 'Gx', class(object)[1])
-    `treatmentInfo<-` <- get(paste0(treatmentType, 'Info<-'),
-        envir=asNamespace(package))
-    treatmentInfo(object) <- value
+    object@treatment <- value
     return(invisible(object))
 })
 
