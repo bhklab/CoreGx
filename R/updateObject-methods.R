@@ -30,7 +30,7 @@ setMethod('updateObject', signature(object="CoreSet"),
     } else {
         treatment <- object@treatment
     }
-    colnames(treatment) <- gsub("drugid|radiation", "treatmentid", colnames(treatment))
+    colnames(treatment) <- gsub("drugid", "treatmentid", colnames(treatment))
 
     if (!.hasSlot(object, "treatmentResponse")) {
         treatmentResponse <- object@sensitivity
@@ -52,7 +52,7 @@ setMethod('updateObject', signature(object="CoreSet"),
     } else {
         colnames(treatmentResponse$info) <- gsub("cellid", "sampleid",
             colnames(treatmentResponse$info))
-        colnames(treatmentResponse$info) <- gsub("drugid|radiation",
+        colnames(treatmentResponse$info) <- gsub("drugid",
             "treatmentid", colnames(treatmentResponse$info))
     }
 
@@ -69,7 +69,7 @@ setMethod('updateObject', signature(object="CoreSet"),
     colnames(curation_$sample) <- gsub("cellid", "sampleid",
         colnames(curation_$sample))
     if ("treatment" %in% names(curation_)) {
-        colnames(curation_$treatment) <- gsub("drugid|radiation",
+        colnames(curation_$treatment) <- gsub("drugid",
             "treatmentid", colnames(curation_$treatment))
     }
 
