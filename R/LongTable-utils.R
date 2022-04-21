@@ -419,7 +419,7 @@ setMethod('$', signature('LongTable'), function(x, name) {
 #' @param name `character(1)` The name of the assay to update
 #' @param value A `data.frame` or `data.table` to update the assay with.
 #'
-#' @return Updates the assay `name` in `x` with `value`, returning an invsible
+#' @return Updates the assay `name` in `x` with `value`, returning an invisible
 #' NULL.
 #'
 #' @export

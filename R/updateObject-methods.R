@@ -22,7 +22,7 @@ setMethod('updateObject', signature(object="CoreSet"),
     if (!.hasSlot(object, "treatment")) {
         if (.hasSlot(object, "drug")) {
             treatment <- object@drug
-        } else if (.hasSlot(Object, "radiation")) {
+        } else if (.hasSlot(object, "radiation")) {
             treatment <- object@radiation
         } else  {
             treatment <- data.frame()
