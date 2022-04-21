@@ -667,7 +667,7 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
     # drugn <- sort(unique(sensitivitySlot(object)$info[ , "drugid"]))
 
     ## consider all drugs
-    drugn <- rownames(drugInfo(object))
+    drugn <- rownames(treatmentInfo(object))
 
     ## unique drug identifiers
     # samplen <- sort(unique(sensitivitySlot(object)$info[ , "sampleid"]))
@@ -716,7 +716,7 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
     }
 
     ## consider all drugs
-    drugn <- rownames(drugInfo(object))
+    drugn <- rownames(treatmentInfo(object))
 
     ## consider all sample lines
     samplen <- rownames(sampleInfo(object))
