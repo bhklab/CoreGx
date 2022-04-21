@@ -43,7 +43,7 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 #' uniquely identified by the identifiers from that group.
 #'
 #' @examples
-#' guessMapping(exampleDataMapper, groups=list(rows='treatment_id', cols='sample_id'),
+#' guessMapping(exampleDataMapper, groups=list(rows='treatmentid', cols='sampleid'),
 #' subset=FALSE)
 #'
 #' @md
@@ -116,7 +116,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #'
 #' @examples
 #' df <- rawdata(exampleDataMapper)
-#' checkColumnCardinality(df, group='treatment_id')
+#' checkColumnCardinality(df, group='treatmentid')
 #'
 #' @aliases cardinality
 #'

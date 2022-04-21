@@ -531,6 +531,124 @@ updateSampleId <- function(object, new.ids=vector("character")) {
 #
 # }
 
+
+### TODO:: Add updating of sensitivity Number tables
+#' Update the treatment ids in a cSet object
+#'
+#' @examples
+#' updateTreatmentId(clevelandSmall_cSet, treatmentNames(clevelandSmall_cSet))
+#'
+#' @param object The object for which the treatment ids will be updated
+#' @param new.ids The new ids to assign to the object
+#'
+#' @return `CoreSet` The modified CoreSet object
+#'
+#' @keywords internal
+#' @importFrom S4Vectors endoapply
+#' @importFrom SummarizedExperiment colData rowData
+#' @export
+updateTreatmentId <- function(object, new.ids = vector('character')){
+
+    if (nrow(treatmentInfo(object)) < 1) {
+        message("No treatments in this object! Returning without modification.")
+        return(object)
+    }
+
+    if (length(new.ids) != nrow(treatmentInfo(object))) {
+        stop('Wrong number of drug identifiers')
+    }
+    if (datasetType(object) == 'sensitivity' || datasetType(object) == 'both') {
+        myx <- match(sensitivityInfo(object)[, "treatmentid"], rownames((object)))
+        sensitivityInfo(object)[, "treatmentid"] <- new.ids[myx]
+    }
+    if (datasetType(object) == 'perturbation' || datasetType(object) == 'both') {
+        molecularProfilesSlot(object) <- lapply(molecularProfilesSlot(object),
+                function(SE) {
+            myx <- match(
+                SummarizedExperiment::colData(SE)[["treatmentid"]],
+                rownames(treatmentInfo(object))
+            )
+            SummarizedExperiment::colData(SE)[["treatmentid"]] <- new.ids[myx]
+            return(SE)
+        })
+    }
+    if (any(duplicated(new.ids))) {
+        warning('Duplicated ids passed to updateTreatmentId. Merging old ids ',
+            'into the same identifier')
+        if (ncol(sensNumber(object)) > 0){
+            sensMatch <- match(colnames(sensNumber(object)),
+                rownames(treatmentInfo(object)))
+        }
+        if (dim(pertNumber(object))[[2]] > 0) {
+            pertMatch <- match(dimnames(pertNumber(object))[[2]],
+                rownames(treatmentInfo(object)))
+        }
+        curMatch <- match(rownames(curation(object)$treatment),
+            rownames(treatmentInfo(object)))
+
+        duplId <- unique(new.ids[duplicated(new.ids)])
+        for(id in duplId) {
+            if (ncol(sensNumber(object))>0){
+                myx <- which(new.ids[sensMatch] == id)
+                sensNumber(object)[, myx[1]] <- apply(sensNumber(object)[, myx], 1, sum)
+                sensNumber(object) <- sensNumber(object)[, -myx[-1]]
+                # sensMatch <- sensMatch[-myx[-1]]
+            }
+            if (dim(pertNumber(object))[[2]] > 0) {
+                myx <- which(new.ids[pertMatch] == id)
+                pertNumber(object)[,myx[1],] <- apply(pertNumber(object)[,myx,],
+                    c(1,3), sum)
+                pertNumber(object) <- pertNumber(object)[,-myx[-1], ]
+                # pertMatch <- pertMatch[-myx[-1]]
+            }
+
+            myx <- which(new.ids[curMatch] == id)
+            curation(object)$treatment[myx[1], ] <-
+                apply(curation(object)$treatment[myx, ], 2, paste,
+                    collapse='///')
+            curation(object)$treatment <- curation(object)$treatment[-myx[-1], ]
+            # curMatch <- curMatch[-myx[-1]]
+
+            myx <- which(new.ids == id)
+            treatmentInfo(object)[myx[1],] <- apply(treatmentInfo(object)[myx,],
+                2, paste, collapse='///')
+            treatmentInfo(object) <- treatmentInfo(object)[-myx[-1], ]
+            new.ids <- new.ids[-myx[-1]]
+            if (ncol(sensNumber(object)) > 0) {
+                sensMatch <- match(colnames(sensNumber(object)),
+                    rownames(treatmentInfo(object)))
+            }
+            if (dim(pertNumber(object))[[2]] > 0) {
+                pertMatch <- match(dimnames(pertNumber(object))[[2]],
+                    rownames(treatmentInfo(object)))
+            }
+            curMatch <- match(rownames(curation(object)$treatment),
+                rownames(treatmentInfo(object)))
+        }
+    } else {
+        if (dim(pertNumber(object))[[2]]>0){
+            pertMatch <- match(dimnames(pertNumber(object))[[2]],
+                rownames(treatmentInfo(object)))
+        }
+        if (ncol(sensNumber(object))>0){
+            sensMatch <- match(colnames(sensNumber(object)),
+                rownames(treatmentInfo(object)))
+        }
+        curMatch <- match(rownames(curation(object)$treatment),
+            rownames(treatmentInfo(object)))
+    }
+    if (dim(pertNumber(object))[[2]]>0){
+        dimnames(pertNumber(object))[[2]] <- new.ids[pertMatch]
+    }
+    if (ncol(sensNumber(object))>0){
+        colnames(sensNumber(object)) <- new.ids[sensMatch]
+    }
+    rownames(curation(object)$treatment) <- new.ids[curMatch]
+    rownames(treatmentInfo(object)) <- new.ids
+    return(object)
+}
+
+
 .summarizeSensitivityNumbers <- function(object) {
 
     if (datasetType(object) != "sensitivity" && datasetType(object) != "both") {

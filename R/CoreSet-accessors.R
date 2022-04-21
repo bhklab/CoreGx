@@ -494,6 +494,7 @@ setReplaceMethod('treatmentInfo', signature(object='CoreSet',
 ##
 ## == treatmentNames
 
+
 #' @export
 setGeneric('treatmentNames', function(object, ...)
     standardGeneric('treatmentNames'))
@@ -551,7 +552,7 @@ setGeneric('treatmentNames<-', function(object, ..., value)
 setReplaceMethod('treatmentNames',
         signature(object='CoreSet', value='character'),
         function(object, value) {
-    rownames(treatmentInfo(object)) <- value
+    object <- updateTreatmentId(object, new.ids=value)
     return(invisible(object))
 })
 
@@ -1213,9 +1214,9 @@ setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_OR_MAE"),
     ## @sensitivity
 
     ### Arguments:
-    - `dimension`: Optional `character(1)` One of 'drug', 'sample' or 'assay' to
-    retrieve `rowData`, `colData` or the 'assay_metadata' assay from the
-    `{class_}` `@sensitvity` `LongTable` object, respectively. Ignored with
+    - `dimension`: Optional `character(1)` One of 'treatment', 'sample' or
+    'assay' to retrieve `rowData`, `colData` or the 'assay_metadata' assay from
+    the `{class_}` `@sensitvity` `LongTable` object, respectively. Ignored with
     warning if `@sensitivity` is not a `LongTable` object.
     -  `...`: Additional arguments to the `rowData` or `colData`.
     `LongTable` methods. Only used if the sensitivity slot contains a
@@ -1251,7 +1252,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
         if (!missing(dimension)) {
             switch(dimension,
                 sample={ return(colData(sensitivitySlot(object), ...)) },
-                drug={ return(rowData(sensitivitySlot(object), ...)) },
+                treatment={ return(rowData(sensitivitySlot(object), ...)) },
                 assay={ return(assay(sensitivitySlot(object), 'assay_metadata')) },
                 .error(funContext, 'Invalid value for the dimension argument.
                     Please select on of "sample", "drug" or "assay'))
@@ -1283,8 +1284,9 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     # Extract the information needed to reconstruct the sensitivityInfo
     #   data.frame
     aidx <- which(assayNames(longTable) %in% "assay_metadata")
-    if (!length(aidx)) stop("No assay_metadata assay?!")
+    if (!length(aidx)) aidx <- 1
     assayIndexDT <- assay(longTable, aidx, key=TRUE)
+    if (aidx == 1) assayIndexDT <- assayIndexDT[, .(rowKey, colKey)]
     setkeyv(assayIndexDT, c('rowKey', 'colKey'))
     rowDataDT <- rowData(longTable, key=TRUE)
     setkeyv(rowDataDT, 'rowKey')
@@ -1313,19 +1315,23 @@ setMethod(sensitivityInfo, signature("CoreSet"),
         ]
     infoDT_sub <- unique(infoDT[, ..keepCols])
 
-    # pad the dropped NA values
-    na_info <- copy(metadata(longTable)$sensitivityInfo_NA)
-    setnames(na_info, "drugid", "drug1id")
-    na_info <- cbind(
-        na_info,
-        unique(infoDT_sub[, .SD, .SDcols=!patterns("^drug1id$|^cellid$|^replicate_id$|^rn$")])
-    )
-    na_info[, replicate_id := seq_len(.N), by=.(drug1id, cellid)]
-    infoDT_sub <- rbind(infoDT_sub, na_info)
-    infoDT_sub <- cbind(
-        infoDT_sub,
-        as.data.table(metadata(longTable)$experiment_metadata)
-    )
+    # pad the dropped NA values, if they exists
+    if ("sensitiivtyInfo_NA" %in% names(metadata(longTable))) {
+            na_info <- copy(metadata(longTable)$sensitivityInfo_NA)
+        setnames(na_info, "drugid", "drug1id")
+        na_info <- cbind(
+            na_info,
+            unique(infoDT_sub[, .SD, .SDcols=!patterns("^drug1id$|^cellid$|^replicate_id$|^rn$")])
+        )
+        na_info[, replicate_id := seq_len(.N), by=.(drug1id, cellid)]
+        infoDT_sub <- rbind(infoDT_sub, na_info)
+    }
+    if ("experiment_metadata" %in% names(metadata(longTable))) {
+        infoDT_sub <- cbind(
+            infoDT_sub,
+            as.data.table(metadata(longTable)$experiment_metadata)
+        )
+    }
 
     # rebuild the rownames
     idCols <- grep("^drug[0-9]*id", colnames(infoDT_sub), value=TRUE)

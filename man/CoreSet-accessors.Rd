@@ -422,9 +422,9 @@ slot of a \code{CoreSet} object. Arguemnts:
 \subsection{@sensitivity}{
 \subsection{Arguments:}{
 \itemize{
-\item \code{dimension}: Optional \code{character(1)} One of 'drug', 'sample' or 'assay' to
-retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from the
-\code{CoreSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
+\item \code{dimension}: Optional \code{character(1)} One of 'treatment', 'sample' or
+'assay' to retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from
+the \code{CoreSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
 warning if \verb{@sensitivity} is not a \code{LongTable} object.
 \item \code{...}: Additional arguments to the \code{rowData} or \code{colData}.
 \code{LongTable} methods. Only used if the sensitivity slot contains a

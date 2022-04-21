@@ -33,6 +33,6 @@ of columns (your identifiers) and all other columns.
 }
 \examples{
 df <- rawdata(exampleDataMapper)
-checkColumnCardinality(df, group='treatment_id')
+checkColumnCardinality(df, group='treatmentid')
 
 }
