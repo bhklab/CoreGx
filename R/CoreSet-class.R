@@ -558,7 +558,7 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
         stop('Wrong number of drug identifiers')
     }
     if (datasetType(object) == 'sensitivity' || datasetType(object) == 'both') {
-        myx <- match(sensitivityInfo(object)[, "treatmentid"], rownames((object)))
+        myx <- match(sensitivityInfo(object)[, "treatmentid"], rownames(treatmentInfo(object)))
         sensitivityInfo(object)[, "treatmentid"] <- new.ids[myx]
     }
     if (datasetType(object) == 'perturbation' || datasetType(object) == 'both') {
