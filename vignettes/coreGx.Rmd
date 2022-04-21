@@ -64,7 +64,10 @@ the `SummarizedExperiments` are feature and sample annotations for each data
 type.
 
 The `sample` slot contains a `data.frame` with annotations for samples used in
-the sensitivty and/or perturbation slots.
+the molecularProfiles or sensitivity slot.
+
+The `treatment` slot contains a `data.frame` for treatments used in the the
+molecularProfiles or sensitivity slot.
 
 The `datasetType` slot contains a character vector indicating the experiment
 type the `CoreSet` contains.

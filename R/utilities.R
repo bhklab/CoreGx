@@ -714,9 +714,9 @@
     for (g in seq_along(y)) {
         if(n[g]==1){ ## The n=1 case is called very often, and there are significant savings (20x) to not calling numerical integration.
             if(x[g]>0){
-                pnorm(x[g], sd=scale[g]/sqrt(2), lower.tail = F)/(scale*2*sqrt(pi))
+                pnorm(x[g], sd=scale[g]/sqrt(2), lower.tail = FALSE)/(scale*2*sqrt(pi))
             } else {
-                pnorm(x[g], sd=scale[g]/sqrt(2), lower.tail = T)/(scale*2*sqrt(pi))
+                pnorm(x[g], sd=scale[g]/sqrt(2), lower.tail = TRUE)/(scale*2*sqrt(pi))
             }
         } else {
             if (x[g] > 0) {
