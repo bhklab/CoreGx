@@ -3,7 +3,6 @@
 NULL
 
 #' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
-#' @export
 setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 
 .local_class <- 'CoreSet'
@@ -16,7 +15,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' @slot annotation See Slots section.
 #' @slot molecularProfiles See Slots section.
 #' @slot sample See Slots section.
-#' @slot curation See Slots section.
+#' @slot treatment See Slots section.
 #' @slot sensitivity See Slots section.
 #' @slot perturbation See Slots section.
 #' @slot curation See Slots section.
@@ -42,9 +41,12 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' * molecularProfiles: A `list` or `MultiAssayExperiment` containing
 #    a set of `SummarizedExperiment`s with molecular profile data for a given
 #'   ``r .local_class`` object.
-#' * sample: A `data.frame` containg the annotations for all the sample
-#'   lines profiled in the data set, across all molecular data types and
+#' * sample: A `data.frame` containg the annotations for all the samples
+#'   profiled in the data set, across all molecular data types and
 #'   treatment response experiments.
+#' * treatment: A `data.frame` containing the annotations for all treatments
+#'   in the dataset, including the mandatory 'treatmentid' column to uniquely
+#'   identify each treatment.
 #' * sensitivity: A `list` or `LongTable` containing all the data for the
 #'   sensitivity experiments, including `$info`, a `data.frame` containing the
 #'   experimental info, `$raw` a 3D `array` containing raw data,
@@ -54,9 +56,9 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' * perturbation: `list` containing `$n`, a `data.frame`
 #'   summarizing the available perturbation data. This slot is currently
 #'   being deprecated.
-#' * curation: `list` containing mappings for
-#'   `sample`, `tissue` names used in the data set to universal
-#'   identifiers used between different ``r .local_class`` objects
+#' * curation: `list` containing mappings for `treatment`,
+#'   `sample` and `tissue` names used in the data set to universal
+#'   identifiers used between different ``r .local_class`` objects.
 #' * datasetType: `character` string of 'sensitivity',
 #'   'perturbation', or both detailing what type of data can be found in the
 #'   CoreSet, for proper processing of the data
@@ -100,22 +102,29 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' @param molecularProfiles A \code{list} of SummarizedExperiment objects containing
 #'   molecular profiles for each molecular data type.
 #' @param sample A \code{data.frame} containing the annotations for all the sample
-#'   profiled in the data set, across all data types
+#'   profiled in the data set, across all data types. Must contain the mandatory
+#'   `sampleid` column which uniquely identifies each sample in the object.
+#' @param treatment A `data.frame` containing annotations for all treatments
+#'   profiled in the dataset. Must contain the mandatory `treatmentid` column
+#'   which uniquely identifies each treatment in the object.
 #' @param sensitivityInfo A \code{data.frame} containing the information for the
-#'   sensitivity experiments
+#'   sensitivity experiments. Must contain a 'sampleid' column with unique
+#'   identifiers to each sample, matching the `sample` object and a 'treatmentid'
+#'   columns with unique indenifiers for each treatment, matching the `treatment`
+#'   object.
 #' @param sensitivityRaw A 3 Dimensional \code{array} contaning the raw drug
 #'   dose response data for the sensitivity experiments
 #' @param sensitivityProfiles \code{data.frame} containing drug sensitivity profile
 #'   statistics such as IC50 and AUC
 #' @param sensitivityN,perturbationN A \code{data.frame} summarizing the
 #'   available sensitivity/perturbation data
-#' @param curationSample,curationTissue A \code{data.frame} mapping
-#'   the names for samples and tissues used in the data set to universal
-#'   identifiers used between different CoreSet objects
-#' @param datasetType A \code{character} string of 'sensitivity',
-#'   'preturbation', or both detailing what type of data can be found in the
-#'   CoreSet, for proper processing of the data
-#' @param verify \code{boolean} Should the function verify the CoreSet and
+#' @param curationSample,curationTissue,curationTreatment A \code{data.frame} mapping
+#'   the names for samples, tissues and treatments used in the data set to
+#'   universal identifiers used between different CoreSet objects
+#' @param datasetType A `character(1)` string of 'sensitivity',
+#'   'preturbation', or 'both' detailing what type of data can be found in the
+#'   `CoreSet`, for proper processing of the data
+#' @param verify `logical(1)`Should the function verify the CoreSet and
 #'   print out any errors it finds after construction?
 #'
 #' @return An object of class CoreSet
@@ -140,10 +149,10 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     verify=TRUE
 ) {
 
-    .Deprecated("CoreSet2", package=packageName(), msg="The CoreSet class is
-        being redesigned. Please use the new constructor to ensure forwards
-        compatibility with future releases! Old objects can be updated with
-        the updateObject method.", old="CoreSet")
+    # .Deprecated("CoreSet2", package=packageName(), msg="The CoreSet class is
+    #     being redesigned. Please use the new constructor to ensure forwards
+    #     compatibility with future releases! Old objects can be updated with
+    #     the updateObject method.", old="CoreSet")
 
     # ensure new sampleid and treatmentid identifiers are honoured
     sample <- .checkForSampleId(sample)
@@ -285,6 +294,10 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
         containing all treatment response data associated with the `{class_}`
         object.
     @param curation {cx_}
+    @param perturbation A deprecated slot in a `{class_}` object included
+    for backwards compatibility. This may be removed in future releases.
+    @param datasetType A deprecated slot in a `{class_}` object included
+    for backwards compatibility. This may be removed in future releases.
 
     @examples
     data({data_})
@@ -301,9 +314,11 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
 )
 
 #' @eval .docs_CoreSet2_constructor(class_=.local_class,
-#' tx_="This slot is not implemented for a CoreSet object yet.",
+#' tx_="",
 #' sx_="",
-#' cx_="A `list(2)` object with two items named `treatment` and `sample` with mappings from publication identifiers to standardized identifiers for both annotations, respectively.",
+#' cx_="A `list(2)` object with two items named `treatment` and `sample` with
+#' mappings from publication identifiers to standardized identifiers for
+#' both annotations, respectively.",
 #' data_=.local_data)
 #' @md
 #' @export

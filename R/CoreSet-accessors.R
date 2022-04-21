@@ -331,7 +331,7 @@ setReplaceMethod("sampleInfo", signature(object="CoreSet", value="data.frame"),
     object
 })
 #' @export
-`cellInfo<-` <- function(...) `sampleInfo<-`(...)
+`cellInfo<-` <- function(object, value) `sampleInfo<-`(object, value=value)
 
 
 ##
@@ -369,7 +369,7 @@ setMethod("sampleNames", signature("CoreSet"), function(object) {
     rownames(sampleInfo(object))
 })
 #' @export
-cellNames <- function(...) sampleNames(...)
+cellNames <- function(object) sampleNames(object)
 
 
 #' @noRd
@@ -406,7 +406,7 @@ setReplaceMethod("sampleNames", signature(object="CoreSet", value="character"),
     return(object)
 })
 #' @export
-`cellNames<-` <- function(...) `sampleNames<-`(...)
+`cellNames<-` <- function(object, value) `sampleNames<-`(object, value=value)
 
 
 ## -------------------

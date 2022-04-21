@@ -18,7 +18,7 @@ CoreSet2(
 \arguments{
 \item{name}{A \code{character(1)} vector with the \code{CoreSet} objects name.}
 
-\item{treatment}{A \code{data.frame} with treatment level metadata. This slot is not implemented for a CoreSet object yet.}
+\item{treatment}{A \code{data.frame} with treatment level metadata.}
 
 \item{sample}{A \code{data.frame} with sample level metadata for the union
 of samples in \code{treatmentResponse} and \code{molecularProfiles}.}
@@ -30,7 +30,15 @@ of samples in \code{treatmentResponse} and \code{molecularProfiles}.}
 containing all treatment response data associated with the \code{CoreSet}
 object.}
 
-\item{curation}{A \code{list(2)} object with two items named \code{treatment} and \code{sample} with mappings from publication identifiers to standardized identifiers for both annotations, respectively.}
+\item{perturbation}{A deprecated slot in a \code{CoreSet} object included
+for backwards compatibility. This may be removed in future releases.}
+
+\item{datasetType}{A deprecated slot in a \code{CoreSet} object included
+for backwards compatibility. This may be removed in future releases.}
+
+\item{curation}{A \code{list(2)} object with two items named \code{treatment} and \code{sample} with
+mappings from publication identifiers to standardized identifiers for
+both annotations, respectively.}
 }
 \value{
 A \code{CoreSet} object storing standardized and curated treatment

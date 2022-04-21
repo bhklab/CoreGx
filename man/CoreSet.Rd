@@ -28,10 +28,14 @@ CoreSet(
 molecular profiles for each molecular data type.}
 
 \item{sample}{A \code{data.frame} containing the annotations for all the sample
-profiled in the data set, across all data types}
+profiled in the data set, across all data types. Must contain the mandatory
+\code{sampleid} column which uniquely identifies each sample in the object.}
 
 \item{sensitivityInfo}{A \code{data.frame} containing the information for the
-sensitivity experiments}
+sensitivity experiments. Must contain a 'sampleid' column with unique
+identifiers to each sample, matching the \code{sample} object and a 'treatmentid'
+columns with unique indenifiers for each treatment, matching the \code{treatment}
+object.}
 
 \item{sensitivityRaw}{A 3 Dimensional \code{array} contaning the raw drug
 dose response data for the sensitivity experiments}
@@ -42,15 +46,19 @@ statistics such as IC50 and AUC}
 \item{sensitivityN, perturbationN}{A \code{data.frame} summarizing the
 available sensitivity/perturbation data}
 
-\item{curationSample, curationTissue}{A \code{data.frame} mapping
-the names for samples and tissues used in the data set to universal
-identifiers used between different CoreSet objects}
+\item{curationSample, curationTissue, curationTreatment}{A \code{data.frame} mapping
+the names for samples, tissues and treatments used in the data set to
+universal identifiers used between different CoreSet objects}
 
-\item{datasetType}{A \code{character} string of 'sensitivity',
-'preturbation', or both detailing what type of data can be found in the
-CoreSet, for proper processing of the data}
+\item{treatment}{A \code{data.frame} containing annotations for all treatments
+profiled in the dataset. Must contain the mandatory \code{treatmentid} column
+which uniquely identifies each treatment in the object.}
 
-\item{verify}{\code{boolean} Should the function verify the CoreSet and
+\item{datasetType}{A \code{character(1)} string of 'sensitivity',
+'preturbation', or 'both' detailing what type of data can be found in the
+\code{CoreSet}, for proper processing of the data}
+
+\item{verify}{\code{logical(1)}Should the function verify the CoreSet and
 print out any errors it finds after construction?}
 }
 \value{

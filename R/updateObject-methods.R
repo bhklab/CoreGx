@@ -1,6 +1,8 @@
 #' Update the `CoreSet` class after changes in it struture or API
 #'
 #' @param object A `CoreSet` object to update the class structure for.
+#' @param verify A `logical(1)` indicating is `validObject` should be called
+#' after updating the object. Defaults to `TRUE`, only set `FALSE` for debugging.
 #'
 #' @return `CoreSet` with update class structure.
 #'

@@ -8,6 +8,9 @@
 }
 \arguments{
 \item{object}{A \code{CoreSet} object to update the class structure for.}
+
+\item{verify}{A \code{logical(1)} indicating is \code{validObject} should be called
+after updating the object. Defaults to \code{TRUE}, only set \code{FALSE} for debugging.}
 }
 \value{
 \code{CoreSet} with update class structure.
