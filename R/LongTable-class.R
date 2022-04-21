@@ -92,7 +92,7 @@ setOldClass('long.table', S4Class='LongTable')
 #' @examples
 #' data(merckLongTable)
 #' merckLongTable
-#' 
+#'
 #' @import data.table
 #' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
@@ -213,7 +213,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
 #' A class union to allow multiple types in a CoreSet slot
 #'
 #' @include LongTable-class.R
-setClassUnion('list_or_LongTable', c('list', 'LongTable'))
+setClassUnion('list_OR_LongTable', c('list', 'LongTable'))
 
 # #' Ensure that all rowID and colID keys are valid
 # #'

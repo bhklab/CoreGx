@@ -132,11 +132,11 @@ character vector specifies the columns of \verb{@rawdata} to assign to each item
 \examples{
 rowDataMap(exampleDataMapper)
 
-rowDataMap(exampleDataMapper) <- list(c('drug_id'), c())
+rowDataMap(exampleDataMapper) <- list(c('treatmentid'), c())
 
 colDataMap(exampleDataMapper)
 
-colDataMap(exampleDataMapper) <- list(c('cell_id'), c())
+colDataMap(exampleDataMapper) <- list(c('sampleid'), c())
 
 assayMap(exampleDataMapper)
 

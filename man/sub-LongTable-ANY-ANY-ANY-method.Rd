@@ -56,11 +56,11 @@ merckLongTable['ABT-888', 'CAOV3']
 # Numeric
 merckLongTable[1, c(1, 2)]
 # Logical
-merckLongTable[, colData(merckLongTable)$cellid == 'A2058']
+merckLongTable[, colData(merckLongTable)$sampleid == 'A2058']
 # Call
 merckLongTable[
      .(drug1id == 'Dasatinib' & drug2id != '5-FU'),
-     .(cellid == 'A2058'),
+     .(sampleid == 'A2058'),
  ]
 
 }

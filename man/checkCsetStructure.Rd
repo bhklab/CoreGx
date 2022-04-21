@@ -22,7 +22,7 @@ structure of the cSet object passed in.
 \description{
 This function checks the structure of a PharamcoSet, ensuring that the
 correct annotations are in place and all the required slots are filled so
-that matching of cells and drugs can be properly done across different types
+that matching of samples and drugs can be properly done across different types
 of data and with other studies.
 }
 \examples{

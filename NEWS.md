@@ -1,5 +1,12 @@
 # CoreGx News File
 
+## v 2.0.0
+* The `@cell` slot has become the `@sample` slot. Associated generics and
+accessor methods have been renamed, then aliased to their old names. As such,
+old code should still work as expected, but will in fact be calling different
+S4 methods.
+* Added the `@treatment` slot to the `CoreSet-class`
+
 ## v 1.5.8
 * Fixed imports for the CoreSet2 constructor to resolve errors in downstream package PharmacoGx
 
@@ -33,7 +40,7 @@ modularizing the subset methods for reuse in dependent packages
 combine and other set operations for a CoreSet object.
 
 ## v1.5.1
-- Fixed some spelling errors and incorrect code chunk configurations in the 
+- Fixed some spelling errors and incorrect code chunk configurations in the
 LongTable vignette
 - Fix bug in .rebuildProfiles where the function fails if replicate_id is
 assigned as a rowID column in the LongTable in @sensitivity
@@ -49,7 +56,7 @@ assigned as a rowID column in the LongTable in @sensitivity
 
 ## v1.1.5
 - Implemented a new class, the `LongTable`, to store the results of a treatment
-response experiment. This class provides a flexible and fast data storage 
+response experiment. This class provides a flexible and fast data storage
 object which can be subclassed for use in other R packages.
 - Added vignette documenting `LongTable` accessors and usage of the new object.
 

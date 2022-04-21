@@ -12,26 +12,26 @@ NULL
 #' @inheritSection DataMapper-class Slots
 #'
 #' @section Slots:
-#' * rowDataMap: A list-like object containing two `character` vectors. 
-#' The first is column names in `rawdata` needed to uniquely identify each row, 
+#' * rowDataMap: A list-like object containing two `character` vectors.
+#' The first is column names in `rawdata` needed to uniquely identify each row,
 #' the second is additional columns which map to rows, but are not required to
 #' uniquely identify them. Rows should be drugs.
-#' * colDataMap: A list-like object containing two `character` vectors. 
-#' The first is column names in `rawdata` needed to uniquely identify each 
-#' column, the second is additional columns which map to rows, but are not 
+#' * colDataMap: A list-like object containing two `character` vectors.
+#' The first is column names in `rawdata` needed to uniquely identify each
+#' column, the second is additional columns which map to rows, but are not
 #' required to uniquely identify them. Columns should be samples.
 #' * assayMap: A list-like where each item is a `character` vector of
-#' `rawdata` column names to assign to an assay, where the name of that assay 
-#' is the name of the list item. If names are omitted, assays will be numbered 
+#' `rawdata` column names to assign to an assay, where the name of that assay
+#' is the name of the list item. If names are omitted, assays will be numbered
 #' by their index in the list.
 #' * metadataMap: A list-like where each item is a `character` vector of
-#' `rawdata` column names to assign to the `@metadata` of the `LongTable`, 
-#' where the name of that assay is the name of the list item. If names are 
+#' `rawdata` column names to assign to the `@metadata` of the `LongTable`,
+#' where the name of that assay is the name of the list item. If names are
 #' omitted, assays will be numbered by their index in the list.
 #'
 #' @md
 #' @aliases LongTableDataMapper-class
-.LongTableDataMapper <- setClass('LongTableDataMapper', 
+.LongTableDataMapper <- setClass('LongTableDataMapper',
     contains=c('DataMapper'),
     slots=list(
         rowDataMap='list_or_List',
@@ -42,44 +42,44 @@ NULL
 
 #' Constructor for the `LongTableDataMapper` class, which maps from one or
 #'   more raw experimental data files to the slots of a `LongTable` object.
-#' 
+#'
 #' @details
-#' The `guessMapping` method can be used to test hypotheses about the 
+#' The `guessMapping` method can be used to test hypotheses about the
 #' cardinality of one or more sets of identifier columns. This is helpful
 #' to determine the id columns for `rowDataMap` and `colDataMap`, as well
 #' as identify columns mapping to `assays` or `metadata`.
-#' 
+#'
 #' To attach metadata not associated with `rawdata`, please use the `metadata`
-#' assignment method on your `LongTableDataMapper`. This metadata will be 
+#' assignment method on your `LongTableDataMapper`. This metadata will be
 #' merge with any metadata from `metadataMap` and added to the `LongTable`
 #' which this object ultimately constructs.
 #'
-#' @param rawdata A `data.frame` of raw data from a treatment response 
+#' @param rawdata A `data.frame` of raw data from a treatment response
 #' experiment. This will be coerced to a `data.table` internally. We recommend
 #' using joins to aggregate your raw data if it is not present in a single file.
-#' @param rowDataMap A list-like object containing two `character` vectors. 
-#' The first is column names in `rawdata` needed to uniquely identify each row, 
+#' @param rowDataMap A list-like object containing two `character` vectors.
+#' The first is column names in `rawdata` needed to uniquely identify each row,
 #' the second is additional columns which map to rows, but are not required to
 #' uniquely identify them. Rows should be drugs.
-#' @param colDataMap A list-like object containing two `character` vectors. 
-#' The first is column names in `rawdata` needed to uniquely identify each 
-#' column, the second is additional columns which map to rows, but are not 
+#' @param colDataMap A list-like object containing two `character` vectors.
+#' The first is column names in `rawdata` needed to uniquely identify each
+#' column, the second is additional columns which map to rows, but are not
 #' required to uniquely identify them. Columns should be samples.
 #' @param assayMap A list-like where each item is a `character` vector of
-#' `rawdata` column names to assign to an assay, where the name of that assay 
-#' is the name of the list item. If names are omitted, assays will be numbered 
+#' `rawdata` column names to assign to an assay, where the name of that assay
+#' is the name of the list item. If names are omitted, assays will be numbered
 #' by their index in the list
 #' @param metadataMap A list-like where each item is a `character` vector of
-#' `rawdata` column names to assign to the `@metadata` of the `LongTable`, 
-#' where the name of that assay is the name of the list item. If names are 
+#' `rawdata` column names to assign to the `@metadata` of the `LongTable`,
+#' where the name of that assay is the name of the list item. If names are
 #' omitted, assays will be numbered by their index in the list.
 #'
 #' @return A `LongTable` object, with columns mapped to it's slots according
 #' to the various maps in the `LongTableDataMapper` object.
 #'
 #' @seealso [`guessMapping`]
-#' 
-#' @examples 
+#'
+#' @examples
 #' data(exampleDataMapper)
 #' exampleDataMapper
 #'
@@ -92,7 +92,7 @@ LongTableDataMapper <- function(rawdata=list(), rowDataMap=list(),
 
     if (is(rawdata, 'data.frame') && !is(rawdata, 'data.table')) setDT(rawdata)
 
-    .LongTableDataMapper(rawdata=rawdata, rowDataMap=rowDataMap, 
+    .LongTableDataMapper(rawdata=rawdata, rowDataMap=rowDataMap,
         colDataMap=colDataMap, assayMap=assayMap, metadataMap=metadataMap)
 }
 
@@ -316,8 +316,8 @@ setGeneric('rowDataMap<-', function(object, ..., value) standardGeneric('rowData
 #' @rdname LongTableDataMapper-accessors
 #' @eval
 #' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_3,
-#' data_=.local_data_3, id_col_='drug_id')
-setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper', 
+#' data_=.local_data_3, id_col_='treatmentid')
+setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
     value='list_or_List'), function(object, value) {
     funContext <- '[CoreGx::`rowDataMap<-`,LongTableDataMapper-method]\n\t'
     rawdataCols <- colnames(rawdata(object))
@@ -341,13 +341,13 @@ setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
         hasMetaCols <- value[[2]] %in% rawdataCols
         if (!all(hasMetaCols)) {
             stop(.errorMsg(funContext, 'The follow metadata columns in value[[2]] ',
-                'are not present in rawdata(object): ', 
+                'are not present in rawdata(object): ',
                 .collapse(value[[2]][!hasMetaCols]), '!'))
         }
         hasOneToOneRelationship <-
             value[[2]] %in% cardinality(rawdata(object), group=value[[1]])
         if (!all(hasOneToOneRelationship)) {
-            stop(.errorMsg(funContext, 'The columns ', 
+            stop(.errorMsg(funContext, 'The columns ',
                 .collapse(value[[2]][!hasOneToOneRelationship], ' do not have a ',
                 '1:1 relationship with the specified ID columns!')))
         }
@@ -368,7 +368,7 @@ setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
 setGeneric('colDataMap', function(object, ...) standardGeneric('colDataMap'))
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval 
+#' @eval
 #' .docs_LongTableDataMapper_get_dimDataMap(dim_='col', class_=.local_class_3,
 #' data_=.local_data_3)
 setMethod('colDataMap', signature(object='LongTableDataMapper'),
@@ -382,7 +382,7 @@ setGeneric('colDataMap<-', function(object, ..., value) standardGeneric('colData
 #' @rdname LongTableDataMapper-accessors
 #' @eval
 #' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_3,
-#' data_=.local_data_3, id_col_='cell_id')
+#' data_=.local_data_3, id_col_='sampleid')
 setReplaceMethod('colDataMap',
         signature(object='LongTableDataMapper', value='list_or_List'),
         function(object, value) {
@@ -438,8 +438,8 @@ setGeneric('assayMap', function(object, ...) standardGeneric('assayMap'))
 .docs_LongTableDataMapper_get_assayMap <- function(...) .parseToRoxygen(
     "
     @details
-    __assayMap__:  A `list` of character vectors. The name of each list item 
-    will be the assay in a `LongTableDataMapper` object that the columns in the 
+    __assayMap__:  A `list` of character vectors. The name of each list item
+    will be the assay in a `LongTableDataMapper` object that the columns in the
     `character` vector will be assigned to. Column renaming occurs automatically
     when the character vectors have names (from the value to the name).
 
@@ -447,7 +447,7 @@ setGeneric('assayMap', function(object, ...) standardGeneric('assayMap'))
     assayMap({data_})
 
     @md
-    @aliases assayMap,{class_},list-method assayMap,{class_},List-method 
+    @aliases assayMap,{class_},list-method assayMap,{class_},List-method
     assayMap
     @exportMethod assayMap
     ",
@@ -456,7 +456,7 @@ setGeneric('assayMap', function(object, ...) standardGeneric('assayMap'))
 
 #' @rdname LongTableDataMapper-accessors
 #' @eval .docs_LongTableDataMapper_get_assayMap(class_=.local_class_3, data_=.local_data_3)
-setMethod('assayMap', signature(object='LongTableDataMapper'), function(object) 
+setMethod('assayMap', signature(object='LongTableDataMapper'), function(object)
 {
     object@assayMap
 })
@@ -473,7 +473,7 @@ setGeneric('assayMap<-', function(object, ..., value) standardGeneric('assayMap<
     returning an invisible NULL. Arguments:
     - value:  A `list` of character vectors, where the name of each list
     item is the name of an assay and the values of each character vector
-    specify the columns mapping to the assay in the `S4` object the 
+    specify the columns mapping to the assay in the `S4` object the
     `{class_}` constructs.
 
     @examples
@@ -520,7 +520,7 @@ setGeneric('metadataMap', function(object, ...) standardGeneric('metadataMap'))
 .docs_LongTableDataMapper_get_metadataMap <- function(...) .parseToRoxygen(
     "
     @details
-    __metadataMap__:  A `list` of `character` vectors. Each item is an element 
+    __metadataMap__:  A `list` of `character` vectors. Each item is an element
     of the constructed objects `@metadata` slot.
 
     @examples
@@ -550,11 +550,11 @@ setGeneric('metadataMap<-', function(object, ..., value)
 .docs_LongTableDataMapper_set_metadataMap <- function(...) .parseToRoxygen(
     "
     @details
-    __metadataMap<-__: Updates `{class_}` object in-place, then returns an 
+    __metadataMap<-__: Updates `{class_}` object in-place, then returns an
     `invisible(NULL)`. Arguments:
     - value:  A `list` of `character` vectors. The name of each list item
-    is the name of the item in the `@metadata` slot of the `{class_}` object 
-    created when `metaConstruct` is called on the `DataMapper`, and a 
+    is the name of the item in the `@metadata` slot of the `{class_}` object
+    created when `metaConstruct` is called on the `DataMapper`, and a
     character vector specifies the columns of `@rawdata` to assign to each item.
 
     @examples
@@ -568,10 +568,10 @@ setGeneric('metadataMap<-', function(object, ..., value)
 )
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_3, 
+#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_3,
 #' data_=.local_data_3, col_='metadata')
-setReplaceMethod('metadataMap', signature(object='LongTableDataMapper', 
-    value='list_or_List'), function(object, value) 
+setReplaceMethod('metadataMap', signature(object='LongTableDataMapper',
+    value='list_or_List'), function(object, value)
 {
     funContext <- '[CoreGx::`metadataMap<-,LongTableDataMapper-method`]\n\t'
     rawdataCols <- colnames(rawdata(object))

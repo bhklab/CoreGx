@@ -1,21 +1,21 @@
 #' Generic for preprocessing complex data before being used in the constructor
 #'   of an `S4` container object.
-#' 
+#'
 #' This method is intended to abstract away complex constructor arguments
 #'   and data preprocessing steps needed to transform raw data, such as that
-#'   produced in a treatment-response or next-gen sequencing experiment, and 
+#'   produced in a treatment-response or next-gen sequencing experiment, and
 #'   automate building of the appropriate `S4` container object. This is
 #'   is intended to allow mapping between different experimental designs,
 #'   in the form of an `S4` configuration object, and various S4 class
 #'   containers in the Bioconductor community and beyond.
-#' 
+#'
 #' @param mapper An `S4` object abstracting arguments to an `S4` class
 #'   constructor into a well documented `Mapper` object.
 #' @param ... Allow new arguments to be defined for this generic.
-#' 
+#'
 #' @return An `S4` object for which the class corresponds to the type of
 #'   the build configuration object passed to this method.
-#' 
+#'
 #'
 #' @md
 #' @export
@@ -23,18 +23,18 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 
 #' @rdname metaConstruct
 #' @title metaConstruct
-#' 
-#' @param mapper An `LongTableDataMapper` object abstracting arguments to an 
+#'
+#' @param mapper An `LongTableDataMapper` object abstracting arguments to an
 #'  the `LongTable` constructor.
-#' 
-#' @return A `LongTable` object, as specified in the mapper. 
+#'
+#' @return A `LongTable` object, as specified in the mapper.
 #'
 #' @examples
 #' data(exampleDataMapper)
-#' rowDataMap(exampleDataMapper) <- list(c('drug_id'), c())
-#' colDataMap(exampleDataMapper) <- list(c('cell_id'), c())
+#' rowDataMap(exampleDataMapper) <- list(c('treatmentid'), c())
+#' colDataMap(exampleDataMapper) <- list(c('sampleid'), c())
 #' assayMap(exampleDataMapper) <- list(sensitivity=c('viability'))
-#' metadataMap(exampleDataMapper) <- list(study_metadata=c('metadata'))
+#' metadataMap(exampleDataMapper) <- list(experiment_metadata=c('metadata'))
 #' longTable <- metaConstruct(exampleDataMapper)
 #' longTable
 #'
@@ -43,7 +43,7 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         function(mapper) {
     funContext <- paste0('[', .S4MethodContext('metaConstruct', class(mapper)[1]))
-    
+
     # -- get the rawdata
     DT <- rawdata(mapper)
 
@@ -70,10 +70,11 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
     }
 
     # -- extract LongTable level metadata
-    metadataL <- lapply(metadataMap(mapper), 
+    metadataL <- lapply(metadataMap(mapper),
         function(j, x) as.list(unique(x[, j, with=FALSE])), x=DT)
+    metadataL <- c(metadataL, metadata(mapper))
 
-    # -- 
+    # --
     assayIDs <- c(rowIDs, colIDs)
     assayColumns <- lapply(assayMap(mapper), FUN=c, assayIDs)
     assayDtL <- lapply(assayColumns, FUN=subset, x=DT, subset=TRUE)
@@ -87,7 +88,7 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         setkeyv(assayDT, c('rowKey', 'colKey'))
         notMissingNames <- names(assayColumns[[i]]) != ""
         if (any(notMissingNames))
-            setnames(assayDT, old=assayColumns[[i]][notMissingNames], 
+            setnames(assayDT, old=assayColumns[[i]][notMissingNames],
                 new=names(assayColumns[[i]])[notMissingNames], skip_absent=TRUE)
         assayDtL[[i]] <- na.omit(assayDT)
     }

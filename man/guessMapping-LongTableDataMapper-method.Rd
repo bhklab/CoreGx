@@ -43,7 +43,7 @@ The function automatically guesses metadata by checking if any columns have
 only a single value. This is returned as an additional item in the list.
 }
 \examples{
-guessMapping(exampleDataMapper, groups=list(rows='drug_id', cols='cell_id'),
+guessMapping(exampleDataMapper, groups=list(rows='treatmentid', cols='sampleid'),
 subset=FALSE)
 
 }
