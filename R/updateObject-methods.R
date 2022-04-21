@@ -20,7 +20,13 @@ setMethod('updateObject', signature(object="CoreSet"),
     colnames(sample_) <- gsub("cellid", "sampleid", colnames(sample_))
 
     if (!.hasSlot(object, "treatment")) {
-        treatment <- data.frame()
+        if (.hasSlot(object, "drug")) {
+            treatment <- object@drug
+        } else if (.hasSlot(Object, "radiation")) {
+            treatment <- data.frame()
+        } else  {
+            treatment <- data.frame()
+        }
     } else {
         treatment <- object@treatment
     }
