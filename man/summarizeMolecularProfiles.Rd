@@ -3,7 +3,7 @@
 \name{summarizeMolecularProfiles}
 \alias{summarizeMolecularProfiles}
 \title{Summarize molecular profile data such that there is a single entry for each
-cell line/treatment combination}
+sample line/treatment combination}
 \usage{
 summarizeMolecularProfiles(object, ...)
 }
@@ -17,7 +17,7 @@ Depends on the implemented method
 }
 \description{
 Summarize molecular profile data such that there is a single entry for each
-cell line/treatment combination
+sample line/treatment combination
 }
 \examples{
 print("Generics shouldn't need examples?")

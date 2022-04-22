@@ -23,7 +23,7 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 #'
 #' The function automatically guesses metadata by checking if any columns have
 #' only a single value. This is returned as an additional item in the list.
-#' 
+#'
 #' @param object A `LongTableDataMapper` object.
 #' @param groups A `list` containing one or more vector of column names
 #'   to group-by. The function uses these to determine 1:1 mappings between
@@ -43,7 +43,7 @@ setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping')
 #' uniquely identified by the identifiers from that group.
 #'
 #' @examples
-#' guessMapping(exampleDataMapper, groups=list(rows='drug_id', cols='cell_id'),
+#' guessMapping(exampleDataMapper, groups=list(rows='treatmentid', cols='sampleid'),
 #' subset=FALSE)
 #'
 #' @md
@@ -67,7 +67,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     idCols <- unique(unlist(groups))
 
     # Map unique columns in the data to the metadata slot
-    metadataColumns <- names(which(vapply(mapData, FUN=.length_unique, 
+    metadataColumns <- names(which(vapply(mapData, FUN=.length_unique,
         numeric(1)) == 1))
     metadataColumns <- setdiff(metadataColumns, idCols)
     metadata <- mapData[, .SD, .SDcols=metadataColumns]
@@ -75,7 +75,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 
     # Check the mappings for each group in groups
     for (i in seq_along(groups)) {
-        message(funContext, paste0('Mapping for group ', names(groups)[i], 
+        message(funContext, paste0('Mapping for group ', names(groups)[i],
             ': ', paste0(groups[[i]], collapse=', ')))
         mappedCols <- checkColumnCardinality(DT, groups[[i]])
         mappedCols <- setdiff(mappedCols, idCols)
@@ -86,7 +86,7 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     # Merge the results
     groups <- c(list(metadata=NA), groups)
     mappings <- mget(names(groups))
-    unmapped <- setdiff(colnames(mapData), 
+    unmapped <- setdiff(colnames(mapData),
         unique(c(unlist(groups), unlist(lapply(mappings, colnames)))))
     if (!data) mappings <- lapply(mappings, colnames)
     mappings <- mapply(list, groups, mappings, SIMPLIFY=FALSE)
@@ -99,31 +99,31 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 
 #' Search a data.frame for 1:`cardinality` relationships between a group
 #'   of columns (your identifiers) and all other columns.
-#' 
+#'
 #' @param df A `data.frame` to search for 1:`cardinality` mappings with
 #'   the columns in `group`.
-#' @param group A `character` vector of one or more column names to 
+#' @param group A `character` vector of one or more column names to
 #'   check the cardinality of other columns against.
 #' @param cardinality The cardinality of to search for (i.e., 1:`cardinality`)
-#'   relationships with the combination of columns in group. Defaults to 1 
+#'   relationships with the combination of columns in group. Defaults to 1
 #'   (i.e., 1:1 mappings).
-#' @param ... Fall through arguments to data.table::`[`. For developer use. 
-#'   One use case is setting verbose=TRUE to diagnose slow data.table 
+#' @param ... Fall through arguments to data.table::`[`. For developer use.
+#'   One use case is setting verbose=TRUE to diagnose slow data.table
 #'   operations.
-#' 
+#'
 #' @return A `character` vector with the names of the columns with
 #'    cardinality of 1:`cardinality` with the columns listed in `group`.
 #'
 #' @examples
 #' df <- rawdata(exampleDataMapper)
-#' checkColumnCardinality(df, group='drug_id')
+#' checkColumnCardinality(df, group='treatmentid')
 #'
 #' @aliases cardinality
-#' 
+#'
 #' @md
 #' @export
 checkColumnCardinality <- function(df, group, cardinality=1, ...) {
-    
+
     ## FIXME:: Make this faster using logical operators to get a `logical`
     ##   matrix then using `colAlls` to check for the correct cardinality.
     funContext <- '[CoreGx::checkColumnCardinality]\n\t'
@@ -136,7 +136,7 @@ checkColumnCardinality <- function(df, group, cardinality=1, ...) {
     setindexv(df, cols=group)
     groupDT <- df[, .(group_index = .GRP), by=group, ...]
     if (nrow(df) == max(groupDT$group_index)) {
-        if (cardinality != 1) stop(.errorMsg(funContext, 'The group argument 
+        if (cardinality != 1) stop(.errorMsg(funContext, 'The group argument
             uniquely identifies each row, so the cardinality is 1:1!'))
         columnsHaveCardinality <- setdiff(colnames(df), group)
     } else {

@@ -16,7 +16,7 @@ NULL
 #'
 #' @md
 #' @aliases TREDataMapper-class
-.TREDataMapper <- setClass("TREDataMapper",  contains=c("LongTableDataMapper"))
+.TREDataMapper <- setClass("TREDataMapper", contains=c("LongTableDataMapper"))
 
 #' Constructor for the `TREDataMapper` class, which maps from one or
 #'   more raw experimental data files to the slots of a `LongTable` object.

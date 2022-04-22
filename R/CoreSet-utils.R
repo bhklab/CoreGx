@@ -79,7 +79,7 @@ setGeneric('subsetBySample', function(x, samples, ...)
     ## subset methods
 
     ### subsetBySample
-    samples <- cellInfo({data_})$cellid[seq_len(10)]
+    samples <- sampleInfo({data_})$sampleid[seq_len(10)]
     {data_}_sub <- subsetBySample({data_}, samples)
 
     @md
@@ -95,11 +95,11 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
 
     funContext <- .S4MethodContext('subsetBySample', 'CoreSet')
 
-    sampleNames <- rownames(cellInfo(x))
+    sampleNames <- rownames(sampleInfo(x))
     if (!all(samples %in% sampleNames)) {
         .warning(funContext, 'Samples missing from ', class(x)[1], ': ',
             setdiff(samples, sampleNames), '! Please ensure all specified
-            samples are valid rownames of cellInfo(x). Proceeding with
+            samples are valid rownames of sampleInfo(x). Proceeding with
             the valid samples only.')
         samples <- union(samples, sampleNames)
     }
@@ -117,12 +117,12 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
     ##TODO:: do we still need this?
 
     # -- curation slot
-    sampleCuration <- curation(x)$cell
-    curation(x)$cell <- sampleCuration[rownames(sampleCuration) %in% samples, ]
+    sampleCuration <- curation(x)$sample
+    curation(x)$sample <- sampleCuration[rownames(sampleCuration) %in% samples, ]
 
-    # -- cell slot
-    cellInf <- cellInfo(x)
-    cellInfo(x) <- cellInf[rownames(cellInf) %in% samples, ]
+    # -- sample slot
+    sampleInf <- sampleInfo(x)
+    sampleInfo(x) <- sampleInf[rownames(sampleInf) %in% samples, ]
 
     # -- check object is still valid and return
     checkCsetStructure(x)
@@ -133,13 +133,13 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
 .subsetMolecularProfilesBySample <- function(slotData, samples) {
     funContext <- .funContext(':::.subsetMolecularProfilesBySample')
     if (is(slotData, 'MultiAssayExperiment')) {
-        hasSamples <- colData(slotData)$cellid %in% samples
-        if (!all(hasSamples)) .warning(funContext, 'Some specified samples are 
+        hasSamples <- colData(slotData)$sampleid %in% samples
+        if (!all(hasSamples)) .warning(funContext, 'Some specified samples are
             not present in `molecularProfilesSlot(x)`')
         molecProfs <- slotData[, hasSamples]
     } else {
         SEcolData <- lapply(slotData, colData)
-        SEsamples <- lapply(SEcolData, FUN=`[[`, i='cellid')
+        SEsamples <- lapply(SEcolData, FUN=`[[`, i='sampleid')
         hasSEsamples <- lapply(SEsamples, FUN=`%in%`, samples)
         molecProfs <- mapply(`[`, x=slotData, j=hasSEsamples)
     }
@@ -151,7 +151,7 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
     if (is(slotData, 'LongTable')) {
         slotData <- slotData[, samples]
     } else {
-        keepSamples <- slotData$info$cellid %in% samples
+        keepSamples <- slotData$info$sampleid %in% samples
         slotData$profiles <- slotData$profiles[keepSamples, ]
         slotData$raw <- slotData$raw[keepSamples, , ]
         slotData$n <- slotData$n[rownames(slotData$n) %in% samples, ]
@@ -208,7 +208,7 @@ setMethod('subsetByTreatment', signature('CoreSet'),
     if (!all(treatments %in% treatmentNames)) {
         .warning(funContext, 'Treatments missing from ', class(x)[1], ': ',
             setdiff(treatments, treatmentNames), '! Please ensure all specified
-            treatments are valid rownames of treatmentInfo(x). 
+            treatments are valid rownames of treatmentInfo(x).
             Proceeding with the valid treatments only.')
         treatments <- union(treatments, treatmentNames)
     }
@@ -231,7 +231,7 @@ setMethod('subsetByTreatment', signature('CoreSet'),
 
     # -- molecularProfiles
     # deal with potential loss of samples when subsetting by treatment
-    keepSamples <- cellNames(x)
+    keepSamples <- sampleNames(x)
     molecSlot <- molecularProfilesSlot(x)
     molecularProfilesSlot(x) <- .subsetMolecularProfilesBySample(molecSlot,
         keepSamples)
@@ -313,6 +313,6 @@ setMethod('subsetByFeature', signature(x='CoreSet'),
     newSlotData <- if (is(slotData, 'MultiAssayExperiment')) subsetMAE else
         as.list(experiments(subsetMAE))
     molecularProfilesSlot(x) <- newSlotData
-    ## TODO:: What if this drops cells from the PSet?
+    ## TODO:: What if this drops samples from the PSet?
     return(x)
 })

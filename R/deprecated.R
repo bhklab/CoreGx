@@ -1,8 +1,36 @@
+#' @title List of `deprecated` or `defunct` methods in the `CoreGx` R package.
+#'
+#' @details
+#' ## deprecated
+#' `CoreSet`: The `CoreSet` constructor is being updated to have a new API. This
+#' API is currently available via the `CoreSet2` constructor. In Bioconductor
+#' 3.16, the old constructor will be renamed `CoreSet2` and the new constructor
+#' will be renamed `CoreSet`.
+#'
+#' ## defunct
+#' `buildLongTable`: This function no longer works as building a `LongTable` or
+#' `TreatmentResponseExperiment` now uses a `DataMapper` and the `metaConstruct`
+#' method. See `vignette("LongTable")` for a detailed description of how
+#' to create a LongTable object.
+#'
+#' @name CoreGx-deprecated
+#' @aliases
+#' CoreGx-defunct
+NULL
+
+
+# ===== Deprecated
+
+
+# ===== Defunct
+
+# -- buildLongTableClass
+
 # ==== LongTable Class
 
 #' LongTable build method
 #'
-#' @describeIn LongTable Create a LongTable object from a single data.table or
+#' @description Create a LongTable object from a single data.table or
 #'   data.frame object.
 #'
 #' @param from `character` Path to the .csv file containing the data and
@@ -31,7 +59,7 @@
 setMethod('buildLongTable', signature(from='data.frame'),
         function(from, rowDataCols, colDataCols, assayCols) {
 
-    .Deprecated("metaConstruct", msg="This method has been deprecated
+    .Defunct("metaConstruct", msg="This method has been deprecated
         in favour of use of the LongTableDataMapper metadata object
         with the metaConstruct method to build a LongTable object!")
 
@@ -113,7 +141,7 @@ setMethod('buildLongTable', signature(from='data.frame'),
 
 #' LongTable build method from character
 #'
-#' @describeIn LongTable Create a LongTable object from a single .csv file
+#' @description LongTable Create a LongTable object from a single .csv file
 #'
 #' @param from `character` Path to the .csv file containing the data and
 #'   metadata from which to build the `LongTable`.
@@ -153,15 +181,17 @@ setMethod('buildLongTable', signature(from='character'),
 
 #' LongTable build method from list
 #'
-#' @describeIn Create a LongTable object from a list containing file paths,
+#' @description Create a LongTable object from a list containing file paths,
 #'   data.frames and data.tables.
 #'
 #' @examples
+#' \dontrun{
 #' assayList <- assays(merckLongTable, withDimnames=TRUE)
 #' rowDataCols <- list(rowIDs(merckLongTable), rowMeta(merckLongTable))
 #' colDataCols <- list(colIDs(merckLongTable), colMeta(merckLongTable))
 #' assayCols <- assayCols(merckLongTable)
 #' longTable <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)
+#' }
 #'
 #' @param from `list` A list containing any combination of character file paths,
 #'  data.tables and data.frames which will be used to construct the LongTable.
@@ -184,13 +214,13 @@ setMethod('buildLongTable', signature(from='character'),
 #' @importFrom crayon magenta cyan
 #' @export
 setMethod('buildLongTable', signature(from='list'),
-          function(from, rowDataCols, colDataCols, assayCols) {
+        function(from, rowDataCols, colDataCols, assayCols) {
 
     # Prevent modify by reference for data.tables in list
     from <- copy(from)
 
     # local helpers
-    ##FIXME:: This is exactly what the Map function is (an alias for mapply with 
+    ##FIXME:: This is exactly what the Map function is (an alias for mapply with
     ##   SIMPLIFY=FALSE)
     .mapply <- function(...) mapply(..., SIMPLIFY=FALSE)
 
@@ -208,7 +238,7 @@ setMethod('buildLongTable', signature(from='list'),
     if (any(isDF)) for (i in which(isDF)) from[[i]] <- data.table(from[[i]])
 
     # validate mappings
-    ## TODO:: Ensure there is no case where joining on rowMeta or colMeta gives 
+    ## TODO:: Ensure there is no case where joining on rowMeta or colMeta gives
     #  different results than just ids
     joinCols <- unique(unlist(c(rowDataCols, colDataCols)))
     dataColNames <- lapply(from, FUN=colnames)
@@ -282,7 +312,6 @@ setMethod('buildLongTable', signature(from='list'),
 #' @keywords internal
 #' @noRd
 .selectDataTable <- function(colNames, DT, keep.rownames=FALSE) {
-
     # validate input
     if (!is.data.table(DT)) {
         tryCatch({

@@ -14,7 +14,7 @@
 \item{value}{A \code{data.frame} or \code{data.table} to update the assay with.}
 }
 \value{
-Updates the assay \code{name} in \code{x} with \code{value}, returning an invsible
+Updates the assay \code{name} in \code{x} with \code{value}, returning an invisible
 NULL.
 }
 \description{
