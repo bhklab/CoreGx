@@ -183,7 +183,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
             colData(molecularProfiles[[nm]]))
         # handle perturbation case
         colData(molecularProfiles[[nm]]) <- .checkForIdColumns(
-            colData(molecularProfiles[[nm]]), "treatmentid", "treatmentid",
+            colData(molecularProfiles[[nm]]), "treatmentid", "drugid",
             error=FALSE)
     }
 
@@ -285,7 +285,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
 
 #' @noRd
 .checkForTreatmentId <- function(df)
-    .checkForIdColumn(df, new_col="treatmentid", old_col="treatmentid")
+    .checkForIdColumn(df, new_col="treatmentid", old_col="drugid")
 
 #' @noRd
 .checkForSampleId <- function(df)
