@@ -424,8 +424,8 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
             )
             cat(title, ":\n")
             cat(paste0(space, "Dim: ",
-                paste0(dim(molecularProfiles(object, mDataType=item), collapse=", "),
-                "\n"))
+                paste0(dim(molecularProfiles(object, mDataType=item)), collapse=", ")),
+                "\n"
             )
         }
     }
