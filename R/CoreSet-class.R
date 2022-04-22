@@ -98,6 +98,11 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' objects returned by this constructor are expected to work with the CoreSet
 #' methods.
 #'
+#' ## __WARNING__:
+#' Parameters to this function have been renamed!
+#' * cell is now sample
+#' * drug is now treatment
+#'
 #' @param name A \code{character} string detailing the name of the dataset
 #' @param molecularProfiles A \code{list} of SummarizedExperiment objects containing
 #'   molecular profiles for each molecular data type.
@@ -126,8 +131,9 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #'   `CoreSet`, for proper processing of the data
 #' @param verify `logical(1)`Should the function verify the CoreSet and
 #'   print out any errors it finds after construction?
+#' @param ... Catch and parse any renamed constructor arguments.
 #'
-#' @return An object of class CoreSet
+#' @return An object of class `CoreSet`
 #'
 #' @examples
 #' data(clevelandSmall_cSet)
@@ -146,13 +152,24 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     perturbationN=array(NA, dim=c(0,0,0)), curationSample=data.frame(),
     curationTissue=data.frame(), curationTreatment=data.frame(),
     treatment=data.frame(), datasetType=c("sensitivity", "perturbation", "both"),
-    verify=TRUE
+    verify=TRUE, ...
 ) {
 
     # .Deprecated("CoreSet2", package=packageName(), msg="The CoreSet class is
     #     being redesigned. Please use the new constructor to ensure forwards
     #     compatibility with future releases! Old objects can be updated with
     #     the updateObject method.", old="CoreSet")
+
+    # parse deprecated parameters to ensure changes don't break old code
+    dotnames <- ...names()
+    if ("cell" %in% dotnames) {
+        .warning("The cell parameter is deprecated, assigning to sample...")
+        sample <- cell
+    }
+    if ("drug" %in% dotnames) {
+        .warning("The drug paramter is deprecated, assigning to treatment...")
+        treatment <- drug
+    }
 
     # ensure new sampleid and treatmentid identifiers are honoured
     sample <- .checkForSampleId(sample)
@@ -166,7 +183,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
             colData(molecularProfiles[[nm]]))
         # handle perturbation case
         colData(molecularProfiles[[nm]]) <- .checkForIdColumns(
-            colData(molecularProfiles[[nm]]), "treatmentid", "drugid",
+            colData(molecularProfiles[[nm]]), "treatmentid", "treatmentid",
             error=FALSE)
     }
 
@@ -228,6 +245,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
         curation=curation, treatment=treatment)
     if (verify) { checkCsetStructure(object)}
 
+    ## TODO:: Are these functions identitical in inheriting packages?
     if(length(sensitivityN) == 0 &&
             datasetType %in% c("sensitivity", "both")) {
         sensNumber(object) <- .summarizeSensitivityNumbers(object)
@@ -267,7 +285,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
 
 #' @noRd
 .checkForTreatmentId <- function(df)
-    .checkForIdColumn(df, new_col="treatmentid", old_col="drugid")
+    .checkForIdColumn(df, new_col="treatmentid", old_col="treatmentid")
 
 #' @noRd
 .checkForSampleId <- function(df)
@@ -733,7 +751,7 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
     }
 
     ## unique drug identifiers
-    # drugn <- sort(unique(sensitivitySlot(object)$info[ , "drugid"]))
+    # drugn <- sort(unique(sensitivitySlot(object)$info[ , "treatmentid"]))
 
     ## consider all drugs
     drugn <- rownames(treatmentInfo(object))
@@ -746,7 +764,7 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
 
     sensitivity.info <- matrix(0, nrow=length(samplen), ncol=length(drugn),
         dimnames=list(samplen, drugn))
-    drugids <- sensitivityInfo(object)[, "drugid"]
+    drugids <- sensitivityInfo(object)[, "treatmentid"]
     sampleids <- sensitivityInfo(object)[, "sampleid"]
     sampleids <- sampleids[grep("///", drugids, invert=TRUE)]
     drugids <- drugids[grep("///", drugids, invert=TRUE)]
@@ -796,10 +814,10 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
 
     for (i in seq_len(length(molecularProfilesSlot(object)))) {
         if (nrow(colData(molecularProfilesSlot(object)[[i]])) > 0 &&
-                all(is.element(c("sampleid", "drugid"),
+                all(is.element(c("sampleid", "treatmentid"),
                     colnames(colData(molecularProfilesSlot(object)[[i]]))))) {
             tt <- table(colData(molecularProfilesSlot(object)[[i]])[ , "sampleid"],
-                colData(molecularProfilesSlot(object)[[i]])[ , "drugid"])
+                colData(molecularProfilesSlot(object)[[i]])[ , "treatmentid"])
             perturbation.info[rownames(tt), colnames(tt),
                 names(molecularProfilesSlot(object))[i]] <- tt
         }

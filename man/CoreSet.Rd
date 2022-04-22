@@ -18,7 +18,8 @@ CoreSet(
   curationTreatment = data.frame(),
   treatment = data.frame(),
   datasetType = c("sensitivity", "perturbation", "both"),
-  verify = TRUE
+  verify = TRUE,
+  ...
 )
 }
 \arguments{
@@ -60,15 +61,27 @@ which uniquely identifies each treatment in the object.}
 
 \item{verify}{\code{logical(1)}Should the function verify the CoreSet and
 print out any errors it finds after construction?}
+
+\item{...}{Catch and parse any renamed constructor arguments.}
 }
 \value{
-An object of class CoreSet
+An object of class \code{CoreSet}
 }
 \description{
 A constructor that simplifies the process of creating CoreSets, as well
 as creates empty objects for data not provided to the constructor. Only
 objects returned by this constructor are expected to work with the CoreSet
 methods.
+}
+\details{
+\subsection{\strong{WARNING}:}{
+
+Parameters to this function have been renamed!
+\itemize{
+\item cell is now sample
+\item drug is now treatment
+}
+}
 }
 \examples{
 data(clevelandSmall_cSet)
