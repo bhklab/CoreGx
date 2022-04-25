@@ -187,7 +187,7 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, ..., value) {
 
     if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
         x@rowData <- value
-        return(x)
+        return(invisible(x))
     }
 
     # type check input
@@ -230,7 +230,7 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, ..., value) {
     ## TODO:: Add some sanity checks before returing
 
     x@rowData <- rowData
-    x
+    return(invisible(x))
 })
 
 

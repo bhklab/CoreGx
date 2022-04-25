@@ -26,76 +26,6 @@ NULL
 ## == subset
 
 
-#' Subset a `LongTable` using <dim>Key column
-#'
-#' @param x `LongTable`
-#' @param keys `integer` Inte
-#' @param dim `character(1)` One of "row" or "col", corresponding to "rowKey" or
-#'   "colKey" columns in rowData or colData.
-#' @param reindex `logical(1)` Should index values be reset such that they
-#'   are the smallest possible set of consecutive integers. Modifies the
-#'   "rowKey", "colKey", and all assayKey columns. Initial benchmarks indicate
-#'   rindex=FALSE save 35% of execution time.
-#'
-#' @details
-#' Initial benchmarks indicate this is marginally faster than .subsetByIndex
-#' when only using a single selector. ~7% faster when reindex=TRUE, ~4% faster
-#' when reindex=FALSE. Probably not worth using, but I already wrote it.
-#'
-#' @noRd
-.subsetByDimData <- function(x, keys, dim=c("row", "col"), reindex=FALSE) {
-    # -- parse dimension to subset on
-    dim <- match.arg(dim)
-    dimData <- get(paste0(dim, "Data"), getNamespace("CoreGx"))
-    setDimData <- get(paste0(dim, "Data<-"), getNamespace("CoreGx"))
-    dimKey <- paste0(dim, "Key")
-    # -- validate input
-    assertClass(x, "LongTable")
-    assertIntegerish(keys)
-    keys <- sort(unique(keys))
-    x <- copy(x)    # -- subset slots
-    dData <- dimData(x, raw=TRUE)[keys, ]
-    index <- mutable(getIntern(x, "assayIndex"))
-    index <- index[get(dimKey) %in% keys, ]
-    assays <- assays(x, withDimnames=FALSE)
-    metaKeys <- c("rowKey", "colKey")
-    for (i in seq_along(assays)) {
-        setkeyv(assays[[i]], metaKeys)
-        # join based subsets use binary-search, O(log(n)) vs O(n) for vector-scan
-        # see https://rdatatable.gitlab.io/data.table/articles/datatable-keys-fast-subset.html
-        assays[[i]] <- assays[[i]][index[, metaKeys, with=FALSE], ]
-    }
-    # -- optionally reindex the table
-    if (reindex) {
-        # update assay keys first
-        for (i in seq_along(assays)) {
-            aKey <- names(assays)[i]
-            assays[[i]][, (aKey) := .I]
-            index[assays[[i]],
-                (aKey) := get(paste0("i.", aKey))
-            ]
-            setkeyv(assays[[i]], names(assays)[i])
-        }
-        # update rowKey and colKey
-        newKey <- paste0(".", dimKey)
-        dData[, (newKey) := .I]
-        index[dData, (dimKey) := get(newKey)]
-        setkeyv(index, metaKeys)
-        dData[, (c(oldKey, newKey)) := .(get(newKey), NULL)]
-    }
-    # -- update object and return
-    # delete row-/colKeys by reference
-    for (a in assays) a[, (metaKeys) := NULL]
-    # raw=TRUE allows direct modification of slots
-    setDimData(x, raw=TRUE, value=dData)
-    assays(x, raw=TRUE) <- assays
-    unlockBinding("assayIndex", getIntern(x))
-    assign("assayIndex", index, envir=getIntern(x))
-    lockBinding("assayIndex", getIntern(x))
-    return(x)
-}
-
-
 #' Subset a `LongTable` using an "assayIndex" data.frame
 #'
 #' @param x `LongTable`
@@ -112,11 +42,13 @@ NULL
 #'
 #' @noRd
 .subsetByIndex <- function(x, index, reindex=FALSE) {
+
     # -- validate input
     assertClass(x, "LongTable")
     assertDataFrame(index)
     if (!is.data.table(index)) setDT(index)
     x <- copy(x)
+
     # -- subset slots
     rData <- rowData(x, raw=TRUE)[sort(unique(index$rowKey)), ]
     cData <- colData(x, raw=TRUE)[sort(unique(sort(index$colKey))), ]
@@ -129,27 +61,12 @@ NULL
         # see https://rdatatable.gitlab.io/data.table/articles/datatable-keys-fast-subset.html
         assays[[i]] <- assays[[i]][index[, metaKeys, with=FALSE], ]
     }
+
     # -- optionally reindex the table
     if (reindex) {
-        # update assay keys first
-        for (i in seq_along(assays)) {
-            aKey <- names(assays)[i]
-            assays[[i]][, (aKey) := .I]
-            index[assays[[i]],
-                (aKey) := get(paste0("i.", aKey))
-            ]
-            setkeyv(assays[[i]], names(assays)[i])
-        }
-        # update rowKey and colKey
-        rData[, .rowKey := .I]
-        cData[, .colKey := .I]
-        index[rData, rowKey := .rowKey]
-        setkeyv(index, "colKey")
-        index[cData, colKey := .colKey]
-        setkeyv(index, metaKeys)
-        rData[, `:=`(rowKey=.rowKey, .rowKey=NULL)]
-        cData[, `:=`(colKey=.colKey, .colKey=NULL)]
+        x <- reindex(x)
     }
+
     # -- update object and return
     # delete row-/colKeys by reference
     for (a in assays) a[, (metaKeys) := NULL]
@@ -591,15 +508,18 @@ setReplaceMethod('$', signature('LongTable'), function(x, name, value) {
 #'
 #' @export
 setMethod('reindex', signature(object='LongTable'), function(object) {
+
     # -- extract the requisite data
     mutableIntern <- mutable(getIntern(object))
     index <- mutableIntern$assayIndex
     rData <- copy(rowData(object, raw=TRUE))
     cData <- copy(colData(object, raw=TRUE))
     aList <- copy(assays(object, raw=TRUE))
+
     # -- sort metadata tables by their id columns and update the index
     rData[, .rowKey := .I, by=c(rowIDs(object))]
     cData[, .colKey := .I, by=c(colIDs(object))]
+
     # -- update rowKey and colKey in the asssayIndex, if they have changed
     if (rData[, any(rowKey != .rowKey)]) {
         index[rData, rowKey := .rowKey]
@@ -613,6 +533,7 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     }
     rData[, .rowKey := NULL]
     cData[, .colKey := NULL]
+
     # -- add new indices for assayKeys to index
     setkeyv(index, c("rowKey", "colKey"))  #
     assays_ <- setdiff(colnames(index), c("rowKey", "colKey"))
@@ -621,6 +542,7 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
         index[!is.na(get(nm)), paste0(".", nm) := .I]
         assayEqualKeys[nm] <- index[!is.na(get(nm)), all(get(paste0(".", nm)) == get(nm))]
     }
+
     # -- check equality and update assayKeys in assays if they have changed
     for (nm in names(which(!assayEqualKeys))) {
         setkeyv(index, nm)
@@ -630,6 +552,7 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     }
     index[, paste0(".", assays_) := NULL]
     setkeyv(index, assayNames(object))
+
     # -- update the object with the reindexed tables and return
     rowData(object, raw=TRUE) <- rData
     colData(object, raw=TRUE) <- cData

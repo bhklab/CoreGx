@@ -39,11 +39,14 @@ testthat::test_that("`assay<-LongTable-method` allows non-id column updates", {
     assay_[, viabililty := rnorm(.N)]
     nlt[["sensitivity"]] <- assay_
     testthat::expect_true(all.equal(nlt[["sensitivity"]], assay_))
-    testthat::expect_true(is.character(all.equal(nlt[["sensitivity"]], lt[["sensitivity"]])))
+    testthat::expect_false(isTRUE(all.equal(nlt[["sensitivity"]], lt[["sensitivity"]])))
 })
 
 testthat::test_that("`assay<-LongTable-method` prevents id column updates", {
     nlt <- copy(lt)
+    assay_ <- nlt[["sensitivity"]]
+    assay_[, drug1dose := rnorm(.N)]
+    nlt[["sensitivity"]] <- assay_
 })
 
 # ==== LongTable-utils.R
