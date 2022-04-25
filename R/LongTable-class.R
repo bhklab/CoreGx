@@ -191,9 +191,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         on="colKey"
     ]
     setkeyv(assayIndex, c(rowIDs, colIDs))
-    for (i in seq_along(assays)) {
-        assayIndex[assays[[i]], col := col,
-            env=list(col=names(assays)[i])]
+    for (nm in names(assays)) {
+        assayIndex[assays[[nm]], (nm) := get(nm)]
     }
     assayIndex[, (c(rowIDs, colIDs)) := NULL]
     setkeyv(assayIndex, names(assays))
@@ -216,11 +215,11 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     setcolorder(colData, unlist(internals[c('colIDs', 'colMeta')]))
 
     ## Assemble  the pseudo row and column names for the LongTable
-    rowData[, .rownames := paste0(rows, collapse=":"), by=.I,
-        env=list(rows=as.list(rowIDs))]
-    colData[, .colnames := paste0(cols, collapse=":"), by=.I,
-        env=list(cols=as.list(colIDs))]
-
+    .pasteColons <- function(...) paste(..., collapse=':')
+    rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))),
+        .SDcols=rowIDs]
+    colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
+        .SDcols=colIDs]
     return(CoreGx:::.LongTable(rowData=rowData, colData=colData, assays=assays,
         metadata=metadata, .intern=internals))
 }

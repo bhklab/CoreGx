@@ -53,12 +53,10 @@ NULL
     assertClass(x, "LongTable")
     assertIntegerish(keys)
     keys <- sort(unique(keys))
-    x <- copy(x)
-    getIntern(x) <- new.env(getIntern(x), parent=emptyenv())  # copy object environment to prevent modify by reference
-    # -- subset slots
+    x <- copy(x)    # -- subset slots
     dData <- dimData(x, raw=TRUE)[keys, ]
-    index <- getIntern(x, "assayIndex")
-    index <- index[col %in% value, , env=list(col=dimKey, value=keys)]
+    index <- mutable(getIntern(x, "assayIndex"))
+    index <- index[get(dimKey) %in% keys, ]
     assays <- assays(x, withDimnames=FALSE)
     metaKeys <- c("rowKey", "colKey")
     for (i in seq_along(assays)) {
@@ -74,18 +72,16 @@ NULL
             aKey <- names(assays)[i]
             assays[[i]][, (aKey) := .I]
             index[assays[[i]],
-                col := value,
-                env=list(col=aKey, value=paste0("i.", aKey))
+                (aKey) := get(paste0("i.", aKey))
             ]
             setkeyv(assays[[i]], names(assays)[i])
         }
         # update rowKey and colKey
         newKey <- paste0(".", dimKey)
-        dData[, newKey := .I, env=list(newKey=newKey)]
-        index[dData, oldKey := newKey, env=list(newKey=newKey, oldKey=dimKey)]
+        dData[, (newKey) := .I]
+        index[dData, (dimKey) := get(newKey)]
         setkeyv(index, metaKeys)
-        dData[, `:=`(oldKey=newKey, newKey=NULL),
-            env=list(newKey=newKey, oldKey=dimKey)]
+        dData[, (c(oldKey, newKey)) := .(get(newKey), NULL)]
     }
     # -- update object and return
     # delete row-/colKeys by reference
@@ -140,8 +136,7 @@ NULL
             aKey <- names(assays)[i]
             assays[[i]][, (aKey) := .I]
             index[assays[[i]],
-                col := value,
-                env=list(col=aKey, value=paste0("i.", aKey))
+                (aKey) := get(paste0("i.", aKey))
             ]
             setkeyv(assays[[i]], names(assays)[i])
         }
@@ -624,16 +619,14 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     assayEqualKeys <- setNames(vector("logical", length(assays_)), assays_)
     for (nm in assays_) {
         index[!is.na(get(nm)), paste0(".", nm) := .I]
-        assayEqualKeys[nm] <- index[!is.na(get(nm)), all(dotcol == col),
-            env=list(dotcol=paste0(".", nm), col=nm)]
+        assayEqualKeys[nm] <- index[!is.na(get(nm)), all(get(paste0(".", nm)) == get(nm))]
     }
     # -- check equality and update assayKeys in assays if they have changed
     for (nm in names(which(!assayEqualKeys))) {
         setkeyv(index, nm)
-        aList[[nm]][index, col := dotcol,
-            env=list(col=nm, dotcol=paste0(".", nm))]
+        aList[[nm]][index, (nm) := get(paste0(".", nm))]
         setkeyv(aList[[nm]], nm)
-        index[, (nm) := dotcol, env=list(dotcol=paste0(".", nm))]
+        index[, (nm) := get(paste0(".", nm))]
     }
     index[, paste0(".", assays_) := NULL]
     setkeyv(index, assayNames(object))

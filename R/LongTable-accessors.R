@@ -393,7 +393,10 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
         setkeyv(assayIndex, names(aList)[i])
         aList[[i]] <- assayIndex[aList[[i]], ]
         aList[[i]][, (names(aList)) := NULL]
-        if (!key) aList[[i]][, c("rowKey", "colKey") := NULL]
+        if (!key) {
+            aList[[i]][, c("rowKey", "colKey") := NULL]
+            setkeyv(aList[[i]], idCols(x))
+        }
     }
     return(aList)
 })
@@ -510,7 +513,10 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
     }
     assayData <- assayData[, .SD, .SDcols=!assayName]
 
-    if (!key) assayData <- assayData[, -c('rowKey', 'colKey')]
+    if (!key) {
+        assayData <- assayData[, -c('rowKey', 'colKey')]
+        setkeyv(assayData, idCols(x))
+    }
 
     if (!withDimnames && metadata)
         warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
@@ -585,7 +591,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     }
     # -- add assayKey column to the value
     setkeyv(value, assayKey)
-    value[, col := .I, env=list(col=i)]
+    value[, (i) := .I]
 
     # -- join assay with existing metadata
     rKeys <- intersect(rowIDs(x), assayKey)
@@ -603,9 +609,9 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     setkeyv(annotatedIndex, "colKey")
     annotatedIndex <- merge.data.table(annotatedIndex, cIndex, all=TRUE)
 
-    # -- update assayIndex based with the new assay
+    # -- update assayIndex with the new assay
     setkeyv(annotatedIndex, assayKey)
-    annotatedIndex[value, col := col, env=list(col=i)]
+    annotatedIndex[value, (i) := get(i)]
     annotatedIndex[, (assayKey) := NULL]
     setkeyv(annotatedIndex, unique(c(assayNames(x), i)))
 
