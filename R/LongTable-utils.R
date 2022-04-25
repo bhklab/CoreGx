@@ -190,34 +190,6 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     } else {
         colDataSubset <- .colData(longTable)
     }
-
-    # Subset assays to only keys in remaining in rowData/colData
-    rowKeys <- rowDataSubset$rowKey
-    colKeys <- colDataSubset$colKey
-
-    if (missing(assays)) { assays <- assayNames(longTable) }
-    keepAssays <- assayNames(longTable) %in% assays
-
-    assayData <- lapply(assays(longTable, withDimnames=FALSE)[keepAssays],
-                     FUN=.filterLongDataTable,
-                     indexList=list(rowKeys, colKeys))
-
-    # Subset rowData and colData to only keys contained in remaining assays
-    ## TODO:: Implement message telling users which rowData and colData
-    ## columns are being dropped when selecting a specific assay.
-    assayRowIDs <- unique(unlist(lapply(assayData, `[`, j='rowKey', drop=TRUE)))
-    assayColIDs <- unique(unlist(lapply(assayData, `[`, j='colKey', drop=TRUE)))
-
-    rowDataSubset <- rowDataSubset[rowKey %in% assayRowIDs]
-    colDataSubset <- colDataSubset[colKey %in% assayColIDs]
-
-    newLongTable <- LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
-                     rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
-                     assays=assayData, metadata=metadata(longTable))
-
-    newLongTable <- if (reindex) reindex(newLongTable) else newLongTable
-
-    return(newLongTable)
 })
 
 
