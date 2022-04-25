@@ -569,6 +569,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     if (length(i) > 1) .error(funContext, ' Only a single assay ',
         'name can be assiged with assay(x, i) <- value.')
 
+    value <- copy(value)  # prevent modify by reference
     if (!is.data.table(value)) setDT(value)
 
     # -- extract strucutral metadata form .intern slot

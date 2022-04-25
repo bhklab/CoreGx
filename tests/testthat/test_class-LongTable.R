@@ -33,6 +33,19 @@ testthat::test_that("`assay<-LongTable-method` assignment does not corrupt data 
     }
 })
 
+testthat::test_that("`assay<-LongTable-method` allows non-id column updates", {
+    nlt <- copy(lt)
+    assay_ <- nlt[["sensitivity"]]
+    assay_[, viabililty := rnorm(.N)]
+    nlt[["sensitivity"]] <- assay_
+    testthat::expect_true(all.equal(nlt[["sensitivity"]], assay_))
+    testthat::expect_true(is.character(all.equal(nlt[["sensitivity"]], lt[["sensitivity"]])))
+})
+
+testthat::test_that("`assay<-LongTable-method` prevents id column updates", {
+    nlt <- copy(lt)
+})
+
 # ==== LongTable-utils.R
 
 testthat::test_that("`reindex,LongTale-method` does not mutate by reference", {
