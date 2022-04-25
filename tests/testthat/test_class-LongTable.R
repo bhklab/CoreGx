@@ -10,6 +10,8 @@ test_that("`rowData,LongTable-method` orders data correctly", {
 
 })
 
+# === @assay slot
+
 testthat::test_that("`assay,LongTable-method` and `assays,LongTable-method` return equivalent data", {
     assay_list <- lapply(seq_along(assayNames(lt)), FUN=assay,
         x=lt, withDimnames=TRUE)
@@ -17,6 +19,17 @@ testthat::test_that("`assay,LongTable-method` and `assays,LongTable-method` retu
     for (i in seq_along(assay_list)) {
         print(i)
         testthat::expect_true(all.equal(assay_list[[i]], assays_[[i]]))
+    }
+})
+
+testthat::test_that("`assay<-LongTable-method` assignment does not corrupt data relationships", {
+    nlt <- copy(lt)
+    for (nm in assayNames(lt)) {
+        print(nm)
+        nlt[[nm]] <- nlt[[nm]]
+        testthat::expect_true(all.equal(nlt[[nm]], lt[[nm]]))
+        testthat::expect_true(all.equal(assays(nlt, raw=TRUE)[[nm]], assays(lt, raw=TRUE)[[nm]]))
+        testthat::expect_true(all.equal(getIntern(nlt)$assayIndex, getIntern(lt)$assayIndex))
     }
 })
 
