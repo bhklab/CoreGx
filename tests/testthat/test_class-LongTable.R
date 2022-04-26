@@ -91,3 +91,19 @@ testthat::test_that("`CoreGx:::.subsetByIndex` is equivalent to subsetting the r
     assayByIndex <- nlt$sensitivity
     testthat::expect_true(all.equal(rawSubset, assayByIndex))
 })
+
+testthat::test_that("`subset,LongTable-method` works with row and column names", {
+    nlt <- subset(lt, rownames(lt)[1:5], colnames(lt)[1:5])
+    testthat::expect_equal(rownames(nlt), rownames(lt)[1:5])
+    testthat::expect_true(all.equal(rowData(nlt), rowData(lt)[1:5, ]))
+    testthat::expect_equal(colnames(nlt), colnames(lt)[1:5])
+    testthat::expect_true(all.equal(colData(nlt), colData(lt)[1:5, ]))
+})
+
+testthat::test_that("`subset,LongTable-method` works with call queries", {
+
+})
+
+testhat::test_that("`subset,LongTable-method` works with regex queries", {
+
+})
