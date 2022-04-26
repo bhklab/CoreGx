@@ -136,37 +136,68 @@ setMethod('subset', signature('LongTable'),
         function(x, i, j, assays=assayNames(x),
             reindex=TRUE) {
 
-    # -- prevent modify by reference
+    # prevent modify by reference
     x <- copy(x)
 
-    # -- find matching rows
-    ## FIXME:: invalid names are ignored silently!
-    if (missing(i)) i <- quote(1:.N)
-    if (is.character(i)) {
-        imatch <- rownames(x) %in% i
-        if (!any(imatch)) imatch <- grepl(.preprocessRegexQuery(i), rownames(x))
-        if (!any(imatch))
-            stop(.errorMsg("No rownames(x) matched the specified `i` value!"),
-                call.=FALSE)
-        i <- imatch
-    }
-    if (is.logical(i)) i <- which(i)
-    if (is.call(i)) i <- substitute(i)
-    rows <- rowData(x, key=TRUE)[eval(i), rowKey]
+    # local helper functions
+    .rowData <- function(...) rowData(..., key=TRUE)
+    .colData <- function(...) colData(..., key=TRUE)
+    .tryCatchNoWarn <- function(...) suppressWarnings(tryCatch(...))
+    .strSplitLength <- function(...) length(strsplit(...))
 
-    # -- find matching columns
-    if (missing(j)) j <- quote(1:.N)
-    if (is.character(j)) {
-        jmatch <- rownames(x) %in% j
-        if (!any(jmatch)) jmatch <- grepl(.preprocessRegexQuery(j), colnames(x))
-        if (!any(jmatch))
-            stop(.errorMsg("No colnames(x) matched the specified `j` value!"),
-                call.=FALSE)
-        j <- jmatch
+    # subset rowData
+    ## FIXME:: Can I parameterize this into a helper that works for both row
+    ## and column data?
+    if (!missing(i)) {
+        ## TODO:: Clean up this if-else block
+        if (.tryCatchNoWarn(is.call(i), error=function(e) FALSE)) {
+            rowDataSubset <- .rowData(x)[eval(i), ]
+        } else if (.tryCatchNoWarn(is.character(i), error=function(e) FALSE)) {
+            ## TODO:: Implement diagnosis for failed regex queries
+            idCols <- rowIDs(x, key=TRUE)
+            if (max(unlist(lapply(i, .strSplitLength, split=':'))) > length(idCols))
+                stop(cyan$bold('Attempting to select more rowID columns than
+                    there are in the LongTable.\n\tPlease use query of the form ',
+                    paste0(idCols, collapse=':')))
+            i <- grepl(.preprocessRegexQuery(i), rownames(x), ignore.case=TRUE)
+            i <- str2lang(.variableToCodeString(i))
+            rowDataSubset <- .rowData(x)[eval(i), ]
+        } else {
+            isub <- substitute(i)
+            rowDataSubset <- .tryCatchNoWarn(.rowData(x)[i, ],
+                error=function(e) .rowData(x)[eval(isub), ])
+        }
+    } else {
+        rowDataSubset <- .rowData(x)
     }
-    if (is.logical(j)) j <- which(j)
-    if (is.call(j)) j <- substitute(j)
-    cols <- colData(x, key=TRUE)[eval(j), colKey]
+
+    # subset colData
+    if (!missing(j)) {
+        ## TODO:: Clean up this if-else block
+        if (.tryCatchNoWarn(is.call(j), error=function(e) FALSE, silent=TRUE)) {
+            colDataSubset <- .colData(x)[eval(j), ]
+        } else if (.tryCatchNoWarn(is.character(j), error=function(e) FALSE, silent=TRUE)) {
+            ## TODO:: Implement diagnosis for failed regex queries
+            idCols <- colIDs(x, key=TRUE)
+            if (max(unlist(lapply(j, .strSplitLength, split=':'))) > length(idCols))
+                stop(cyan$bold('Attempting to select more ID columns than there
+                    are in the LongTable.\n\tPlease use query of the form ',
+                    paste0(idCols, collapse=':')))
+            j <- grepl(.preprocessRegexQuery(j), colnames(x), ignore.case=TRUE)
+            j <- str2lang(.variableToCodeString(j))
+            colDataSubset <- .colData(x)[eval(j), ]
+        } else {
+            jsub <- substitute(j)
+            colDataSubset <- .tryCatchNoWarn(.colData(x)[j, ],
+                error=function(e) .colData(x)[eval(jsub), ])
+        }
+    } else {
+        colDataSubset <- .colData(x)
+    }
+
+    # Subset assays to only keys in remaining in rowData/colData
+    rows <- rowDataSubset$rowKey
+    cols <- colDataSubset$colKey
 
     # -- find matching assays
     validAssays <- assays %in% assayNames(x)
