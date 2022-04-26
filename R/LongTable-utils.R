@@ -159,7 +159,7 @@ setMethod('subset', signature('LongTable'),
                 stop(cyan$bold('Attempting to select more rowID columns than
                     there are in the LongTable.\n\tPlease use query of the form ',
                     paste0(idCols, collapse=':')))
-            imatch <- i %in% rownames(x)
+            imatch <- rownames(x) %in% i
             if (!any(imatch))
                 imatch <- grepl(.preprocessRegexQuery(i), rownames(x),
                     ignore.case=TRUE)
@@ -186,7 +186,7 @@ setMethod('subset', signature('LongTable'),
                 stop(cyan$bold('Attempting to select more ID columns than there
                     are in the LongTable.\n\tPlease use query of the form ',
                     paste0(idCols, collapse=':')))
-            jmatch <- j %in% colnames(x)
+            jmatch <- colnames(x) %in% j
             if (!any(jmatch))
                 jmatch <- grepl(.preprocessRegexQuery(j), colnames(x),
                     ignore.case=TRUE)
