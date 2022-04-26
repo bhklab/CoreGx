@@ -154,14 +154,18 @@ setMethod('subset', signature('LongTable'),
             rowDataSubset <- .rowData(x)[eval(i), ]
         } else if (.tryCatchNoWarn(is.character(i), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
+            i <- unique(i)
             idCols <- rowIDs(x, key=TRUE)
             if (max(unlist(lapply(i, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more rowID columns than
                     there are in the LongTable.\n\tPlease use query of the form ',
                     paste0(idCols, collapse=':')))
-            i <- grepl(.preprocessRegexQuery(i), rownames(x), ignore.case=TRUE)
-            i <- str2lang(.variableToCodeString(i))
-            rowDataSubset <- .rowData(x)[eval(i), ]
+            imatch <- i %in% rownames(x)
+            if (!any(imatch))
+                imatch <- grepl(.preprocessRegexQuery(i), rownames(x),
+                    ignore.case=TRUE)
+            imatch <- str2lang(.variableToCodeString(imatch))
+            rowDataSubset <- .rowData(x)[eval(imatch), ]
         } else {
             isub <- substitute(i)
             rowDataSubset <- .tryCatchNoWarn(.rowData(x)[i, ],
@@ -178,14 +182,18 @@ setMethod('subset', signature('LongTable'),
             colDataSubset <- .colData(x)[eval(j), ]
         } else if (.tryCatchNoWarn(is.character(j), error=function(e) FALSE, silent=TRUE)) {
             ## TODO:: Implement diagnosis for failed regex queries
+            j <- unique(j)
             idCols <- colIDs(x, key=TRUE)
             if (max(unlist(lapply(j, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more ID columns than there
                     are in the LongTable.\n\tPlease use query of the form ',
                     paste0(idCols, collapse=':')))
-            j <- grepl(.preprocessRegexQuery(j), colnames(x), ignore.case=TRUE)
-            j <- str2lang(.variableToCodeString(j))
-            colDataSubset <- .colData(x)[eval(j), ]
+            jmatch <- j %in% colnames(x)
+            if (!any(jmatch))
+                jmatch <- grepl(.preprocessRegexQuery(j), colnames(x),
+                    ignore.case=TRUE)
+            jmatch <- str2lang(.variableToCodeString(jmatch))
+            colDataSubset <- .colData(x)[eval(jmatch), ]
         } else {
             jsub <- substitute(j)
             colDataSubset <- .tryCatchNoWarn(.colData(x)[j, ],
