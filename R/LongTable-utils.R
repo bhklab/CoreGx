@@ -57,17 +57,13 @@ NULL
     setkeyv(index, metaKeys)
     for (i in seq_along(assays)) {
         setkeyv(assays[[i]], metaKeys)
+        aname <- names(assays)[i]
         # join based subsets use binary-search, O(log(n)) vs O(n) for vector-scan
         # see https://rdatatable.gitlab.io/data.table/articles/datatable-keys-fast-subset.html
-        assays[[i]] <- assays[[i]][index[, metaKeys, with=FALSE], ]
+        assays[[i]] <- assays[[i]][index[, c(metaKeys, aname), with=FALSE], ]
+        setkeyv(assays[[i]], aname)
     }
-
-    # -- optionally reindex the table
-    if (reindex) {
-        x <- reindex(x)
-    }
-
-    # -- update object and return
+    # -- update object
     # delete row-/colKeys by reference
     for (a in assays) a[, (metaKeys) := NULL]
     # raw=TRUE allows direct modification of slots
@@ -77,6 +73,11 @@ NULL
     mutableIntern <- mutable(getIntern(x))
     mutableIntern$assayIndex <- index
     x@.intern <- immutable(mutableIntern)
+
+    # -- optionally reindex the table
+    if (reindex) {
+        x <- reindex(x)
+    }
     return(x)
 }
 
@@ -132,64 +133,9 @@ NULL
 #' @export
 setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TRUE) {
 
-    longTable <- x
-    rm(x)
-
-    # local helper functions
-    .rowData <- function(...) rowData(..., key=TRUE)
-    .colData <- function(...) colData(..., key=TRUE)
-    .tryCatchNoWarn <- function(...) suppressWarnings(tryCatch(...))
-    .strSplitLength <- function(...) length(strsplit(...))
-
-    # subset rowData
-    ## FIXME:: Can I parameterize this into a helper that works for both row
-    ## and column data?
-    if (!missing(i)) {
-        ## TODO:: Clean up this if-else block
-        if (.tryCatchNoWarn(is.call(i), error=function(e) FALSE)) {
-            rowDataSubset <- .rowData(longTable)[eval(i), ]
-        } else if (.tryCatchNoWarn(is.character(i), error=function(e) FALSE)) {
-            ## TODO:: Implement diagnosis for failed regex queries
-            idCols <- rowIDs(longTable, key=TRUE)
-            if (max(unlist(lapply(i, .strSplitLength, split=':'))) > length(idCols))
-                stop(cyan$bold('Attempting to select more rowID columns than
-                    there are in the LongTable.\n\tPlease use query of the form ',
-                    paste0(idCols, collapse=':')))
-            i <- grepl(.preprocessRegexQuery(i), rownames(longTable), ignore.case=TRUE)
-            i <- str2lang(.variableToCodeString(i))
-            rowDataSubset <- .rowData(longTable)[eval(i), ]
-        } else {
-            isub <- substitute(i)
-            rowDataSubset <- .tryCatchNoWarn(.rowData(longTable)[i, ],
-                error=function(e) .rowData(longTable)[eval(isub), ])
-        }
-    } else {
-        rowDataSubset <- .rowData(longTable)
-    }
-
-    # subset colData
-    if (!missing(j)) {
-        ## TODO:: Clean up this if-else block
-        if (.tryCatchNoWarn(is.call(j), error=function(e) FALSE, silent=TRUE)) {
-            colDataSubset <- .colData(longTable)[eval(j), ]
-        } else if (.tryCatchNoWarn(is.character(j), error=function(e) FALSE, silent=TRUE)) {
-            ## TODO:: Implement diagnosis for failed regex queries
-            idCols <- colIDs(longTable, key=TRUE)
-            if (max(unlist(lapply(j, .strSplitLength, split=':'))) > length(idCols))
-                stop(cyan$bold('Attempting to select more ID columns than there
-                    are in the LongTable.\n\tPlease use query of the form ',
-                    paste0(idCols, collapse=':')))
-            j <- grepl(.preprocessRegexQuery(j), colnames(longTable), ignore.case=TRUE)
-            j <- str2lang(.variableToCodeString(j))
-            colDataSubset <- .colData(longTable)[eval(j), ]
-        } else {
-            jsub <- substitute(j)
-            colDataSubset <- .tryCatchNoWarn(.colData(longTable)[j, ],
-                error=function(e) .colData(longTable)[eval(jsub), ])
-        }
-    } else {
-        colDataSubset <- .colData(longTable)
-    }
+    if (is.call(i)) {
+        rowIdx <- copy(rowData(x, raw=TRUE))[eval(i), rowKey]
+    } else if (is.character(i)) {}
 })
 
 
