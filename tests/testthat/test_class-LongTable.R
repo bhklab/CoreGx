@@ -131,9 +131,31 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
 })
 
 testthat::test_that("`subset,LongTable-method` works with regex queries", {
-
-})
-
-testthat::test_that("`[,LongTable-method` is equivalent to `subset,LongTable-method", {
-
+    nlt <- subset(lt,
+        c("vemurafenib", "Vismodegib"),
+        c("UACC*", "SK-MEL-*")
+    )
+    testthat::expect_s4_class(nlt, "LongTable")
+    testthat::expect_equal(
+        rowData(nlt),
+        rowData(lt)[drug1id %in% unique(drug1id)[1:5]]
+    )
+    testthat::expect_equal(
+        colData(nlt),
+        colData(lt)[cellid %in% unique(cellid)[1:5]]
+    )
+    nlt2 <- lt[
+        c("vemurafenib", "Vismodegib"),
+        c("UUC*", "SK-MEL-*")
+    ]
+    testthat::expect_s4_class(nlt2, "LongTable")
+    testthat::expect_equal(
+        rowData(nlt2),
+        rowData(lt)[drug1id %in% unique(drug1id)[1:5]]
+    )
+    testthat::expect_equal(
+        colData(nlt2),
+        colData(lt)[grepl()]
+    )
+    testthat::expect_equivalent(nlt, nlt2)
 })

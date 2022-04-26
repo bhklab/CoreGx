@@ -67,7 +67,9 @@ NULL
     # delete row-/colKeys by reference
     for (a in assays) a[, (metaKeys) := NULL]
     # raw=TRUE allows direct modification of slots
+    setkeyv(rData, "rowKey")
     rowData(x, raw=TRUE) <- rData
+    setkeyv(cData, "colKey")
     colData(x, raw=TRUE) <- cData
     assays(x, raw=TRUE) <- assays
     mutableIntern <- mutable(getIntern(x))
