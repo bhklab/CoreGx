@@ -154,7 +154,6 @@ setMethod('subset', signature('LongTable'),
             rowDataSubset <- .rowData(x)[eval(i), ]
         } else if (.tryCatchNoWarn(is.character(i), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            i <- unique(i)
             idCols <- rowIDs(x, key=TRUE)
             if (max(unlist(lapply(i, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more rowID columns than
@@ -182,7 +181,6 @@ setMethod('subset', signature('LongTable'),
             colDataSubset <- .colData(x)[eval(j), ]
         } else if (.tryCatchNoWarn(is.character(j), error=function(e) FALSE, silent=TRUE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            j <- unique(j)
             idCols <- colIDs(x, key=TRUE)
             if (max(unlist(lapply(j, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more ID columns than there
@@ -254,7 +252,7 @@ setMethod('subset', signature('LongTable'),
 #' @noRd
 .preprocessRegexQuery <- function(queryString) {
     # Support vectors of regex queries
-    query <- paste0(queryString, collapse='|')
+    query <- paste0(unique(queryString), collapse='|')
     # Swap all * with .*
     query <- gsub('\\.\\*', '*', query)
     return(gsub('\\*', '.*', query))
