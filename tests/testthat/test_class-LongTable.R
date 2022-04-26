@@ -29,8 +29,8 @@ testthat::test_that("`assay<-LongTable-method` assignment does not corrupt data 
         nlt[[nm]] <- nlt[[nm]]
         testthat::expect_true(all.equal(nlt[[nm]], lt[[nm]]))
         testthat::expect_true(all.equal(assays(nlt, raw=TRUE)[[nm]], assays(lt, raw=TRUE)[[nm]]))
-        testthat::expect_true(all.equal(getIntern(nlt)$assayIndex, getIntern(lt)$assayIndex))
     }
+    testthat::expect_true(all.equal(getIntern(nlt)$assayIndex, getIntern(lt)$assayIndex))
 })
 
 testthat::test_that("`assay<-LongTable-method` allows non-id column updates", {
@@ -88,6 +88,9 @@ testthat::test_that("`CoreGx:::.subsetByIndex` is equivalent to subsetting the r
     aindex <- mutable(getIntern(lt, "assayIndex"))
     subindex <- aindex[rowKey %in% keepRows$rowKey, ]
     nlt <- CoreGx:::.subsetByIndex(lt, subindex)
+    testthat::expect_true(
+        !anyNA(assays(nlt, raw=TRUE)[["sensitivity"]]$sensitivity)
+    )
     assayByIndex <- nlt$sensitivity
     testthat::expect_true(all.equal(rawSubset, assayByIndex))
 })
@@ -121,7 +124,9 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
         ]
     )
     # check for NA values in the key column of the assay
-    testthat::expect_true(!anyNA(assays(nlt, raw=TRUE)[["sensitivity"]]))
+    testthat::expect_true(
+        !anyNA(assays(nlt, raw=TRUE)[["sensitivity"]]$sensitivity)
+    )
     nlt2 <- lt[
         .(drug1id %in% unique(drug1id)[1:5]),
         .(cellid %in% unique(cellid)[1:5])
@@ -142,7 +147,9 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
         ]
     )
     # check for NA values in the key column of the assay
-    testthat::expect_true(!anyNA(assays(nlt2, raw=TRUE)[["sensitivity"]]))
+    testthat::expect_true(
+        !anyNA(assays(nlt2, raw=TRUE)[["sensitivity"]]$sensitivity)
+    )
     testthat::expect_equivalent(nlt, nlt2)
 })
 
@@ -162,7 +169,7 @@ testthat::test_that("`subset,LongTable-method` works with regex queries", {
     )
     nlt2 <- lt[
         c("vemurafenib", "Vismodegib"),
-        c("UUC*", "SK-MEL-*")
+        c("UACC*", "SK-MEL-*")
     ]
     testthat::expect_s4_class(nlt2, "LongTable")
     testthat::expect_equal(

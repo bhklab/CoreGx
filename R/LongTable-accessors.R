@@ -624,6 +624,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     setkeyv(assayValue, i)
 
     # -- update the object
+    setcolorder(annotatedIndex, c("rowKey", "colKey"))
     mutable_intern$assayIndex <- annotatedIndex
     mutable_intern$assayKeys[[i]] <- assayKey
     x@.intern <- immutable(mutable_intern)
