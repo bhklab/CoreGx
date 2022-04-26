@@ -114,6 +114,14 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
         colData(nlt),
         colData(lt)[cellid %in% unique(cellid)[1:5]]
     )
+    testthat::expect_equal(
+        nlt[["sensitivity"]],
+        lt[["sensitivity"]][
+            drug1id %in% unique(drug1id)[1:5] & cellid %in% unique(cellid)[1:5],
+        ]
+    )
+    # check for NA values in the key column of the assay
+    testthat::expect_true(!anyNA(assays(nlt, raw=TRUE)[["sensitivity"]]))
     nlt2 <- lt[
         .(drug1id %in% unique(drug1id)[1:5]),
         .(cellid %in% unique(cellid)[1:5])
@@ -127,6 +135,14 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
         colData(nlt2),
         colData(lt)[cellid %in% unique(cellid)[1:5]]
     )
+    testthat::expect_equal(
+        assays(nlt2, raw=TRUE)$sensitivity,
+        assays(lt, raw=TRUE)$sensitivity[
+            drug1id %in% unique(drug1id)[1:5] & cellid %in% unique(cellid)[1:5],
+        ]
+    )
+    # check for NA values in the key column of the assay
+    testthat::expect_true(!anyNA(assays(nlt2, raw=TRUE)[["sensitivity"]]))
     testthat::expect_equivalent(nlt, nlt2)
 })
 
