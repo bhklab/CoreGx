@@ -80,3 +80,14 @@ testthat::test_that("`reindex,LongTable-method` does not corrupt data relationsh
         testthat::expect_true(all.equal(assayL1[[i]], assayL2[[i]]))
     }
 })
+
+testthat::test_that("`CoreGx:::.subsetByIndex` is equivalent to subsetting the raw data", {
+    keepRows <- rowData(lt, key=TRUE)[drug1id %in% drug1id[1:5], ]
+    fullAssay <- lt$sensitivity
+    rawSubset <- fullAssay[drug1id %in% keepRows$drug1id, ]
+    aindex <- mutable(getIntern(lt, "assayIndex"))
+    subindex <- aindex[rowKey %in% keepRows$rowKey, ]
+    nlt <- CoreGx:::.subsetByIndex(lt, subindex)
+    assayByIndex <- nlt$sensitivity
+    testthat::expect_true(all.equal(rawSubset, assayByIndex))
+})
