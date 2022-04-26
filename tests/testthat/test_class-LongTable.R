@@ -47,6 +47,7 @@ testthat::test_that("`assay<-LongTable-method` prevents id column updates", {
     assay_ <- nlt[["sensitivity"]]
     assay_[, drug1dose := rnorm(.N)]
     nlt[["sensitivity"]] <- assay_
+    testthat::expect_true(all.equal(nlt$sensitivity, lt$sensitivity))
 })
 
 # ==== LongTable-utils.R
@@ -117,12 +118,6 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
         colData(nlt),
         colData(lt)[cellid %in% unique(cellid)[1:5]]
     )
-    testthat::expect_equal(
-        nlt[["sensitivity"]],
-        lt[["sensitivity"]][
-            drug1id %in% unique(drug1id)[1:5] & cellid %in% unique(cellid)[1:5],
-        ]
-    )
     # check for NA values in the key column of the assay
     testthat::expect_true(
         !anyNA(assays(nlt, raw=TRUE)[["sensitivity"]]$sensitivity)
@@ -140,12 +135,6 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
         colData(nlt2),
         colData(lt)[cellid %in% unique(cellid)[1:5]]
     )
-    testthat::expect_equal(
-        assays(nlt2, raw=TRUE)$sensitivity,
-        assays(lt, raw=TRUE)$sensitivity[
-            drug1id %in% unique(drug1id)[1:5] & cellid %in% unique(cellid)[1:5],
-        ]
-    )
     # check for NA values in the key column of the assay
     testthat::expect_true(
         !anyNA(assays(nlt2, raw=TRUE)[["sensitivity"]]$sensitivity)
@@ -161,11 +150,11 @@ testthat::test_that("`subset,LongTable-method` works with regex queries", {
     testthat::expect_s4_class(nlt, "LongTable")
     testthat::expect_equal(
         rowData(nlt),
-        rowData(lt)[drug1id %in% unique(drug1id)[1:5]]
+        rowData(lt)[grepl("vemurafenib|Vismodegib", rownames(lt)), ]
     )
     testthat::expect_equal(
         colData(nlt),
-        colData(lt)[cellid %in% unique(cellid)[1:5]]
+        colData(lt)[grepl("UACC*|SK-MEL-*", colnames(lt)), ]
     )
     nlt2 <- lt[
         c("vemurafenib", "Vismodegib"),
@@ -174,11 +163,11 @@ testthat::test_that("`subset,LongTable-method` works with regex queries", {
     testthat::expect_s4_class(nlt2, "LongTable")
     testthat::expect_equal(
         rowData(nlt2),
-        rowData(lt)[drug1id %in% unique(drug1id)[1:5]]
+        rowData(lt)[grepl("vemurafenib|Vismodegib", rownames(lt)), ]
     )
     testthat::expect_equal(
         colData(nlt2),
-        colData(lt)[grepl()]
+        colData(lt)[grepl("UACC*|SK-MEL-*", colnames(lt)), ]
     )
     testthat::expect_equivalent(nlt, nlt2)
 })
