@@ -119,10 +119,11 @@ NULL
 #' @param assays `character`, `numeric` or `logical` Optional list of assay
 #'   names to subset. Can be used to subset the assays list further,
 #'   returning only the selected items in the new LongTable.
-#' @param reindex `logical` Should the col/rowKeys be remapped after subsetting.
-#'   defaults to TRUE. For chained subsetting you may be able to get performance
-#'   gains by setting to FALSE and calling reindex() manually after subsetting
-#'   is finished.
+#' @param reindex `logical(1)` Should index values be reset such that they
+#'   are the smallest possible set of consecutive integers. Modifies the
+#'   "rowKey", "colKey", and all assayKey columns. Initial benchmarks indicate
+#'   `reindex=FALSE` saves ~20% of both execution time and memory allocation. The
+#'   cost of reindexing decreases the smaller your subet gets.
 #'
 #' @return `LongTable` A new `LongTable` object subset based on the specified
 #'      parameters.
@@ -131,12 +132,60 @@ NULL
 #' @importFrom crayon magenta cyan
 #' @import data.table
 #' @export
-setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TRUE) {
+setMethod('subset', signature('LongTable'),
+        function(x, i, j, assays=assayNames(x),
+            reindex=TRUE) {
 
-    if (is.call(i)) {
-        rowIdx <- copy(rowData(x, raw=TRUE))[eval(i), rowKey]
-    } else if (is.character(i)) {}
+    # -- prevent modify by reference
+    x <- copy(x)
+
+    # -- find matching rows
+    ## FIXME:: invalid names are ignored silently!
+    if (missing(i)) i <- quote(1:.N)
+    if (is.character(i)) {
+        imatch <- rownames(x) %in% i
+        if (!any(imatch)) imatch <- grepl(.preprocessRegexQuery(i), rownames(x))
+        if (!any(imatch))
+            stop(.errorMsg("No rownames(x) matched the specified `i` value!"),
+                call.=FALSE)
+        i <- imatch
+    }
+    if (is.logical(i)) i <- which(i)
+    if (is.call(i)) i <- substitute(i)
+    rows <- rowData(x, key=TRUE)[eval(i), rowKey]
+
+    # -- find matching columns
+    if (missing(j)) j <- quote(1:.N)
+    if (is.character(j)) {
+        jmatch <- rownames(x) %in% j
+        if (!any(jmatch)) jmatch <- grepl(.preprocessRegexQuery(j), colnames(x))
+        if (!any(jmatch))
+            stop(.errorMsg("No colnames(x) matched the specified `j` value!"),
+                call.=FALSE)
+        j <- jmatch
+    }
+    if (is.logical(j)) j <- which(j)
+    if (is.call(j)) j <- substitute(j)
+    cols <- colData(x, key=TRUE)[eval(j), colKey]
+
+    # -- find matching assays
+    validAssays <- assays %in% assayNames(x)
+    if (any(!validAssays))
+        warning(.warnMsg(assays[!validAssays],
+            " are not valid assay names, ignoring..."), call.=FALSE)
+    keepAssays <- assayNames(x) %in% assays
+
+    # -- subset index, then use index to subset x
+    idx <- mutable(getIntern(x, "assayIndex"))[
+        rowKey %in% rows & colKey %in% cols,
+        .SD,
+        .SDcols=c("rowKey", "colKey", assayNames(x)[keepAssays])
+    ]
+    assays(x, raw=TRUE)[!keepAssays] <- NULL  # delete assays being dropped
+
+    return(.subsetByIndex(x, idx, reindex=reindex))
 })
+
 
 
 #' Convenience function for converting R code to a call
@@ -282,8 +331,8 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #'
 #' @export
 setMethod('[', signature('LongTable'),
-        function(x, i, j, assays, ..., drop=FALSE) {
-    subset(x, i, j, assays)
+        function(x, i, j, assays=assayNames(x), ..., drop=FALSE) {
+    subset(x, i, j, assays=assays, ...)
 })
 
 
@@ -441,12 +490,12 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     # -- update rowKey and colKey in the asssayIndex, if they have changed
     if (rData[, any(rowKey != .rowKey)]) {
         index[rData, rowKey := .rowKey]
-        rData[, let(rowKey=.rowKey)]
+        rData[, rowKey := .rowKey]
         setkeyv(rData, "rowKey")
     }
     if (cData[, any(colKey != .colKey)]) {
         index[cData, colKey := .colKey]
-        cData[, let(colKey=.colKey)]
+        cData[, colKey := .colKey]
         setkeyv(cData, "colKey")
     }
     rData[, .rowKey := NULL]

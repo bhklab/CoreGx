@@ -4,7 +4,7 @@
 \alias{subset,LongTable-method}
 \title{Subset method for a LongTable object.}
 \usage{
-\S4method{subset}{LongTable}(x, i, j, assays, reindex = TRUE)
+\S4method{subset}{LongTable}(x, i, j, assays = assayNames(x), reindex = TRUE)
 }
 \arguments{
 \item{x}{\code{LongTable} The object to subset.}
@@ -31,10 +31,11 @@ for the \code{colData} data.table.}
 names to subset. Can be used to subset the assays list further,
 returning only the selected items in the new LongTable.}
 
-\item{reindex}{\code{logical} Should the col/rowKeys be remapped after subsetting.
-defaults to TRUE. For chained subsetting you may be able to get performance
-gains by setting to FALSE and calling reindex() manually after subsetting
-is finished.}
+\item{reindex}{\code{logical(1)} Should index values be reset such that they
+are the smallest possible set of consecutive integers. Modifies the
+"rowKey", "colKey", and all assayKey columns. Initial benchmarks indicate
+\code{reindex=FALSE} saves ~20\% of both execution time and memory allocation. The
+cost of reindexing decreases the smaller your subet gets.}
 }
 \value{
 \code{LongTable} A new \code{LongTable} object subset based on the specified
