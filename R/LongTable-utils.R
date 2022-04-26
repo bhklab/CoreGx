@@ -60,7 +60,9 @@ NULL
         aname <- names(assays)[i]
         # join based subsets use binary-search, O(log(n)) vs O(n) for vector-scan
         # see https://rdatatable.gitlab.io/data.table/articles/datatable-keys-fast-subset.html
-        assays[[i]] <- assays[[i]][index[, c(metaKeys, aname), with=FALSE], ]
+        assays[[i]] <- assays[[i]][
+            index[!is.na(get(aname)), c(metaKeys, aname), with=FALSE],
+        ]
         setkeyv(assays[[i]], aname)
     }
     # -- update object
