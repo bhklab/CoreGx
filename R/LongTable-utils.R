@@ -73,6 +73,7 @@ NULL
     colData(x, raw=TRUE) <- cData
     assays(x, raw=TRUE) <- assays
     mutableIntern <- mutable(getIntern(x))
+    setkeyv(index, names(assays))
     mutableIntern$assayIndex <- index
     x@.intern <- immutable(mutableIntern)
 
