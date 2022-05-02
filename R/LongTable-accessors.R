@@ -616,6 +616,26 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     annotatedIndex[, (assayKey) := NULL]
     setkeyv(annotatedIndex, unique(c(assayNames(x), i)))
 
+    # -- detect and warn users if they have modified id columns
+    equalRowIDs <- all.equal(
+        unique(value[, rowIDs(x), with=FALSE]),
+        rowIDs(x, data=TRUE)
+    )
+    equalColIDs <- all.equal(
+        unique(value[, colIDs(x), with=FALSE]),
+        colIDs(x, data=TRUE)
+    )
+    if (!isTRUE(equalRowIDs))
+        stop(.errorMsg("One or more rowIDs(x) columns have been modified.",
+                " Identifier columns cannot be modified via assay assignment!"),
+            call.=FALSE
+        )
+    if (!isTRUE(equalColIDs))
+        stop(.errorMsg("One or more colIDs(x) column have been modified.",
+                " Identifier columns cannot be modified via assay assignment!"),
+            call.=FALSE
+        )
+
     # -- remove metadata columns for the assay
     ## TODO:: Do we want to allow mutating rowData and colData via assay method?
     throwAwayCols <- c(idCols(x), rowMeta(x), colMeta(x))
