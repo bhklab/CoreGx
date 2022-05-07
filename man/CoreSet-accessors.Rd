@@ -16,20 +16,24 @@
 \alias{name<-,CoreSet-method}
 \alias{name<-,CoreSet,character-method}
 \alias{name<-}
+\alias{sampleInfo,CoreSet-method}
+\alias{sampleInfo}
 \alias{cellInfo,CoreSet-method}
 \alias{cellInfo}
-\alias{sampleInfo}
+\alias{sampleInfo<-,CoreSet,data.frame-method}
+\alias{sampleInfo<-}
 \alias{cellInfo<-,CoreSet,data.frame-method}
 \alias{cellInfo<-}
-\alias{sampleInfo<-}
-\alias{cellNames,CoreSet-method}
+\alias{sampleNames,CoreSet-method}
+\alias{sampleName,CoreSet-method}
+\alias{sampleNames}
 \alias{cellName,CoreSet-method}
 \alias{cellNames}
-\alias{sampleNames}
-\alias{cellNames<-,CoreSet,character-method}
+\alias{sampleNames<-,CoreSet,character-method}
+\alias{sampleNames<-,CoreSet,list-method}
+\alias{sampleNames<-}
 \alias{cellNames<-,CoreSet,list-method}
 \alias{cellNames<-}
-\alias{sampleNames<-}
 \alias{treatmentInfo,CoreSet-method}
 \alias{treatmentInfo}
 \alias{treatmentInfo<-,CoreSet,data.frame-method}
@@ -91,7 +95,7 @@
 \alias{sensitivityRaw<-,CoreSet,array-method}
 \alias{sensitivitySlot,CoreSet-method}
 \alias{sensitivitySlot}
-\alias{sensitivitySlot<-,CoreSet,list_or_LongTable-method}
+\alias{sensitivitySlot<-,CoreSet,list_OR_LongTable-method}
 \alias{sensitivitySlot<-}
 \alias{sensitivitySlot<-,CoreSet,list-method}
 \alias{sensitivitySlot<-,CoreSet,LongTable-method}
@@ -117,13 +121,13 @@
 
 \S4method{name}{CoreSet}(object) <- value
 
-\S4method{cellInfo}{CoreSet}(object)
+\S4method{sampleInfo}{CoreSet}(object)
 
-\S4method{cellInfo}{CoreSet,data.frame}(object) <- value
+\S4method{sampleInfo}{CoreSet,data.frame}(object) <- value
 
-\S4method{cellNames}{CoreSet}(object)
+\S4method{sampleNames}{CoreSet}(object)
 
-\S4method{cellNames}{CoreSet,character}(object) <- value
+\S4method{sampleNames}{CoreSet,character}(object) <- value
 
 \S4method{treatmentInfo}{CoreSet}(object)
 
@@ -183,7 +187,7 @@
 
 \S4method{sensitivitySlot}{CoreSet}(object)
 
-\S4method{sensitivitySlot}{CoreSet,list_or_LongTable}(object) <- value
+\S4method{sensitivitySlot}{CoreSet,list_OR_LongTable}(object) <- value
 
 \S4method{sensNumber}{CoreSet}(object)
 
@@ -251,20 +255,23 @@ the \verb{@annotation} slot.
 \item value: \code{character(1)} The name of the \code{CoreSet} object.
 }
 
-\strong{cellInfo}: \code{data.frame} Metadata for all cell-lines in a \code{CoreSet} object.
+\strong{cellInfo}: \code{data.frame} Metadata for all sample in a \code{CoreSet} object.
 
-\strong{cellInfo<-}: assign updated cell-line annotations to the \code{CoreSet} object. Arguments:
+\strong{sampleInfo<-}: assign updated sample annotations to the \code{CoreSet}
+object.
+Arguments:
 \itemize{
 \item value: a \code{data.frame} object.
 }
 
-\strong{cellNames}: \code{character} Retrieve the rownames of the \code{data.frame} in
-the \code{cell} slot from a CoreSet object.
+\strong{sampleNames}: \code{character} Retrieve the rownames of the \code{data.frame} in
+the \code{sample} slot from a CoreSet object.
 
-\strong{cellNames<-}: assign new rownames to the cellInfo slot \code{data.frame} for
-a CoreSet object. Arguments:
+\strong{sampleNames<-}: assign new rownames to the sampleInfo \code{data.frame} for
+a CoreSet object.
+Arguments:
 \itemize{
-\item value: \code{character} vector of rownames for the \code{cellInfo(object)} \code{data.frame}.
+\item value: \code{character} vector of rownames for the \code{sampleInfo(object)} \code{data.frame}.
 }
 
 \strong{treatmentInfo}: \code{data.frame} Metadata for all treatments in a \code{CoreSet}
@@ -296,7 +303,7 @@ object. Arguments:
 \subsection{@curation}{
 
 \strong{curation}: A \code{list} of curated mappings between identifiers in the
-CoreSet object and the original data publication. Contains two \code{data.frame}s, 'cell' with cell-line ids and
+CoreSet object and the original data publication. Contains two \code{data.frame}s, 'sample' with sample ids and
 'tissue' with tissue ids.
 }
 
@@ -304,7 +311,7 @@ CoreSet object and the original data publication. Contains two \code{data.frame}
 \itemize{
 \item value: A \code{list} of \code{data.frame}s, one for each type of curated
 identifier. For a \code{CoreSet} object the slot should contain tissue and
-cell-line id \code{data.frame}s.
+sample id \code{data.frame}s.
 }
 
 \subsection{datasetType slot}{
@@ -412,13 +419,13 @@ slot of a \code{CoreSet} object. Arguemnts:
 \code{SummarizedExperiment}.
 }
 
-\subsection{@sensitivity}{
+\subsection{@treatmentResponse}{
 \subsection{Arguments:}{
 \itemize{
-\item \code{dimension}: Optional \code{character(1)} One of 'drug', 'cell' or 'assay' to
-retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from the
-\code{CoreSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
-warning if \verb{@sensitivity} is not a \code{LongTable} object.
+\item \code{dimension}: Optional \code{character(1)} One of 'treatment', 'sample' or
+'assay' to retrieve \code{rowData}, \code{colData} or the 'assay_metadata' assay from
+the \code{CoreSet} \verb{@sensitvity} \code{LongTable} object, respectively. Ignored with
+warning if \verb{@treatmentResponse} is not a \code{LongTable} object.
 \item \code{...}: Additional arguments to the \code{rowData} or \code{colData}.
 \code{LongTable} methods. Only used if the sensitivity slot contains a
 \code{LongTable} object instead of a \code{list} and the \code{dimension} argument is
@@ -429,32 +436,32 @@ specified.
 \subsection{Methods:}{
 
 \strong{sensitivityInfo}: \code{DataFrame} or \code{data.frame} of sensitivity drug combo
-by cell-line metadata for the \code{CoreSet} object. When the \code{dimension}
+by sample metadata for the \code{CoreSet} object. When the \code{dimension}
 parameter is used, it allows retrieval of the dimension specific metadata
-from the \code{LongTable} object in \verb{@sensitivity} of a CoreSet object.
+from the \code{LongTable} object in \verb{@treatmentResponse} of a CoreSet object.
 }
 
 }
 
-\strong{sensitivityInfo}<-: Update the \verb{@sensitivity} slot metadata for a
+\strong{sensitivityInfo}<-: Update the \verb{@treatmentResponse} slot metadata for a
 \code{CoreSet} object. When used without the \code{dimension} argument is behaves
-similar to the old CoreSet implementation, where the \verb{@sensitivity} slot
+similar to the old CoreSet implementation, where the \verb{@treatmentResponse} slot
 contained a list with a \verb{$info} \code{data.frame} item. When the \code{dimension}
-arugment is used, more complicated assignments can occur where 'cell'
+arugment is used, more complicated assignments can occur where 'sample'
 modifies the \verb{@sensitvity} \code{LongTable} colData, 'drug' the rowData and
 'assay' the 'assay_metadata' assay.
 Arguments:
 \itemize{
 \item value: A \code{data.frame} of treatment response experiment metadata,
-documenting experiment level metadata (mapping to drugs and cells). If
-the \verb{@sensitivity} slot doesn't contain a \code{LongTable} and \code{dimension} is
+documenting experiment level metadata (mapping to drugs and samples). If
+the \verb{@treatmentResponse} slot doesn't contain a \code{LongTable} and \code{dimension} is
 not specified, you can only modify existing columns as returned by
 \code{sensitivityInfo(object)}.
 }
 
 \strong{sensitivityMeaures}: Get the 'sensitivityMeasures' available in a \code{CoreSet}
-object. Each measure reprents some summary of cell-line sensitivity to a given
-dryuh, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
+object. Each measure reprents some summary of sample sensitivity to a given
+drug, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
 \code{character} vector with all available metrics for the PSet object.
 
 \strong{sensitivityMeaures}: Update the sensitivity meaure in a \code{CoreSet}
@@ -481,7 +488,7 @@ computation of additional summary metrics.
 \strong{sensitivityRaw}: Access the raw sensitiity measurents for a CoreSet
 object. A 3D \code{array} where rows are experiment_ids, columns are doses
 and the third dimension is metric, either 'Dose' for the doses used or
-'Viability' for the cell-line viability at that dose.
+'Viability' for the sample viability at that dose.
 
 \strong{sensitvityRaw<-}: Update the raw dose and viability data in a \code{CoreSet}.
 \itemize{
@@ -491,26 +498,26 @@ dose or viability measurement for that experiment_id and replicate.
 }
 
 \strong{sensNumber}: Return a count of viability observations in a \code{CoreSet}
-object for each drug-combo by cell-line combination.
+object for each drug-combo by sample combination.
 
 \strong{sensNumber<-}: Update the 'n' item, which holds a matrix with a count
-of drug by cell-line experiment counts, in the \code{list} in \verb{@sensitivity}
+of drug by sample-line experiment counts, in the \code{list} in \verb{@treatmentResponse}
 slot of a \code{CoreSet} object. Will error when \verb{@sensitviity} contains
 a \code{LongTable} object, since the counts are computed on the fly. Arguments:
 \itemize{
-\item value: A \code{matrix} where rows are cells and columns are drugs, with a
+\item value: A \code{matrix} where rows are samples and columns are drugs, with a
 count of the number of experiments for each combination as the values.
 }
 
 \strong{pertNumber}: \code{array} Summary of available perturbation experiments
 from in a \code{CoreSet} object. Returns a 3D \code{array} with the number of
-perturbation experiments per drug and cell line, and data type.
+perturbation experiments per drug and sample, and data type.
 
 \strong{pertNumber<-}: Update the \verb{@perturbation$n} value in a \code{CoreSet} object,
 which stores a summary of the available perturbation experiments. Arguments:
 \itemize{
 \item value: A new 3D \code{array} with the number of perturbation experiments per
-drug and cell line, and data type
+drug and sample, and data type
 }
 }
 \examples{
@@ -531,11 +538,11 @@ name(clevelandSmall_cSet)
 
 name(clevelandSmall_cSet) <- 'new_name'
 
-cellInfo(clevelandSmall_cSet) <- cellInfo(clevelandSmall_cSet)
+sampleInfo(clevelandSmall_cSet) <- sampleInfo(clevelandSmall_cSet)
 
-cellNames(clevelandSmall_cSet)
+sampleNames(clevelandSmall_cSet)
 
-cellNames(clevelandSmall_cSet) <- cellNames(clevelandSmall_cSet)
+sampleNames(clevelandSmall_cSet) <- sampleNames(clevelandSmall_cSet)
 
 treatmentInfo(clevelandSmall_cSet)
 

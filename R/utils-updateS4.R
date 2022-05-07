@@ -7,13 +7,14 @@
 #' fails or corrupts your data. You can then modify the `DataMapper` as
 #' necessary to fix the sensititivity data.
 #'
-#' @return A `LongTable` constructed from `object@sensitivty`, or a
+#' @return A `LongTable` constructed from `object@treatmentResponse`, or a
 #' `LongTableDataMapper` if `mapper`=TRUE.
 #'
 #' @keywords internal
+#' @noRd
 #' @importFrom data.table data.table as.data.table merge.data.table
 #' melt.data.table
-.sensitivityToLongTable <- function(object, mapper=FALSE) {
+.sensitivityToTRE <- function(object, mapper=FALSE) {
 
     # -- validate input
     funContext <- .funContext(':::.sensitivitySlotToLongTable')
@@ -52,9 +53,7 @@
 
     rawdataDT <- merge.data.table(assayDT, profDT, by='rn')
     rawdataDT <- merge.data.table(rawdataDT, infoDT, by='rn')
-    # Find any hidden replicates, order to maintain ordinality of dose replicates
-    setorderv(rawdataDT, cols=rowCols[2])
-    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols[1], colCols)]
+    rawdataDT[, replicate_id := seq_len(.N), by=c(rowCols, colCols)]
 
     if (max(rawdataDT$replicate_id) > 1) {
         # Handle case where there is only 1 drug (i.e., radiation in RadioGx)
@@ -72,6 +71,10 @@
         colDataMap=colCols,
         assayMap=c(rowCols, colCols)
     )
+
+    # -- capute the na rownames to make recreation easier in .rebuildInfo
+    missing_rows <- setdiff(infoDT$rn, rawdataDT$rn)
+    na_index <- infoDT[rn %in% missing_rows, .(rn, drugid, cellid)]
 
     # -- build a LongTableDataMapper object
     TREdataMapper <- TREDataMapper(rawdata=rawdataDT)
@@ -94,7 +97,40 @@
     assayMap(TREdataMapper) <- assayMap
     metadataMap(TREdataMapper) <-
         list(experiment_metadata=guess$metadata$mapped_columns)
+    metadata(TREdataMapper) <- list(sensitivityInfo_NA=na_index)
 
     # build the object
     return(if (!mapper) metaConstruct(TREdataMapper) else TREdataMapper)
+}
+
+
+#' Compare the valus of sensitivityInfo before and after use of
+#' .sensitivityToTRE
+#'
+#' @param object `CoreSet` to be updated to the new
+#' `TreatmentResponseExperiment` sensitivity format.
+#'
+#' @return None, displays results of `all.equal` on the sensitivityInfo for
+#'   the columns which should be conserved.
+#'
+#' @keywords internal
+#' @noRd
+#' @importFrom data.table data.table as.data.table merge.data.table
+#' melt.data.table
+.compareSensitivityInfo <- function(object) {
+    new_object <- copy(object)
+    tre <- .sensitivityToTRE(object)
+    new_object@treatmentResponse <- tre
+
+    si <- copy(sensitivityInfo(object))
+    nsi <- copy(sensitivityInfo(new_object))
+
+    setDT(si, keep.rownames="rownames")
+    setDT(nsi, keep.rownames="rownames")
+
+    equal_columns <- setdiff(colnames(si), "rownames")
+    all.equal(
+        si[order(drugid, cellid), .SD, .SDcols=equal_columns],
+        nsi[order(drugid, cellid), .SD, .SDcols=equal_columns]
+    )
 }

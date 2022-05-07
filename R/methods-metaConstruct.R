@@ -30,10 +30,10 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 #'
 #' @examples
 #' data(exampleDataMapper)
-#' rowDataMap(exampleDataMapper) <- list(c('drug_id'), c())
-#' colDataMap(exampleDataMapper) <- list(c('cell_id'), c())
+#' rowDataMap(exampleDataMapper) <- list(c('treatmentid'), c())
+#' colDataMap(exampleDataMapper) <- list(c('sampleid'), c())
 #' assayMap(exampleDataMapper) <- list(sensitivity=c('viability'))
-#' metadataMap(exampleDataMapper) <- list(study_metadata=c('metadata'))
+#' metadataMap(exampleDataMapper) <- list(experiment_metadata=c('metadata'))
 #' longTable <- metaConstruct(exampleDataMapper)
 #' longTable
 #'

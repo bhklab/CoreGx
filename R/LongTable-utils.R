@@ -99,10 +99,10 @@ NULL
 #' # Numeric
 #' subset(merckLongTable, 1, c(1, 2))
 #' # Logical
-#' subset(merckLongTable, , colData(merckLongTable)$cellid == 'A2058')
+#' subset(merckLongTable, , colData(merckLongTable)$sampleid == 'A2058')
 #' # Call
 #' subset(merckLongTable, drug1id == 'Dasatinib' & drug2id != '5-FU',
-#'     cellid == 'A2058')
+#'     sampleid == 'A2058')
 #'
 #' @param x `LongTable` The object to subset.
 #' @param i `character`, `numeric`, `logical` or `expression`
@@ -236,7 +236,7 @@ setMethod('subset', signature('LongTable'),
 #'   `[`, where they will be evaluated in the correct context.
 #'
 #' @examples
-#' .(cell_line1 == 'A2058')
+#' .(sample_line1 == 'A2058')
 #'
 #' @param ... `pairlist` One or more R expressions to convert to calls.
 #'
@@ -333,11 +333,11 @@ setMethod('subset', signature('LongTable'),
 #' # Numeric
 #' merckLongTable[1, c(1, 2)]
 #' # Logical
-#' merckLongTable[, colData(merckLongTable)$cellid == 'A2058']
+#' merckLongTable[, colData(merckLongTable)$sampleid == 'A2058']
 #' # Call
 #' merckLongTable[
 #'      .(drug1id == 'Dasatinib' & drug2id != '5-FU'),
-#'      .(cellid == 'A2058'),
+#'      .(sampleid == 'A2058'),
 #'  ]
 #'
 #' @param x `LongTable` The object to subset.
@@ -483,7 +483,7 @@ setMethod('$', signature('LongTable'), function(x, name) {
 #' @param name `character(1)` The name of the assay to update
 #' @param value A `data.frame` or `data.table` to update the assay with.
 #'
-#' @return Updates the assay `name` in `x` with `value`, returning an invsible
+#' @return Updates the assay `name` in `x` with `value`, returning an invisible
 #' NULL.
 #'
 #' @export

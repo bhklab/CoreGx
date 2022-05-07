@@ -73,7 +73,7 @@ data(clevelandSmall_cSet)
 ## subset methods
 
 ### subsetBySample
-samples <- cellInfo(clevelandSmall_cSet)$cellid[seq_len(10)]
+samples <- sampleInfo(clevelandSmall_cSet)$sampleid[seq_len(10)]
 clevelandSmall_cSet_sub <- subsetBySample(clevelandSmall_cSet, samples)
 
 

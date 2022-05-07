@@ -16,7 +16,7 @@ setGeneric("summarizeSensitivityProfiles",
 
 
 #' Summarize molecular profile data such that there is a single entry for each
-#'   cell line/treatment combination
+#'   sample line/treatment combination
 #'
 #' @examples
 #' print("Generics shouldn't need examples?")

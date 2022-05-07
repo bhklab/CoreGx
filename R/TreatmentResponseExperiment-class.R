@@ -1,4 +1,5 @@
 #' @include LongTable-class.R
+#' @noRd
 NULL
 
 #' @title TreatmentResponseExperiment class definition
@@ -110,7 +111,8 @@ TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
         rowData=LT@rowData,
         colData=LT@colData,
         assays=LT@assays,
-        .intern=LT@.intern
+        .intern=LT@.intern,
+        metadata=LT@metadata
     )
 }
 

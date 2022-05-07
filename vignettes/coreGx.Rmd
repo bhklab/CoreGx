@@ -1,12 +1,12 @@
 ---
 title: "CoreGx: Class and Function Abstractions for PharmacoGx, RadioGx and ToxicoGx"
 
-author: 
+author:
 - name: Petr Smirnov
 - name: Ian Smith
 - name: Christopher Eeles
 - name: Benjamin Haibe-Kains
-  
+
 output: BiocStyle::html_document
 
 vignette: |
@@ -20,10 +20,10 @@ library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This package provides a foundation for the PharmacoGx, RadioGx and ToxicoGx 
-packages. It is not intended for standalone use, only as a dependency for the 
+This package provides a foundation for the PharmacoGx, RadioGx and ToxicoGx
+packages. It is not intended for standalone use, only as a dependency for the
 aforementioned software. Its existence allows abstracting generic definitions,
-method definitions and class structures common to all three of the Gx suite 
+method definitions and class structures common to all three of the Gx suite
 packages.
 
 ## Importing and Using CoreGx
@@ -39,7 +39,7 @@ library(SummarizedExperiment)
 ## The CoreSet Class
 
 The CoreSet class is intended as a general purpose data structure for storing
-multiomic treatment response data. Extensions of this class have been 
+multiomic treatment response data. Extensions of this class have been
 customized for their respective fields of study. For example, the PharmacoSet
 class inherits from the CoreSet and is specialized for storing and analyzing
 drug sensitivity and perturbation experiments on cancer cell lines together with
@@ -55,7 +55,7 @@ getClass("CoreSet")
 
 The `annotation` slot holds the CoreSet name, the original constructor call, and
 a range of metadata about the R session in which the constructor was called.
-This allows easy comparison of CoreSet versions across time and ensures the 
+This allows easy comparison of CoreSet versions across time and ensures the
 code used to generate a CoreSet is documented and reproducible.
 
 The `molecularProfiles` slot contains a list of `SummarizedExperiment` objects
@@ -63,8 +63,11 @@ for each multi-omic molecular datatype available for a given experiment. Within
 the `SummarizedExperiments` are feature and sample annotations for each data
 type.
 
-The `cell` slot contains a `data.frame` with annotations for cell lines used in
-the sensitivty and/or perturbation slots.
+The `sample` slot contains a `data.frame` with annotations for samples used in
+the molecularProfiles or sensitivity slot.
+
+The `treatment` slot contains a `data.frame` for treatments used in the the
+molecularProfiles or sensitivity slot.
 
 The `datasetType` slot contains a character vector indicating the experiment
 type the `CoreSet` contains.
@@ -107,7 +110,7 @@ mProf[seq_len(5), seq_len(5)]
 Access cell-line metadata:
 
 ```{r cSet_accessor_demo1}
-cInfo <- cellInfo(clevelandSmall_cSet)
+cInfo <- sampleInfo(clevelandSmall_cSet)
 cInfo[seq_len(5), seq_len(5)]
 ```
 
@@ -118,7 +121,7 @@ sensProf <- sensitivityProfiles(clevelandSmall_cSet)
 sensProf[seq_len(5), seq_len(5)]
 ```
 
-For more information about the accessor methods available for the `CoreSet` 
+For more information about the accessor methods available for the `CoreSet`
 class please see the `class?CoreSet` help page.
 
 ## Extending the CoreSet Class
@@ -127,7 +130,7 @@ Given that the CoreSet class is intended for extension, we will show some
 examples of how to define a new class based on it and implement new methods
 for the generics provided for the CoreSet class.
 
-Here we will define a new class, the `DemoSet`, with an additional slot, the 
+Here we will define a new class, the `DemoSet`, with an additional slot, the
 `demoSlot`. We will then view the available methods for this class as well as
 define new S4 methods on it.
 
@@ -150,7 +153,7 @@ methods(class="DemoSet")
 We see that all the accessors defined for the `CoreSet` are also defined for the
 inheriting `DemoSet`. These methods all assume the inherit slots have the same
 structure as the `CoreSet`. If this is not true, for example, if molecularProfiles
-holds `ExpressionSets` instead of `SummarizedExperiments`, we can redefine 
+holds `ExpressionSets` instead of `SummarizedExperiments`, we can redefine
 existing methods as follows:
 
 ```{r defining_methods_for_a_new_class}
@@ -161,19 +164,19 @@ expressionSets <- lapply(molecularProfilesSlot(clevelandSmall_dSet), as, 'Expres
 molecularProfilesSlot(clevelandSmall_dSet) <- expressionSets
 
 # Now this will error
-tryCatch({molecularProfiles(clevelandSmall_dSet, 'rna')}, 
-         error=function(e) 
+tryCatch({molecularProfiles(clevelandSmall_dSet, 'rna')},
+         error=function(e)
              print(paste("Error: ", e$message)))
 ```
 
-Since we changed the data in the `molecularProfiles` slot of the `DemoSet`, 
+Since we changed the data in the `molecularProfiles` slot of the `DemoSet`,
 the original method from `CoreGx` no longer works. Thus we get an error when
 trying to access that slot. To fix this we will need to set a new S4 method
 for the molecularProfiles generic function defined in `CoreGx`.
 
 ```{r redefine_the_method}
-setMethod(molecularProfiles, 
-          signature("DemoSet"), 
+setMethod(molecularProfiles,
+          signature("DemoSet"),
           function(object, mDataType) {
             pData(object@molecularProfiles[[mDataType]])
           })
@@ -204,7 +207,7 @@ the 'DemoSet' class to retrieve data in the slot.
 setGeneric('demoSlot<-', function(object, value) standardGeneric('demoSlot<-'))
 
 # Define a setter method
-setReplaceMethod('demoSlot', 
+setReplaceMethod('demoSlot',
                  signature(object='DemoSet', value="character"),
                  function(object, value) {
                    object@demoSlot <- value
@@ -233,7 +236,7 @@ demoSlot(clevelandSmall_dSet)
 Now you should have all the knowledge you need to extend the CoreSet class
 for use in other treatment-response experiments!
 
-For more information about this package and the possibility of collaborating on 
+For more information about this package and the possibility of collaborating on
 its extension please contact benjamin.haibe.kains@utoronto.ca.
 
 # sessionInfo
