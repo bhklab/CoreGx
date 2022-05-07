@@ -62,7 +62,42 @@ testthat::text_that("`assay<-LongTable-method` allows simple summary assignments
         ),
         by=.(drug1id, drug2id, cellid)
     ]
+    testthat::expect_silent(nlt$sens_sum <- sens_sum)
+    testthat::expect_true(all.equal(
+        rowIDs(lt, data=TRUE),
+        unique(nlt$sens_sum[, rowIDs(nlt), with=FALSE]),
+        check.attributes=FALSE
+    ))
+    testthat::expect_true(all.equal(
+        colIDs(lt, data=TRUE),
+        unique(nlt$sens_sum[, colIDs(nlt), with=FALSE]),
+        check.attributes=FALSE
+    ))
 })
+
+testthat::test_that("`assay<-LongTable-method` summary assignment doesn't break referential integrity", {
+    nlt <- copy(lt)
+    sens <- nlt$sensitivity
+    sens_sum <- sens[,
+        .(
+            mean_drug1dose=mean(drug1dose, na.rm=TRUE),
+            mean_drug2dose=mean(drug2dose, na.rm=TRUE),
+            mean_viability=mean(viability, na.rm=TRUE)
+        ),
+        by=.(drug1id, drug2id, cellid)
+    ]
+    testthat::expect_silent(nlt$sens_sum <- sens_sum)
+    testthat::expect_true(all.equal(rowData(lt), rowData(nlt)))
+    testthat::expect_true(all.equal(colData(lt), colData(nlt)))
+    non_summary_assays <- setdiff(assayNames(nlt), "sens_sum")
+    for (aname in non_summary_assays) {
+        testthat::expect_true(all.equal(
+            lt[[aname]],
+            nlt[[aname]]
+        ))
+    }
+})
+
 
 
 
