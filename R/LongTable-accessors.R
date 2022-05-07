@@ -623,8 +623,9 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
         "value! Cannot summarize over an entire dimension."), call.=FALSE)
     ## set check.attributes=FALSE to allow unequal table keys
     equalRowIDs <- all.equal(
-        unique(value[, presentRowIDs, with=FALSE]),
-        unique(rowIDs(x, data=TRUE)[, presentRowIDs, with=FALSE]),
+        unique(value[, presentRowIDs, with=FALSE])[order(mget(presentRowIDs))],
+        unique(rowIDs(x, data=TRUE)[order(mget(presentRowIDs)), presentRowIDs,
+            with=FALSE]),
         check.attributes=FALSE
     )
     if (!isTRUE(equalRowIDs))
@@ -637,8 +638,9 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     if (!(length(presentColIDs) > 0)) stop(.errorMsg("No colIDs(x) present in",
         "value! Cannot summarize over an entire dimension."), call.=FALSE)
     equalColIDs <- all.equal(
-        unique(value[, presentColIDs, with=FALSE]),
-        unique(colIDs(x, data=TRUE)[, presentColIDs, with=FALSE]),
+        unique(value[, presentColIDs, with=FALSE])[order(mget(presentColIDs))],
+        unique(colIDs(x, data=TRUE)[order(mget(presentColIDs)), presentColIDs,
+            with=FALSE]),
         check.attributes=FALSE
     )
     if (!isTRUE(equalColIDs))
