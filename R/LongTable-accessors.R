@@ -619,7 +619,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     # -- detect and warn users if they have modified id columns
     # rowIDs
     presentRowIDs <- intersect(rowIDs(x), colnames(value))  # allow summary over some keys
-    if (!(length(presentRowIDs) > 1)) stop(.errorMsg("No rowIDs(x) present in",
+    if (!(length(presentRowIDs) > 0)) stop(.errorMsg("No rowIDs(x) present in",
         "value! Cannot summarize over an entire dimension."), call.=FALSE)
     ## set check.attributes=FALSE to allow unequal table keys
     equalRowIDs <- all.equal(
@@ -634,7 +634,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
         )
     # colIDs
     presentColIDs <- intersect(colIDs(x), colnames(value))  # allow summary over some keys
-    if (!(length(presentColIDs) > 1)) stop(.errorMsg("No colIDs(x) present in",
+    if (!(length(presentColIDs) > 0)) stop(.errorMsg("No colIDs(x) present in",
         "value! Cannot summarize over an entire dimension."), call.=FALSE)
     equalColIDs <- all.equal(
         unique(value[, presentColIDs, with=FALSE]),
