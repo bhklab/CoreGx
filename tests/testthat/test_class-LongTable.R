@@ -50,6 +50,22 @@ testthat::test_that("`assay<-LongTable-method` prevents id column updates", {
     testthat::expect_true(all.equal(nlt$sensitivity, lt$sensitivity))
 })
 
+
+testthat::text_that("`assay<-LongTable-method` allows simple summary assignments", {
+    nlt <- copy(lt)
+    sens <- nlt$sensitivity
+    sens_sum <- sens[,
+        .(
+            mean_drug1dose=mean(drug1dose, na.rm=TRUE),
+            mean_drug2dose=mean(drug2dose, na.rm=TRUE),
+            mean_viability=mean(viability, na.rm=TRUE)
+        ),
+        by=.(drug1id, drug2id, cellid)
+    ]
+})
+
+
+
 # ==== LongTable-utils.R
 
 testthat::test_that("`reindex,LongTale-method` does not mutate by reference", {

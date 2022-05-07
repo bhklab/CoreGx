@@ -617,19 +617,27 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     setkeyv(annotatedIndex, unique(c(assayNames(x), i)))
 
     # -- detect and warn users if they have modified id columns
+    # rowIDs
+    presentRowIDs <- intersect(rowIDs(x), colnames(value))  # allow summary over some keys
+    if (!(length(presentRowIDs) > 1)) stop(.errorMsg("No rowIDs(x) present in",
+        "value! Cannot summarize over an entire dimension."), call.=FALSE)
     equalRowIDs <- all.equal(
-        unique(value[, rowIDs(x), with=FALSE]),
-        rowIDs(x, data=TRUE)
-    )
-    equalColIDs <- all.equal(
-        unique(value[, colIDs(x), with=FALSE]),
-        colIDs(x, data=TRUE)
+        unique(value[, presentRowIDs, with=FALSE]),
+        unique(rowIDs(x, data=TRUE)[, presentRowIDs, with=FALSE])
     )
     if (!isTRUE(equalRowIDs))
         stop(.errorMsg("One or more rowIDs(x) columns have been modified.",
                 " Identifier columns cannot be modified via assay assignment!"),
             call.=FALSE
         )
+    # colIDs
+    presentColIDs <- intersect(colIDs(x), colnames(value))  # allow summary over some keys
+    if (!(length(presentColIDs) > 1)) stop(.errorMsg("No colIDs(x) present in",
+        "value! Cannot summarize over an entire dimension."), call.=FALSE)
+    equalColIDs <- all.equal(
+        unique(value[, presentColIDs, with=FALSE]),
+        unique(colIDs(x, data=TRUE)[, presentColIDs, with=FALSE])
+    )
     if (!isTRUE(equalColIDs))
         stop(.errorMsg("One or more colIDs(x) column have been modified.",
                 " Identifier columns cannot be modified via assay assignment!"),
