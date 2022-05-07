@@ -621,9 +621,11 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     presentRowIDs <- intersect(rowIDs(x), colnames(value))  # allow summary over some keys
     if (!(length(presentRowIDs) > 1)) stop(.errorMsg("No rowIDs(x) present in",
         "value! Cannot summarize over an entire dimension."), call.=FALSE)
+    ## set check.attributes=FALSE to allow unequal table keys
     equalRowIDs <- all.equal(
         unique(value[, presentRowIDs, with=FALSE]),
-        unique(rowIDs(x, data=TRUE)[, presentRowIDs, with=FALSE])
+        unique(rowIDs(x, data=TRUE)[, presentRowIDs, with=FALSE]),
+        check.attributes=FALSE
     )
     if (!isTRUE(equalRowIDs))
         stop(.errorMsg("One or more rowIDs(x) columns have been modified.",
@@ -636,7 +638,8 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
         "value! Cannot summarize over an entire dimension."), call.=FALSE)
     equalColIDs <- all.equal(
         unique(value[, presentColIDs, with=FALSE]),
-        unique(colIDs(x, data=TRUE)[, presentColIDs, with=FALSE])
+        unique(colIDs(x, data=TRUE)[, presentColIDs, with=FALSE]),
+        check.attributes=FALSE
     )
     if (!isTRUE(equalColIDs))
         stop(.errorMsg("One or more colIDs(x) column have been modified.",
