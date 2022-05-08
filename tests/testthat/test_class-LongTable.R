@@ -192,7 +192,7 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
     testthat::expect_true(
         !anyNA(assays(nlt2, raw=TRUE)[["sensitivity"]]$sensitivity)
     )
-    testthat::expect_equivalent(nlt, nlt2)
+    testthat::expect_equal(nlt, nlt2)
 })
 
 testthat::test_that("`subset,LongTable-method` works with regex queries", {
