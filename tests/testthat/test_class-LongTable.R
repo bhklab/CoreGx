@@ -222,5 +222,5 @@ testthat::test_that("`subset,LongTable-method` works with regex queries", {
         colData(nlt2),
         colData(lt)[grepl("UACC*|SK-MEL-*", colnames(lt)), ]
     )
-    testthat::expect_equivalent(nlt, nlt2)
+    testthat::expect_equal(nlt, nlt2)
 })
