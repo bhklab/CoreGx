@@ -46,12 +46,14 @@ testthat::test_that("`assay<-LongTable-method` prevents id column updates", {
     nlt <- copy(lt)
     assay_ <- nlt[["sensitivity"]]
     assay_[, drug1dose := rnorm(.N)]
-    nlt[["sensitivity"]] <- assay_
+    testthat::expect_error({ nlt[["sensitivity"]] <- assay_ },
+        regexp=".*Identifier columns cannot be modified via assay assignment!.*"
+    )
     testthat::expect_true(all.equal(nlt$sensitivity, lt$sensitivity))
 })
 
 
-testthat::text_that("`assay<-LongTable-method` allows simple summary assignments", {
+testthat::test_that("`assay<-LongTable-method` allows simple summary assignments", {
     nlt <- copy(lt)
     sens <- nlt$sensitivity
     sens_sum <- sens[,

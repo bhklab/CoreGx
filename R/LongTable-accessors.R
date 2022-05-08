@@ -490,13 +490,19 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'),
 #'   has all the information needed to recreated the LongTable object.
 #' @param key `logical` Should the key columns also be returned? Defaults to
 #'   !withDimnames.
+#' @param ... For developer use only! Pass raw=TRUE to return the slot for
+#'   modification by reference.
 #'
 #' @importMethodsFrom SummarizedExperiment assay
 #' @importFrom crayon magenta cyan
 #' @import data.table
 #' @export
 setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
-        metadata=withDimnames, key=!withDimnames) {
+        metadata=withDimnames, key=!withDimnames, ...) {
+    # secret arguments for internal use
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        return(x@assays[[i]])
+    }
 
     ## TODO:: Update input validation to use checkmate where possible
     # validate input

@@ -1520,7 +1520,7 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
     profDT[, sample_uid := Reduce(.paste_colon, mget(colCols))]
     profDT[, drug_uid := Reduce(.paste_colon, mget(rowCols))]
     profDT[, exp_id := .paste_(drug_uid, sample_uid)]
-    assayCols <- colnames(assay(object, 'profiles', metadata=FALSE, key=FALSE))
+    assayCols <- setdiff(colnames(assay(object, "profiles", raw=TRUE)), "profiles")
     sensProf <- as.data.frame(unique(profDT[, .SD, .SDcols=assayCols]))
     rownames(sensProf) <- unique(profDT$exp_id)
     return(sensProf)

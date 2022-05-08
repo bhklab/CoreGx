@@ -60,7 +60,14 @@
 
 \S4method{assays}{LongTable,list}(x, withDimnames = TRUE, ...) <- value
 
-\S4method{assay}{LongTable,ANY}(x, i, withDimnames = FALSE, metadata = withDimnames, key = !withDimnames)
+\S4method{assay}{LongTable,ANY}(
+  x,
+  i,
+  withDimnames = FALSE,
+  metadata = withDimnames,
+  key = !withDimnames,
+  ...
+)
 
 \S4method{assay}{LongTable,character}(x, i) <- value
 
@@ -93,9 +100,8 @@ instead of the column names? Default is FALSE.}
 the positional argument to use.names from the rowData generic. It
 doesn't do anything at this time and can be ignored.}
 
-\item{...}{For developer use only! Pass raw=TRUE to modify the slot
-directly. This will corrupt your data if you don't know what you are
-doing!}
+\item{...}{For developer use only! Pass raw=TRUE to return the slot for
+modification by reference.}
 
 \item{value}{A \code{data.frame} or \code{data.table} to update the assay data
 with. This must at minumum contain the row and column data identifier
