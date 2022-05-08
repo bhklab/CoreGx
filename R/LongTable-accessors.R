@@ -374,6 +374,14 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
     if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
         return(x@assays)
     }
+
+    # input validation
+    if (!withDimnames && metadata)
+        warning(.warnMsg('[CoreGx::assays] Cannot use metadata=TRUE when',
+            ' withDimnames=FALSE. Ignoring the metadata argument.'),
+            call.=FALSE)
+
+    # optionally join with rowData and colData
     assayIndex <- mutable(getIntern(x)$assayIndex)
     if (metadata) {
         rData <- rowData(x, key=TRUE)
@@ -388,15 +396,27 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
         setkeyv(assayIndex, "colKey")
         assayIndex <- cData[assayIndex, , on="colKey"]
     }
+
+    # honor row and column ordering guarantees from CoreGx design documentation
     aList <- copy(x@assays)
+    corder <- c(
+        if (withDimnames) idCols(x),
+        if (key) c("rowKey", "colKey"),
+        if (withDimnames && metadata) c(sort(rowMeta(x)), sort(colMeta(x)))
+    )
     for (i in seq_along(aList)) {
         setkeyv(assayIndex, names(aList)[i])
         aList[[i]] <- assayIndex[aList[[i]], ]
-        aList[[i]][, (names(aList)) := NULL]
+        aList[[i]][, (setdiff(names(aList), names(aList)[i])) := NULL]
+        if (withDimnames || key) aList[[i]][, (names(aList)[i]) := NULL]
         if (!key) {
             aList[[i]][, c("rowKey", "colKey") := NULL]
-            setkeyv(aList[[i]], idCols(x))
         }
+        if (withDimnames) setkeyv(aList[[i]], idCols(x))
+        else if (key) setkeyv(aList[[i]], c("rowKey", "colKey"))
+        else setkeyv(aList[[i]], names(aList)[[i]])
+        if (!is.null(corder)) setcolorder(aList[[i]], corder) else
+            setcolorder(aList[[i]])
     }
     return(aList)
 })
@@ -494,7 +514,8 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
 
     if (!withDimnames && metadata)
         warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
-            ' withDimnames=FALSE. Ignoring the metadata argument.'))
+            ' withDimnames=FALSE. Ignoring the metadata argument.'),
+            call.=FALSE)
 
     # extract the specified assay
     assayData <- copy(x@assays[[keepAssay]])
