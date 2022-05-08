@@ -478,6 +478,7 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'),
 setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         metadata=withDimnames, key=!withDimnames) {
 
+    ## TODO:: Update input validation to use checkmate where possible
     # validate input
     if (length(i) > 1)
         .error('\n[CoreGx::assay] Please specifying a single string ',
@@ -490,6 +491,10 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         stop(.errorMsg('\n[CoreGx::assay] There is no assay ', i,
             ' in this LongTable. Use assayNames(longTable) for a list',
             'of valid assay names.'))
+
+    if (!withDimnames && metadata)
+        warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
+            ' withDimnames=FALSE. Ignoring the metadata argument.'))
 
     # extract the specified assay
     assayData <- copy(x@assays[[keepAssay]])
@@ -511,6 +516,8 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         setkeyv(assayData, "colKey")
         assayData <- colData(x, key=TRUE)[assayData, ]
     }
+    # honour row and column ordering guarantees
+    ## See: https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation
     if (withDimnames || key) {
         assayData[, (assayName) := NULL]
         if (withDimnames) setkeyv(assayData, idCols(x)) else
@@ -518,10 +525,13 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
     } else {
         setkeyv(assayData, assayName)
     }
-
-    if (!withDimnames && metadata)
-        warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
-            ' withDimnames=FALSE. Ignoring the metadata argument.'))
+    if (!key) assayData[, c("rowKey", "colKey") := NULL]
+    corder <- c(
+        if (withDimnames) idCols(x),
+        if (key) c("rowKey", "colKey"),
+        if (withDimnames && metadata) c(sort(rowMeta(x)), sort(colMeta(x)))
+    )
+    if (!is.null(corder)) setcolorder(assayData, corder) else setcolorder(assayData)
 
     ## Add [] to ensure assay always prints, even after modify by reference
     ## See: https://stackoverflow.com/questions/33195362/data-table-is-not-displayed-on-first-call-after-being-modified-in-a-function
