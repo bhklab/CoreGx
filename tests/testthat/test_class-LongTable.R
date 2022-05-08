@@ -72,7 +72,7 @@ testthat::test_that("`assay<-LongTable-method` allows simple summary assignments
     ))
     testthat::expect_true(all.equal(
         colIDs(lt, data=TRUE),
-        unique(nlt$sens_sum[, colIDs(nlt), with=FALSE]),
+        unique(nlt$sens_sum[, colIDs(nlt), with=FALSE])[order(mget(colIDs(nlt)))],
         check.attributes=FALSE
     ))
 })
