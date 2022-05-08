@@ -2,7 +2,7 @@ library(testthat)
 library(data.table)
 
 
-# ==== LongTable-acessors.R
+# ==== LongTable-accessors.R
 
 # see https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation for
 # explanation
@@ -10,7 +10,7 @@ test_that("`rowData,LongTable-method` orders data correctly", {
 
 })
 
-# === @assay slot
+# == @assay slot
 
 testthat::test_that("`assay,LongTable-method` and `assays,LongTable-method` return equivalent data", {
     assay_list <- lapply(seq_along(assayNames(lt)), FUN=assay,

@@ -1513,14 +1513,14 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
 })
 
 #' @keywords internal
-.rebuildProfiles <- function(LT) {
-    profDT <- LT$profiles
-    rowCols <- rowIDs(LT)[!grepl('drug.*dose|replicate.*', rowIDs(LT))]
-    colCols <- colIDs(LT)
+.rebuildProfiles <- function(object) {
+    profDT <- object$profiles
+    rowCols <- rowIDs(object)[!grepl('drug.*dose|replicate.*', rowIDs(object))]
+    colCols <- colIDs(object)
     profDT[, sample_uid := Reduce(.paste_colon, mget(colCols))]
     profDT[, drug_uid := Reduce(.paste_colon, mget(rowCols))]
     profDT[, exp_id := .paste_(drug_uid, sample_uid)]
-    assayCols <- colnames(assay(LT, 'profiles', metadata=FALSE, key=FALSE))
+    assayCols <- colnames(assay(object, 'profiles', metadata=FALSE, key=FALSE))
     sensProf <- as.data.frame(unique(profDT[, .SD, .SDcols=assayCols]))
     rownames(sensProf) <- unique(profDT$exp_id)
     return(sensProf)
@@ -1551,7 +1551,7 @@ setReplaceMethod("sensitivityProfiles",
     function(object, value)
 {
     if (is(sensitivitySlot(object), 'LongTable'))
-        LT <- sensitivitySlot(object)
+        object <- sensitivitySlot(object)
 
     else
         object@treatmentResponse$profiles <- value

@@ -495,34 +495,37 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
     assayData <- copy(x@assays[[keepAssay]])
 
     # optionally join to rowData and colData
-    assayIndex <- unique(na.omit(getIntern(x, "assayIndex")[,
+    assayIndex <- mutable(unique(na.omit(getIntern(x, "assayIndex")[,
         c("rowKey", "colKey", assayName),
         with=FALSE
-    ]))
+    ])))
     setkeyv(assayIndex, assayName)
     assayData <- assayData[assayIndex, ]
     setkeyv(assayData, "rowKey")
     if (withDimnames && !metadata) {
         assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, ]
-        setkev(assayData, "colKey")
+        setkeyv(assayData, "colKey")
         assayData <- colIDs(x, data=TRUE, key=TRUE)[assayData, ]
     } else if (withDimnames && metadata) {
         assayData <- rowData(x, key=TRUE)[assayData, ]
         setkeyv(assayData, "colKey")
         assayData <- colData(x, key=TRUE)[assayData, ]
     }
-    assayData <- assayData[, .SD, .SDcols=!assayName]
-
-    if (!key) {
-        assayData <- assayData[, -c('rowKey', 'colKey')]
-        setkeyv(assayData, idCols(x))
+    if (withDimnames || key) {
+        assayData[, (assayName) := NULL]
+        if (withDimnames) setkeyv(assayData, idCols(x)) else
+            setkeyv(assayData, c("rowKey", "colKey"))
+    } else {
+        setkeyv(assayData, assayName)
     }
 
     if (!withDimnames && metadata)
         warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
             ' withDimnames=FALSE. Ignoring the metadata argument.'))
 
-    return(assayData)
+    ## Add [] to ensure assay always prints, even after modify by reference
+    ## See: https://stackoverflow.com/questions/33195362/data-table-is-not-displayed-on-first-call-after-being-modified-in-a-function
+    return(assayData[])
 })
 
 
