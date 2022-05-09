@@ -29,8 +29,8 @@
 
     # sensitivityInfo
     infoDT <- as.data.table(oldSensitivity$info, keep.rownames=TRUE)
-    rowCols <- c(drug1id="drugid", drug1dose='dose')
-    colCols <- c(cellid="cellid")
+    rowCols <- c(treatment1id="treatmentid", treatment1dose='dose')
+    colCols <- c(sampleid="sampleid")
 
     # sensitivityProfiles
     profDT <- as.data.table(oldSensitivity$profiles, keep.rownames=TRUE)
@@ -74,7 +74,7 @@
 
     # -- capute the na rownames to make recreation easier in .rebuildInfo
     missing_rows <- setdiff(infoDT$rn, rawdataDT$rn)
-    na_index <- infoDT[rn %in% missing_rows, .(rn, drugid, cellid)]
+    na_index <- infoDT[rn %in% missing_rows, .(rn, treatmentid, sampleid)]
 
     # -- build a LongTableDataMapper object
     TREdataMapper <- TREDataMapper(rawdata=rawdataDT)
@@ -130,7 +130,7 @@
 
     equal_columns <- setdiff(colnames(si), "rownames")
     all.equal(
-        si[order(drugid, cellid), .SD, .SDcols=equal_columns],
-        nsi[order(drugid, cellid), .SD, .SDcols=equal_columns]
+        si[order(treatmentid, sampleid), .SD, .SDcols=equal_columns],
+        nsi[order(treatmentid, sampleid), .SD, .SDcols=equal_columns]
     )
 }

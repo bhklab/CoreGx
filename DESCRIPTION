@@ -54,7 +54,8 @@ Imports:
     data.table,
     crayon,
     glue,
-    rlang
+    rlang,
+    bench
 Suggests:
     pander,
     markdown,

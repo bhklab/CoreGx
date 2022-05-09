@@ -1439,7 +1439,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_sensitivityMeasures(class_=.local_class, data_=.local_data)
-setMethod(sensitivityMeasures, "CoreSet", function(object){
+setMethod(sensitivityMeasures, "CoreSet", function(object) {
     return(colnames(sensitivityProfiles(object)))
 })
 
@@ -1515,7 +1515,7 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
 #' @keywords internal
 .rebuildProfiles <- function(object) {
     profDT <- object$profiles
-    rowCols <- rowIDs(object)[!grepl('drug.*dose|replicate.*', rowIDs(object))]
+    rowCols <- rowIDs(object)
     colCols <- colIDs(object)
     profDT[, sample_uid := Reduce(.paste_colon, mget(colCols))]
     profDT[, drug_uid := Reduce(.paste_colon, mget(rowCols))]
@@ -1551,8 +1551,10 @@ setReplaceMethod("sensitivityProfiles",
     function(object, value)
 {
     if (is(sensitivitySlot(object), 'LongTable'))
-        object <- sensitivitySlot(object)
-
+        warning(.warnMsg("The ", class(object)[1], " class structure has been",
+            " updated! Assignment via sensitivityProfiles no long works, please",
+            " see vignette('The LongTable Class', package='CoreGx') for more",
+            " information."))
     else
         object@treatmentResponse$profiles <- value
     return(object)
