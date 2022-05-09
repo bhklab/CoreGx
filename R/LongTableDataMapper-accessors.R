@@ -74,7 +74,7 @@ NULL
     # Input validation
     checkmate::assertClass(x, "LongTableDataMapper")
     checkmate::assertLogical(key)
-    checkmate::assertList(dataMap, types=c("character"), max.len=2)
+    checkmate::assertList(dataMap, types=c("character", "NULL"), max.len=2)
 
     # Extract relevant data
     .rawdata <- rawdata(x)
@@ -209,7 +209,7 @@ setGeneric('rowDataMap<-', function(object, ..., value)
 #' @rdname LongTableDataMapper-accessors
 #' @eval
 #' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_3,
-#' data_=.local_data_3, id_col_='drug_id')
+#' data_=.local_data_3, id_col_='treatmentid')
 setReplaceMethod('rowDataMap', signature(object='LongTableDataMapper',
         value='list_OR_List'), function(object, value) {
     funContext <- '[CoreGx::`rowDataMap<-`,LongTableDataMapper-method]\n\t'
@@ -298,7 +298,7 @@ setGeneric('colDataMap<-', function(object, ..., value) standardGeneric('colData
 #' @rdname LongTableDataMapper-accessors
 #' @eval
 #' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_3,
-#' data_=.local_data_3, id_col_='cell_id')
+#' data_=.local_data_3, id_col_='sampleid')
 setReplaceMethod('colDataMap',
         signature(object='LongTableDataMapper', value='list_OR_List'),
         function(object, value) {

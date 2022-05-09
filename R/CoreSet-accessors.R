@@ -221,7 +221,7 @@ setGeneric("name", function(object, ...) standardGeneric("name"))
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_name(class_=.local_class, data_=.local_data)
-setMethod('name', signature("CoreSet"), function(object){
+setMethod('name', signature("CoreSet"), function(object) {
     return(object@annotation$name)
 })
 
@@ -412,7 +412,7 @@ setReplaceMethod("sampleNames", signature(object="CoreSet", value="character"),
 ## -------------------
 ## ---- treatment slot
 
-## TODO: Implement an actual @treatment slot to replace @drug and @radiation
+## TODO: Implement an actual @treatment slot to replace @treatment and @radiation
 
 #
 # == treatmentInfo
@@ -443,8 +443,8 @@ setGeneric('treatmentInfo', function(object, ...)
 #' @eval .docs_CoreSet_get_treatmentInfo(class_=.local_class, data_=.local_data)
 setMethod('treatmentInfo', signature('CoreSet'), function(object) {
     treatmentType <- switch(class(object)[1],
-        'PharmacoSet'='drug',
-        'ToxicoSet'='drug',
+        'PharmacoSet'='treatment',
+        'ToxicoSet'='treatment',
         'RadioSet'='radiation',
         'CoreSet'='treatment'
     )
@@ -1220,7 +1220,7 @@ setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_OR_MAE"),
 
     ### Methods:
 
-    __sensitivityInfo__: `DataFrame` or `data.frame` of sensitivity drug combo
+    __sensitivityInfo__: `DataFrame` or `data.frame` of sensitivity treatment combo
     by sample metadata for the `{class_}` object. When the `dimension`
     parameter is used, it allows retrieval of the dimension specific metadata
     from the `LongTable` object in `@treatmentResponse` of a {class_} object.
@@ -1250,7 +1250,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
                 treatment={ return(rowData(sensitivitySlot(object), ...)) },
                 assay={ return(assay(sensitivitySlot(object), 'assay_metadata')) },
                 .error(funContext, 'Invalid value for the dimension argument.
-                    Please select on of "sample", "drug" or "assay'))
+                    Please select on of "sample", "treatment" or "assay'))
         } else {
             return(.rebuildInfo(sensitivitySlot(object)))
         }
@@ -1299,7 +1299,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
         -c('rowKey', 'colKey')
     ]
     infoDT <- tryCatch({
-        infoDT[, .SD, .SDcols=!patterns('drug.*dose$')]
+        infoDT[, .SD, .SDcols=!patterns('treatment.*dose$')]
     }, error=function(e) infoDT)
 
     # determine which columns map 1:1 with new identifiers and subset to those
@@ -1313,12 +1313,12 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     # pad the dropped NA values, if they exists
     if ("sensitiivtyInfo_NA" %in% names(metadata(longTable))) {
             na_info <- copy(metadata(longTable)$sensitivityInfo_NA)
-        setnames(na_info, "drugid", "drug1id")
+        setnames(na_info, "treatmentid", "treatment1id")
         na_info <- cbind(
             na_info,
-            unique(infoDT_sub[, .SD, .SDcols=!patterns("^drug1id$|^cellid$|^replicate_id$|^rn$")])
+            unique(infoDT_sub[, .SD, .SDcols=!patterns("^treatment1id$|^sampleid$|^replicate_id$|^rn$")])
         )
-        na_info[, replicate_id := seq_len(.N), by=.(drug1id, cellid)]
+        na_info[, replicate_id := seq_len(.N), by=.(treatment1id, sampleid)]
         infoDT_sub <- rbind(infoDT_sub, na_info)
     }
     if ("experiment_metadata" %in% names(metadata(longTable))) {
@@ -1329,11 +1329,11 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     }
 
     # rebuild the rownames
-    idCols <- grep("^drug[0-9]*id", colnames(infoDT_sub), value=TRUE)
-    infoDT_sub[, drugid := Reduce(.paste_slashes, mget(..idCols))]
-    infoDT_sub[, drug_uid := Reduce(.paste_colon, mget(..rowIDcols))]
+    idCols <- grep("^treatment[0-9]*id", colnames(infoDT_sub), value=TRUE)
+    infoDT_sub[, treatmentid := Reduce(.paste_slashes, mget(..idCols))]
+    infoDT_sub[, treatment_uid := Reduce(.paste_colon, mget(..rowIDcols))]
     infoDT_sub[, sample_uid := Reduce(.paste_colon, mget(..colIDcols))]
-    infoDT_sub[, exp_id := Reduce(.paste_, .(drug_uid, sample_uid))]
+    infoDT_sub[, exp_id := Reduce(.paste_, .(treatment_uid, sample_uid))]
 
     # convert to data.frame
     setDF(infoDT_sub, rownames=infoDT_sub$exp_id)
@@ -1350,11 +1350,11 @@ setMethod(sensitivityInfo, signature("CoreSet"),
     similar to the old {class_} implementation, where the `@treatmentResponse` slot
     contained a list with a `$info` `data.frame` item. When the `dimension`
     arugment is used, more complicated assignments can occur where 'sample'
-    modifies the `@sensitvity` `LongTable` colData, 'drug' the rowData and
+    modifies the `@sensitvity` `LongTable` colData, 'treatment' the rowData and
     'assay' the 'assay_metadata' assay.
     Arguments:
     - value: A `data.frame` of treatment response experiment metadata,
-    documenting experiment level metadata (mapping to drugs and samples). If
+    documenting experiment level metadata (mapping to treatments and samples). If
     the `@treatmentResponse` slot doesn't contain a `LongTable` and `dimension` is
     not specified, you can only modify existing columns as returned by
     `sensitivityInfo(object)`.
@@ -1399,11 +1399,11 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
                 unique(value[, .SD, .SDcols=valueCols %in% colDataCols])
         } else {
             switch(dimension,
-                drug={ rowData(object@treatmentResponse, ...) <- value },
+                treatment={ rowData(object@treatmentResponse, ...) <- value },
                 sample={ colData(object@treatmentResponse, ...) <- value },
                 assay={ assay(object@treatmentResponse, 'assay_metadata') <- value },
                 .error(funContext, 'Invalid argument to dimension parameter.
-                    Please choose one of "sample", "drug" or "assay"'))
+                    Please choose one of "sample", "treatment" or "assay"'))
         }
     } else {
         if (!missing(dimension))
@@ -1426,7 +1426,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
     @details
     __sensitivityMeaures__: Get the 'sensitivityMeasures' available in a `{class_}`
     object. Each measure reprents some summary of sample sensitivity to a given
-    drug, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
+    treatment, such as ic50, ec50, AUC, AAC, etc. The results are returned as a
     `character` vector with all available metrics for the PSet object.
     @examples
     sensitivityMeasures({data_}) <- sensitivityMeasures({data_})
@@ -1485,7 +1485,7 @@ setReplaceMethod('sensitivityMeasures',
     __sensitivityProfiles__: Return the sensitivity profile summaries from the
     sensitivity slot. This data.frame cotanins vaarious sensitivity summary
     metrics, such as ic50, amax, EC50, aac, HS, etc as columns, with rows as
-    drug by sample experiments.
+    treatment by sample experiments.
     @examples
     sensitivityProfiles({data_})
 
@@ -1515,11 +1515,13 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
 #' @keywords internal
 .rebuildProfiles <- function(object) {
     profDT <- object$profiles
-    rowCols <- rowIDs(object)
+    rowCols <- rowIDs(object)[
+        !grepl("treatment[0-9]*dose|drug[0-9]*dose|replicate.*id", rowIDs(object))
+    ]
     colCols <- colIDs(object)
     profDT[, sample_uid := Reduce(.paste_colon, mget(colCols))]
-    profDT[, drug_uid := Reduce(.paste_colon, mget(rowCols))]
-    profDT[, exp_id := .paste_(drug_uid, sample_uid)]
+    profDT[, treatment_uid := Reduce(.paste_colon, mget(rowCols))]
+    profDT[, exp_id := .paste_(treatment_uid, sample_uid)]
     assayCols <- setdiff(colnames(assay(object, "profiles", raw=TRUE)), "profiles")
     sensProf <- as.data.frame(unique(profDT[, .SD, .SDcols=assayCols]))
     rownames(sensProf) <- unique(profDT$exp_id)
@@ -1605,7 +1607,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 .rebuildRaw <- function(longTable) {
 
     ## TODO:: This function currently assumes there will only be one valid
-    ## dose per drug combination, which may not be true.
+    ## dose per treatment combination, which may not be true.
 
     funContext <- .funContext(':::.rebuildRaw')
     if (!('sensitivity' %in% assayNames(longTable)))
@@ -1616,7 +1618,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     # Extract the information needed to reconstruct the sensitivityRaw array
     viability <- longTable$sensitivity
 
-    # Early return for single drug sensitivity experimentss
+    # Early return for single treatment sensitivity experimentss
     ## TODO:: refactor this into a helper?
     if ('assay_metadata' %in% assayNames(longTable) &&
         'old_column' %in% colnames(longTable$assay_metadata))
@@ -1628,9 +1630,9 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
         if (length(colIDs(longTable)) > 1) {
             assayDT[, sampleid := Reduce(.paste_colon, mget(colIDs(longTable)))]
         }
-        assayDT[, exp_id := paste0(drug1id, '_', sampleid)]
+        assayDT[, exp_id := paste0(treatment1id, '_', sampleid)]
         .mean <- function(x) mean(as.numeric(x), na.rm=TRUE)
-        doseDT <- dcast(assayDT, exp_id ~ old_column, value.var='drug1dose',
+        doseDT <- dcast(assayDT, exp_id ~ old_column, value.var='treatment1dose',
             fun.aggregate=.mean)
         viabDT <- dcast(assayDT, exp_id ~ old_column, value.var='viability',
             fun.aggregate=.mean)
@@ -1704,16 +1706,16 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
         ## TODO:: validate value
         longTable <- sensitivitySlot(object)
 
-        viabilityCols <- colnames(assay(longTable, 'sensitivity',
-            metadata=FALSE, key=FALSE))
-        # Handle the non-drug combo case
+        viabilityCols <- setdiff(colnames(assay(longTable, 'sensitivity',
+            metadata=FALSE, key=FALSE)), "sensitivity")
+        # Handle the non-treatment combo case
         if (length(viabilityCols) != ncol(value)) {
             valueDT <- as.data.table(value)
             valueDT <- dcast(valueDT, V1 + V2 ~ V3, value.var='value')
             valueDT[, V2 := NULL] # drop the column names
             setnames(valueDT, old=c('Dose', 'Viability'),
-                new=c('drug1dose', 'viability'))
-            valueDT[, c('drug1id', 'sample_uid') := tstrsplit(V1, '_', type.convert=TRUE)]
+                new=c('treatment1dose', 'viability'))
+            valueDT[, c('treatment1id', 'sample_uid') := tstrsplit(V1, '_', type.convert=TRUE)]
             valueDT[, (colIDs(longTable)) := tstrsplit(sample_uid, ':', type.convert=TRUE)]
             valueDT[, c('V1', 'sample_uid') := NULL]
             assay(longTable, i='sensitivity') <- valueDT
@@ -1742,7 +1744,7 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
     } else {
         if (!is.array(value)) .error(funContext, "Values assigned to the
             sensitivityRaw slot must be an array of experiment by dose by
-            value!")
+            values!")
         object@treatmentResponse$raw <- value
         object
     }
@@ -1793,7 +1795,7 @@ setGeneric("sensitivitySlot<-", function(object, ..., value)
     `data.frame` of experiment metadata, 'profiles' `data.frame` with
     summary statistics from the sensitivity experiment and a 'raw' 3D array
     where rows are experiments, columns are replicates and pages are 'Dose'
-    or 'Viability' containing their respective values for that drug by sample
+    or 'Viability' containing their respective values for that treatment by sample
     experiment. The type of `value` must match type of the current `@treatmentResponse`
     slot of the `{class_}` object.
 
@@ -1837,7 +1839,7 @@ setGeneric("sensNumber", function(object, ...) standardGeneric("sensNumber"))
     "
     @details
     __sensNumber__: Return a count of viability observations in a `{class_}`
-    object for each drug-combo by sample combination.
+    object for each treatment-combo by sample combination.
 
     @examples
     sensNumber({data_})
@@ -1867,26 +1869,26 @@ setMethod(sensNumber, "CoreSet", function(object){
         measure=patterns('^viability'), variable.name='replicate',
         value.name='viability')
 
-    # Determine the drug and sample combos, ignoring other identifiers
+    # Determine the treatment and sample combos, ignoring other identifiers
     .paste_colon <- function(x, y) paste(x, y, sep=':')
-    drugidCols <- sensitivityDT[, colnames(.SD), .SDcols=patterns('drug.*id')]
+    treatmentidCols <- sensitivityDT[, colnames(.SD), .SDcols=patterns('treatment.*id')]
     sampleidCols <- sensitivityDT[, colnames(.SD), .SDcols=patterns('sample.*id')]
 
     # Parse the columns to dcast by to get the counts
-    sensitivityDT_melted[, .drugCombo := Reduce(.paste_colon, mget(drugidCols))]
+    sensitivityDT_melted[, .treatmentCombo := Reduce(.paste_colon, mget(treatmentidCols))]
     sensitivityDT_melted[, .sampleCombo := Reduce(.paste_colon, mget(sampleidCols))]
 
     # Count existing sensitivity measurements
     .count_not_NA <- function(x) sum(!is.na(x))
-    sensNumbDT <- dcast(sensitivityDT_melted, .drugCombo ~ .sampleCombo,
+    sensNumbDT <- dcast(sensitivityDT_melted, .treatmentCombo ~ .sampleCombo,
         value.var='viability', fun.aggregate=.count_not_NA)
-    sensNumberM <- as.matrix(sensNumbDT[, !'.drugCombo'])
-    rownames(sensNumberM) <- sensNumbDT[['.drugCombo']]
+    sensNumberM <- as.matrix(sensNumbDT[, !'.treatmentCombo'])
+    rownames(sensNumberM) <- sensNumbDT[['.treatmentCombo']]
 
     return(sensNumberM)
 
-    ## TODO:: Pad for any missing drugs or samples
-    allDrugCombos <- rowData(object)[, Reduce(.paste_colon, mget(drugidCols))]
+    ## TODO:: Pad for any missing treatments or samples
+    allDrugCombos <- rowData(object)[, Reduce(.paste_colon, mget(treatmentidCols))]
     allSampleCombos <- colData(object)[, Reduce(.paste_colon, mget(sampleidCols))]
 
 }
@@ -1899,10 +1901,10 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
     "
     @details
     __sensNumber<-__: Update the 'n' item, which holds a matrix with a count
-    of drug by sample-line experiment counts, in the `list` in `@treatmentResponse`
+    of treatment by sample-line experiment counts, in the `list` in `@treatmentResponse`
     slot of a `{class_}` object. Will error when `@sensitviity` contains
     a `LongTable` object, since the counts are computed on the fly. Arguments:
-    - value: A `matrix` where rows are samples and columns are drugs, with a
+    - value: A `matrix` where rows are samples and columns are treatments, with a
     count of the number of experiments for each combination as the values.
 
     @examples
@@ -1945,7 +1947,7 @@ setGeneric("pertNumber", function(object, ...) standardGeneric("pertNumber"))
     @details
     __pertNumber__: `array` Summary of available perturbation experiments
     from in a `{class_}` object. Returns a 3D `array` with the number of
-    perturbation experiments per drug and sample, and data type.
+    perturbation experiments per treatment and sample, and data type.
 
     @examples
     pertNumber({data_})
@@ -1972,7 +1974,7 @@ setGeneric("pertNumber<-", function(object, value) standardGeneric("pertNumber<-
     __pertNumber<-__: Update the `@perturbation$n` value in a `{class_}` object,
     which stores a summary of the available perturbation experiments. Arguments:
     - value: A new 3D `array` with the number of perturbation experiments per
-    drug and sample, and data type
+    treatment and sample, and data type
 
     @examples
     pertNumber({data_}) <- pertNumber({data_})

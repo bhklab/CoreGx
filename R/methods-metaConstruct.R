@@ -32,7 +32,7 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 #' data(exampleDataMapper)
 #' rowDataMap(exampleDataMapper) <- list(c('treatmentid'), c())
 #' colDataMap(exampleDataMapper) <- list(c('sampleid'), c())
-#' assayMap(exampleDataMapper) <- list(sensitivity=c('viability'))
+#' assayMap(exampleDataMapper) <- list(sensitivity=list(c("treatmentid", "sampleid"), c('viability')))
 #' metadataMap(exampleDataMapper) <- list(experiment_metadata=c('metadata'))
 #' longTable <- metaConstruct(exampleDataMapper)
 #' longTable
@@ -46,9 +46,15 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
 
     # subset the rawdata slot to build out each component of LongTable
     rowDataDT <- rowData(mapper)
-    rowIDs <- key(rowDataDT)
+    rowIDs <- rowDataMap(mapper)[[1]]
+    rid_names <- names(rowIDs)
+    has_rid_names <- !is.null(rid_names) & rid_names != ""
+    rowIDs[has_rid_names] <- rid_names[has_rid_names]
     colDataDT <- colData(mapper)
-    colIDs <- key(colDataDT)
+    colIDs <- colDataMap(mapper)[[1]]
+    cid_names <- names(colIDs)
+    has_cid_names <- !is.null(cid_names) & cid_names != ""
+    colIDs[has_cid_names] <- cid_names[has_cid_names]
     assayDtL <- assays(mapper)
     assayIDs <- lapply(assayMap(mapper), `[[`, i=1)
     for (i in seq_along(assayIDs)) {

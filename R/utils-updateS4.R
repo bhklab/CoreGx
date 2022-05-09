@@ -104,11 +104,12 @@
 }
 
 
-#' Compare the valus of sensitivityInfo before and after use of
+#' Compare the values of sensitivityInfo before and after use of
 #' .sensitivityToTRE
 #'
 #' @param object `CoreSet` to be updated to the new
 #' `TreatmentResponseExperiment` sensitivity format.
+#' @param FUN `function` The function to compare results from.
 #'
 #' @return None, displays results of `all.equal` on the sensitivityInfo for
 #'   the columns which should be conserved.
@@ -117,20 +118,21 @@
 #' @noRd
 #' @importFrom data.table data.table as.data.table merge.data.table
 #' melt.data.table
-.compareSensitivityInfo <- function(object) {
+.compareTreatmentResponse <- function(object, FUN) {
+
     new_object <- copy(object)
-    tre <- .sensitivityToTRE(object)
+    tre <- CoreGx:::.sensitivityToTRE(object)
     new_object@treatmentResponse <- tre
 
-    si <- copy(sensitivityInfo(object))
-    nsi <- copy(sensitivityInfo(new_object))
+    old_res <- copy(FUN(object))
+    new_res <- copy(FUN(new_object))
 
-    setDT(si, keep.rownames="rownames")
-    setDT(nsi, keep.rownames="rownames")
+    setDT(old_res, keep.rownames="rownames")
+    setDT(new_res, keep.rownames="rownames")
 
-    equal_columns <- setdiff(colnames(si), "rownames")
+    equal_columns <- colnames(old_res)
     all.equal(
-        si[order(treatmentid, sampleid), .SD, .SDcols=equal_columns],
-        nsi[order(treatmentid, sampleid), .SD, .SDcols=equal_columns]
+        old_res[order(rownames), .SD, .SDcols=equal_columns],
+        new_res[order(rownames), .SD, .SDcols=equal_columns]
     )
 }
