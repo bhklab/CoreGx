@@ -41,17 +41,8 @@ setMethod('updateObject', signature(object="CoreSet"),
     }
 
     if (is(treatmentResponse, "LongTable")) {
-        unlockBinding("colIDs", getIntern(treatmentResponse))
-        assign("colIDs",
-            setNames(gsub("cellid", "sampleid", colIDs(treatmentResponse)),
-                gsub("cellid", "sampleid", colIDs(treatmentResponse))),
-            envir=getIntern(treatmentResponse)
-        )
-        lockBinding("colIDs", getIntern(treatmentResponse))
-        colData_ <- colData(treatmentResponse)
-        data.table::setnames(colData_, "cellid", "sampleid", skip_absent=TRUE)
-        colData(treatmentResponse) <- colData_
         treatmentResponse <- updateObject(treatmentResponse)
+        mutableIntern <- mutable(getIntern(treatmentResponse))
     } else {
         colnames(treatmentResponse$info) <- gsub("cellid", "sampleid",
             colnames(treatmentResponse$info))
@@ -75,9 +66,6 @@ setMethod('updateObject', signature(object="CoreSet"),
         colnames(curation_$treatment) <- gsub("drugid",
             "treatmentid", colnames(curation_$treatment))
     }
-
-    ## TODO:: change any occurance of cellid to sample id in the old sensitivity
-    ## slot list
 
     cSet <- .CoreSet(
         sample=sample_,

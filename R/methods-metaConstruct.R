@@ -38,6 +38,7 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 #' longTable
 #'
 #' @md
+#' @importFrom data.table key
 #' @export
 setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         function(mapper) {
@@ -45,11 +46,16 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
 
     # subset the rawdata slot to build out each component of LongTable
     rowDataDT <- rowData(mapper)
-    rowIDs <- rowDataMap(mapper)$id_columns
+    rowIDs <- key(rowDataDT)
     colDataDT <- colData(mapper)
-    colIDs <- colDataMap(mapper)$id_columns
+    colIDs <- key(colDataDT)
     assayDtL <- assays(mapper)
     assayIDs <- lapply(assayMap(mapper), `[[`, i=1)
+    for (i in seq_along(assayIDs)) {
+        aid_names <- names(assayIDs[[i]])
+        notEmptyNames <- !is.null(aid_names) & aid_names != ""
+        assayIDs[[i]][notEmptyNames] <- aid_names[notEmptyNames]
+    }
 
     # subset the metadata columns out of raw data and add any additional metadata
     metadataL <- lapply(metadataMap(mapper),

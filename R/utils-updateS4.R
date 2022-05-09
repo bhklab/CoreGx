@@ -88,8 +88,8 @@
     guess$metadata[[2]] <- setdiff(guess$metadata[[2]],
         c(assayCols, guess$rowDataMap[[2]], guess$colDataMap[[2]]))
     assayMap$assay_metadata <- setdiff(guess$assayMap$mapped_columns, assayCols)
-
-    # set the names correctly
+    assayMap <- lapply(assayMap, FUN=function(x, y) list(y, x),  # add id columns
+        y=guess$assayMap[[1]])
 
     # update the data mapper
     rowDataMap(TREdataMapper) <- guess$rowDataMap
