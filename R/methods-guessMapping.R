@@ -6,6 +6,9 @@
 #'
 #' @return A `list` with mapping guesses as items.
 #'
+#' @examples
+#' "Generics shouldn't need examples!"
+#'
 #' @md
 #' @export
 setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping'))

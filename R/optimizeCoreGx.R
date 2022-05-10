@@ -18,6 +18,10 @@
 #' displays a message indicating the optimal number of threads.
 #' If `report=TRUE`, also returns a `data.frame` of the benchmark results.
 #'
+#' @examples
+#' data(merckLongTable)
+#' optimizeCoreGx(merckLongTable)
+#'
 #' @md
 #' @export
 optimizeCoreGx <- function(sample_data, set=FALSE, report=!set) {

@@ -57,6 +57,10 @@ setClassUnion("immutable_list", c("immutable", "list"))
 #'
 #' @return `logical(1)` Does the object inherit from the "immutable" S3-class?
 #'
+#' @examples
+#' immutable_list <- immutable(as.list(1:5))
+#' is.immutable(immutable_list)
+#'
 #' @export
 is.immutable <- function(object) {
     is(object, "immutable")
@@ -95,6 +99,8 @@ show.immutable <- function(x) print(x)
 #'
 #' @param x An R object inheriting from the "immutable" S3-clas
 #' @param ... Objects to concatenate to `x`.
+#'
+#' @return x with one or more values appended to it.
 #'
 #' @md
 #' @export
@@ -243,6 +249,10 @@ subset.immutable <- function(x, ...) {
 #' @param object An R object inheriting from the "immutable" class.
 #'
 #' @return The `object` with the "immutable" class stripped from it.
+#'
+#' @example
+#' immut_list <- immutable(list())
+#' mutable(immut_list)
 #'
 #' @md
 #' @export

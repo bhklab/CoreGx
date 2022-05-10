@@ -16,3 +16,8 @@ S3-class.}
 \description{
 Check if an R object inherits from the immutable S3-class.
 }
+\examples{
+immutable_list <- immutable(as.list(1:5))
+is.immutable(immutable_list)
+
+}

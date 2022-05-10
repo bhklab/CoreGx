@@ -50,3 +50,7 @@ experiment and configured according to the rowIDs and colIDs arguments.
 \description{
 LongTable constructor method
 }
+\examples{
+"See vignette('The LongTable Class', package='CoreGx')"
+
+}

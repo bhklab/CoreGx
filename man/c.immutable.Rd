@@ -12,6 +12,9 @@ another "immutable" class object.}
 
 \item{...}{Objects to concatenate to \code{x}.}
 }
+\value{
+x with one or more values appended to it.
+}
 \description{
 Ensures that \code{c} and \code{append} to an "immutable" class object return an
 immutable class object.

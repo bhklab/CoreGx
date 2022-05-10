@@ -71,6 +71,9 @@ NULL
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
+#' @examples
+#' "See vignette('The LongTable Class', package='CoreGx')"
+#'
 #' @importFrom data.table key setkeyv
 #' @export
 LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,

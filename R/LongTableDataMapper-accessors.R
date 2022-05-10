@@ -22,6 +22,7 @@ NULL
 #'
 #' @importFrom checkmate assertClass assertLogical
 #' @importFrom methods getPackageName
+#' @noRd
 #' @keywords internal
 .get_dimData <- function(x, key, dim=c("row", "col", "meta")) {
 
@@ -65,6 +66,7 @@ NULL
 #' @importFrom checkmate assertClass assertLogical assertList
 #' @importFrom methods getPackageName
 #' @importFrom data.table setkeyv
+#' @noRd
 #' @keywords internal
 .get_dimDataFromMap <- function(x, dataMap, key=TRUE, rename=TRUE, funContext) {
 

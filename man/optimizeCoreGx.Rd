@@ -26,3 +26,8 @@ If \code{report=TRUE}, also returns a \code{data.frame} of the benchmark results
 A helper method to find the best multithreading configuration for your
 computer
 }
+\examples{
+data(merckLongTable)
+optimizeCoreGx(merckLongTable)
+
+}
