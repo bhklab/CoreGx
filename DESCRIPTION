@@ -2,7 +2,7 @@ Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
 Version: 2.1.1
-Date: 2022-04-12
+Date: 2022-05-09
 Authors@R: c(
     person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca",
         role = c("aut")),
