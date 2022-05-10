@@ -1,3 +1,6 @@
+#' @include immutable-class.R
+NULL
+
 #' @title LongTable class definition
 #'
 #' @description Define a private constructor method to be used to build a
@@ -18,11 +21,9 @@
 #'   `LongTable`.
 #' - *metadata*: An optional `list` of additional metadata for a `LongTable`
 #'   which doesn't map to one of the dimensions.
-#' - *.intern*: An `environment` that holds internal structural metadata
+#' - *.intern*: An `immutable` `list` that holds internal structural metadata
 #'   about a LongTable object, such as which columns are required to key
-#'   the object. An environment has been used to allow locking items, which
-#'   can prevent accidental modification of a property required for the class
-#'   to work.
+#'   the object.
 #'
 #' @return `LongTable` object containing the assay data from a treatment
 #'   response experiment
@@ -39,100 +40,77 @@
         colData='data.table',
         assays='list',
         metadata='list',
-        .intern='environment')
+        .intern='immutable_list')
 )
-#' @export
-setOldClass('long.table', S4Class='LongTable')
+
 
 #' @title LongTable constructor method
 #'
 #' @rdname LongTable
 #'
-#' @description Builds a `LongTable` object from rectangular objects. The
-#' `rowData` argument should contain row level metadata, while the `colData`
-#' argument should contain column level metadata, for the experimental assays
-#' in the `assays` list. The `rowIDs` and `colIDs` lists are used to configure
-#' the internal keys mapping rows or columns to rows in the assays. Each list
-#' should contain at minimum one character vector, specifying which columns
-#' in `rowData` or `colData` are required to uniquely identify each row. An
-#' optional second character vector can be included, specifying any metadata
-#' columns for either dimension. These should contain information about each
-#' row but NOT be required to uniquely identify a row in the `colData` or
-#' `rowData` objects. Additional metadata can be attached to a `LongTable` by
-#' passing a list to the metadata argument.
-#'
-#' @param rowData `data.table`, `data.frame`, `matrix` A table like object
-#'   coercible to a `data.table` containing the a unique `rowID` column which
-#'   is used to key assays, as well as additional row metadata to subset on.
-#' @param rowIDs `character`, `integer` A vector specifying
-#'   the names or integer indexes of the row data identifier columns. These
-#'   columns will be pasted together to make up the rownames of the
-#'   `LongTable` object.
-#' @param colData `data.table`, `data.frame`, `matrix` A table like object
-#'   coercible to a `data.table` containing the a unique `colID` column which
-#'   is used to key assays, as well as additional column metadata to subset on.
-#' @param colIDs `character`, `integer` A vector specifying
-#'   the names or integer indexes of the column data identifier columns. These
-#'   columns will be pasted together to make up the colnames of the
-#'   `LongTable` object.
-#' @param assays A `list` containing one or more objects coercible to a
-#'   `data.table`, and keyed by rowIDs and colIDs corresponding to the rowID and
-#'   colID columns in colData and rowData.
-#' @param metadata A `list` of metadata associated with the `LongTable`
-#'   object being constructed
-#' @param keep.rownames `logical`, `character`
-#'   Logical: whether rownames should be added as a column if coercing to a
-#'   `data.table`, default is FALSE. If TRUE, rownames are added to the column
-#'   'rn'.
-#'   Character: specify a custom column name to store the rownames in.
+#' @param rowData `data.frame` A rectangular object coercible to a `data.table`.
+#' @param rowIDs `character` A vector of `rowData` column names needed to
+#'   uniquely identify each row in a `LongTable`.
+#' @param colData `data.frame` A rectangular object coercible to a `data.table.`
+#' @param colIDs `chacter` A vector of `colData` column names needed to uniquely
+#'   identify each column in a `LongTable`.
+#' @param assays `list` A list of rectangular objects, each coercible to
+#'   a `data.table`. Must be named and item names must match the `assayIDs`
+#'   list.
+#' @param assayIDs `list` A list of `character` vectors specifying the columns
+#'   needed to uniquely identify each row in an `assay`. Names must match the
+#'   `assays` list.
+#' @param metadata `list` A list of one or more metadata items associated with
+#'   a LongTable experiment.
+#' @param keep.rownames `logical(1)` or `character(1)` Should rownames be
+#'   retained when coercing to `data.table` inside the constructor. Default
+#'   is FALSE. If TRUE, adds a 'rn' column to each rectangular object that
+#'   gets coerced from `data.frame` to `data.table`. If a string, that becomes
+#'   the name of the rownames column.
 #'
 #' @return A `LongTable` object containing the data for a treatment response
 #'   experiment and configured according to the rowIDs and colIDs arguments.
 #'
 #' @examples
-#' data(merckLongTable)
-#' merckLongTable
+#' "See vignette('The LongTable Class', package='CoreGx')"
 #'
-#' @import data.table
+#' @importFrom data.table key setkeyv
 #' @export
-LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
+LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         metadata=list(), keep.rownames=FALSE) {
 
     # handle missing parameters
     isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
-        colData=missing(colData), assays=missing(assays))
+        colIDs=missing(colIDs), assays=missing(assays),
+        assayIDs=missing(assayIDs))
 
-    if (all(isMissing)) {
-        rowData <- data.table(row="1")
-        rowIDs <- "row"
-        colData <- data.table(col="1")
-        colIDs <- "col"
-        assays <- list(measurement=data.table(row="1", col="1",
-            metric=0.123))
-        isMissing <- FALSE
-    } else if (any(isMissing)) {
-        stop(.errorMsg('\nRequired parameter(s) missing: ',
-            names(isMissing)[isMissing], collapse='\n\t'))
-    }
+    if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
+        names(isMissing)[isMissing], collapse='\n\t'))
 
     # check parameter types and coerce or error
-    if (!is(colData, "data.table"))
+    if (!is(colData, "data.table")) {
         tryCatch({
             colData <- data.table(colData, keep.rownames=keep.rownames)
         }, error=function(e)
             stop(.errorMsg("colData must be coercible to a data.frame!"))
         )
+    } else {
+        colData <- copy(colData)
+    }
 
-    if (!is(rowData, "data.table"))
+    if (!is(rowData, "data.table")) {
         tryCatch({
             rowData <- data.table(rowData, keep.rownames=keep.rownames) },
         error=function(e)
             stop(.errorMsg("rowData must be coerceible to a data.frame!"))
         )
+    } else {
+        rowData <- copy(rowData)
+    }
 
     isDT <- is.items(assays, FUN=is.data.table)
     isDF <- is.items(assays, FUN=is.data.frame) & !isDT
-    if (!all(isDT))
+    if (!all(isDT)) {
         tryCatch({
             for (i in which(isDF))
                 assays[[i]] <- data.table(assays[[i]], keep.rownames)
@@ -144,28 +122,31 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
                 types, '\nPlease ensure all items in the assays list are ',
                 'coerceable to a data.frame!'), collapse=', ')
         })
+    }
+    assays <- copy(assays)
 
     # Create the row and column keys for LongTable internal mappings
-    # Currently skipping if row and col key already exist to prevent failed
-    #   join when calling this function from subset,LongTable-method
     if (!('rowKey' %in% colnames(rowData)))
-        rowData[, c('rowKey') := .GRP, by=rowIDs]
+        rowData[, c('rowKey') := .GRP, keyby=c(rowIDs)]
     if (!('colKey' %in% colnames(colData)))
-        colData[, c('colKey') := .GRP, by=colIDs]
+        colData[, c('colKey') := .GRP, keyby=c(colIDs)]
 
     # initialize the internals object to store private metadata for a LongTable
-    internals <- new.env()
+    # NOTE: assign parent as emptyenv to prevent leaving parent.frame on the stack
+    internals <- setNames(vector("list", length=6),
+        c("rowIDs", "rowMeta", "colIDs", "colMeta", "assayKeys", "assayIndex"))
 
-    # capture row interal metadata
+    ## FIXME:: Move all validity checks to top of the function to prevent wasted
+    ## computation or into class validity method
+
+    # capture row internal metadata
     if (is.numeric(rowIDs) || is.logical(rowIDs))
         rowIDs <- colnames(rowData)[rowIDs]
     if (!all(rowIDs %in% colnames(rowData)))
         stop(.errorMsg('\nRow IDs not in rowData: ',
             setdiff(rowIDs, colnames(rowData)), collapse=', '))
     internals$rowIDs <- rowIDs
-    lockBinding('rowIDs', internals)
     internals$rowMeta <- setdiff(colnames(rowData[, -'rowKey']), rowIDs)
-    lockBinding('rowMeta', internals)
 
     # capture column internal metadata
     if (is.numeric(colIDs) || is.logical(colIDs))
@@ -174,39 +155,90 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays,
         stop(.errorMsg('\nColumn IDs not in colData: ',
             setdiff(colIDs, colnames(colData)), collapse=', '))
     internals$colIDs <- colIDs
-    lockBinding('colIDs', internals)
     internals$colMeta <- setdiff(colnames(colData[, -'colKey']), colIDs)
-    lockBinding('colMeta', internals)
+
+    # -- capture assays internal metadata
+    # sort such that rowIDs are first, then colIDs; ensures reindex returns
+    # the same order as construtor
+    for (i in seq_along(assayIDs)) {
+        rids <- intersect(rowIDs, assayIDs[[i]])
+        cids <- intersect(colIDs, assayIDs[[i]])
+        assayIDs[[i]] <- c(rids, cids)
+    }
+    internals$assayKeys <- assayIDs
+
+    # ensure names of assays and assayIDs match
+    hasMatchingAssayNames <- names(assays) == names(assayIDs)
+    if (!all(hasMatchingAssayNames)) stop(.errorMsg(
+        "Mismatched names between assays and assayIDs for:\n\t",
+        paste0(names(assays)[!hasMatchingAssayNames], collapse=", ")),
+        call.=FALSE)
+    # set keys for join with metadata
+    for (nm in names(assays)) {
+        setkeyv(assays[[nm]], assayIDs[[nm]])
+        assays[[nm]][, (nm) := .I]
+    }
+
+    # build the index mapping assay rows to rowKey and colKey
+    assayIndex <- expand.grid(rowKey=rowData$rowKey, colKey=colData$colKey)
+    setDT(assayIndex)
+    setkeyv(assayIndex, c("rowKey", "colKey"))
+    setkeyv(rowData, "rowKey")
+    assayIndex <- assayIndex[
+        rowData[, c(rowIDs, "rowKey"), with=FALSE], ,
+        on="rowKey"
+    ]
+    setkeyv(colData, "colKey")
+    assayIndex <- assayIndex[
+        colData[, c(colIDs, "colKey"), with=FALSE], ,
+        on="colKey"
+    ]
+    setkeyv(assayIndex, c(rowIDs, colIDs))
+    for (nm in names(assays)) {
+        assayIndex[assays[[nm]], (nm) := get(nm)]
+    }
+    assayIndex[, (c(rowIDs, colIDs)) := NULL]
+    setkeyv(assayIndex, names(assays))
+    internals$assayIndex <- assayIndex
+
+    # make internals immutable to prevent users from modifying structural metadata
+    internals <- immutable(internals)
+
+    # Drop extra assay columns and key by the assay key in the assay index
+    for (i in seq_along(assays)) {
+        assays[[i]][, (assayIDs[[i]]) := NULL]
+        setkeyv(assays[[i]], names(assays)[i])
+    }
 
     # Reorder columns to match the keys, this prevents issues in unit tests
     # caused by different column orders
-    setcolorder(rowData, unlist(mget(c('rowIDs', 'rowMeta'), internals)))
-    setcolorder(colData, unlist(mget(c('colIDs', 'colMeta'), internals)))
+    setkeyv(rowData, "rowKey")
+    setkeyv(colData, "colKey")
+    setcolorder(rowData, unlist(internals[c("rowIDs", "rowMeta")]))
+    setcolorder(colData, unlist(internals[c('colIDs', 'colMeta')]))
 
     ## Assemble  the pseudo row and column names for the LongTable
-    ### TODO:: Is this the slow part of the constructor?
     .pasteColons <- function(...) paste(..., collapse=':')
     rowData[, `:=`(.rownames=mapply(.pasteColons, transpose(.SD))),
-        .SDcols=internals$rowIDs]
+        .SDcols=rowIDs]
     colData[, `:=`(.colnames=mapply(.pasteColons, transpose(.SD))),
-        .SDcols=internals$colIDs]
-
-    # Conditionally key the assay tables
-    for (i in seq_along(assays)) {
-        if (!("rowKey" %in% colnames(assays[[i]]))) {
-            assays[[i]] <- merge.data.table(assays[[i]],
-                rowData[, c("rowKey", rowIDs), with=FALSE],
-                by=rowIDs)[, .SD, .SDcols=!rowIDs]
-        }
-        if (!("colKey" %in% colnames(assays[[i]]))) {
-            assays[[i]] <- merge.data.table(assays[[i]],
-                colData[, c("colKey", colIDs), with=FALSE],
-                by=colIDs)[, .SD, .SDcols=!colIDs]
-        }
-    }
-
-    return(.LongTable(rowData=rowData, colData=colData, assays=assays,
+        .SDcols=colIDs]
+    return(CoreGx:::.LongTable(rowData=rowData, colData=colData, assays=assays,
         metadata=metadata, .intern=internals))
+}
+
+# NOT RUN: testing code for construtor method
+if (sys.nframe() == 0) {
+    bench::system_time(rowData <- rowData(dataMapperLT))
+    bench::system_time(rowIDs <- rowDataMap(dataMapperLT)[[1]])
+    bench::system_time(colData <- colData(dataMapperLT))
+    bench::system_time(colIDs <- colDataMap(dataMapperLT)[[1]])
+    bench::system_time(assays <- assays(dataMapperLT))
+    bench::system_time(assayIDs <- lapply(assayMap(dataMapperLT), `[[`, i=1))
+
+    bench::system_time(
+        lt <- LongTable(rowData, rowIDs, colData, colIDs, assays, assayIDs)
+    )
 }
 
 # ---- Class unions for CoreSet slots
@@ -358,7 +390,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
 #' @export
 setMethod('rowIDs', signature(object='LongTable'),
         function(object, data=FALSE, key=FALSE) {
-    cols <- getIntern(object, 'rowIDs')
+    cols <- mutable(getIntern(object, 'rowIDs'))
     if (key) cols <- c(cols, 'rowKey')
     if (data) rowData(object, key=key)[, ..cols] else cols
 })
@@ -382,7 +414,7 @@ setMethod('rowIDs', signature(object='LongTable'),
 #' @export
 setMethod('rowMeta', signature(object='LongTable'),
         function(object, data=FALSE, key=FALSE) {
-    cols <- getIntern(object, 'rowMeta')
+    cols <- mutable(getIntern(object, 'rowMeta'))
     cols <- cols[!grepl('^\\.', cols)]
     if (key) cols <- c(cols, 'rowKey')
     if (data) rowData(object, key=key)[, ..cols] else cols
@@ -409,7 +441,7 @@ setMethod('rowMeta', signature(object='LongTable'),
 setMethod('colIDs', signature(object='LongTable'),
         function(object, data=FALSE, key=FALSE) {
 
-    cols <- getIntern(object, 'colIDs')
+    cols <- mutable(getIntern(object, 'colIDs'))
     if (key) cols <- c(cols, 'colKey')
     if (data) colData(object, key=TRUE)[, ..cols] else cols
 
@@ -436,7 +468,7 @@ setMethod('colIDs', signature(object='LongTable'),
 setMethod('colMeta', signature(object='LongTable'),
     function(object, data=FALSE, key=FALSE) {
 
-    cols <- getIntern(object, 'colMeta')
+    cols <- mutable(getIntern(object, 'colMeta'))
     cols <- cols[!grepl('^\\.', cols)]
     if (key) cols <- c(cols, 'colKey')
     if (data) colData(object, key=TRUE)[, ..cols] else cols

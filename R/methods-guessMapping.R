@@ -6,6 +6,9 @@
 #'
 #' @return A `list` with mapping guesses as items.
 #'
+#' @examples
+#' "Generics shouldn't need examples!"
+#'
 #' @md
 #' @export
 setGeneric('guessMapping', function(object, ...) standardGeneric('guessMapping'))
@@ -89,8 +92,9 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
     unmapped <- setdiff(colnames(mapData),
         unique(c(unlist(groups), unlist(lapply(mappings, colnames)))))
     if (!data) mappings <- lapply(mappings, colnames)
-    mappings <- mapply(list, groups, mappings, SIMPLIFY=FALSE)
-    mappings <- lapply(mappings, `names<-`, value=c('id_columns', 'mapped_columns'))
+    mappings <- Map(f=list, groups, mappings)
+    mappings <- lapply(mappings, FUN=setNames,
+        nm=c('id_columns', 'mapped_columns'))
 
     mappings[['unmapped']] <- unmapped
 
@@ -121,28 +125,27 @@ setMethod('guessMapping', signature(object='LongTableDataMapper'),
 #' @aliases cardinality
 #'
 #' @md
+#' @importFrom data.table setindexv
+#' @importFrom MatrixGenerics colAlls
 #' @export
 checkColumnCardinality <- function(df, group, cardinality=1, ...) {
 
-    ## FIXME:: Make this faster using logical operators to get a `logical`
-    ##   matrix then using `colAlls` to check for the correct cardinality.
-    funContext <- '[CoreGx::checkColumnCardinality]\n\t'
+    funContext <- '\n[CoreGx::checkColumnCardinality]\n\t'
 
     # Copy to prevent accidental modify by references
     df <- copy(df)
     if (!is.data.table(df)) setDT(df)
 
     # Intercept slow data.table group by when nrow == .NGRP
-    setindexv(df, cols=group)
-    groupDT <- df[, .(group_index = .GRP), by=group, ...]
-    if (nrow(df) == max(groupDT$group_index)) {
+    setkeyv(df, cols=group)
+    nrowEqualsNGroup <- df[, .N, by=group, ...][, max(N), ...] == 1
+    if (nrowEqualsNGroup) {
         if (cardinality != 1) stop(.errorMsg(funContext, 'The group argument
             uniquely identifies each row, so the cardinality is 1:1!'))
         columnsHaveCardinality <- setdiff(colnames(df), group)
     } else {
         dimDT <- df[, lapply(.SD, FUN=.length_unique), by=group, ...]
-        columnsHaveCardinality <- names(which(
-            vapply(dimDT, .all_equals, y=cardinality, logical(1))))
+        columnsHaveCardinality <- colnames(dimDT)[colAlls(dimDT == cardinality)]
     }
 
     return(columnsHaveCardinality)

@@ -90,7 +90,6 @@ setGeneric("sensitivityInfo<-",
 #' Generic function to get the raw data array for a treatment response experiment
 #'   from an S4 class.
 #'
-
 #' @examples
 #' print("Generics shouldn't need examples?")
 #'
@@ -246,7 +245,7 @@ setGeneric('buildLongTable',
 # ===== Other Generics
 
 
-#' Retrieve the symbol for the object@.intern slot
+#' Retrieve the specified item from object internal metadata.
 #'
 #' Internal slot for storing metadata relevant to the internal operation of an
 #'     S4 object.
@@ -267,6 +266,22 @@ setGeneric('buildLongTable',
 #' @export getIntern
 setGeneric('getIntern',
     function(object, x, ...) standardGeneric('getIntern'))
+
+
+#' Set the internal structural metadata for an S4 class
+#'
+#' @param object An R object to update internal structural metadata for.
+#' @param value An `immutable_list` object, being a class union between `list`
+#'   and `immutable` S3 classes.
+#'
+#' @examples
+#' print("Generics shouldn't need examples?")
+#'
+#' @return Updates the object and returns invisibly.
+#'
+#' @keywords internal
+setGeneric("getIntern<-",
+    function(object, ..., value) standardGeneric("getIntern<-"))
 
 
 #' Generic to access the row identifiers from

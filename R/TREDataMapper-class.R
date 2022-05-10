@@ -43,10 +43,13 @@ NULL
 #' The first is column names in `rawdata` needed to uniquely identify each
 #' column, the second is additional columns which map to rows, but are not
 #' required to uniquely identify them. Columns should be samples.
-#' @param assayMap A list-like where each item is a `character` vector of
-#' `rawdata` column names to assign to an assay, where the name of that assay
-#' is the name of the list item. If names are omitted, assays will be numbered
-#' by their index in the list
+#' @param assayMap A list-like where each item is a `list` with two `character`
+#' vectors defining an assay, the first containing the identifier columns in
+#' `rawdata` needed to uniquely identify each row an assay, and the second the
+#' `rawdata` columns to be mapped to that assay. The names of `assayMap`
+#' will be the names of the assays in the `TreatmentResponseExperiment` that
+#' is created when calling `metaConstruct` on this `DataMapper` object. If the
+#' character vectors have names, the value columns will be renamed accordingly.
 #' @param metadataMap A list-like where each item is a `character` vector of
 #' `rawdata` column names to assign to the `@metadata` of the `LongTable`,
 #' where the name of that assay is the name of the list item. If names are
@@ -60,12 +63,11 @@ NULL
 #' @md
 #' @importFrom data.table setDT
 #' @export
-TREDataMapper <- function(rawdata=list(), rowDataMap=list(),
-    colDataMap=list(), assayMap=list(), metadataMap=list()
-) {
-    funContext <- "[CoreGx::TREDataMapper]\n\t"
-
-    ## TODO:: input validation with checkmate
+TREDataMapper <- function(rawdata=data.frame(),
+        rowDataMap=list(character(), character()),
+        colDataMap=list(character(), character()),
+        assayMap=list(list(character(), character())),
+        metadataMap=list(character())) {
 
     if (is(rawdata, "LongTableDataMapper")) {
         lt_dm <- rawdata

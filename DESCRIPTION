@@ -1,8 +1,8 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
-Version: 2.1.0
-Date: 2022-04-12
+Version: 2.1.1
+Date: 2022-05-09
 Authors@R: c(
     person("Petr","Smirnov", email = "petr.smirnov@uhnresearch.ca",
         role = c("aut")),
@@ -42,6 +42,7 @@ Imports:
     MatrixGenerics,
     piano,
     BiocParallel,
+    parallel,
     BumpyMatrix,
     checkmate,
     methods,
@@ -53,7 +54,8 @@ Imports:
     data.table,
     crayon,
     glue,
-    rlang
+    rlang,
+    bench
 Suggests:
     pander,
     markdown,
@@ -63,10 +65,12 @@ Suggests:
     formatR,
     testthat
 License: GPL-3
+Config/testthat/edition: 3
 Roxygen: list(markdown=TRUE, r6=FALSE)
 RoxygenNote: 7.1.2
-Collate: 
+Collate:
     'allGenerics.R'
+    'immutable-class.R'
     'LongTable-class.R'
     'CoreSet-class.R'
     'CoreSet-accessors.R'
@@ -75,6 +79,7 @@ Collate:
     'LongTable-accessors.R'
     'LongTable-utils.R'
     'LongTableDataMapper-class.R'
+    'LongTableDataMapper-accessors.R'
     'TreatmentResponseExperiment-class.R'
     'TREDataMapper-class.R'
     'adaptiveMatthewCor.R'
@@ -93,6 +98,7 @@ Collate:
     'methods-guessMapping.R'
     'methods-metaConstruct.R'
     'methods-subsetTo.R'
+    'optimizeCoreGx.R'
     'updateObject-methods.R'
     'utilities.R'
     'utils-iteration.R'

@@ -5,7 +5,9 @@
 #'
 #' @return A subsetted version of the original `object`
 #'
+#' @examples
+#' "Generics shouldn't need examples!"
+#'
 #' @export
 #' @keywords internal
 setGeneric("subsetTo", function(object, ...) standardGeneric("subsetTo"))
-

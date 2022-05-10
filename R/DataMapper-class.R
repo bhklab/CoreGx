@@ -1,10 +1,11 @@
-#' @importClassesFrom S4Vectors List
-setClassUnion('list_or_List', c('list', 'List'))
+#' @importClassesFrom S4Vectors Annotated list_OR_List
+#' @importFrom data.table copy
+NULL
 
 #' An S4 Class For Mapping from Raw Experimental Data to a Specific S4 Object
-#' 
+#'
 #' This object will be used as a way to abstract away data preprocessing.
-#' 
+#'
 #' @section Slots:
 #' * rawdata: A list-like object containing one or more pieces of raw data
 #'   that will be processed and mapped to the slots of an `S4` object.
@@ -14,7 +15,7 @@ setClassUnion('list_or_List', c('list', 'List'))
 #' @aliases DataMapper-class
 .DataMapper <- setClass('DataMapper',
     contains=c('VIRTUAL', 'Annotated'),
-    slots=list(rawdata='list_or_List')
+    slots=list(rawdata='list_OR_List')
 )
 
 .local_class_2 <- 'DataMapper'
@@ -69,11 +70,12 @@ setGeneric('rawdata', function(object, ...) standardGeneric('rawdata'))
 #' @aliases rawdata
 #' @eval .docs_DataMapper_get_rawdata(class_=.local_class_2)
 setMethod('rawdata', signature(object='DataMapper'), function(object) {
-    object@rawdata
+    rawdata_ <- object@rawdata
+    return(data.table::copy(rawdata_))
 })
 
 #' @export
-setGeneric("rawdata<-", function(object, ..., value) 
+setGeneric("rawdata<-", function(object, ..., value)
     standardgeneric("rawdata<-"))
 
 .docs_DataMapper_set_rawdata <- function(...) .parseToRoxygen(

@@ -4,7 +4,7 @@
 \alias{[,LongTable,ANY,ANY,ANY-method}
 \title{[ LongTable Method}
 \usage{
-\S4method{[}{LongTable,ANY,ANY,ANY}(x, i, j, assays, ..., drop = FALSE)
+\S4method{[}{LongTable,ANY,ANY,ANY}(x, i, j, assays = assayNames(x), ..., drop = FALSE)
 }
 \arguments{
 \item{x}{\code{LongTable} The object to subset.}

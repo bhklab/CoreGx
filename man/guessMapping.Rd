@@ -18,3 +18,7 @@ A \code{list} with mapping guesses as items.
 \description{
 Generic for Guessing the Mapping Between Some Raw Data and an S4 Object
 }
+\examples{
+"Generics shouldn't need examples!"
+
+}

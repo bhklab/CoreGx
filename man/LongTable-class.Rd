@@ -38,23 +38,36 @@
 
 \S4method{assayCols}{LongTable}(object, i)
 
-\S4method{getIntern}{LongTable,character}(object, x, ...)
+\S4method{getIntern}{LongTable,character}(object, x)
 
 \S4method{getIntern}{LongTable,missing}(object, x)
 
-\S4method{rowData}{LongTable}(x, key = FALSE, use.names = FALSE)
+\S4method{rowData}{LongTable}(x, key = FALSE, use.names = FALSE, ...)
 
-\S4method{rowData}{LongTable}(x) <- value
+\S4method{rowData}{LongTable}(x, ...) <- value
 
-\S4method{colData}{LongTable}(x, key = FALSE)
+\S4method{colData}{LongTable}(x, key = FALSE, dimnames = FALSE, ...)
 
-\S4method{colData}{LongTable,ANY}(x) <- value
+\S4method{colData}{LongTable,ANY}(x, ...) <- value
 
-\S4method{assays}{LongTable}(x, withDimnames = TRUE, metadata = withDimnames, key = !withDimnames)
+\S4method{assays}{LongTable}(
+  x,
+  withDimnames = TRUE,
+  metadata = withDimnames,
+  key = !withDimnames,
+  ...
+)
 
-\S4method{assays}{LongTable,list}(x) <- value
+\S4method{assays}{LongTable,list}(x, withDimnames = TRUE, ...) <- value
 
-\S4method{assay}{LongTable,ANY}(x, i, withDimnames = FALSE, metadata = withDimnames, key = !withDimnames)
+\S4method{assay}{LongTable,ANY}(
+  x,
+  i,
+  withDimnames = FALSE,
+  metadata = withDimnames,
+  key = !withDimnames,
+  ...
+)
 
 \S4method{assay}{LongTable,character}(x, i) <- value
 
@@ -83,12 +96,12 @@ instead of the column names? Default is FALSE.}
 
 \item{x}{The \code{LongTable} object to retrieve the dimnames for.}
 
-\item{...}{\code{pairlist} Addtional arguments to get or mget inside of the
-function.}
-
 \item{use.names}{\code{logical} This parameter is just here to stop matching
-the posotopoma; argument to use.names from the rowData generic. It
+the positional argument to use.names from the rowData generic. It
 doesn't do anything at this time and can be ignored.}
+
+\item{...}{For developer use only! Pass raw=TRUE to return the slot for
+modification by reference.}
 
 \item{value}{A \code{data.frame} or \code{data.table} to update the assay data
 with. This must at minumum contain the row and column data identifier
@@ -130,11 +143,10 @@ A \code{list} of \code{character} vectors containing the value column names for
 each assay if i is missing, otherwise a \code{character} vector of value column
 names for the selected assay.
 
-value of x if length(x) == 1 else named list of values for all
-symbols in x
+\code{immutable} value of x if length(x) == 1 else named list of values
+for all symbols in x.
 
-A named \code{list} with all values in environment object@.intern coerced
-to a list (and therefore copied).
+An \code{immutable} list.
 
 A \code{data.table} containing rowID, row identifiers, and row metadata.
 
@@ -194,7 +206,7 @@ uniquely identify each row.
 LongTable object. This is mostly for developmer use.
 
 \item \code{getIntern}: Access all structural metadata present within a
-LongTable object. This is mostly for developmer use.
+LongTable object. This is primarily for developmer use.
 
 \item \code{rowData}: Get the row level annotations for a \code{LongTable} object.
 
@@ -270,11 +282,9 @@ column dimension of a \code{LongTable}.
 \code{LongTable}.
 \item \emph{metadata}: An optional \code{list} of additional metadata for a \code{LongTable}
 which doesn't map to one of the dimensions.
-\item \emph{.intern}: An \code{environment} that holds internal structural metadata
+\item \emph{.intern}: An \code{immutable} \code{list} that holds internal structural metadata
 about a LongTable object, such as which columns are required to key
-the object. An environment has been used to allow locking items, which
-can prevent accidental modification of a property required for the class
-to work.
+the object.
 }
 }
 
