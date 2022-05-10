@@ -24,7 +24,7 @@
 #' are not S3 generics and therefore no mechanism exists for hooking into them
 #' to extend their functionality.
 #'
-#' @param object Any R object
+#' @param object,x Any R object
 #'
 #' @return The `object` with "immutable" prepended to its class attribute.
 #'
@@ -45,6 +45,7 @@ immutable <- function(object) {
 #' @export
 setOldClass("immutable")
 
+#' @rdname immutable
 #' @export
 setClassUnion("immutable_list", c("immutable", "list"))
 
@@ -65,18 +66,20 @@ is.immutable <- function(object) {
 #' @title Print method for objects inheriting from the "immutable" S3-class
 #'
 #' @param x An object inheriting from the "immutable" S3-class.
+#' @param ... Fallthrough arguments to `print.default`.
 #'
 #' @return None, `invisible(NULL)`
 #'
 #' @md
 #' @export
-print.immutable <- function(x) {
+print.immutable <- function(x, ...) {
     other_cls <- setdiff(attributes(x)$class, "immutable")
     class(x) <- other_cls
     cat("immutable", class(x), "\n")
-    print(x)
+    print(x, ...)
 }
 
+#' @rdname immutable
 #' @export
 show.immutable <- function(x) print(x)
 
@@ -118,13 +121,13 @@ c.immutable <- function(x, ...) {
 #' immut_mat[1:5, 1:5]
 #'
 #' @md
-#' @aliases subset.immutable, [.immutable, [[.immutable, $.immutable
+#' @aliases subset, [, [[, $
 #' @export
 subset.immutable <- function(x, ...) {
     sub_obj <- NextMethod()
     immutable(sub_obj)
 }
-#' @name [.immutable
+#' @name [
 #' @rdname setOps-immutable
 #' @export
 `[.immutable` <- function(x, ...) {
@@ -143,14 +146,14 @@ subset.immutable <- function(x, ...) {
     sub_obj <- NextMethod()
     immutable(sub_obj)
 }
-#' @name [[.immutable
+#' @name [[
 #' @rdname setOps-immutable
 #' @export
 `[[.immutable` <- function(x, ...) {
     sub_obj <- NextMethod()
     immutable(sub_obj)
 }
-#' @name $.immutable
+#' @name $
 #' @rdname setOps-immutable
 #' @export
 `$.immutable` <- function(x, ...) {
@@ -169,8 +172,9 @@ subset.immutable <- function(x, ...) {
 #' Prevents modification of objects labelled with the "immutable" S3-class by
 #' intercepting assignment during S3-method dispatch and returning an error.
 #'
-#' @param object An R object inherting from the "immutable" S3-class.
+#' @param object,x An R object inherting from the "immutable" S3-class.
 #' @param ... Catch subset arguments for various dimensions.
+#' @param value Not used.
 #'
 #' @return None, throws an error.
 #'
@@ -182,48 +186,49 @@ subset.immutable <- function(x, ...) {
 #' immutable_df$a
 #'
 #' @md
-#' @aliases subset<-.immutable, [<-.immutable, [[<-.immutable, $<-.immutable
+#' @usage \\method{subset}{immutable}(object, ...) <- value
+#' @aliases subset<-, [<-, [[<-, $<-, colnames<-, rownames<-, dimnames<-, names<-
 #' @export
 `subset<-.immutable` <- function(object, ..., value) {
     stop(.immutable_emsg, call.=FALSE)
 }
-#' @name [<-.immutable
+#' @name [<-
 #' @rdname assignment-immutable
 #' @export
 `[<-.immutable` <- function(object, ..., value) {
     stop(.immutable_emsg, call.=FALSE)
 }
-#' @name [[<-.immutable
+#' @name [[<-
 #' @rdname assignment-immutable
 #' @export
 `[[<-.immutable` <- function(object, ..., value) {
     stop(.immutable_emsg, call.=FALSE)
 }
-#' @name $<-.immutable
+#' @name $<-
 #' @rdname assignment-immutable
 #' @export
 `$<-.immutable` <- function(object, ..., value) {
     stop(.immutable_emsg, call.=FALSE)
 }
-
+#' @name names<-
 #' @rdname assignment-immutable
-#' @aliases names<-.immutable, dimnames<-.immutable, colnames<-.immutable,
-#' rownames<-.immutable
 #' @export
 `names<-.immutable` <- function(x, value)
     stop(.immutable_emsg, call.=FALSE)
-#' @name dimnames<-.immutable
+#' @name dimnames<-
 #' @rdname assignment-immutable
 #' @export
 `dimnames<-.immutable` <- function(x, value)
     stop(.immutable_emsg, call.=FALSE)
-#' @name colnames<-.immutable
+#' @name colnames<-
 #' @rdname assignment-immutable
+#' @usage \\method{colnames}{immutable}(x) <- value
 #' @export
 `colnames<-.immutable` <- function(x, value)
     stop(.immutable_emsg, call.=FALSE)
-#' @name rownames<-.immutable
+#' @name rownames<-
 #' @rdname assignment-immutable
+#' @usage \\method{rownames}{immutable}(x) <- value
 #' @export
 `rownames<-.immutable` <- function(x, value)
     stop(.immutable_emsg, call.=FALSE)

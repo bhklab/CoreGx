@@ -3,22 +3,30 @@
 \name{assignment-immutable}
 \alias{assignment-immutable}
 \alias{subset<-.immutable}
-\alias{subset<-.immutable,}
-\alias{[<-.immutable,}
-\alias{[[<-.immutable,}
-\alias{$<-.immutable}
+\alias{subset<-,}
+\alias{[<-,}
+\alias{[[<-,}
+\alias{$<-,}
+\alias{colnames<-,}
+\alias{rownames<-,}
+\alias{dimnames<-,}
+\alias{names<-}
+\alias{[<-}
 \alias{[<-.immutable}
+\alias{[[<-}
 \alias{[[<-.immutable}
+\alias{$<-}
+\alias{$<-.immutable}
 \alias{names<-.immutable}
-\alias{names<-.immutable,}
-\alias{dimnames<-.immutable,}
-\alias{colnames<-.immutable,}
-\alias{rownames<-.immutable}
+\alias{dimnames<-}
 \alias{dimnames<-.immutable}
+\alias{colnames<-}
 \alias{colnames<-.immutable}
+\alias{rownames<-}
+\alias{rownames<-.immutable}
 \title{Intercept assignment operations for "immutable" S3 objects.}
 \usage{
-subset.immutable(object, ...) <- value
+\\method{subset}{immutable}(object, ...) <- value
 
 \method{[}{immutable}(object, ...) <- value
 
@@ -30,14 +38,16 @@ subset.immutable(object, ...) <- value
 
 \method{dimnames}{immutable}(x) <- value
 
-colnames.immutable(x) <- value
+\\method{colnames}{immutable}(x) <- value
 
-rownames.immutable(x) <- value
+\\method{rownames}{immutable}(x) <- value
 }
 \arguments{
-\item{object}{An R object inherting from the "immutable" S3-class.}
+\item{object, x}{An R object inherting from the "immutable" S3-class.}
 
 \item{...}{Catch subset arguments for various dimensions.}
+
+\item{value}{Not used.}
 }
 \value{
 None, throws an error.
