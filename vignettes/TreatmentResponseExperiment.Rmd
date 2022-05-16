@@ -1,5 +1,5 @@
 ---
-title: "The LongTable Class"
+title: "The TreatmentResponseExperiment Class"
 author:
 - name: Petr Smirnov
   affiliation: &pm Princess Margaret Cancer Centre, University Health Network, Toronto Canada
@@ -11,7 +11,7 @@ package: CoreGx
 output:
   BiocStyle::html_document
 vignette: |
-  %\VignetteIndexEntry{The LongTable Class}
+  %\VignetteIndexEntry{The TreatmentResponseExperiment Class}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -28,12 +28,12 @@ library(data.table)
 
 # Why Do We Need A New Class?
 
-The current implementation for the `@sensitivity` slot in a `PharmacoSet` has
-some limitations.
+The current implementation for the `@treatmentResponse` slot in a
+`PharmacoSet` has some limitations.
 
 Firstly, it does not natively support dose-response experiments with
 multiple drugs and/or cancer cell lines. As a result we have not been
-able to include this data into a PharmacoSet thus far.
+able to include this data into a `PharmacoSet` thus far.
 
 Secondly, drug combination data has the potential to scale to high dimensionality.
 As a result we need an object that is highly performant to ensure
@@ -54,26 +54,26 @@ of the `SummarizedExperiment` and `MultiAssayExperiment` classes and implements
 them using the `data.table` package, which provides an R API to a rich set of
 tools for high performance data processing implemented in C.
 
-# Anatomy of a LongTable
+# Anatomy of a TreatmentResponseExperiment
 
 ## Class Diagram
 
 ```{r class_diagram, fig.wide=TRUE, caption='LongTable Class Diagram'}
-knitr::include_graphics('LongTableClassDiagram.png')
+knitr::include_graphics('TreatmentResponseExperimentClassDiagram.drawio.png')
 ```
 
 We have borrowed directly from the `SummarizedExperiment` class
 for the `rowData`, `colData`, `metadata` and `assays` slot names.
 We also implemented the `SummarizedExperiment` accessor generics for the
-`LongTable`.
+`TreatmentResponseExperiment`.
 
 ## Object Structure and Cardinality
 
 There are, however, some important differences which make this object more
 flexible when dealing with high dimensional data.
 
-```{r long_table_structure, fig.wide=TRUE, caption='LongTable Structure'}
-knitr::include_graphics('LongTableStructure.png')
+```{r tre_structure, fig.wide=TRUE, caption='TreatmentResponseExperiment Structure'}
+knitr::include_graphics('TreatmentResponseExperimentStructure.drawio.png')
 ```
 
 Unlike a `SummarizedExperiment`, there are three distinct
