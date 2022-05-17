@@ -1,11 +1,12 @@
 #' @include LongTable-class.R LongTable-accessors.R
+#' @importFrom checkmate assertClass assertDataFrame
 NULL
 
 
 #### CoreGx dynamic documentation
 ####
 #### Warning: for dynamic docs to work, you must set
-#### Roxygen: list(markdown = TRUE, r6=FALSE)
+#### Roxygen: list(markdown=TRUE, r6=FALSE)
 #### in the DESCRPTION file!
 
 
@@ -24,6 +25,66 @@ NULL
 ##
 ## == subset
 
+
+#' Subset a `LongTable` using an "assayIndex" data.frame
+#'
+#' @param x `LongTable`
+#' @param index `data.frame` Table with columns "rowKey", "colKey" and
+#'   ".<assayName>", were <assayName> is the value for each `assayNames(x)`.
+#'   Warning: rownames are dropped internally in coercion to `data.table`,
+#' @param reindex `logical(1)` Should index values be reset such that they
+#'   are the smallest possible set of consecutive integers. Modifies the
+#'   "rowKey", "colKey", and all assayKey columns. Initial benchmarks indicate
+#'   `reindex=FALSE` saves ~20% of both execution time and memory allocation. The
+#'   cost of reindexing decreases the smaller your subet gets.
+#'
+#' @return `LongTable` subset according to the provided index.
+#'
+#' @noRd
+.subsetByIndex <- function(x, index, reindex=FALSE) {
+
+    # -- validate input
+    assertClass(x, "LongTable")
+    assertDataFrame(index)
+    if (!is.data.table(index)) setDT(index)
+    x <- copy(x)
+
+    # -- subset slots
+    rData <- rowData(x, raw=TRUE)[sort(unique(index$rowKey)), ]
+    cData <- colData(x, raw=TRUE)[sort(unique(sort(index$colKey))), ]
+    assays <- assays(x, withDimnames=FALSE)
+    metaKeys <- c("rowKey", "colKey")
+    setkeyv(index, metaKeys)
+    for (i in seq_along(assays)) {
+        setkeyv(assays[[i]], metaKeys)
+        aname <- names(assays)[i]
+        # join based subsets use binary-search, O(log(n)) vs O(n) for vector-scan
+        # see https://rdatatable.gitlab.io/data.table/articles/datatable-keys-fast-subset.html
+        assays[[i]] <- assays[[i]][
+            index[!is.na(get(aname)), c(metaKeys, aname), with=FALSE],
+        ]
+        setkeyv(assays[[i]], aname)
+    }
+    # -- update object
+    # delete row-/colKeys by reference
+    for (a in assays) a[, (metaKeys) := NULL]
+    # raw=TRUE allows direct modification of slots
+    setkeyv(rData, "rowKey")
+    rowData(x, raw=TRUE) <- rData
+    setkeyv(cData, "colKey")
+    colData(x, raw=TRUE) <- cData
+    assays(x, raw=TRUE) <- assays
+    mutableIntern <- mutable(getIntern(x))
+    setkeyv(index, names(assays))
+    mutableIntern$assayIndex <- index
+    x@.intern <- immutable(mutableIntern)
+
+    # -- optionally reindex the table
+    if (reindex) {
+        x <- reindex(x)
+    }
+    return(x)
+}
 
 #' Subset method for a LongTable object.
 #'
@@ -63,10 +124,11 @@ NULL
 #' @param assays `character`, `numeric` or `logical` Optional list of assay
 #'   names to subset. Can be used to subset the assays list further,
 #'   returning only the selected items in the new LongTable.
-#' @param reindex `logical` Should the col/rowKeys be remapped after subsetting.
-#'   defaults to TRUE. For chained subsetting you may be able to get performance
-#'   gains by setting to FALSE and calling reindex() manually after subsetting
-#'   is finished.
+#' @param reindex `logical(1)` Should index values be reset such that they
+#'   are the smallest possible set of consecutive integers. Modifies the
+#'   "rowKey", "colKey", and all assayKey columns. Initial benchmarks indicate
+#'   `reindex=FALSE` saves ~20% of both execution time and memory allocation. The
+#'   cost of reindexing decreases the smaller your subet gets.
 #'
 #' @return `LongTable` A new `LongTable` object subset based on the specified
 #'      parameters.
@@ -75,10 +137,12 @@ NULL
 #' @importFrom crayon magenta cyan
 #' @import data.table
 #' @export
-setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TRUE) {
+setMethod('subset', signature('LongTable'),
+        function(x, i, j, assays=assayNames(x),
+            reindex=TRUE) {
 
-    longTable <- x
-    rm(x)
+    # prevent modify by reference
+    x <- copy(x)
 
     # local helper functions
     .rowData <- function(...) rowData(..., key=TRUE)
@@ -92,78 +156,78 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
     if (!missing(i)) {
         ## TODO:: Clean up this if-else block
         if (.tryCatchNoWarn(is.call(i), error=function(e) FALSE)) {
-            rowDataSubset <- .rowData(longTable)[eval(i), ]
+            rowDataSubset <- .rowData(x)[eval(i), ]
         } else if (.tryCatchNoWarn(is.character(i), error=function(e) FALSE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            idCols <- rowIDs(longTable, key=TRUE)
+            idCols <- rowIDs(x, key=TRUE)
             if (max(unlist(lapply(i, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more rowID columns than
                     there are in the LongTable.\n\tPlease use query of the form ',
                     paste0(idCols, collapse=':')))
-            i <- grepl(.preprocessRegexQuery(i), rownames(longTable), ignore.case=TRUE)
-            i <- str2lang(.variableToCodeString(i))
-            rowDataSubset <- .rowData(longTable)[eval(i), ]
+            imatch <- rownames(x) %in% i
+            if (!any(imatch))
+                imatch <- grepl(.preprocessRegexQuery(i), rownames(x),
+                    ignore.case=TRUE)
+            imatch <- str2lang(.variableToCodeString(imatch))
+            rowDataSubset <- .rowData(x)[eval(imatch), ]
         } else {
             isub <- substitute(i)
-            rowDataSubset <- .tryCatchNoWarn(.rowData(longTable)[i, ],
-                error=function(e) .rowData(longTable)[eval(isub), ])
+            rowDataSubset <- .tryCatchNoWarn(.rowData(x)[i, ],
+                error=function(e) .rowData(x)[eval(isub), ])
         }
     } else {
-        rowDataSubset <- .rowData(longTable)
+        rowDataSubset <- .rowData(x)
     }
 
     # subset colData
     if (!missing(j)) {
         ## TODO:: Clean up this if-else block
         if (.tryCatchNoWarn(is.call(j), error=function(e) FALSE, silent=TRUE)) {
-            colDataSubset <- .colData(longTable)[eval(j), ]
+            colDataSubset <- .colData(x)[eval(j), ]
         } else if (.tryCatchNoWarn(is.character(j), error=function(e) FALSE, silent=TRUE)) {
             ## TODO:: Implement diagnosis for failed regex queries
-            idCols <- colIDs(longTable, key=TRUE)
+            idCols <- colIDs(x, key=TRUE)
             if (max(unlist(lapply(j, .strSplitLength, split=':'))) > length(idCols))
                 stop(cyan$bold('Attempting to select more ID columns than there
                     are in the LongTable.\n\tPlease use query of the form ',
                     paste0(idCols, collapse=':')))
-            j <- grepl(.preprocessRegexQuery(j), colnames(longTable), ignore.case=TRUE)
-            j <- str2lang(.variableToCodeString(j))
-            colDataSubset <- .colData(longTable)[eval(j), ]
+            jmatch <- colnames(x) %in% j
+            if (!any(jmatch))
+                jmatch <- grepl(.preprocessRegexQuery(j), colnames(x),
+                    ignore.case=TRUE)
+            jmatch <- str2lang(.variableToCodeString(jmatch))
+            colDataSubset <- .colData(x)[eval(jmatch), ]
         } else {
             jsub <- substitute(j)
-            colDataSubset <- .tryCatchNoWarn(.colData(longTable)[j, ],
-                error=function(e) .colData(longTable)[eval(jsub), ])
+            colDataSubset <- .tryCatchNoWarn(.colData(x)[j, ],
+                error=function(e) .colData(x)[eval(jsub), ])
         }
     } else {
-        colDataSubset <- .colData(longTable)
+        colDataSubset <- .colData(x)
     }
 
     # Subset assays to only keys in remaining in rowData/colData
-    rowKeys <- rowDataSubset$rowKey
-    colKeys <- colDataSubset$colKey
+    rows <- rowDataSubset$rowKey
+    cols <- colDataSubset$colKey
 
-    if (missing(assays)) { assays <- assayNames(longTable) }
-    keepAssays <- assayNames(longTable) %in% assays
+    # -- find matching assays
+    validAssays <- assays %in% assayNames(x)
+    if (any(!validAssays))
+        warning(.warnMsg(assays[!validAssays],
+            " are not valid assay names, ignoring..."), call.=FALSE)
+    keepAssays <- assayNames(x) %in% assays
 
-    assayData <- lapply(assays(longTable, withDimnames=FALSE)[keepAssays],
-                     FUN=.filterLongDataTable,
-                     indexList=list(rowKeys, colKeys))
+    # -- subset index, then use index to subset x
+    idx <- mutable(getIntern(x, "assayIndex"))[
+        rowKey %in% rows & colKey %in% cols,
+        .SD,
+        .SDcols=c("rowKey", "colKey", assayNames(x)[keepAssays])
+    ]
+    assays(x, raw=TRUE)[!keepAssays] <- NULL  # delete assays being dropped
 
-    # Subset rowData and colData to only keys contained in remaining assays
-    ## TODO:: Implement message telling users which rowData and colData
-    ## columns are being dropped when selecting a specific assay.
-    assayRowIDs <- unique(unlist(lapply(assayData, `[`, j='rowKey', drop=TRUE)))
-    assayColIDs <- unique(unlist(lapply(assayData, `[`, j='colKey', drop=TRUE)))
-
-    rowDataSubset <- rowDataSubset[rowKey %in% assayRowIDs]
-    colDataSubset <- colDataSubset[colKey %in% assayColIDs]
-
-    newLongTable <- LongTable(colData=colDataSubset, colIDs=longTable@.intern$colIDs ,
-                     rowData=rowDataSubset, rowIDs=longTable@.intern$rowIDs,
-                     assays=assayData, metadata=metadata(longTable))
-
-    newLongTable <- if (reindex) reindex(newLongTable) else newLongTable
-
-    return(newLongTable)
+    return(.subsetByIndex(x, idx, reindex=reindex))
 })
+
 
 
 #' Convenience function for converting R code to a call
@@ -193,7 +257,7 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #' @noRd
 .preprocessRegexQuery <- function(queryString) {
     # Support vectors of regex queries
-    query <- paste0(queryString, collapse='|')
+    query <- paste0(unique(queryString), collapse='|')
     # Swap all * with .*
     query <- gsub('\\.\\*', '*', query)
     return(gsub('\\*', '.*', query))
@@ -309,8 +373,8 @@ setMethod('subset', signature('LongTable'), function(x, i, j, assays, reindex=TR
 #'
 #' @export
 setMethod('[', signature('LongTable'),
-        function(x, i, j, assays, ..., drop=FALSE) {
-    subset(x, i, j, assays)
+        function(x, i, j, assays=assayNames(x), ..., drop=FALSE) {
+    subset(x, i, j, assays=assays, ...)
 })
 
 
@@ -454,27 +518,57 @@ setReplaceMethod('$', signature('LongTable'), function(x, name, value) {
 #' @export
 setMethod('reindex', signature(object='LongTable'), function(object) {
 
-    # extract assays joined to row/colData
-    assayDataList <- assays(object, withDimnames=TRUE, metadata=TRUE)
+    # -- extract the requisite data
+    mutableIntern <- mutable(getIntern(object))
+    index <- mutableIntern$assayIndex
+    rData <- copy(rowData(object, raw=TRUE))
+    cData <- copy(colData(object, raw=TRUE))
+    aList <- copy(assays(object, raw=TRUE))
 
-    # find names of ID columns
-    rowIDCols <- colnames(rowData(object))
-    colIDCols <- colnames(colData(object))
+    # -- sort metadata tables by their id columns and update the index
+    rData[, .rowKey := .I, by=c(rowIDs(object))]
+    cData[, .colKey := .I, by=c(colIDs(object))]
 
-    # extract the ID columns from the assay data
-    newRowData <- .extractIDData(assayDataList, rowIDCols, 'rowKey')
-    newColData <- .extractIDData(assayDataList, colIDCols, 'colKey')
+    # -- update rowKey and colKey in the asssayIndex, if they have changed
+    if (rData[, any(rowKey != .rowKey)]) {
+        index[rData, rowKey := .rowKey]
+        rData[, rowKey := .rowKey]
+        setkeyv(rData, "rowKey")
+    }
+    if (cData[, any(colKey != .colKey)]) {
+        index[cData, colKey := .colKey]
+        cData[, colKey := .colKey]
+        setkeyv(cData, "colKey")
+    }
+    rData[, .rowKey := NULL]
+    cData[, .colKey := NULL]
 
-    # remap the rowKey and colKey columns to the assays
-    newAssayData <- lapply(assayDataList,
-        FUN=.joinDropOn, DT2=newRowData, on=rowIDCols)
-    newAssayData <- lapply(newAssayData,
-        FUN=.joinDropOn, DT2=newColData, on=colIDCols)
-    newAssayData <- lapply(newAssayData, setkeyv, cols=c('rowKey', 'colKey'))
+    # -- add new indices for assayKeys to index
+    setkeyv(index, c("rowKey", "colKey"))  #
+    assays_ <- setdiff(colnames(index), c("rowKey", "colKey"))
+    assayEqualKeys <- setNames(vector("logical", length(assays_)), assays_)
+    for (nm in assays_) {
+        index[!is.na(get(nm)), paste0(".", nm) := .I]
+        assayEqualKeys[nm] <- index[!is.na(get(nm)), all(get(paste0(".", nm)) == get(nm))]
+    }
 
-    return(LongTable(rowData=newRowData, rowIDs=getIntern(object, 'rowIDs'),
-        colData=newColData, colIDs=getIntern(object, 'colIDs'),
-        assays=newAssayData, metadata=metadata(object)))
+    # -- check equality and update assayKeys in assays if they have changed
+    for (nm in names(which(!assayEqualKeys))) {
+        setkeyv(index, nm)
+        aList[[nm]][index, (nm) := get(paste0(".", nm))]
+        setkeyv(aList[[nm]], nm)
+        index[, (nm) := get(paste0(".", nm))]
+    }
+    index[, paste0(".", assays_) := NULL]
+    setkeyv(index, assayNames(object))
+
+    # -- update the object with the reindexed tables and return
+    rowData(object, raw=TRUE) <- rData
+    colData(object, raw=TRUE) <- cData
+    assays(object, raw=TRUE) <- aList
+    mutableIntern$assayIndex <- index
+    object@.intern <- immutable(mutableIntern)
+    return(object)
 })
 
 

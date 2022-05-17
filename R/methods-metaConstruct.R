@@ -16,7 +16,6 @@
 #' @return An `S4` object for which the class corresponds to the type of
 #'   the build configuration object passed to this method.
 #'
-#'
 #' @md
 #' @export
 setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct'))
@@ -33,80 +32,48 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 #' data(exampleDataMapper)
 #' rowDataMap(exampleDataMapper) <- list(c('treatmentid'), c())
 #' colDataMap(exampleDataMapper) <- list(c('sampleid'), c())
-#' assayMap(exampleDataMapper) <- list(sensitivity=c('viability'))
+#' assayMap(exampleDataMapper) <- list(sensitivity=list(c("treatmentid", "sampleid"), c('viability')))
 #' metadataMap(exampleDataMapper) <- list(experiment_metadata=c('metadata'))
 #' longTable <- metaConstruct(exampleDataMapper)
 #' longTable
 #'
 #' @md
+#' @importFrom data.table key
 #' @export
 setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         function(mapper) {
     funContext <- paste0('[', .S4MethodContext('metaConstruct', class(mapper)[1]))
 
-    # -- get the rawdata
-    DT <- rawdata(mapper)
-
-    # -- preprocess the row identifiers and metadata
-    rowDataDT <- unique(DT[, unlist(rowDataMap(mapper)), with=FALSE])
+    # subset the rawdata slot to build out each component of LongTable
+    rowDataDT <- rowData(mapper)
     rowIDs <- rowDataMap(mapper)[[1]]
-    rowDataDT[, c('rowKey') := .GRP, keyby=rowIDs]
-    renameRowCols <- names(rowIDs) != ""
-    if (any(renameRowCols)) {
-        setnames(rowDataDT, rowIDs[renameRowCols], names(rowIDs)[renameRowCols])
-        setnames(DT, rowIDs[renameRowCols], names(rowIDs)[renameRowCols])
-        rowIDs[renameRowCols] <- names(rowIDs)[renameRowCols]
-    }
-
-    # -- preprocess the col identifiers and metadata
-    colDataDT <- unique(DT[, unlist(colDataMap(mapper)), with=FALSE])
+    rid_names <- names(rowIDs)
+    has_rid_names <- !is.null(rid_names) & rid_names != ""
+    rowIDs[has_rid_names] <- rid_names[has_rid_names]
+    colDataDT <- colData(mapper)
     colIDs <- colDataMap(mapper)[[1]]
-    colDataDT[, c('colKey') := .GRP, keyby=colIDs]
-    renameColCols <- names(colIDs) != ""
-    if (any(renameColCols)) {
-        setnames(colDataDT, colIDs[renameColCols], names(colIDs)[renameColCols])
-        setnames(DT, colIDs[renameColCols], names(colIDs)[renameColCols])
-        colIDs[renameColCols] <- names(colIDs)[renameColCols]
+    cid_names <- names(colIDs)
+    has_cid_names <- !is.null(cid_names) & cid_names != ""
+    colIDs[has_cid_names] <- cid_names[has_cid_names]
+    assayDtL <- assays(mapper)
+    assayIDs <- lapply(assayMap(mapper), `[[`, i=1)
+    for (i in seq_along(assayIDs)) {
+        aid_names <- names(assayIDs[[i]])
+        notEmptyNames <- !is.null(aid_names) & aid_names != ""
+        assayIDs[[i]][notEmptyNames] <- aid_names[notEmptyNames]
     }
 
-    # -- extract LongTable level metadata
+    # subset the metadata columns out of raw data and add any additional metadata
     metadataL <- lapply(metadataMap(mapper),
-        function(j, x) as.list(unique(x[, j, with=FALSE])), x=DT)
+        function(j, x) as.list(unique(x[, j, with=FALSE])), x=rawdata(mapper))
     metadataL <- c(metadataL, metadata(mapper))
 
-    # --
-    assayIDs <- c(rowIDs, colIDs)
-    assayColumns <- lapply(assayMap(mapper), FUN=c, assayIDs)
-    assayDtL <- lapply(assayColumns, FUN=subset, x=DT, subset=TRUE)
-
-    ## TODO:: make this prettier with pipes once R 4.1 launches
-    for (i in seq_along(assayDtL)) {
-        assayDT <- copy(assayDtL[[i]])
-        assayDT <- merge(assayDT, rowDataDT[, c('rowKey', ..rowIDs)], by=rowIDs)
-        assayDT <- merge(assayDT, colDataDT[, c('colKey', ..colIDs)], by=colIDs)
-        assayDT[, c(rowIDs, colIDs) := NULL]
-        setkeyv(assayDT, c('rowKey', 'colKey'))
-        notMissingNames <- names(assayColumns[[i]]) != ""
-        if (any(notMissingNames))
-            setnames(assayDT, old=assayColumns[[i]][notMissingNames],
-                new=names(assayColumns[[i]])[notMissingNames], skip_absent=TRUE)
-        assayDtL[[i]] <- na.omit(assayDT)
-    }
-
-    if (is(mapper, "TREDataMapper")) {
-        object <- CoreGx::TreatmentResponseExperiment(
+    ## FIXME:: Handle TREDataMapper class after updating constructor
+    object <- CoreGx::LongTable(
         rowData=rowDataDT, rowIDs=rowIDs,
         colData=colDataDT, colIDs=colIDs,
-        assays=assayDtL,
-        metadata=metadataL
-        )
-    } else {
-        object <- CoreGx::LongTable(
-            rowData=rowDataDT, rowIDs=rowIDs,
-            colData=colDataDT, colIDs=colIDs,
-            assays=assayDtL,
-            metadata=metadataL
-        )
-    }
+        assays=assayDtL, assayIDs=assayIDs,
+        metadata=metadataL)
+
     return(object)
 })

@@ -10,62 +10,47 @@ LongTable(
   colData,
   colIDs,
   assays,
+  assayIDs,
   metadata = list(),
   keep.rownames = FALSE
 )
 }
 \arguments{
-\item{rowData}{\code{data.table}, \code{data.frame}, \code{matrix} A table like object
-coercible to a \code{data.table} containing the a unique \code{rowID} column which
-is used to key assays, as well as additional row metadata to subset on.}
+\item{rowData}{\code{data.frame} A rectangular object coercible to a \code{data.table}.}
 
-\item{rowIDs}{\code{character}, \code{integer} A vector specifying
-the names or integer indexes of the row data identifier columns. These
-columns will be pasted together to make up the rownames of the
-\code{LongTable} object.}
+\item{rowIDs}{\code{character} A vector of \code{rowData} column names needed to
+uniquely identify each row in a \code{LongTable}.}
 
-\item{colData}{\code{data.table}, \code{data.frame}, \code{matrix} A table like object
-coercible to a \code{data.table} containing the a unique \code{colID} column which
-is used to key assays, as well as additional column metadata to subset on.}
+\item{colData}{\code{data.frame} A rectangular object coercible to a \code{data.table.}}
 
-\item{colIDs}{\code{character}, \code{integer} A vector specifying
-the names or integer indexes of the column data identifier columns. These
-columns will be pasted together to make up the colnames of the
-\code{LongTable} object.}
+\item{colIDs}{\code{chacter} A vector of \code{colData} column names needed to uniquely
+identify each column in a \code{LongTable}.}
 
-\item{assays}{A \code{list} containing one or more objects coercible to a
-\code{data.table}, and keyed by rowIDs and colIDs corresponding to the rowID and
-colID columns in colData and rowData.}
+\item{assays}{\code{list} A list of rectangular objects, each coercible to
+a \code{data.table}. Must be named and item names must match the \code{assayIDs}
+list.}
 
-\item{metadata}{A \code{list} of metadata associated with the \code{LongTable}
-object being constructed}
+\item{assayIDs}{\code{list} A list of \code{character} vectors specifying the columns
+needed to uniquely identify each row in an \code{assay}. Names must match the
+\code{assays} list.}
 
-\item{keep.rownames}{\code{logical}, \code{character}
-Logical: whether rownames should be added as a column if coercing to a
-\code{data.table}, default is FALSE. If TRUE, rownames are added to the column
-'rn'.
-Character: specify a custom column name to store the rownames in.}
+\item{metadata}{\code{list} A list of one or more metadata items associated with
+a LongTable experiment.}
+
+\item{keep.rownames}{\code{logical(1)} or \code{character(1)} Should rownames be
+retained when coercing to \code{data.table} inside the constructor. Default
+is FALSE. If TRUE, adds a 'rn' column to each rectangular object that
+gets coerced from \code{data.frame} to \code{data.table}. If a string, that becomes
+the name of the rownames column.}
 }
 \value{
 A \code{LongTable} object containing the data for a treatment response
 experiment and configured according to the rowIDs and colIDs arguments.
 }
 \description{
-Builds a \code{LongTable} object from rectangular objects. The
-\code{rowData} argument should contain row level metadata, while the \code{colData}
-argument should contain column level metadata, for the experimental assays
-in the \code{assays} list. The \code{rowIDs} and \code{colIDs} lists are used to configure
-the internal keys mapping rows or columns to rows in the assays. Each list
-should contain at minimum one character vector, specifying which columns
-in \code{rowData} or \code{colData} are required to uniquely identify each row. An
-optional second character vector can be included, specifying any metadata
-columns for either dimension. These should contain information about each
-row but NOT be required to uniquely identify a row in the \code{colData} or
-\code{rowData} objects. Additional metadata can be attached to a \code{LongTable} by
-passing a list to the metadata argument.
+LongTable constructor method
 }
 \examples{
-data(merckLongTable)
-merckLongTable
+"See vignette('The LongTable Class', package='CoreGx')"
 
 }

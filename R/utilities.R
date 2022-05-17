@@ -112,7 +112,7 @@
             stop("x must contain only real numbers, NA-values, and/or -Inf (if x_as_log flag is set to TRUE).")
         }
 
-        if (x_as_log == FALSE && min(x, na.rm=TRUE) < 0) {
+        if (x_as_log == FALSE && min(x) < 0) {
             if (verbose == 2) {
                 message("x:")
                 message(x)
@@ -385,7 +385,7 @@
         }
         
         if (trunc) {
-            y = pmin(as.numeric(y), ifelse(y_to_frac,100,1))
+            y = pmin(as.numeric(y), 1)
             y = pmax(as.numeric(y), 0)
         }
 
@@ -1066,7 +1066,7 @@
         if (trunc == FALSE) {
 
             if (n == 1) {
-                return(sum(diffs^2/scale^2))
+                return(sum(diffs^2))
             }
 
             return(sum(-log(.dmednnormals(diffs, n, scale))))

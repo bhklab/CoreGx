@@ -16,7 +16,7 @@ NULL
 #' @param from `LongTable` Object to coerce.
 #'
 #' @return A `data.table` with the data from a LongTable.
-#' 
+#'
 #' @import data.table
 #' @export
 setAs('LongTable', 'data.table', def=function(from) {
@@ -28,7 +28,7 @@ setAs('LongTable', 'data.table', def=function(from) {
     DT <- longTableData[[1]]
     longTableData[[1]] <- NULL
     for (i in seq_along(longTableData)) {
-        DT <- merge.data.table(DT, longTableData[[i]], 
+        DT <- merge.data.table(DT, longTableData[[i]],
             suffixes=c('', paste0('._', i)), by=.EACHI, all.x=TRUE, all.y=TRUE)
     }
 
@@ -67,15 +67,18 @@ setAs('LongTable', 'data.table', def=function(from) {
     ))
     setcolorder(DT, colOrder)
 
+    aMap <- lapply(assayCols, FUN=setdiff,
+        y=c(idCols(from), rowMeta(from), colMeta(from)))
+    aMap <- Map(list, mutable(getIntern(from, "assayKeys")), aMap)
+
     longTableMapper <- LongTableDataMapper(
         rowDataMap=list(rowIDs(from), rowMeta(from)),
         colDataMap=list(colIDs(from), colMeta(from)),
-        assayMap=lapply(assayCols, FUN=setdiff, 
-            y=c(idCols(from), rowMeta(from), colMeta(from))
-        ),
+        assayMap=aMap,
         metadataMap=tryCatch({ lapply(metadata(from), names) },
             error=function(e) list())
     )
+    metadata(longTableMapper) <- metadata(from)
     attr(DT, 'longTableDataMapper') <- longTableMapper
 
     # return the data.table
@@ -178,10 +181,10 @@ setAs('data.table', 'LongTable', def=function(from) {
             'data.table to LongTable only works if the longTableMapper ',
             'attribute has been set!'))
 
-    longTableMapper<- attr(from, 'longTableDataMapper')
+    longTableMapper <- attr(from, 'longTableDataMapper')
 
     requiredConfig <- c('assayMap', 'rowDataMap', 'colDataMap')
-    hasRequiredConfig <- vapply(requiredConfig, 
+    hasRequiredConfig <- vapply(requiredConfig,
         FUN=\(x, f) length(do.call(f, list(x)))[[1]] > 0,
         x=longTableMapper, FUN.VALUE=logical(1))
     if (!all(hasRequiredConfig))
@@ -233,7 +236,7 @@ setAs(from='SummarizedExperiment', to='data.table', function(from) {
     # -- extract and process assays
     assayL <- assays(from)
     assayDtL <- lapply(assayL, as.data.table, keep.rownames='.feature')
-    meltDtL <- lapply(assayDtL, melt, id.vars='.feature', 
+    meltDtL <- lapply(assayDtL, melt, id.vars='.feature',
         variable.name='.sample', variable.factor=FALSE)
     assayDT <- meltDtL[[1]][, .(.sample, .feature)]
     for (i in seq_along(meltDtL))
@@ -253,14 +256,14 @@ setAs(from='SummarizedExperiment', to='data.table', function(from) {
 #' @name as
 #' @title Coerce a SummarizedExperiment to a data.frame
 #'
-#' @examples 
+#' @examples
 #' SE <- molecularProfilesSlot(clevelandSmall_cSet)[[1]]
 #' as(SE, 'data.frame')
-#' 
+#'
 #' @param from `SummarizedExperiment` object.
-#' 
+#'
 #' @return `data.frame` with long format of data in `from`.
-#' 
+#'
 #' @importFrom data.table as.data.table melt.data.table merge.data.table
 #' @export
 setAs(from='SummarizedExperiment', to='data.frame', function(from) {
@@ -316,10 +319,10 @@ setAs("LongTable", "SummarizedExperiment", def=function(from) {
 #' @param LT `LongTable` to convert to gDR `SummarizedExperiment` format.
 #' @param assay_names `character()` Names to rename the assays to. These
 #'   are assumed to be in the same order as `assayNames(LT)`.
-#' 
-#' @return `SummarizedExperiment` object with all assay from `LT` as 
+#'
+#' @return `SummarizedExperiment` object with all assay from `LT` as
 #'   `BumpyMatrix`es.
-#' 
+#'
 #' @md
 #' @importFrom data.table setnames
 #' @importFrom SummarizedExperiment SummarizedExperiment
@@ -329,7 +332,7 @@ setAs("LongTable", "SummarizedExperiment", def=function(from) {
     if (!missing(assay_names) && length(assay_names) == length(assayNames(LT)))
         names(assay_list) <- assay_names
     SummarizedExperiment(
-        assays=assay_list, rowData=rowData(LT), colData=colData(LT), 
+        assays=assay_list, rowData=rowData(LT), colData=colData(LT),
             metadata=c(metadata(LT), list(.intern=as.list(getIntern(LT))))
     )
 }

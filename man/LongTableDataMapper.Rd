@@ -6,11 +6,11 @@
 more raw experimental data files to the slots of a \code{LongTable} object.}
 \usage{
 LongTableDataMapper(
-  rawdata = list(),
-  rowDataMap = list(),
-  colDataMap = list(),
-  assayMap = list(),
-  metadataMap = list()
+  rawdata = data.frame(),
+  rowDataMap = list(character(), character()),
+  colDataMap = list(character(), character()),
+  assayMap = list(list(character(), character())),
+  metadataMap = list(character())
 )
 }
 \arguments{
@@ -28,10 +28,13 @@ The first is column names in \code{rawdata} needed to uniquely identify each
 column, the second is additional columns which map to rows, but are not
 required to uniquely identify them. Columns should be samples.}
 
-\item{assayMap}{A list-like where each item is a \code{character} vector of
-\code{rawdata} column names to assign to an assay, where the name of that assay
-is the name of the list item. If names are omitted, assays will be numbered
-by their index in the list}
+\item{assayMap}{A list-like where each item is a \code{list} with two \code{character}
+vectors defining an assay, the first containing the identifier columns in
+\code{rawdata} needed to uniquely identify each row an assay, and the second the
+\code{rawdata} columns to be mapped to that assay. The names of \code{assayMap}
+will be the names of the assays in the \code{LongTable} that is created when
+calling \code{metaConstruct} on this \code{DataMapper} object. If the character vectors
+have names, the value columns will be renamed accordingly.}
 
 \item{metadataMap}{A list-like where each item is a \code{character} vector of
 \code{rawdata} column names to assign to the \verb{@metadata} of the \code{LongTable},
@@ -54,7 +57,7 @@ as identify columns mapping to \code{assays} or \code{metadata}.
 
 To attach metadata not associated with \code{rawdata}, please use the \code{metadata}
 assignment method on your \code{LongTableDataMapper}. This metadata will be
-merge with any metadata from \code{metadataMap} and added to the \code{LongTable}
+merged with any metadata from \code{metadataMap} and added to the \code{LongTable}
 which this object ultimately constructs.
 }
 \examples{

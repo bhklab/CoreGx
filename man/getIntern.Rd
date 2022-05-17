@@ -2,7 +2,7 @@
 % Please edit documentation in R/allGenerics.R
 \name{getIntern}
 \alias{getIntern}
-\title{Retrieve the symbol for the object@.intern slot}
+\title{Retrieve the specified item from object internal metadata.}
 \usage{
 getIntern(object, x, ...)
 }

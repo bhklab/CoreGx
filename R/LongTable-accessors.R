@@ -77,34 +77,23 @@ NULL
 #' @param object `LongTable`
 #' @param x `character` One or more symbol name strings to retrieve from
 #'     the object@.intern environment.
-#' @param ... `pairlist` Addtional arguments to get or mget inside of the
-#'     function.
 #'
-#' @return value of x if length(x) == 1 else named list of values for all
-#'     symbols in x
+#' @return `immutable` value of x if length(x) == 1 else named list of values
+#'     for all symbols in x.
 #'
 #' @include LongTable-class.R
 #' @export
 setMethod('getIntern', signature(object='LongTable', x='character'),
-    function(object, x, ...) {
-
-    if (length(x) > 1)
-        tryCatch({ mget(x, envir=object@.intern, ...) },
-            error=function(e) {
-                message(e); mget(x, envir=object@.intern) })
-    else
-        tryCatch({ get(x, envir=object@.intern, ...) },
-            error=function(e) {
-                message(e); get(x, envir=object@.intern) })
+        function(object, x) {
+    return(if (length(x) == 1) object@.intern[[x]] else object@.intern[x])
 })
 #' @describeIn LongTable Access all structural metadata present within a
-#'   LongTable object. This is mostly for developmer use.
+#'   LongTable object. This is primarily for developmer use.
 #'
 #' @param object `LongTable`
 #' @param x `missing` This argument is excluded from from the function call.
 #'
-#' @return A named `list` with all values in environment object@.intern coerced
-#' to a list (and therefore copied).
+#' @return An `immutable` list.
 #'
 #' @examples
 #' getIntern(merckLongTable)
@@ -115,6 +104,20 @@ setMethod('getIntern', signature(object='LongTable', x='missing'),
     function(object, x) object@.intern
 )
 
+#' Set the .intern slot of a LongTable
+#'
+#' @param object `LongTable`
+#' @param value An `immutable_list` object, being a class union between `list`
+#'   and `immutable` S3 classes.
+#'
+#' @return Updates the object and returns invisibly.
+#'
+#' @keywords internal
+setReplaceMethod("getIntern", signature(object="LongTable",
+    value="immutable_list"), function(object, value) {
+        object@.intern <- value
+        return(object)
+})
 
 ## ==================
 ## ---- rowData Slot
@@ -132,20 +135,26 @@ setMethod('getIntern', signature(object='LongTable', x='missing'),
 #' @param key `logical` Should the rowKey column also be returned? Defaults
 #'     to FALSE.
 #' @param use.names `logical` This parameter is just here to stop matching
-#'     the posotopoma; argument to use.names from the rowData generic. It
+#'     the positional argument to use.names from the rowData generic. It
 #'     doesn't do anything at this time and can be ignored.
+#' @param ... For developer use only! Pass raw=TRUE to modify the slot
+#'   directly. This will corrupt your data if you don't know what you are
+#'   doing!
 #'
 #' @return A `data.table` containing rowID, row identifiers, and row metadata.
 #'
 #' @importFrom data.table data.table copy
 #' @export
 setMethod('rowData', signature(x='LongTable'),
-        function(x, key=FALSE, use.names=FALSE) {
-    return(
-        if (key) copy(x@rowData[, -'.rownames']) else
-        copy(x@rowData[, -c('.rownames', 'rowKey')])
-    )
+        function(x, key=FALSE, use.names=FALSE, ...) {
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        return(x@rowData)
+    } else {
+        return(if (key) copy(x@rowData[, -'.rownames']) else
+            copy(x@rowData[, -c('.rownames', 'rowKey')]))
+    }
 })
+
 
 #' Updates the `rowData` slot as long as the ID columns are not changed.
 #'
@@ -162,6 +171,9 @@ setMethod('rowData', signature(x='LongTable'),
 # '   the existing `rowData` in `x`.
 #' @param value A `data.table` or `data.frame` to update the `rowData` of
 #'   `x` with.
+#' @param ... For developer use only! Pass raw=TRUE to modify the slot
+#'   directly. This will corrupt your data if you don't know what you are
+#'   doing!
 #'
 #' @return A copy of the `LongTable` object with the `rowData`
 #'   slot updated.
@@ -171,7 +183,12 @@ setMethod('rowData', signature(x='LongTable'),
 #' @importFrom SummarizedExperiment `rowData<-`
 #' @importFrom data.table setDT
 #' @export
-setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
+setReplaceMethod('rowData', signature(x='LongTable'), function(x, ..., value) {
+
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        x@rowData <- value
+        return(invisible(x))
+    }
 
     # type check input
     if (is(value, 'data.frame')) setDT(value)
@@ -213,14 +230,13 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
     ## TODO:: Add some sanity checks before returing
 
     x@rowData <- rowData
-    x
+    return(invisible(x))
 })
 
 
 ## ==================
 ## ---- colData Slot
 ## ------------------
-
 
 
 #' Retrieve the column metadata table from a LongTable object
@@ -235,14 +251,20 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, value) {
 #'   object.
 #'
 #' @param x A `LongTable` to retrieve column metadata from.
-#' @param key `logical` She the colKey column also be returned? Defaults to
+#' @param key `logical` Should the colKey column also be returned? Defaults to
 #'     FALSE.
+#' @param ... For developer use only! Pass raw=TRUE to return the slot for
+#'   modification by reference.
 #'
 #' @return A `data.table` containing row identifiers and metadata.
 #'
 #' @import data.table
 #' @export
-setMethod('colData', signature(x='LongTable'), function(x, key=FALSE) {
+setMethod('colData', signature(x='LongTable'),
+        function(x, key=FALSE, dimnames=FALSE, ...) {
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        return(x@colData)
+    }
     return(if (key) copy(x@colData[, -'.colnames']) else
         copy(x@colData[, -c('.colnames', 'colKey')]))
 })
@@ -259,6 +281,9 @@ setMethod('colData', signature(x='LongTable'), function(x, key=FALSE) {
 #' @param value A `data.table` or `data.frame` to update with. Must have
 #'   all of the colIDs currently in the `LongTable` object in order to ensure
 #'   assay key mappings are consistent.
+#' @param ... For developer use only! Pass raw=TRUE to modify the slot
+#'   directly. This will corrupt your data if you don't know what you are
+#'   doing!
 #'
 #' @return A copy of the `LongTable` object with the `colData`
 #'   slot updated.
@@ -267,7 +292,13 @@ setMethod('colData', signature(x='LongTable'), function(x, key=FALSE) {
 #' @importFrom SummarizedExperiment colData<-
 #' @importFrom data.table data.table setDT
 #' @export
-setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
+setReplaceMethod('colData', signature(x='LongTable'),
+        function(x, ..., value) {
+
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        x@colData <- value
+        return(x)
+    }
 
     # type check input
     if (is(value, 'data.frame')) setDT(value)
@@ -323,25 +354,71 @@ setReplaceMethod('colData', signature(x='LongTable'), function(x, value) {
 #'
 #' @param x `LongTable` What to extract the assay data from.
 #' @param withDimnames `logical` Should the returned assays be joined to
-#'   the row and column identifiers (i.e., the pseudo dimnames of the object).
+#'   the row and column identifiers (i.e., the pseudo-dimnames of the object).
 #' @param metadata `logical` Should row and column metadata also be joined
 #'   to the returned assays. This is useful for modifying assays before
 #'   reconstructing a new LongTable.
 #' @param key `logical` Should the key columns also be returned? Defaults
 #'   to !`withDimnames`.
+#' @param ... For developer use only! Pass raw=TRUE to return the slot for
+#'   modification by reference.
 #'
 #' @return A `list` of `data.table` objects, one per assay in the object.
 #'
 #' @importMethodsFrom SummarizedExperiment assays
 #' @import data.table
 #' @export
-setMethod('assays', signature(x='LongTable'),
-        function(x, withDimnames=TRUE, metadata=withDimnames,
-            key=!withDimnames) {
-    return(structure(
-        lapply(assayNames(x), FUN=assay, x=x, withDimnames=withDimnames,
-            metadata=metadata, key=key),
-        .Names=assayNames(x)))
+setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
+        metadata=withDimnames, key=!withDimnames, ...) {
+    # secret arguments for internal use
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        return(x@assays)
+    }
+
+    # input validation
+    if (!withDimnames && metadata)
+        warning(.warnMsg('[CoreGx::assays] Cannot use metadata=TRUE when',
+            ' withDimnames=FALSE. Ignoring the metadata argument.'),
+            call.=FALSE)
+
+    # optionally join with rowData and colData
+    assayIndex <- mutable(getIntern(x)$assayIndex)
+    if (metadata) {
+        rData <- rowData(x, key=TRUE)
+        cData <- colData(x, key=TRUE)
+    } else {
+        rData <- rowIDs(x, data=TRUE, key=TRUE)
+        cData <- colIDs(x, data=TRUE, key=TRUE)
+    }
+    if (withDimnames) {
+        setkeyv(assayIndex, "rowKey")
+        assayIndex <- rData[assayIndex, , on="rowKey"]
+        setkeyv(assayIndex, "colKey")
+        assayIndex <- cData[assayIndex, , on="colKey"]
+    }
+
+    # honor row and column ordering guarantees from CoreGx design documentation
+    aList <- copy(x@assays)
+    corder <- c(
+        if (withDimnames) idCols(x),
+        if (key) c("rowKey", "colKey"),
+        if (withDimnames && metadata) c(sort(rowMeta(x)), sort(colMeta(x)))
+    )
+    for (i in seq_along(aList)) {
+        setkeyv(assayIndex, names(aList)[i])
+        aList[[i]] <- assayIndex[aList[[i]], ]
+        aList[[i]][, (setdiff(names(aList), names(aList)[i])) := NULL]
+        if (withDimnames || key) aList[[i]][, (names(aList)[i]) := NULL]
+        if (!key) {
+            aList[[i]][, c("rowKey", "colKey") := NULL]
+        }
+        if (withDimnames) setkeyv(aList[[i]], idCols(x))
+        else if (key) setkeyv(aList[[i]], c("rowKey", "colKey"))
+        else setkeyv(aList[[i]], names(aList)[[i]])
+        if (!is.null(corder)) setcolorder(aList[[i]], corder) else
+            setcolorder(aList[[i]])
+    }
+    return(aList)
 })
 
 
@@ -359,6 +436,9 @@ setMethod('assays', signature(x='LongTable'),
 #' @param x A `LongTable` to modify the assays in.
 #' @param value A `list` of `data.frame` or `data.table` objects, all of which
 #'   contain the row and column identifiers and metadata.
+#' @param ... For developer use only! Pass raw=TRUE to modify the slot
+#'   directly. This will corrupt your data if you don't know what you are
+#'   doing!
 #'
 #' @return A copy of the `LongTable` with the assays modified.
 #'
@@ -366,10 +446,14 @@ setMethod('assays', signature(x='LongTable'),
 #' @import data.table
 #' @export
 setReplaceMethod('assays', signature(x='LongTable', value='list'),
-        function(x, value) {
-    assay_names <- names(value)
-    for (name in assay_names) {
-        x[[name]] <- value[[name]]
+        function(x, ..., value) {
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        x@assays <- value
+    } else {
+        assay_names <- names(value)
+        for (name in assay_names) {
+            x[[name]] <- value[[name]]
+        }
     }
     return(x)
 })
@@ -406,14 +490,21 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'),
 #'   has all the information needed to recreated the LongTable object.
 #' @param key `logical` Should the key columns also be returned? Defaults to
 #'   !withDimnames.
+#' @param ... For developer use only! Pass raw=TRUE to return the slot for
+#'   modification by reference.
 #'
 #' @importMethodsFrom SummarizedExperiment assay
 #' @importFrom crayon magenta cyan
 #' @import data.table
 #' @export
 setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
-        metadata=withDimnames, key=!withDimnames) {
+        metadata=withDimnames, key=!withDimnames, ...) {
+    # secret arguments for internal use
+    if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
+        return(x@assays[[i]])
+    }
 
+    ## TODO:: Update input validation to use checkmate where possible
     # validate input
     if (length(i) > 1)
         .error('\n[CoreGx::assay] Please specifying a single string ',
@@ -421,47 +512,57 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
             'assays.')
 
     keepAssay <- if (is.character(i)) which(assayNames(x) == i) else i
+    assayName <- assayNames(x)[keepAssay]
     if (length(keepAssay) < 1)
         stop(.errorMsg('\n[CoreGx::assay] There is no assay ', i,
             ' in this LongTable. Use assayNames(longTable) for a list',
             'of valid assay names.'))
 
-    # extract the specified assay
-    time <- Sys.time()
-    assayData <- x@assays[[keepAssay]]
-
-    # optionally join to rowData and colData
-    if (withDimnames && !metadata) {
-        assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, on='rowKey']
-        assayData <- colIDs(x, data=TRUE, key=TRUE)[assayData, on='colKey']
-    } else if (withDimnames && metadata) {
-        assayData <- rowData(x, key=TRUE)[assayData, on='rowKey']
-        assayData <- colData(x, key=TRUE)[assayData, on='colKey']
-    }
-    time1 <- Sys.time()
-    time1 - time
-
-    # drop any duplicated columns to prevent issues in the setter methods,
-    # actually drops any columns prefixed with i.
-    duplicates <- grep('^i\\..*', colnames(assayData), value=TRUE)
-    ## TODO:: Is there any situation where ignoring duplicated keys could break the object?
-    ## TODO:: Maybe add equality test for duplicate columns?
-    warnDuplicates <- setdiff(duplicates, c('i.drug_sample_rep', 'i.rowKey', 'i.colKey'))
-    if (length(duplicates) > 0) {
-        if (length(warnDuplicates) > 0)
-            warning(.warnMsg('\n[CoreGx::assay] Dropping columns duplicated when ',
-                'joining assays with from ', i, 'when joining with rowData and ',
-                'colData: ', .collapse(warnDuplicates)))
-        assayData <- assayData[, -duplicates, with=FALSE]
-    }
-
-    if (!key) assayData <- assayData[, -c('rowKey', 'colKey')]
-
     if (!withDimnames && metadata)
         warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
-            ' withDimnames=FALSE. Ignoring the metadata argument.'))
+            ' withDimnames=FALSE. Ignoring the metadata argument.'),
+            call.=FALSE)
 
-    assayData
+    # extract the specified assay
+    assayData <- copy(x@assays[[keepAssay]])
+
+    # optionally join to rowData and colData
+    assayIndex <- mutable(unique(na.omit(getIntern(x, "assayIndex")[,
+        c("rowKey", "colKey", assayName),
+        with=FALSE
+    ])))
+    setkeyv(assayIndex, assayName)
+    assayData <- assayData[assayIndex, ]
+    setkeyv(assayData, "rowKey")
+    if (withDimnames && !metadata) {
+        assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, ]
+        setkeyv(assayData, "colKey")
+        assayData <- colIDs(x, data=TRUE, key=TRUE)[assayData, ]
+    } else if (withDimnames && metadata) {
+        assayData <- rowData(x, key=TRUE)[assayData, ]
+        setkeyv(assayData, "colKey")
+        assayData <- colData(x, key=TRUE)[assayData, ]
+    }
+    # honour row and column ordering guarantees
+    ## See: https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation
+    if (withDimnames || key) {
+        assayData[, (assayName) := NULL]
+        if (withDimnames) setkeyv(assayData, idCols(x)) else
+            setkeyv(assayData, c("rowKey", "colKey"))
+    } else {
+        setkeyv(assayData, assayName)
+    }
+    if (!key) assayData[, c("rowKey", "colKey") := NULL]
+    corder <- c(
+        if (withDimnames) idCols(x),
+        if (key) c("rowKey", "colKey"),
+        if (withDimnames && metadata) c(sort(rowMeta(x)), sort(colMeta(x)))
+    )
+    if (!is.null(corder)) setcolorder(assayData, corder) else setcolorder(assayData)
+
+    ## Add [] to ensure assay always prints, even after modify by reference
+    ## See: https://stackoverflow.com/questions/33195362/data-table-is-not-displayed-on-first-call-after-being-modified-in-a-function
+    return(assayData[])
 })
 
 
@@ -508,75 +609,108 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     if (length(i) > 1) .error(funContext, ' Only a single assay ',
         'name can be assiged with assay(x, i) <- value.')
 
+    value <- copy(value)  # prevent modify by reference
     if (!is.data.table(value)) setDT(value)
 
-    ## TODO:: Do we want to support mutating the row and column metadata?
+    # -- extract strucutral metadata form .intern slot
+    mutable_intern <- mutable(getIntern(x))
+    aIndex <- mutable_intern$assayIndex
+    aKeys <- mutable_intern$assayKeys
 
-    # Extract identifier columns
-    idColumns <- idCols(x)
-    valueColumns <- setdiff(colnames(value), idColumns)
-    metaColumns <- unique(c(rowMeta(x), colMeta(x)))
+    # -- determine if the assay already exists
+    assayExists <- i %in% assayNames(x)
 
-    # Determine if assigning new assay or updating existing assay
-    existingAssay <- i %in% assayNames(x)
-
-    # Handle missing mandatory identifiers in rowData and colData
-    missingRowCols <- setdiff(rowIDs(x), colnames(value))
-    missingRowTypes <- vapply(rowData(x)[, ..missingRowCols], FUN=typeof,
-        FUN.VALUE=character(1))
-    missingColCols <- setdiff(colIDs(x), colnames(value))
-    missingColTypes <- vapply(colData(x)[, ..missingColCols], FUN=typeof,
-        FUN.VALUE=character(1))
-    missingColumns <- c(missingRowCols, missingColCols)
-    missingTypes <- c(missingRowTypes, missingColTypes)
-
-    if (existingAssay && length(missingColumns) > 0) {
-            tryCatch({
-                value <- merge.data.table(
-                    assay(x, i, withDimnames=TRUE, metadata=FALSE),
-                    value,
-                    on=intersect(idColumns, colnames(value)),
-                    all.x=TRUE)
-            }, error=function(e) .error(funContext, 'Failed to map missing ',
-                'id columns via join with existing assay: ', e))
+    # -- determine the id columns if the assay doesn't already exits
+    if (!any(assayExists)) {
+        assayKey <- key(value)
+        if (is.null(assayKey)) assayKey <- intersect(idCols(x), colnames(value))
     } else {
-        # Pad missing id columns and sort
-        for (idx in seq_along(missingColumns))
-            set(value, j=missingColumns[idx], value=as(NA, missingTypes[idx]))
-        setcolorder(value, idColumns)
-        # Add new identifiers to be to the metadata
-        newRowData <- fsetdiff(value[, .SD, .SDcols=rowIDs(x)],
-            rowData(x)[, .SD, .SDcols=rowIDs(x)]
-        )
-        rowData(x) <- rbind(rowData(x), newRowData,
-            use.names=TRUE, fill=TRUE)
-        newColData <- fsetdiff(value[, .SD, .SDcols=colIDs(x)],
-            colData(x)[, .SD, .SDcols=colIDs(x)]
-        )
-        colData(x) <- rbind(colData(x), newColData,
-            use.names=TRUE, fill=TRUE)
+        if (sum(assayExists) > 1)
+            .error(funContext, "Only one assay can be modified at a time.",
+                " Please set i to be a character(1) vector.")
+        assayKey <- aKeys[[i]]
     }
+    # -- add assayKey column to the value
+    setkeyv(value, assayKey)
+    value[, (i) := .I]
 
-    # Determine what joins need to be done
-    hasKeyColumns <- all(c('rowKey', 'colKey') %in% colnames(value))
-    hasIdColumns <- all(idColumns %in% colnames(value))
-    hasMetaColumns <- all(metaColumns %in% colnames(value))
+    # -- join assay with existing metadata
+    rKeys <- intersect(rowIDs(x), assayKey)
+    cKeys <- intersect(colIDs(x), assayKey)
+    rIndex <- rowIDs(x, data=TRUE, key=TRUE)[, .SD, .SDcols=c("rowKey", rKeys)]
+    setkeyv(rIndex, rKeys)
+    cIndex <- colIDs(x, data=TRUE, key=TRUE)[, .SD, .SDcols=c("colKey", cKeys)]
+    setkeyv(cIndex, cKeys)
 
-    # Join to fetch the key columns if they are missing
-    if (hasIdColumns && !hasKeyColumns) {
-        value <- colData(x, key=TRUE)[value, on=colIDs(x)]
-        value <- rowData(x, key=TRUE)[value, on=rowIDs(x)]
-        value <- value[, .SD, .SDcols=c('rowKey', 'colKey', valueColumns)]
-    } else if (!hasKeyColumns) {
-        stop("The assay has insufficient information to be retrieve",
-            " the row or column keys. Please ensure either the rowKey",
-            " and colKey columns are present, or all of idCols(x)!")
-    }
+    # -- add an index to the assay
+    setkeyv(rIndex, "rowKey")
+    setkeyv(cIndex, "colKey")
+    setkeyv(aIndex, "rowKey")
+    annotatedIndex <- merge.data.table(aIndex, rIndex, all=TRUE)
+    setkeyv(annotatedIndex, "colKey")
+    annotatedIndex <- merge.data.table(annotatedIndex, cIndex, all=TRUE)
 
-    x@assays[[i]] <- value
+    # -- update assayIndex with the new assay
+    setkeyv(annotatedIndex, assayKey)
+    annotatedIndex[value, (i) := get(i)]
+    annotatedIndex[, (assayKey) := NULL]
+    setkeyv(annotatedIndex, unique(c(assayNames(x), i)))
+
+    # -- detect and warn users if they have modified id columns
+    # rowIDs
+    presentRowIDs <- intersect(rowIDs(x), colnames(value))  # allow summary over some keys
+    if (!(length(presentRowIDs) > 0)) stop(.errorMsg("No rowIDs(x) present in",
+        "value! Cannot summarize over an entire dimension."), call.=FALSE)
+    ## set check.attributes=FALSE to allow unequal table keys
+    equalRowIDs <- all.equal(
+        unique(value[, presentRowIDs, with=FALSE])[order(mget(presentRowIDs))],
+        unique(rowIDs(x, data=TRUE)[order(mget(presentRowIDs)), presentRowIDs,
+            with=FALSE]),
+        check.attributes=FALSE
+    )
+    if (!isTRUE(equalRowIDs))
+        stop(.errorMsg("One or more rowIDs(x) columns have been modified.",
+                " Identifier columns cannot be modified via assay assignment!"),
+            call.=FALSE
+        )
+    # colIDs
+    presentColIDs <- intersect(colIDs(x), colnames(value))  # allow summary over some keys
+    if (!(length(presentColIDs) > 0)) stop(.errorMsg("No colIDs(x) present in",
+        "value! Cannot summarize over an entire dimension."), call.=FALSE)
+    equalColIDs <- all.equal(
+        unique(value[, presentColIDs, with=FALSE])[order(mget(presentColIDs))],
+        unique(colIDs(x, data=TRUE)[order(mget(presentColIDs)), presentColIDs,
+            with=FALSE]),
+        check.attributes=FALSE
+    )
+    if (!isTRUE(equalColIDs))
+        stop(.errorMsg("One or more colIDs(x) column have been modified.",
+                " Identifier columns cannot be modified via assay assignment!"),
+            call.=FALSE
+        )
+
+    # -- remove metadata columns for the assay
+    ## TODO:: Do we want to allow mutating rowData and colData via assay method?
+    throwAwayCols <- c(idCols(x), rowMeta(x), colMeta(x))
+    keepCols <- setdiff(colnames(value), throwAwayCols)
+    assayValue <- value[, keepCols, with=FALSE]
+    setkeyv(assayValue, i)
+
+    # -- update the object
+    setcolorder(annotatedIndex, c("rowKey", "colKey"))
+    mutable_intern$assayIndex <- annotatedIndex
+    mutable_intern$assayKeys[[i]] <- assayKey
+    x@.intern <- immutable(mutable_intern)
+    x@assays[[i]] <- assayValue
+
     return(x)
 })
 
+if (sys.nframe() == 0) {
+    x <- copy(lt)
+    rData <- copy(rowData(x, raw=TRUE))
+    cData <- copy(colData(x, raw=TRUE))
+}
 
 ##
 ## == assayNames

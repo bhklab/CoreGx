@@ -29,8 +29,8 @@
 
     # sensitivityInfo
     infoDT <- as.data.table(oldSensitivity$info, keep.rownames=TRUE)
-    rowCols <- c(drug1id="drugid", drug1dose='dose')
-    colCols <- c(cellid="cellid")
+    rowCols <- c(treatment1id="treatmentid", treatment1dose='dose')
+    colCols <- c(sampleid="sampleid")
 
     # sensitivityProfiles
     profDT <- as.data.table(oldSensitivity$profiles, keep.rownames=TRUE)
@@ -74,7 +74,7 @@
 
     # -- capute the na rownames to make recreation easier in .rebuildInfo
     missing_rows <- setdiff(infoDT$rn, rawdataDT$rn)
-    na_index <- infoDT[rn %in% missing_rows, .(rn, drugid, cellid)]
+    na_index <- infoDT[rn %in% missing_rows, .(rn, treatmentid, sampleid)]
 
     # -- build a LongTableDataMapper object
     TREdataMapper <- TREDataMapper(rawdata=rawdataDT)
@@ -88,8 +88,8 @@
     guess$metadata[[2]] <- setdiff(guess$metadata[[2]],
         c(assayCols, guess$rowDataMap[[2]], guess$colDataMap[[2]]))
     assayMap$assay_metadata <- setdiff(guess$assayMap$mapped_columns, assayCols)
-
-    # set the names correctly
+    assayMap <- lapply(assayMap, FUN=function(x, y) list(y, x),  # add id columns
+        y=guess$assayMap[[1]])
 
     # update the data mapper
     rowDataMap(TREdataMapper) <- guess$rowDataMap
@@ -104,11 +104,12 @@
 }
 
 
-#' Compare the valus of sensitivityInfo before and after use of
+#' Compare the values of sensitivityInfo before and after use of
 #' .sensitivityToTRE
 #'
 #' @param object `CoreSet` to be updated to the new
 #' `TreatmentResponseExperiment` sensitivity format.
+#' @param FUN `function` The function to compare results from.
 #'
 #' @return None, displays results of `all.equal` on the sensitivityInfo for
 #'   the columns which should be conserved.
@@ -117,20 +118,21 @@
 #' @noRd
 #' @importFrom data.table data.table as.data.table merge.data.table
 #' melt.data.table
-.compareSensitivityInfo <- function(object) {
+.compareTreatmentResponse <- function(object, FUN) {
+
     new_object <- copy(object)
-    tre <- .sensitivityToTRE(object)
+    tre <- CoreGx:::.sensitivityToTRE(object)
     new_object@treatmentResponse <- tre
 
-    si <- copy(sensitivityInfo(object))
-    nsi <- copy(sensitivityInfo(new_object))
+    old_res <- copy(FUN(object))
+    new_res <- copy(FUN(new_object))
 
-    setDT(si, keep.rownames="rownames")
-    setDT(nsi, keep.rownames="rownames")
+    setDT(old_res, keep.rownames="rownames")
+    setDT(new_res, keep.rownames="rownames")
 
-    equal_columns <- setdiff(colnames(si), "rownames")
+    equal_columns <- colnames(old_res)
     all.equal(
-        si[order(drugid, cellid), .SD, .SDcols=equal_columns],
-        nsi[order(drugid, cellid), .SD, .SDcols=equal_columns]
+        old_res[order(rownames), .SD, .SDcols=equal_columns],
+        new_res[order(rownames), .SD, .SDcols=equal_columns]
     )
 }

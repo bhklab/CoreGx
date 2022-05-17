@@ -17,4 +17,8 @@ A subsetted version of the original \code{object}
 \description{
 Subset a CoreSet object based on various parameters, such as cell lines, molecular features
 }
+\examples{
+"Generics shouldn't need examples!"
+
+}
 \keyword{internal}

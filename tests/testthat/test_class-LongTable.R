@@ -1,160 +1,226 @@
-# library(CoreGx)
 # library(testthat)
-# library(parallel)
 # library(data.table)
 
-# ## FIXME:: Refactor into multiple test files?
 
-# # Configure required parameters
-# filePath <- 'merckLongTable.csv'
-# rowDataCols <- list(c(cell_line1='cell_line', BatchID='BatchID'))
-# colDataCols <- list(c(drug1='drugA_name', drug2='drugB_name',
-#     drug1dose='drugA Conc (uM)', drug2dose='drugB Conc (uM)'))
-# assayCols <- list(viability=paste0('viability', seq_len(4)),
-#                   viability_summary=c('mu/muMax', 'X/X0'))
+# # ==== LongTable-accessors.R
 
-# context('Checking LongTable Class Methods.')
+# # see https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation for
+# # explanation
+# test_that("`rowData,LongTable-method` orders data correctly", {
 
-# # ---- 1. buildLongTable 
-# ##FIXME:: This function is being deprecated, write tests for metaConstruct
-# ##  and LongTableDataMapper instead
-# context('Testing buildLongTable function...')
-
-# context('Testing buildLongTable from a single table or file')
-# test_that('Can build LongTable from a file path', {
-#      longTable <- buildLongTable(from=filePath, rowDataCols,
-#         colDataCols, assayCols)
-#      expect_s4_class(longTable,'LongTable')
-#      expect_equal_to_reference(longTable, 'merckLongTable.rds')
 # })
 
-# merckDT <- fread('merckLongTable.csv', na.strings=c('NULL', 'NA', 'None', 'NULL'))
-# test_that('Can build longTable from a data.table', {
-#     longTable1 <- buildLongTable(from=merckDT, rowDataCols,
-#         colDataCols, assayCols)
-#     expect_s4_class(longTable1,'LongTable')
-#     expect_equal_to_reference(longTable1, 'merckLongTable.rds')
+# # == @assay slot
+
+# testthat::test_that("`assay,LongTable-method` and `assays,LongTable-method` return equivalent data", {
+#     assay_list <- lapply(seq_along(assayNames(lt)), FUN=assay,
+#         x=lt, withDimnames=TRUE)
+#     assays_ <- assays(lt)
+#     for (i in seq_along(assay_list)) {
+#         print(i)
+#         testthat::expect_true(all.equal(assay_list[[i]], assays_[[i]]))
+#     }
 # })
 
-# test_that('Can build longTable from a data.frame', {
-#     longTable2 <- buildLongTable(from=setDF(merckDT),
-#         rowDataCols, colDataCols, assayCols)
-#     expect_s4_class(longTable2, 'LongTable')
-#     expect_equal_to_reference(longTable2, 'merckLongTable.rds')
+# testthat::test_that("`assay<-LongTable-method` assignment does not corrupt data relationships", {
+#     nlt <- copy(lt)
+#     for (nm in assayNames(lt)) {
+#         print(nm)
+#         nlt[[nm]] <- nlt[[nm]]
+#         testthat::expect_true(all.equal(nlt[[nm]], lt[[nm]]))
+#         testthat::expect_true(all.equal(assays(nlt, raw=TRUE)[[nm]], assays(lt, raw=TRUE)[[nm]]))
+#     }
+#     testthat::expect_true(all.equal(getIntern(nlt)$assayIndex, getIntern(lt)$assayIndex))
 # })
 
-
-# context('Testing buildLongTable from mutliple tables or files')
-# # already know this works from previous test
-# longTable <- buildLongTable(from=filePath, rowDataCols, colDataCols, assayCols)
-
-# # update rowDataCols and colDataCols based on renamed columns in LongTable
-# rowDataColsOld <- rowDataCols
-# rowDataCols <- lapply(rowDataCols, names)
-# colDataColsOlds <- colDataCols
-# colDataCols <- lapply(colDataCols, names)
-
-# assayList <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
-
-# ## TODO:: Read in raw data for this step so we don't require working accessors
-
-# test_that('Can build LongTable from list of data.tables', {
-#     longTable1 <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)
-#     expect_s4_class(longTable1, 'LongTable')
-#     expect_equal_to_reference(longTable1, 'merckLongTable.rds')
+# testthat::test_that("`assay<-LongTable-method` allows non-id column updates", {
+#     nlt <- copy(lt)
+#     assay_ <- nlt[["sensitivity"]]
+#     assay_[, viabililty := rnorm(.N)]
+#     nlt[["sensitivity"]] <- assay_
+#     testthat::expect_true(all.equal(nlt[["sensitivity"]], assay_))
+#     testthat::expect_false(isTRUE(all.equal(nlt[["sensitivity"]], lt[["sensitivity"]])))
 # })
-# test_that('Can build LongTable from list of data.frames', {
-#     for (assay in assayList) setDF(assay)
-#     longTable1 <- buildLongTable(from=assayList, rowDataCols, colDataCols, assayCols)
-#     expect_s4_class(longTable1, 'LongTable')
-#     expect_equal_to_reference(longTable1, 'merckLongTable.rds')
+
+# testthat::test_that("`assay<-LongTable-method` prevents id column updates", {
+#     nlt <- copy(lt)
+#     assay_ <- nlt[["sensitivity"]]
+#     assay_[, drug1dose := rnorm(.N)]
+#     testthat::expect_error({ nlt[["sensitivity"]] <- assay_ },
+#         regexp=".*Identifier columns cannot be modified via assay assignment!.*"
+#     )
+#     testthat::expect_true(all.equal(nlt$sensitivity, lt$sensitivity))
 # })
 
 
-# context('Testing buildLongTable errors correctly')
-
-# test_that('buildLongTable function errors if assayCols argument missing', {
-#     expect_error(buildLongTable(from=filePath, rowDataCols, colDataCols))
+# testthat::test_that("`assay<-LongTable-method` allows simple summary assignments", {
+#     nlt <- copy(lt)
+#     sens <- nlt$sensitivity
+#     sens_sum <- sens[,
+#         .(
+#             mean_drug1dose=mean(drug1dose, na.rm=TRUE),
+#             mean_drug2dose=mean(drug2dose, na.rm=TRUE),
+#             mean_viability=mean(viability, na.rm=TRUE)
+#         ),
+#         by=.(drug1id, drug2id, cellid)
+#     ]
+#     testthat::expect_silent(nlt$sens_sum <- sens_sum)
+#     testthat::expect_true(all.equal(
+#         rowIDs(lt, data=TRUE),
+#         unique(nlt$sens_sum[, rowIDs(nlt), with=FALSE]),
+#         check.attributes=FALSE
+#     ))
+#     testthat::expect_true(all.equal(
+#         colIDs(lt, data=TRUE),
+#         unique(nlt$sens_sum[, colIDs(nlt), with=FALSE])[order(mget(colIDs(nlt)))],
+#         check.attributes=FALSE
+#     ))
 # })
 
-# test_that('buildLongTable function errors if rowDataCols argument missing', {
-#     expect_error(buildLongTable(from=filePath, colDataCols=colDataCols,
-#         assayCols=assayCols))
-# })
-
-# test_that('builgLongTable function errors if colDataCols argument missing', {
-#     expect_error(buildLongTable(from=filePath, rowDataCols=rowDataCols,
-#         assayCols=assayCols))
-# })
-
-# test_that('    assayCols not in data', {
-#     expect_error(buildLongTable(from=filePath, rowDataCols, colDataCols, ))
-# })
-# ## TODO:: Add more informative error cases
-
-
-# # ---- 2. Acessors methods
-# context('Testing LongTable accessor methods...')
-
-# # work correctly
-# context('LongTable accessors work correctly')
-# test_that('rowData works correctly', {
-#     # without keys
-#     rowData <- rowData(longTable)
-#     expect_equal(colnames(rowData), c('cell_line1', 'BatchID'))
-#     expect_s3_class(rowData, 'data.table')
-#     expect_equal_to_reference(rowData, 'merckLongTable.rowData.rds')
-#     # with keys
-#     rowDataKey <- rowData(longTable, key=TRUE)
-#     expect_equal(colnames(rowDataKey), c('cell_line1', 'BatchID', 'rowKey'))
-#     expect_equal_to_reference(rowDataKey, 'merckLongTable.rowDataWithKey.rds')
-# })
-# test_that('colData works correctly', {
-#     # without keys
-#     colData <- colData(longTable)
-#     expect_equal(colnames(colData), c("drug1", "drug2", "drug1dose", "drug2dose"))
-#     expect_s3_class(colData, 'data.table')
-#     expect_equal_to_reference(colData, 'merckLongTable.colData.rds')
-#     # with keys
-#     colDataKey <- colData(longTable, key=TRUE)
-#     expect_equal(colnames(colDataKey), c("drug1", "drug2", "drug1dose", "drug2dose", 'colKey'))
-#     expect_equal_to_reference(colDataKey, 'merckLongTable.colDataWithKey.rds')
-# })
-# test_that('assays works correctly', {
-#     assays <- assays(longTable)
-#     expect_equal(names(assays), assayNames(longTable))
-#     expect_equal_to_reference(assays, 'merckLongTable.assays.rds')
-#     assaysDimnames <- assays(longTable, withDimnames=TRUE)
-#     expect_equal_to_reference(assaysDimnames, 'merckLongTable.assaysDimnames.rds')
-#     assaysDimnamesMetadata <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
-#     expect_equal_to_reference(assaysDimnamesMetadata, 'merckLongTable.assayDimnamesMetdata.rds')
-# })
-# test_that('assay works correctly', {
-#     assay <- assay(longTable, assayNames(longTable)[1])
-#     expect_equal_to_reference(assay, 'merckLongTable.assay.viability.rds')
-#     assayDimnames <- assay(longTable, assayNames(longTable)[1], withDimnames=TRUE)
-#     expect_equal_to_reference(assayDimnames, 'merckLongTable.assayDimnames.viability.rds')
-#     expect_equal(assay(longTable, 1), assay(longTable, 'viability'))
+# testthat::test_that("`assay<-LongTable-method` summary assignment doesn't break referential integrity", {
+#     nlt <- copy(lt)
+#     sens <- nlt$sensitivity
+#     sens_sum <- sens[,
+#         .(
+#             mean_drug1dose=mean(drug1dose, na.rm=TRUE),
+#             mean_drug2dose=mean(drug2dose, na.rm=TRUE),
+#             mean_viability=mean(viability, na.rm=TRUE)
+#         ),
+#         by=.(drug1id, drug2id, cellid)
+#     ]
+#     testthat::expect_silent(nlt$sens_sum <- sens_sum)
+#     testthat::expect_true(all.equal(rowData(lt), rowData(nlt)))
+#     testthat::expect_true(all.equal(colData(lt), colData(nlt)))
+#     non_summary_assays <- setdiff(assayNames(nlt), "sens_sum")
+#     for (aname in non_summary_assays) {
+#         testthat::expect_true(all.equal(
+#             lt[[aname]],
+#             nlt[[aname]]
+#         ))
+#     }
 # })
 
 
-# # error correctly
-# context('LongTable accessor methods error correctly')
-# test_that('assay function errors if assay is missing', {
-#     expect_error(assay(longTable, 'random'))
+
+
+# # ==== LongTable-utils.R
+
+# testthat::test_that("`reindex,LongTale-method` does not mutate by reference", {
+#     .lt <- copy(lt)
+#     nlt <- reindex(lt)
+#     testthat::expect_true(all.equal(.lt, lt))
 # })
-#test_that('assay function errors with logical', {
-#
-#})
-#
-## ----- 3. Setter Methods
-#
-## work correctly
-#context('Testing LongTable setter methods...')
-#context('LongTable setters work correctly')
-#
-## error correctly
-#context('LongTable setter methods error correctly')
 
+# testthat::test_that("`reindex,LongTable-method` has same index as LongTable constructor", {
+#     nlt <- reindex(lt)
+#     testthat::expect_true(all.equal(getIntern(nlt, "assayIndex"), getIntern(lt, "assayIndex")))
+#     testthat::expect_true(all.equal(assays(nlt, raw=TRUE), assays(lt, raw=TRUE)))
+# })
 
-# ---- 4. Subset methods
+# testthat::test_that("`reindex,LongTable-method` does not corrupt data relationships", {
+#     nlt <- reindex(lt)
+#     for (i in seq_along(assayNames(lt))) {
+#         print(i)
+#         assay1 <- assay(lt, i, withDimnames=TRUE)
+#         setkeyv(assay1, idCols(lt))
+#         assay2 <- assay(nlt, i, withDimnames=TRUE)
+#         setkeyv(assay2, idCols(lt))
+#         testthat::expect_true(all.equal(assay1, assay2))
+#     }
+#     assayL1 <- assays(lt)
+#     assayL2 <- assays(nlt)
+#     for (i in seq_along(assayL1)) {
+#         print(i)
+#         testthat::expect_true(all.equal(assayL1[[i]], assayL2[[i]]))
+#     }
+# })
+
+# testthat::test_that("`CoreGx:::.subsetByIndex` is equivalent to subsetting the raw data", {
+#     keepRows <- rowData(lt, key=TRUE)[drug1id %in% drug1id[1:5], ]
+#     fullAssay <- lt$sensitivity
+#     rawSubset <- fullAssay[drug1id %in% keepRows$drug1id, ]
+#     aindex <- mutable(getIntern(lt, "assayIndex"))
+#     subindex <- aindex[rowKey %in% keepRows$rowKey, ]
+#     nlt <- CoreGx:::.subsetByIndex(lt, subindex)
+#     testthat::expect_true(
+#         !anyNA(assays(nlt, raw=TRUE)[["sensitivity"]]$sensitivity)
+#     )
+#     assayByIndex <- nlt$sensitivity
+#     testthat::expect_true(all.equal(rawSubset, assayByIndex))
+# })
+
+# testthat::test_that("`subset,LongTable-method` works with row and column names", {
+#     nlt <- subset(lt, rownames(lt)[1:5], colnames(lt)[1:5])
+#     testthat::expect_equal(rownames(nlt), rownames(lt)[1:5])
+#     testthat::expect_true(all.equal(rowData(nlt), rowData(lt)[1:5, ]))
+#     testthat::expect_equal(colnames(nlt), colnames(lt)[1:5])
+#     testthat::expect_true(all.equal(colData(nlt), colData(lt)[1:5, ]))
+# })
+
+# testthat::test_that("`subset,LongTable-method` works with call queries", {
+#     nlt <- subset(lt,
+#         drug1id %in% unique(drug1id)[1:5],
+#         cellid %in% unique(cellid)[1:5]
+#     )
+#     testthat::expect_s4_class(nlt, "LongTable")
+#     testthat::expect_equal(
+#         rowData(nlt),
+#         rowData(lt)[drug1id %in% unique(drug1id)[1:5]]
+#     )
+#     testthat::expect_equal(
+#         colData(nlt),
+#         colData(lt)[cellid %in% unique(cellid)[1:5]]
+#     )
+#     # check for NA values in the key column of the assay
+#     testthat::expect_true(
+#         !anyNA(assays(nlt, raw=TRUE)[["sensitivity"]]$sensitivity)
+#     )
+#     nlt2 <- lt[
+#         .(drug1id %in% unique(drug1id)[1:5]),
+#         .(cellid %in% unique(cellid)[1:5])
+#     ]
+#     testthat::expect_s4_class(nlt2, "LongTable")
+#     testthat::expect_equal(
+#         rowData(nlt2),
+#         rowData(lt)[drug1id %in% unique(drug1id)[1:5]]
+#     )
+#     testthat::expect_equal(
+#         colData(nlt2),
+#         colData(lt)[cellid %in% unique(cellid)[1:5]]
+#     )
+#     # check for NA values in the key column of the assay
+#     testthat::expect_true(
+#         !anyNA(assays(nlt2, raw=TRUE)[["sensitivity"]]$sensitivity)
+#     )
+#     testthat::expect_equal(nlt, nlt2)
+# })
+
+# testthat::test_that("`subset,LongTable-method` works with regex queries", {
+#     nlt <- subset(lt,
+#         c("vemurafenib", "Vismodegib"),
+#         c("UACC*", "SK-MEL-*")
+#     )
+#     testthat::expect_s4_class(nlt, "LongTable")
+#     testthat::expect_equal(
+#         rowData(nlt),
+#         rowData(lt)[grepl("vemurafenib|Vismodegib", rownames(lt)), ]
+#     )
+#     testthat::expect_equal(
+#         colData(nlt),
+#         colData(lt)[grepl("UACC*|SK-MEL-*", colnames(lt)), ]
+#     )
+#     nlt2 <- lt[
+#         c("vemurafenib", "Vismodegib"),
+#         c("UACC*", "SK-MEL-*")
+#     ]
+#     testthat::expect_s4_class(nlt2, "LongTable")
+#     testthat::expect_equal(
+#         rowData(nlt2),
+#         rowData(lt)[grepl("vemurafenib|Vismodegib", rownames(lt)), ]
+#     )
+#     testthat::expect_equal(
+#         colData(nlt2),
+#         colData(lt)[grepl("UACC*|SK-MEL-*", colnames(lt)), ]
+#     )
+#     testthat::expect_equal(nlt, nlt2)
+# })

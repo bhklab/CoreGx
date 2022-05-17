@@ -219,8 +219,14 @@ to two assays:sensitivity and profiles.
 
 ```{r split_assays, echo=TRUE}
 assays <- list(
-  sensitivity=guess$assays2[[2]][seq_len(4)],
-  profiles=guess$assays2[[2]][c(5, 6)]
+  sensitivity=list(
+    guess$assays2[[1]],
+    guess$assays2[[2]][seq_len(4)]
+  ),
+  profiles=list(
+    guess$assays2[[1]],
+    guess$assays2[[2]][c(5, 6)]
+  )
 )
 assays
 ```
