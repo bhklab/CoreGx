@@ -39,25 +39,30 @@ Secondly, drug combination data has the potential to scale to high dimensionalit
 As a result we need an object that is highly performant to ensure
 computations on such data can be completed in a timely manner.
 
+To resolve these issues, we designed and implement the
+`TreamtentResponseExperiment` (or `TRE` for short)!
 
 # Design Philosophy
 
-The current use case is supporting drug and cell-line combinations in
-`PharmacoGx`, but we wanted to create something flexible enough to fit
-other use cases. As such, we have used to generic term 'treatment' to refer
-to any experimental intervention one can conduct on a set of samples. In the
-`PharmacoGx` context, a treatment represents application of one or more
-anti-cancer compounds to a cancer cell-line. The resulting viability
-measurements for this cell-line after treatment is the response metric.
-We hope that the implementation of our class is general enough to support
-other use cases. For example, the `TreatmentResponseExperiment` class is also
-being adopted for radiation dose-response experiments in
-`r BiocStyle::BiocPkg("RadioGx")`.
+The current use case is supporting drug combinations experiments in
+`r BiocStyle::Biocpkg("PharmacoGx")`, but we wanted to create something flexible
+enough to fit other use cases. As such, we have used the generic term
+'treatment' to refer to any experimental intervention one can conduct on a
+set of samples. In context of `r BiocStyle::Biocpkg("PharmacoGx")`, a
+treatment represents application of one or more anti-cancer compounds to a
+cancer cell-line. The resulting viability for this cell-line
+after treatment is the response metric. We hope that the implementation of
+our class is general enough to support other use cases. For example, the
+`TreatmentResponseExperiment` class is also being adopted for radiation
+dose-response experiments in cancer cell-lines in
+`r BiocStyle::Biocpkg("RadioGx")` as well as for investigating compound
+toxicity in healthy human and rat cell-lines in
+`r BiocStyle::Biocpkg("ToxicoGx")`.
 
-Our design takes the best aspects
-of the `SummarizedExperiment` and `MultiAssayExperiment` classes and implements
-them using the `data.table` package, which provides an R API to a rich set of
-tools for high performance data processing implemented in C.
+Our design takes the aspects of the `SummarizedExperiment` and
+`MultiAssayExperiment` classes and implements them using the `data.table`
+package, which provides an R API to a rich set of tools for scalable,
+high performance data processing implemented in C.
 
 # Anatomy of a TreatmentResponseExperiment
 
@@ -71,7 +76,7 @@ We have borrowed directly from the `SummarizedExperiment` class
 for the `rowData`, `colData`, `metadata` and `assays` slot names.
 We also implemented the `SummarizedExperiment` accessor methods for the
 `TreatmentResponseExperiment`. Therefore the interface should be familiar to
-users of other Bioconductor packages.
+users of common Bioconductor packages.
 
 ## Object Structure and Cardinality
 
@@ -94,12 +99,17 @@ necessary to uniquely identify a row or column and are used to generate the
 which store any additional data about treatments or samples not required to
 uniquely identify a row in either table.
 
-Within the assays the `rowKey` and `colKey` are combined to form a primary key
-for each assay row. This is required because each assay is stored in 'long'
-format, instead of wide format as in the assay matrices within a
-`SummarizedExperiment`. Thanks to the fast implementation of binary search
-within the `data.table` package, assay tables can scale up to tens or even
-hundreds of millions of rows while still being relatively performant.
+Within the `TreatmentResponseExperiment`, an `assayIndex` is stored in the
+`@.intern` slot which maps between unique combinations of `rowKey` and `colKey`
+and the experimental observations in each assay. This relationship is maintained
+using a separate primary key for each assay, which can map to one or more `rowKey`
+and `colKey` combination. For assays containing raw experimental observations,
+generally each assay row will map to one and only one combination of `rowKey`
+and `colKey`. However, for metrics computed over experimental observations, It
+may be desirable to summarized over some of the `rowID` and/or `colID` columns.
+In this case, the relationship between the summarized rows and the metadata
+stored in the `rowData` and `colData` slots are retained in the `assayIndex`,
+allowing
 
 Also worth noting is the cardinality between `rowData` and `colData` for a given
 assay within the assays list. As indicated by the lower connection between these
@@ -113,7 +123,7 @@ row in an assay become a composite key which uniquely identify an observation.
 To deal with the complex kinds of experimental designs which can be stored
 in a `LongTable`, we have engineered a new object to help document and validate
 the way data is mapped from raw data files, as a single large `data.frame` or
-`data.table`, to the various slots of a `LongTable` object.
+`data.table`, to the various slots of a `TreatmentResponseExperiment` object.
 
 ## The DataMapper Class
 
@@ -132,21 +142,21 @@ Only one slot is defined by default, a `list` or `List` in the `@rawdata` slot.
 An accessor method, `rawdata(DataMapper)`, is defined to assign and retrieve
 the raw data from your mapper object.
 
-## The LongTableDataMapper Class
+## The TREDataMapper Class
 
-The `LongTableDataMapper` class is the first concrete sub-class of a
+The `TreatmentResponseExperimentDataMapper` class is the first concrete sub-class of a
 `DataMapper`. It is the object which defines how to go from a single
 `data.frame` or `data.table` of raw experimental data to a properly formatted
-and valid `LongTable` object. This is accomplished by defining various mappings,
+and valid `TreatmentResponseExperiment` object. This is accomplished by defining various mappings,
 which let the the user decide which columns from `rawdata` should go into which
 slots of the object. Each slot mapping is implemented as a list of character
 vectors specifying the column names from `rawdata` to assign to each slot.
 
 Additionally, a helper method has been included, `guessMapping`, that will
-try to determine which columns of a `LongTable`s `rawdata` should be assigned
+try to determine which columns of a `TreatmentResponseExperiment`s `rawdata` should be assigned
 to which slots, and therefore which maps.
 
-To get started making a `LongTable` lets have a look at some rawdata which is
+To get started making a `TreatmentResponseExperiment` lets have a look at some rawdata which is
 a subset of the data from Oneil *et al.*, 2016. The full set of rawdata is
 available for exploration and download from
 [SynergxDB.ca](https://www.synergxdb.ca/), a free and open source web-app and
@@ -173,7 +183,7 @@ knitr::kable(head(merckDT)[, 5:ncol(merckDT)])
 We can see that all the data related to the treatment response experiment is
 contained within this table.
 
-To get an idea of where in a `LongTable` this data should go, lets come up
+To get an idea of where in a `TreatmentResponseExperiment` this data should go, lets come up
 with some guesses for mappings.
 
 ```{r guess_mapping, echo=TRUE}
@@ -190,19 +200,19 @@ groups <- list(
 # Decide if we want to subset out mapped columns after each group
 subsets <- c(FALSE, TRUE, FALSE, TRUE, FALSE, TRUE)
 
-# First we put our data in the `LongTableDataMapper`
-LTdataMapper <- LongTableDataMapper(rawdata=merckDT)
+# First we put our data in the `TRE`
+TREdataMapper <- TREDataMapper(rawdata=merckDT)
 
 # Then we can test our hypotheses, subset=FALSE means we don't remove mapped
 #   columns after each group is mapped
-guess <- guessMapping(LTdataMapper, groups=groups, subset=subsets)
+guess <- guessMapping(TREdataMapper, groups=groups, subset=subsets)
 guess
 ```
 
-Since we want our `LongTable` to have drugs as rows and samples as columns,
-we see that both `justDrug` and `drugsAndDoses` yield the same result. So we
-do not yet prefer one over the other. Looking at `justCells` and
-`cellsAndBatches`, we see one column maps to each of them and therefore still
+Since we want our `TreatmentResponseExperiment` to have drugs as rows and
+samples as columns, we see that both `justDrug` and `drugsAndDoses` yield the
+same result. So we do not yet prefer one over the other. Looking at `justCells`
+and `cellsAndBatches`, we see one column maps to each of them and therefore still
 have no preference. For `assay1` however, we see that no columns mapped, while
 `assay2` maps many of raw data columns.
 
@@ -210,11 +220,11 @@ Since assays will be subset based on the `rowKey` and `colKey`, we know that
 the rowIDs must be `drugsAndDose` and the the colIDs must be `cellsAndBatches`.
 Therefore, to uniquely identify an observation in any given assay we need
 all of these columns. We can use this information to assign maps to our
-`LongTableDataMapper`.
+`TREDataMapper`.
 
 ```{r mappings_to_datamapper, echo=TRUE}
-rowDataMap(LTdataMapper) <- guess$drugsAndDose
-colDataMap(LTdataMapper) <- guess$cellsAndBatches
+rowDataMap(TREdataMapper) <- guess$drugsAndDose
+colDataMap(TREdataMapper) <- guess$cellsAndBatches
 ```
 
 Looking at our mapped columns for `assay2`, we must decide if we want these
@@ -239,7 +249,7 @@ assays
 ```
 
 ```{r assign_assaymap, echo=TRUE}
-assayMap(LTdataMapper) <- assays
+assayMap(TREdataMapper) <- assays
 ```
 
 ## metaConstruct Method
@@ -247,19 +257,19 @@ assayMap(LTdataMapper) <- assays
 The metaConstruct method accepts a `DataMapper` object as its only argument,
 and uses the information in that `DataMapper` to preprocess all `rawdata` and
 map them to the appropriate slots of an `S4` object. In our case, we are mapping
-from the merckDT `data.table` to a `LongTable`.
+from the merckDT `data.table` to a `TreatmentResponseExperiment`.
 
-At minimum, a `LongTableDataMapper` must specify the `rowDataMap`, `colDataMap`,
-and `assayMap`. Additional maps are available, see `?LongTableDataMapper-class`
-and `?LongTableDataMapper-accessors` for more details.
+At minimum, a `TREDataMapper` must specify the `rowDataMap`, `colDataMap`,
+and `assayMap`. Additional maps are available, see `?TREDataMapper-class`
+and `?TREDataMapper-accessors` for more details.
 
 After configuration, creating the object is very straight forward.
 
 ```{r echo=TRUE}
-longTable <- metaConstruct(LTdataMapper)
+tre <- metaConstruct(TREdataMapper)
 ```
 
-# LongTable Object
+# TreatmentResponseExperiment Object
 
 As mentioned previously, a `LongTable` has both list and table like behaviours.
 For table like operations, a given `LongTable` can be thought of as a `rowKey`
@@ -274,14 +284,14 @@ as desirged before creating the `LongTable`.
 ## Row and Column Names
 
 ```{r rownames, echo=TRUE}
-head(rownames(longTable))
+head(rownames(tre))
 ```
 
 We see that the rownames for the Merck `LongTable` are the cell-line name
 pasted to the batch id.
 
 ```{r colnames, echo=TRUE}
-head(colnames(longTable))
+head(colnames(tre))
 ```
 
 For the column names, a similar pattern is followed by combining the colID
@@ -293,9 +303,9 @@ We can subset a `LongTable` using the same row and column name syntax as
 with a `data.frame` or `matrix`.
 
 ```{r subset_dataframe_character, echo=TRUE}
-row <- rownames(longTable)[1]
-columns <- colnames(longTable)[1:2]
-longTable[row, columns]
+row <- rownames(tre)[1]
+columns <- colnames(tre)[1:2]
+tre[row, columns]
 ```
 
 ### Regex Queries
@@ -304,21 +314,21 @@ However, unlike a `data.frame` or `matrix` this subsetting also accepts partial
 row and column names as well as regex queries.
 
 ```{r rowdata_coldata, echo=TRUE}
-head(rowData(longTable), 3)
-head(colData(longTable), 3)
+head(rowData(tre), 3)
+head(colData(tre), 3)
 ```
 
 For example, if we want to get all instance where '5-FU' is the drug:
 
 ```{r simple_regex, echo=TRUE}
-longTable['5-FU', ]
+tre['5-FU', ]
 ```
 
 This has matched all colnames where 5-FU was in either drug1 or drug2. If we
 only want to match drug1, we have several options:
 
 ```{r column_specific_regex, echo=TRUE}
-all.equal(longTable['5-FU:*:*:*', ], longTable['^5-FU',  ])
+all.equal(tre['5-FU:*:*:*', ], tre['^5-FU',  ])
 ```
 
 As a technicaly note, '\*' is replaced with '.\*' internally for regex queries.
@@ -336,7 +346,7 @@ For example if we want to subset to rows where the cell line is VCAP and columns
 where drug1 is Temozolomide and drug2 is either Lapatinib or Bortezomib:
 
 ```{r , echo=TRUE}
-longTable[
+tre[
     # row query
     .(drug1id == 'Temozolomide' & drug2id %in% c('Lapatinib', 'Bortezomib')),
     .(cellid == 'CAOV3') # column query
@@ -346,17 +356,17 @@ longTable[
 We can also invert matches or subset on other columns in `rowData` or `colData`:
 
 ```{r echo=TRUE}
-subLongTable <-
-  longTable[.(drug1id == 'Temozolomide' & drug2id != 'Lapatinib'),
+subTRE <-
+  tre[.(drug1id == 'Temozolomide' & drug2id != 'Lapatinib'),
             .(batchid != 2)]
 ```
 
 To show that it works as expected:
 
 ```{r echo=TRUE}
-print(paste0('drug2id: ', paste0(unique(rowData(subLongTable)$drug2id),
+print(paste0('drug2id: ', paste0(unique(rowData(subTRE)$drug2id),
     collapse=', ')))
-print(paste0('batchid: ', paste0(unique(colData(subLongTable)$batchid),
+print(paste0('batchid: ', paste0(unique(colData(subTRE)$batchid),
     collapse=', ')))
 ```
 
@@ -365,27 +375,27 @@ print(paste0('batchid: ', paste0(unique(colData(subLongTable)$batchid),
 ## rowData
 
 ```{r echo=TRUE}
-head(rowData(longTable), 3)
+head(rowData(tre), 3)
 ```
 
 ```{r echo=TRUE}
-head(rowData(longTable, key=TRUE), 3)
+head(rowData(tre, key=TRUE), 3)
 ```
 
 ## colData
 
 ```{r echo=TRUE}
-head(colData(longTable), 3)
+head(colData(tre), 3)
 ```
 
 ```{r echo=TRUE}
-head(colData(longTable, key=TRUE), 3)
+head(colData(tre, key=TRUE), 3)
 ```
 
 ## assays
 
 ```{r echo=TRUE}
-assays <- assays(longTable)
+assays <- assays(tre)
 assays[[1]]
 ```
 
@@ -395,18 +405,18 @@ assays[[2]]
 ```
 
 ```{r echo=TRUE}
-assays <- assays(longTable, withDimnames=TRUE)
+assays <- assays(tre, withDimnames=TRUE)
 colnames(assays[[1]])
 ```
 
 ```{r echo=TRUE}
-assays <- assays(longTable, withDimnames=TRUE, metadata=TRUE)
+assays <- assays(tre, withDimnames=TRUE, metadata=TRUE)
 colnames(assays[[2]])
 ```
 
 
 ```{r echo=TRUE}
-assayNames(longTable)
+assayNames(tre)
 ```
 
 Using these names we can access specific assays within a `LongTable`.
@@ -414,13 +424,13 @@ Using these names we can access specific assays within a `LongTable`.
 ## assay
 
 ```{r echo=TRUE}
-colnames(assay(longTable, 'sensitivity'))
-assay(longTable, 'sensitivity')
+colnames(assay(tre, 'sensitivity'))
+assay(tre, 'sensitivity')
 ```
 
 ```{r echo=TRUE}
-colnames(assay(longTable, 'sensitivity', withDimnames=TRUE))
-assay(longTable, 'sensitivity', withDimnames=TRUE)
+colnames(assay(tre, 'sensitivity', withDimnames=TRUE))
+assay(tre, 'sensitivity', withDimnames=TRUE)
 ```
 
 # References

@@ -1,12 +1,12 @@
 #' @include CoreSet-class.R LongTable-class.R
+#' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
 #' @import checkmate
 NULL
 
-#' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
 setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 
 .local_class <- 'CoreSet'
-.local_data <- "ClevelandSmall_cSet"
+.local_data <- "clevelandSmall_cSet"
 
 #' @title
 #' CoreSet - A generic data container for molecular profiles and

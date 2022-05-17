@@ -2,16 +2,16 @@
 % Please edit documentation in R/LongTable-accessors.R
 \name{LongTable-accessors}
 \alias{LongTable-accessors}
-\title{Accessing and modifying information in a \code{LongTable}}
+\title{Accessing and modifying information in a \code{TREDataMapper}}
 \value{
 Accessors: See details.
 
-Setters: An updated \code{LongTable} object, returned invisibly.
+Setters: An updated \code{TREDataMapper} object, returned invisibly.
 }
 \description{
 Documentation for the various setters and getters which allow manipulation
-of data in the slots of a \code{LongTable} object.
+of data in the slots of a \code{TREDataMapper} object.
 }
 \examples{
-data(merckLongTable)
+data(exampleDataMapper)
 }

@@ -1,6 +1,15 @@
 # CoreGx News File
 
-## v 2.1.0
+# v 2.1.2
+* Updated CoreSet vignette to reflect recent changes to the object structure
+* Renamed the LongTable vignette to TreatmentResponseExperiment and updated
+the content to reflect the changes in class structure from 2.1.1
+* Generated new TreatmentResponseExperiment class and structure diagrams and
+inlcuded them in the TreamentResponseExperiment vignette
+## v 2.1.1
+* First update since Bioconductor 3.15 release
+* Merged rework of the `LongTable` class back into main branch
+* The object has now been updated to
 
 ## v 2.0.0
 * The `@cell` slot has become the `@sample` slot. Associated generics and

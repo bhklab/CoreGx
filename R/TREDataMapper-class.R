@@ -1,6 +1,7 @@
 #' @include DataMapper-class.R
 #' @include LongTableDataMapper-class.R
 #' @include TreatmentResponseExperiment-class.R
+#' @include LongTableDataMapper-accessors.R
 NULL
 
 #' A Class for Mapping Between Raw Data and an `TreatmentResponseExperiment`
@@ -84,3 +85,202 @@ TREDataMapper <- function(rawdata=data.frame(),
         metadataMap=metadata(lt_dm)
     )
 }
+
+## ===========================================
+## TREDataMapper Accessors Documentation
+## -------------------------------------------
+
+.local_class_4 <- "TREDataMapper"
+.local_data_4 <- "exampleDataMapper"
+
+#' @name TREDataMapper-accessors
+#'
+#' @eval .docs_DataMapper_accessors(class_=.local_class_4)
+#' @eval .docs_DataMapper_get_rawdata(class_=.local_class_4)
+#'
+#' @param value See details.
+NULL
+
+
+## ---------------
+## -- rawdata slot
+
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_DataMapper_set_rawdata(class_=.local_class_4,
+#' class1_='list')
+setReplaceMethod("rawdata", signature=c(object="TREDataMapper",
+        value="list"), function(object, value) {
+    callNextMethod(object=object, value=value)
+})
+
+
+## --------------------
+## ---- rowDataMap slot
+
+
+##
+## -- rowDataMap
+
+#' @rdname TREDataMapper-accessors
+#' @eval
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_4,
+#' data_=.local_data_4)
+setMethod('rowDataMap', signature(object='TREDataMapper'), function(object) {
+    callNextMethod(object)
+})
+
+
+#' @rdname TREDataMapper-accessors
+#' @eval
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_4,
+#' data_=.local_data_4, id_col_='treatmentid')
+setReplaceMethod('rowDataMap', signature(object='TREDataMapper',
+        value='list_OR_List'), function(object, value) {
+    callNextMethod(object=object, value=value)
+})
+
+
+##
+## -- rowData
+
+
+#' Convenience method to subset the `rowData` out of the `rawdata` slot using
+#'   the assigned `rowDataMap` metadata.
+#'
+#' @param x `TREDataMapper` object with valid data in the `rawdata` and
+#'   `colDataMap` slots.
+#' @param key `logical(1)` Should the table be keyed according to the
+#'   `id_columns` of the `rowDataMap` slot? This will sort the table in memory.
+#'   Default is TRUE.
+#'
+#' @return `data.table` The `rowData` as specified in the `rowDataMap` slot.
+#'
+#' @export
+setMethod("rowData", signature(x="LongTableDataMapper"), function(x, key=TRUE) {
+    callNextMethod(x=x, key=key)
+})
+
+
+## --------------------
+## ---- colDataMap slot
+
+
+##
+## -- colDataMap
+
+#' @rdname TREDataMapper-accessors
+#' @eval
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='col', class_=.local_class_4,
+#' data_=.local_data_4)
+setMethod('colDataMap', signature(object='TREDataMapper'),
+        function(object) {
+    callNextMethod(object=object)
+})
+
+#' @rdname TREDataMapper-accessors
+#' @eval
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_4,
+#' data_=.local_data_4, id_col_='sampleid')
+setReplaceMethod('colDataMap',
+        signature(object="TREDataMapper", value="list_OR_List"),
+        function(object, value) {
+    callNextMethod(object=object, value=value)
+})
+
+
+##
+## -- colData
+
+
+#' Convenience method to subset the `colData` out of the `rawdata` slot using
+#'   the assigned `colDataMap` metadata.
+#'
+#' @param x `TREDataMapper` object with valid data in the `rawdata` and
+#'   `colDataMap` slots.
+#' @param key `logical(1)` Should the table be keyed according to the
+#'   `id_columns` of the `colDataMap` slot? This will sort the table in memory.
+#'   Default is TRUE.
+#'
+#' @return `data.table` The `colData` as specified in the `colDataMap` slot.
+#'
+#' @export
+setMethod("colData", signature("LongTableDataMapper"), function(x, key=TRUE) {
+    callNextMethod(x=x, key=key)
+})
+
+
+## ----------------
+## ---- assayMap slot
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_get_assayMap(class_=.local_class_3, data_=.local_data_3)
+setMethod('assayMap', signature(object='TREDataMapper'),
+        function(object) {
+    object@assayMap
+})
+
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_set_assayMap(class_=.local_class_4, data_=.local_data_4)
+setReplaceMethod('assayMap', signature(object='TREDataMapper',
+        value='list_OR_List'), function(object, value) {
+    callNextMethod(object=object, value=value)
+})
+
+
+#' Extract the data for an assay from a `TREDataMapper`
+#'
+#' @param x `TREDataMapper` The object to retrive assay data form according
+#'   to the `assayMap` slot.
+#' @param i `character(1)` Name of an assay in the `assayMap` slot of `x`.
+#' @param withDimnames `logical(1)` For compatibility with
+#'   `SummarizedExperiment::assay` generic. Not used.
+#'
+#' @return `data.table` Data for the specified assay extracted from the
+#'   `rawdata` slot of `x`.
+#'
+#' @importFrom checkmate assertSubset assertCharacter
+#' @keywords internal
+setMethod("assay", signature(x="TREDataMapper"),
+        function(x, i, withDimnames=TRUE) {
+    callNextMethod(x=x, i=i, withDimnames=withDimnames)
+})
+
+
+#' Extract the data for all assays from a `TREDataMapper`
+#'
+#' @param x `TREDataMapper` The object to retrive assay data form according
+#'   to the `assayMap` slot.
+#' @param withDimnames `logical(1)` For compatibility with
+#'   `SummarizedExperiment::assay` generic. Not used.
+#'
+#' @return `list` Data for all assays extracted from the
+#'   `rawdata` slot of `x` as a `list` of `data.tables`, where the `keys` for
+#'   each table are their `id_columns`.
+#'
+#' @importFrom checkmate assertSubset assertCharacter
+#' @keywords internal
+setMethod("assays", signature(x="TREDataMapper"),
+        function(x, withDimnames=TRUE) {
+    callNextMethod(x=x, withDimnames=withDimnames)
+})
+
+# -- metadataMap
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_LongTableMapper_get_metadataMap(class_=.local_class_4,
+#' data_=.local_data_4)
+setMethod('metadataMap', signature(object='TREDataMapper'),
+        function(object) {
+    callNextMethod(object=object)
+})
+
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_4,
+#' data_=.local_data_4, col_='metadata')
+setReplaceMethod('metadataMap', signature(object='TREDataMapper',
+        value='list_OR_List'), function(object, value) {
+    callNextMethod(object=object, value=value)
+})
