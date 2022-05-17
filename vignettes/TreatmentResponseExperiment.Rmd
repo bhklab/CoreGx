@@ -44,10 +44,15 @@ computations on such data can be completed in a timely manner.
 
 The current use case is supporting drug and cell-line combinations in
 `PharmacoGx`, but we wanted to create something flexible enough to fit
-other use cases. As such, the current class makes no mention of drugs or
-cell-lines, nor anything specifically related to Bioinformatics or Computation
-Biology. Rather, we tried to design a general purpose data structure which
-could support high dimensional data for any use case.
+other use cases. As such, we have used to generic term 'treatment' to refer
+to any experimental intervention one can conduct on a set of samples. In the
+`PharmacoGx` context, a treatment represents application of one or more
+anti-cancer compounds to a cancer cell-line. The resulting viability
+measurements for this cell-line after treatment is the response metric.
+We hope that the implementation of our class is general enough to support
+other use cases. For example, the `TreatmentResponseExperiment` class is also
+being adopted for radiation dose-response experiments in
+`r BiocStyle::BiocPkg("RadioGx")`.
 
 Our design takes the best aspects
 of the `SummarizedExperiment` and `MultiAssayExperiment` classes and implements
@@ -64,8 +69,9 @@ knitr::include_graphics('TreatmentResponseExperimentClassDiagram.drawio.png')
 
 We have borrowed directly from the `SummarizedExperiment` class
 for the `rowData`, `colData`, `metadata` and `assays` slot names.
-We also implemented the `SummarizedExperiment` accessor generics for the
-`TreatmentResponseExperiment`.
+We also implemented the `SummarizedExperiment` accessor methods for the
+`TreatmentResponseExperiment`. Therefore the interface should be familiar to
+users of other Bioconductor packages.
 
 ## Object Structure and Cardinality
 
@@ -77,15 +83,16 @@ knitr::include_graphics('TreatmentResponseExperimentStructure.drawio.png')
 ```
 
 Unlike a `SummarizedExperiment`, there are three distinct
-classes of columns in `rowData` and `colData`.
+subgroups of columns in `rowData` and `colData`.
 
-The first is the `rowKey` or `colKey`, these are implemented internally to keep
-mappings between each assay and the associated samples or drugs; these will not
-be returned by the accessors by default. The second is the `rowIDs` and
-`colIDs`, these hold all of the information necessary to uniquely identify a
-row or column and are used to generate the `rowKey` and `colKey`. Finally, there
-are the `rowMeta` and `colMeta` columns, which store any additional data about
-samples or drugs not required to uniquely identify a row in either table.
+The first are the `rowKey` and `colKey` which are implemented internally to
+map between each assay observation and its associated treatments or samples
+(rows or columns); these will not be returned by the accessors by default.
+The second are the `rowIDs` and `colIDs`, these hold all of the information
+necessary to uniquely identify a row or column and are used to generate the
+`rowKey` and `colKey`. Finally, there are the `rowMeta` and `colMeta` columns,
+which store any additional data about treatments or samples not required to
+uniquely identify a row in either table.
 
 Within the assays the `rowKey` and `colKey` are combined to form a primary key
 for each assay row. This is required because each assay is stored in 'long'

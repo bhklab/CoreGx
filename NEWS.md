@@ -1,11 +1,14 @@
 # CoreGx News File
 
+## v 2.1.0
+
 ## v 2.0.0
 * The `@cell` slot has become the `@sample` slot. Associated generics and
 accessor methods have been renamed, then aliased to their old names. As such,
 old code should still work as expected, but will in fact be calling different
 S4 methods.
 * Added the `@treatment` slot to the `CoreSet-class`
+* Renamed `@sensitity` slot to `@treatmentResponse`
 
 ## v 1.5.8
 * Fixed imports for the CoreSet2 constructor to resolve errors in downstream package PharmacoGx
