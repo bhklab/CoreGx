@@ -7,6 +7,9 @@ the content to reflect the changes in class structure from 2.1.1
 * Generated new TreatmentResponseExperiment class and structure diagrams and
 inlcuded them in the TreamentResponseExperiment vignette
 * Added proper documentation object for the TREDataMapper-accessors
+## v 2.1.2
+* Fix bug in `logLogisticRegression` causing tests to fail in Bioconductor 3.16
+daily builds
 
 ## v 2.1.1
 * First update since Bioconductor 3.15 release
