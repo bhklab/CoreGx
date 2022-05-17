@@ -1,5 +1,11 @@
 # CoreGx News File
 
+## v 2.1.1
+* Fix bug in `logLogisticRegression` causing tests to fail in Bioconductor 3.16
+daily builds
+
+## v 2.1.0
+*
 ## v 2.0.0
 * The `@cell` slot has become the `@sample` slot. Associated generics and
 accessor methods have been renamed, then aliased to their old names. As such,
