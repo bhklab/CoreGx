@@ -1,6 +1,6 @@
 # CoreGx News File
 
-## v 2.1.2
+## v 2.1.3
 * Updated CoreSet vignette to reflect recent changes to the object structure
 * Renamed the LongTable vignette to TreatmentResponseExperiment and updated
 the content to reflect the changes in class structure from 2.1.1
@@ -19,7 +19,7 @@ accessor methods have been renamed, then aliased to their old names. As such,
 old code should still work as expected, but will in fact be calling different
 S4 methods.
 * Added the `@treatment` slot to the `CoreSet-class`
-* Renamed `@sensitity` slot to `@treatmentResponse`
+* Renamed `@sensitivity` slot to `@treatmentResponse`
 
 ## v 1.5.8
 * Fixed imports for the CoreSet2 constructor to resolve errors in downstream package PharmacoGx
