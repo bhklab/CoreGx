@@ -118,7 +118,7 @@ the assay table. Conversely for each row in the assay there may be zero or one k
 in `colData` or `rowData`. When combined, the `rowKey` and `colKey` for a given
 row in an assay become a composite key which uniquely identify an observation.
 
-# Constructing a LongTable
+# Constructing a TreatmentResponseExperiment
 
 To deal with the complex kinds of experimental designs which can be stored
 in a `LongTable`, we have engineered a new object to help document and validate
@@ -144,21 +144,22 @@ the raw data from your mapper object.
 
 ## The TREDataMapper Class
 
-The `TreatmentResponseExperimentDataMapper` class is the first concrete sub-class of a
+The `TREDataMapper` class is the first concrete sub-class of a
 `DataMapper`. It is the object which defines how to go from a single
 `data.frame` or `data.table` of raw experimental data to a properly formatted
-and valid `TreatmentResponseExperiment` object. This is accomplished by defining various mappings,
-which let the the user decide which columns from `rawdata` should go into which
-slots of the object. Each slot mapping is implemented as a list of character
-vectors specifying the column names from `rawdata` to assign to each slot.
+and valid `TreatmentResponseExperiment` object. This is accomplished by defining
+various mappings, which let the the user decide which columns from `rawdata`
+should go into which slots of the object. Each slot mapping is implemented as a
+list of character vectors specifying the column names from `rawdata` to assign
+to each slot.
 
 Additionally, a helper method has been included, `guessMapping`, that will
-try to determine which columns of a `TreatmentResponseExperiment`s `rawdata` should be assigned
-to which slots, and therefore which maps.
+try to determine which columns of a `TreatmentResponseExperiment`s `rawdata`
+should be assigned to which slots, and therefore which maps.
 
-To get started making a `TreatmentResponseExperiment` lets have a look at some rawdata which is
-a subset of the data from Oneil *et al.*, 2016. The full set of rawdata is
-available for exploration and download from
+To get started making a `TreatmentResponseExperiment` lets have a look at some
+rawdata which is a subset of the data from Oneil *et al.*, 2016. The full set
+of rawdata is available for exploration and download from
 [SynergxDB.ca](https://www.synergxdb.ca/), a free and open source web-app and
 database of publicly available drug combination sensitivity experiments which we
 created and released (Seo *et al.*, 2019).
@@ -229,7 +230,7 @@ colDataMap(TREdataMapper) <- guess$cellsAndBatches
 
 Looking at our mapped columns for `assay2`, we must decide if we want these
 to go into more than one assay. If we do, we should name each item of our
-`assayMap` for the `LongTableDataMapper` and specify it in a list of
+`assayMap` for the `TREDataMapper` and specify it in a list of
 `character` vectors, one for each assay. Since viability is the raw experimental
 measurement and the final two columns are summaries of it, we will assign them
 to two assays:sensitivity and profiles.
@@ -271,15 +272,16 @@ tre <- metaConstruct(TREdataMapper)
 
 # TreatmentResponseExperiment Object
 
-As mentioned previously, a `LongTable` has both list and table like behaviours.
-For table like operations, a given `LongTable` can be thought of as a `rowKey`
-by `colKey` rectangular object.
+As mentioned previously, a `TreatmentResponseExperiment` has both list and
+table like behaviours. For table like operations, a given
+`TreatmentResponseExperiment` can be thought of as a `rowKey` by
+`colKey` rectangular object.
 
 To support `data.frame` like sub-setting for this object, the constructor makes
 pseudo row and column names, which are the ID columns for each row of
 `rowData` or `colData` pasted together with a ':'. The ordering of these
 columns is preserved in the pseudo-dim names, so be sure to arrange them
-as desirged before creating the `LongTable`.
+as desirged before creating the `TreatmentResponseExperiment`.
 
 ## Row and Column Names
 
@@ -287,7 +289,7 @@ as desirged before creating the `LongTable`.
 head(rownames(tre))
 ```
 
-We see that the rownames for the Merck `LongTable` are the cell-line name
+We see that the rownames for the Merck `TreatmentResponseExperiment` are the cell-line name
 pasted to the batch id.
 
 ```{r colnames, echo=TRUE}
@@ -299,7 +301,7 @@ columns in the form 'drug1:drug2:drug1dose:drug2dose'.
 
 ## `data.frame` Subsetting
 
-We can subset a `LongTable` using the same row and column name syntax as
+We can subset a `TreatmentResponseExperiment` using the same row and column name syntax as
 with a `data.frame` or `matrix`.
 
 ```{r subset_dataframe_character, echo=TRUE}
@@ -337,10 +339,11 @@ command-line users are familiar with.
 
 ## `data.table` Subsetting
 
-In addition to regex queries, a `LongTable` object supports arbitrarily complex
-subset queries using the `data.table` API. To access this API, you will need to
-use the `.` function, which allows you to pass raw R expressions to be evaluated
-inside the `i` and `j` arguments for `dataTable[i, j]`.
+In addition to regex queries, a `TreatmentResponseExperiment` object supports
+arbitrarily complex subset queries using the `data.table` API. To access this
+API, you will need to use the `.` function, which allows you to pass raw R
+expressions to be evaluated inside the `i` and `j` arguments for
+`dataTable[i, j]`.
 
 For example if we want to subset to rows where the cell line is VCAP and columns
 where drug1 is Temozolomide and drug2 is either Lapatinib or Bortezomib:
@@ -356,12 +359,13 @@ tre[
 We can also invert matches or subset on other columns in `rowData` or `colData`:
 
 ```{r echo=TRUE}
-subTRE <-
-  tre[.(drug1id == 'Temozolomide' & drug2id != 'Lapatinib'),
-            .(batchid != 2)]
+subTRE <- tre[
+  .(drug1id == 'Temozolomide' & drug2id != 'Lapatinib'),
+  .(batchid != 2)
+]
 ```
 
-To show that it works as expected:
+To show that this works as expected:
 
 ```{r echo=TRUE}
 print(paste0('drug2id: ', paste0(unique(rowData(subTRE)$drug2id),
@@ -419,7 +423,8 @@ colnames(assays[[2]])
 assayNames(tre)
 ```
 
-Using these names we can access specific assays within a `LongTable`.
+Using these names we can access specific assays within a
+`TreatmentResponseExperiment`.
 
 ## assay
 
