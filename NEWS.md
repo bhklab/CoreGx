@@ -1,13 +1,8 @@
 # CoreGx News File
 
-## v 2.1.2
+## v 2.0.1
 * Fix bug in `logLogisticRegression` causing tests to fail in Bioconductor 3.16
 daily builds
-
-## v 2.1.1
-* First update since Bioconductor 3.15 release
-* Merged rework of the `LongTable` class back into main branch
-* The object has now been updated to
 
 ## v 2.0.0
 * The `@cell` slot has become the `@sample` slot. Associated generics and
