@@ -22,11 +22,11 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #' @slot datasetType See Slots section.
 #'
 #' @details
-#' The CoreSet (CSet) class was developed as a superclass for pSets in the
+#' The CoreSet (cSet) class was developed as a superclass for pSets in the
 #' PharmacoGx and RadioGx packages to contain the data generated in screens
 #' of cancer sample lines for their genetic profile and sensitivities to therapy
 #' (Pharmacological or Radiation). This class is meant to be a superclass which
-#' is contained within the PharmacoSet (pSet) and RadioSet (RSet) objects
+#' is contained within the PharmacoSet (pSet) and RadioSet (rSet) objects
 #' exported by PharmacoGx and RadioGx. The format of the data is similar for
 #' both pSets and rSets, allowing much of the code to be abstracted into
 #' the CoreSet super-class. However, the models involved with quantifying
@@ -61,7 +61,7 @@ setClassUnion('list_OR_MAE', c('list', 'MultiAssayExperiment'))
 #'   identifiers used between different ``r .local_class`` objects.
 #' * datasetType: `character` string of 'sensitivity',
 #'   'perturbation', or both detailing what type of data can be found in the
-#'   CoreSet, for proper processing of the data
+#'   ``r .local_class``, for proper processing of the data
 #'
 #' @seealso [`CoreSet-accessors`]
 #'

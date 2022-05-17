@@ -127,7 +127,7 @@ setReplaceMethod("rawdata", signature=c(object="TREDataMapper",
 #' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_4,
 #' data_=.local_data_4)
 setMethod('rowDataMap', signature(object='TREDataMapper'), function(object) {
-    callNextMethod(object)
+    callNextMethod()
 })
 
 
@@ -137,7 +137,7 @@ setMethod('rowDataMap', signature(object='TREDataMapper'), function(object) {
 #' data_=.local_data_4, id_col_='treatmentid')
 setReplaceMethod('rowDataMap', signature(object='TREDataMapper',
         value='list_OR_List'), function(object, value) {
-    callNextMethod(object=object, value=value)
+    callNextMethod()
 })
 
 
@@ -157,8 +157,8 @@ setReplaceMethod('rowDataMap', signature(object='TREDataMapper',
 #' @return `data.table` The `rowData` as specified in the `rowDataMap` slot.
 #'
 #' @export
-setMethod("rowData", signature(x="LongTableDataMapper"), function(x, key=TRUE) {
-    callNextMethod(x=x, key=key)
+setMethod("rowData", signature(x="TREDataMapper"), function(x, key=TRUE) {
+    callNextMethod()
 })
 
 
@@ -175,7 +175,7 @@ setMethod("rowData", signature(x="LongTableDataMapper"), function(x, key=TRUE) {
 #' data_=.local_data_4)
 setMethod('colDataMap', signature(object='TREDataMapper'),
         function(object) {
-    callNextMethod(object=object)
+    callNextMethod()
 })
 
 #' @rdname TREDataMapper-accessors
@@ -185,7 +185,7 @@ setMethod('colDataMap', signature(object='TREDataMapper'),
 setReplaceMethod('colDataMap',
         signature(object="TREDataMapper", value="list_OR_List"),
         function(object, value) {
-    callNextMethod(object=object, value=value)
+    callNextMethod()
 })
 
 
@@ -205,8 +205,8 @@ setReplaceMethod('colDataMap',
 #' @return `data.table` The `colData` as specified in the `colDataMap` slot.
 #'
 #' @export
-setMethod("colData", signature("LongTableDataMapper"), function(x, key=TRUE) {
-    callNextMethod(x=x, key=key)
+setMethod("colData", signature(x="TREDataMapper"), function(x, key=TRUE) {
+    callNextMethod()
 })
 
 
@@ -217,7 +217,7 @@ setMethod("colData", signature("LongTableDataMapper"), function(x, key=TRUE) {
 #' @eval .docs_LongTableDataMapper_get_assayMap(class_=.local_class_3, data_=.local_data_3)
 setMethod('assayMap', signature(object='TREDataMapper'),
         function(object) {
-    object@assayMap
+    callNextMethod()
 })
 
 
@@ -225,7 +225,7 @@ setMethod('assayMap', signature(object='TREDataMapper'),
 #' @eval .docs_LongTableDataMapper_set_assayMap(class_=.local_class_4, data_=.local_data_4)
 setReplaceMethod('assayMap', signature(object='TREDataMapper',
         value='list_OR_List'), function(object, value) {
-    callNextMethod(object=object, value=value)
+    callNextMethod()
 })
 
 
@@ -244,7 +244,7 @@ setReplaceMethod('assayMap', signature(object='TREDataMapper',
 #' @keywords internal
 setMethod("assay", signature(x="TREDataMapper"),
         function(x, i, withDimnames=TRUE) {
-    callNextMethod(x=x, i=i, withDimnames=withDimnames)
+    callNextMethod()
 })
 
 
@@ -263,7 +263,7 @@ setMethod("assay", signature(x="TREDataMapper"),
 #' @keywords internal
 setMethod("assays", signature(x="TREDataMapper"),
         function(x, withDimnames=TRUE) {
-    callNextMethod(x=x, withDimnames=withDimnames)
+    callNextMethod()
 })
 
 # -- metadataMap
@@ -273,7 +273,7 @@ setMethod("assays", signature(x="TREDataMapper"),
 #' data_=.local_data_4)
 setMethod('metadataMap', signature(object='TREDataMapper'),
         function(object) {
-    callNextMethod(object=object)
+    callNextMethod()
 })
 
 
@@ -282,5 +282,5 @@ setMethod('metadataMap', signature(object='TREDataMapper'),
 #' data_=.local_data_4, col_='metadata')
 setReplaceMethod('metadataMap', signature(object='TREDataMapper',
         value='list_OR_List'), function(object, value) {
-    callNextMethod(object=object, value=value)
+    callNextMethod()
 })
