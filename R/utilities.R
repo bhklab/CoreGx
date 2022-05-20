@@ -338,6 +338,11 @@
         stop("y_to_frac must be a logical.")
     }
 
+    if(y_to_log && y_to_frac){
+        warning("Both y_to_log and y_as_frac set. Will first convert to fraction and then take the logarithm.\n
+            If this is not what is intended, please reformat data prior to curve fitting. ")
+    }
+
     if (x_to_log) {
         x <- log10(x)
     }
@@ -375,6 +380,10 @@
         x <- x[myxy]
         y <- y[myxy]
 
+        if (y_to_frac) {
+            y <- y/100
+        }
+        
         if (trunc) {
             y = pmin(as.numeric(y), 1)
             y = pmax(as.numeric(y), 0)
@@ -400,9 +409,7 @@
             y <- log(y)
         }
 
-        if (y_to_frac) {
-            y <- y/100
-        }
+
 
          if (length(unique(x)) < 3) {
             stop("Less than 3 unique dose points left after cleaning data, please pass in enough valid measurements.")
