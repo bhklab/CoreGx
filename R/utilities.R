@@ -775,11 +775,20 @@
     span = 1) {
 
     guess <- tryCatch(optim(par = gritty_guess, fn = function(t) {
-        .residual(x = x, y = y, n = median_n, pars = t, f = f, scale = scale, family = family, trunc = trunc)
-    }, lower = lower_bounds, upper = upper_bounds, control = list(factr = 1e-08, trace = 0), method = "L-BFGS-B"), error = function(e) {
+        .residual(
+            x = x, y = y, n = median_n, pars = t, f = f,
+            scale = scale, family = family, trunc = trunc
+        )
+    }, lower = lower_bounds, upper = upper_bounds, control = list(
+        factr = 1e-08,
+        ndeps = rep(1e-4, times = length(gritty_guess)),
+        trace = 0
+    ), method = "L-BFGS-B"), error = function(e) {
         list(par = gritty_guess, convergence = -1)
     })
-    failed = guess[["convergence"]] != 0
+
+
+    failed <- guess[["convergence"]] != 0
     guess <- guess[["par"]]
 
     guess_residual <- .residual(x = x, y = y, n = median_n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
