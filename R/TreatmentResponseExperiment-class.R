@@ -98,13 +98,13 @@ NULL
 #'
 #' @import data.table
 #' @export
-TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
-        assays, metadata=list(), keep.rownames=FALSE) {
+TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
+        metadata=list(), keep.rownames=FALSE) {
     if (!missing(rowData) && is(rowData, "LongTable")) {
         LT <- rowData
     } else {
         LT <- LongTable(rowData=rowData, rowIDs=rowIDs, colData=colData,
-            colIDs=colIDs, assays=assays, metadata=metadata,
+            colIDs=colIDs, assays=assays, assayIDs=assayIDs, metadata=metadata,
             keep.rownames=keep.rownames)
     }
     .TreatmentResponseExperiment(

@@ -3,16 +3,19 @@
 \name{metaConstruct}
 \alias{metaConstruct}
 \alias{metaConstruct,LongTableDataMapper-method}
+\alias{metaConstruct,TREDataMapper-method}
 \title{Generic for preprocessing complex data before being used in the constructor
 of an \code{S4} container object.}
 \usage{
 metaConstruct(mapper, ...)
 
 \S4method{metaConstruct}{LongTableDataMapper}(mapper)
+
+\S4method{metaConstruct}{TREDataMapper}(mapper)
 }
 \arguments{
-\item{mapper}{An \code{LongTableDataMapper} object abstracting arguments to an
-the \code{LongTable} constructor.}
+\item{mapper}{An \code{TREDataMapper} object abstracting arguments to an
+the \code{TreatmentResponseExperiment} constructor.}
 
 \item{...}{Allow new arguments to be defined for this generic.}
 }
@@ -21,6 +24,8 @@ An \code{S4} object for which the class corresponds to the type of
 the build configuration object passed to this method.
 
 A \code{LongTable} object, as specified in the mapper.
+
+A \code{TreatmentResponseExperiment} object, as specified in the mapper.
 }
 \description{
 This method is intended to abstract away complex constructor arguments
@@ -39,5 +44,14 @@ assayMap(exampleDataMapper) <- list(sensitivity=list(c("treatmentid", "sampleid"
 metadataMap(exampleDataMapper) <- list(experiment_metadata=c('metadata'))
 longTable <- metaConstruct(exampleDataMapper)
 longTable
+
+data(exampleDataMapper)
+exampleDataMapper <- as(exampleDataMapper, "TREDataMapper")
+rowDataMap(exampleDataMapper) <- list(c('treatmentid'), c())
+colDataMap(exampleDataMapper) <- list(c('sampleid'), c())
+assayMap(exampleDataMapper) <- list(sensitivity=list(c("treatmentid", "sampleid"), c('viability')))
+metadataMap(exampleDataMapper) <- list(experiment_metadata=c('metadata'))
+tre <- metaConstruct(exampleDataMapper)
+tre
 
 }

@@ -10,6 +10,7 @@ TreatmentResponseExperiment(
   colData,
   colIDs,
   assays,
+  assayIDs,
   metadata = list(),
   keep.rownames = FALSE
 )
