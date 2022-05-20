@@ -148,7 +148,7 @@ setMethod('subset', signature('LongTable'),
     .rowData <- function(...) rowData(..., key=TRUE)
     .colData <- function(...) colData(..., key=TRUE)
     .tryCatchNoWarn <- function(...) suppressWarnings(tryCatch(...))
-    .strSplitLength <- function(...) length(strsplit(...))
+    .strSplitLength <- function(...) length(unlist(strsplit(...)))
 
     # subset rowData
     ## FIXME:: Can I parameterize this into a helper that works for both row
