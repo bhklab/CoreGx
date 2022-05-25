@@ -67,8 +67,8 @@ Suggests:
 License: GPL-3
 Config/testthat/edition: 3
 Roxygen: list(markdown=TRUE, r6=FALSE)
-RoxygenNote: 7.1.2
-Collate:
+RoxygenNote: 7.2.0
+Collate: 
     'allGenerics.R'
     'immutable-class.R'
     'LongTable-class.R'

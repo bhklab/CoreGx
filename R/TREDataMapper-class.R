@@ -269,7 +269,7 @@ setMethod("assays", signature(x="TREDataMapper"),
 # -- metadataMap
 
 #' @rdname TREDataMapper-accessors
-#' @eval .docs_LongTableMapper_get_metadataMap(class_=.local_class_4,
+#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class_4,
 #' data_=.local_data_4)
 setMethod('metadataMap', signature(object='TREDataMapper'),
         function(object) {

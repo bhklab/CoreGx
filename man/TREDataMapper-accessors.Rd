@@ -24,6 +24,7 @@
 \alias{assayMap<-,TREDataMapper,List-methhod}
 \alias{assayMap<-}
 \alias{metadataMap,TREDataMapper-method}
+\alias{metadataMap}
 \alias{metadataMap<-,TREDataMapper,list_OR_List-method}
 \alias{metadataMap<-,TREDataMapper-method}
 \alias{metadataMap<-}
@@ -116,6 +117,9 @@ specify the columns mapping to the assay in the \code{S4} object the
 \code{TREDataMapper} constructs.
 }
 
+\strong{metadataMap}:  A \code{list} of \code{character} vectors. Each item is an element
+of the constructed objects \verb{@metadata} slot.
+
 \strong{metadataMap<-}: Updates \code{TREDataMapper} object in-place, then returns an
 \code{invisible(NULL)}. Arguments:
 \itemize{
@@ -137,6 +141,8 @@ colDataMap(exampleDataMapper) <- list(c('sampleid'), c())
 assayMap(exampleDataMapper)
 
 assayMap(exampleDataMapper) <- list(sensitivity=c(viability1='viability'))
+
+metadataMap(exampleDataMapper)
 
 metadataMap(exampleDataMapper) <- list(object_metadata=c('metadata'))
 
