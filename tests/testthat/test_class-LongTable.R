@@ -1,6 +1,99 @@
 library(testthat)
 library(data.table)
 
+# ==== LongTable-class.R
+
+testthat::test_that("`LongTable` is coercible to TRE", {
+    tre <- as(lt, "TreatmentResponseExperiment")
+    testthat::expect_s4_class(tre, "TreatmentResponseExperiment")
+})
+
+testthat::test_that("`LongTable` constructor method works with valid inputs", {
+    ## Extract required parameters to create an TRE object
+    parameters       <- formalArgs(LongTable)
+    ## TODO:: check for missing colData
+    parameters       <- parameters[##Added to pass the test↓ ↓ ↓
+        !(parameters %in% c("metadata", "keep.rownames", "colData"))
+    ]
+    row_data         <- rowData(tre)
+    row_ids          <- rowIDs(tre)
+    col_data         <- colData(tre)
+    col_ids          <- colIDs(tre)
+    assays_          <- assays(tre)
+    assay_ids        <- replicate(3, idCols(tre), simplify = FALSE)
+    names(assay_ids) <- assayNames(tre)
+    ## regex lookaheads to check for ALL missing parameters
+    regex <- paste0(sprintf("(?=.*%s)", parameters), collapse = "")
+    regex <- paste0("(?s)^", regex) ## handle line breaks in error messages
+    ## Line 87: Report all missing parameters in error message
+    testthat::expect_error({ ntre <- LongTable() },
+        regexp = regex,
+        perl   = TRUE
+    )
+    ## Check for wrong input rowData class (those not coercible to data.frame)
+    ## FIX-ME:: We might need extra check for rowData, colData, assays: even NULL is coercible to data.table
+    #testthat::expect_error({
+    #    ntre <- LongTable(rowData  = NULL,
+    #                      rowIDs   = row_ids,
+    #                      colData  = col_data,
+    #                      colIDs   = col_ids,
+    #                      assays   = assays_,
+    #                      assayIDs = array_ids)
+    #},
+    #    regexp = ".*rowData must be coerceible to a data\\.frame"
+    #)
+    ## FIXME:: Move line 143-156 before line 128 in LongTable-class.R
+    #testthat::expect_error({
+    #    ntre <- LongTable(rowData  = row_data[ , -row_ids[1:2], with = FALSE],
+    #                      rowIDs   = row_ids,
+    #                      colData  = col_data,
+    #                      colIDs   = col_ids,
+    #                      assays   = assays_,
+    #                      assayIDs = array_ids)
+    #}, 
+    #    regexp = paste0(".*Row IDs not in rowData: ",
+    #                    setdiff(row_ids, row_ids[1:2]),
+    #                    collapse = ",")
+    #)
+    ## Question: should we handle the case where assays' IDs are mislabeled?
+    ## Question: should we check for unequal length of names(assays) and names(assayIDs)? (refer to line 171)
+    ## Line 172
+    testthat::expect_error({
+        names(assay_ids)[1] <- "not sensitivity"
+        ntre <- LongTable(rowData  = row_data,
+                          rowIDs   = row_ids,
+                          colData  = col_data,
+                          colIDs   = col_ids,
+                          assays   = assays_,
+                          assayIDs = assay_ids)
+    },
+        regexp = paste0(".*Mismatched names between ",
+                        "assays and assayIDs for\\:\n\t",
+                        paste0(names(assays_)[
+                                    names(assays_) != names(assay_ids)
+                               ],
+                               collapse = ", "),
+                        ".*", collapse = "")
+    )
+})
+
+## Below tested methods should live in LongTable-accessors.R
+
+testthat::test_that("`assayCols,LongTable-method` retrieves specified assay's column names",{
+    testthat::expect_error({ assay_cols <- assayCols(tre, i = 1:2) },
+        regexp = ".*The i parameter only accepts a single assay name or index.*"
+    )
+    testthat::expect_error({
+        assay_cols <- assayCols(tre, i = (length(assayNames(tre)) + 1))
+        },
+        regexp = ".*The specified index is invalid.*"
+    )
+    testthat::expect_error({
+        assay_cols <- assayCols(tre, i = paste0(assayNames(tre), collapse = ""))
+        },
+        regexp = ".*The specified index is invalid.*"
+    )
+})
 
 # ==== LongTable-accessors.R
 
@@ -21,13 +114,18 @@ testthat::test_that("`rowData<-` rowData must be updated with data.table or data
     )
 })
 
-## TODO:: Handle this edge case for both row and column data
+## Case handled, but on line 224, [, duplicated(N)] shouldn't be used:
+##     Consider the case where the duplicated items have N != 1,
+##     while all the unique elements have N == 1.
+##     It will return the row indices of all the unique row data,
+##     and duplicated rows whose N are the same.
+## The fix is simple: we can simply use which(duplicated(value)) on line 226
 testthat::test_that("`rowData<-`prevent from breaking referential integrity on purpose", {
    ntre <- copy(tre)
    rowData_bad <- rowData(ntre)
    rowData_bad <- rbind(rowData_bad, rowData_bad[.N, ])
-   testthat::expect_error({ rowData(ntre) <- rowData_bad },
-       regexp = ""
+   testthat::expect_warning({ rowData(ntre) <- rowData_bad },
+       regexp = ".*ID columns are duplicated for rows.*"
    )
 })
 
@@ -308,6 +406,50 @@ testthat::test_that("`subset,LongTable-method` works with row and column names",
     testthat::expect_true(all.equal(colData(ntre), colData(tre)[1:5, ]))
 })
 
+testthat::test_that("`subset,LongTable-method` doesn't produce non-existing assay observations from joining", {
+    all_assays      <- assays(tre, key = FALSE, withDimnames = TRUE)
+    select_row_idx  <- seq.int(1, dim(tre)[1], by = 2)
+    select_col_idx  <- seq.int(1, dim(tre)[2], by = 2)
+    sub_tre     <- subset(tre, i = select_row_idx, j = select_col_idx)
+    assay_names <- assayNames(tre)
+    for (a in seq_along(assay_names)) {
+        assay_sub  <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
+        obs_exists <- do.call(paste0, assay_sub) %in% # linear search only in R
+                      do.call(paste0, all_assays[[a]])# An O(mn) search :(
+        testthat::expect_true({
+            all(obs_exists)
+        })
+    }
+})
+
+testthat::test_that("`subset,LongTable-method` doesn't miss assay observations for selected row/columns either", {
+    all_assays     <- assays(tre, key = FALSE, withDimnames = TRUE)
+    assay_names    <- assayNames(tre)
+    select_row_idx <- sample.int(n = dim(tre)[1], size = 1, replace = FALSE)
+    sub_tre        <- subset(tre, i = select_row_idx)
+    select_row     <- rowData(tre)[select_row_idx, rowIDs(tre), with = FALSE]
+    for (a in seq_along(assay_names)) {
+        assay_sub1 <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
+        assay_sub2 <- all_assays[[a]][select_row, ]
+        testthat::expect_equal(assay_sub1, assay_sub2)
+    }
+    select_col_idx <- sample.int(n = dim(tre)[2], size = 1, replace = FALSE)
+    sub_tre        <- subset(tre, j = select_col_idx)
+    select_col     <- colData(tre)[select_col_idx, colIDs(tre), with = FALSE]
+    for (a in seq_along(assay_names)) {
+        assay_sub1 <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
+        assay_sub2 <- all_assays[[a]][cellid == select_col, ]
+        testthat::expect_equal(assay_sub1, assay_sub2)
+    }
+    sub_tre     <- tre[select_row_idx, select_col_idx]
+    select_both <- cbind(select_row, select_col)
+    for (a in seq_along(assay_names)) {
+        assay_sub1 <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
+        assay_sub2 <- all_assays[[a]][select_both, ]
+        testthat::expect_equal(assay_sub1, assay_sub2)
+    }
+})
+
 # == reindex
 
 testthat::test_that("`reindex,LongTale-method` does not mutate by reference", {
@@ -341,7 +483,8 @@ testthat::test_that("`reindex,LongTable-method` does not corrupt data relationsh
 })
 
 testthat::test_that("`reindex,LongTable-method` removes gaps in keys in subset LongTable", {
-    stre <- tre[seq.int(1, round(dim(tre)[1] * 0.5), by = 2), ] ## subset data
+    select_row <- seq.int(1, dim(tre)[1], by = 2)
+    stre <- tre[select_row, ] ## subset data
     stre <- reindex(stre)
     ## check if rowData and colData keys have gaps
     row_keys <- rowData(stre, key = TRUE)$rowKey
@@ -351,13 +494,13 @@ testthat::test_that("`reindex,LongTable-method` removes gaps in keys in subset L
     testthat::expect_true(has_no_gaps_in_row)
     testthat::expect_true(has_no_gaps_in_col)
     ## check if assays' keys have gaps
-#    for (i in seq_along(assayNames(stre))) {
-#        assay_name <- assayNames(stre)[i]
-#        assay_keys <- assay(stre, i, key = FALSE, withDimnames = FALSE)[[assay_name]]
-#        has_no_gaps_in_assay <- rle(diff(assay_keys))$value == 1
-#        if (length(has_no_gaps_in_assay) > 1) print(i)
-#        testthat::expect_true(has_no_gaps_in_assay)
-#    } # In summary assay, the repeating primary key failing this test.
+    for (i in seq_along(assayNames(stre))) {
+        assay_name <- assayNames(stre)[i]
+        assay_keys <- assay(stre, i, key = FALSE, withDimnames = FALSE)[[assay_name]]
+        has_no_gaps_in_assay <- rle(diff(assay_keys))$value == 1
+        if (length(has_no_gaps_in_assay) > 1) print(i)
+        testthat::expect_true(has_no_gaps_in_assay)
+    } # Leave summary assay out for now
 })
 
 # == [[
