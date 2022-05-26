@@ -12,6 +12,8 @@ test_that("`rowData,LongTable-method` orders data correctly", {
 
 # == @rowData slot
 
+## tre = TreatmentResponseExperiment
+## ntre = New TreatmentResponseExperiment
 testthat::test_that("`rowData<-` rowData must be updated with data.table or data.frame", {
     ntre <- copy(tre)
     testthat::expect_error({ rowData(ntre) <- NULL }, ## rowData slot
@@ -20,14 +22,14 @@ testthat::test_that("`rowData<-` rowData must be updated with data.table or data
 })
 
 ## TODO:: Handle this edge case for both row and column data
-#testthat::test_that("`rowData<-`prevent from breaking referential integrity on purpose", {
-#    ntre <- copy(tre)
-#    rowData_bad <- rowData(ntre)
-#    rowData_bad <- rbind(rowData_bad, rowData_bad[.N, ])
-#    testthat::expect_error({ rowData(ntre) <- rowData_bad },
-#        regexp = ""
-#    )
-#})
+testthat::test_that("`rowData<-`prevent from breaking referential integrity on purpose", {
+   ntre <- copy(tre)
+   rowData_bad <- rowData(ntre)
+   rowData_bad <- rbind(rowData_bad, rowData_bad[.N, ])
+   testthat::expect_error({ rowData(ntre) <- rowData_bad },
+       regexp = ""
+   )
+})
 
 # This warning doesn't trigger if we remove another ID column.
 # Instead, an error like in the NCI-ALMANAC script will occur. (Too many duplicate rows)

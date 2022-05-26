@@ -212,14 +212,18 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, ..., value) {
 
     # error if all the rowID columns are not present in the new rowData
     equalRowIDs <- rowIDCols %in% sharedRowIDCols
-    if (!all(equalRowIDs)) .warning('\n[CoreGx::rowData<-] The ID columns ',
+    if (!all(equalRowIDs)) warning(.warnMsg('\n[CoreGx::rowData<-] The ID columns ',
         rowIDCols[!equalRowIDs], ' are not present in value. The function ',
         'will attempt to join with existing rowIDs, but this may fail!',
-        collapse=', ')
+        collapse=', '), call.=FALSE)
 
     rowIDs <- rowIDs(x, data=TRUE, key=TRUE)
 
     ## TODO:: Throw error if user tries to modify ID columns
+
+    duplicatedIDcols <- value[, .N, by=c(sharedRowIDCols)][, duplicated(N)]
+    if (any(duplicatedIDcols)) warning(.warnMsg("\n[CoreGx::rowData<-] The ",
+        "ID columns are duplicated for rows ", .collapse(which(duplicatedIDcols))))
 
     rowData <- rowIDs[unique(value), on=.NATURAL, allow.cartesian=FALSE]
     rowData[, rowKey := .I]
