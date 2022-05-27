@@ -41,3 +41,19 @@ NULL
 #' @keywords datasets
 #' @format LongTableDataMapper object
 NULL
+
+#' NCI-ALMANAC Drug Combination Data TreatmentResponseExperiment Subset
+#'
+#' This is a `TreatmentResponseExperiment` object containing a subset of
+#'   NCI-ALMANAC drug combination screening data,
+#'   with 2347 unique treatment combinations on 10 cancer cell lines selected.
+#'
+#' @references
+#' Susan L. Holbeck, Richard Camalier, James A. Crowell, Jeevan Prasaad Govindharajulu, Melinda Hollingshead, Lawrence W. Anderson, Eric Polley, Larry Rubinstein, Apurva Srivastava, Deborah Wilsker, Jerry M. Collins, James H. Doroshow; The National Cancer Institute ALMANAC: A Comprehensive Screening Resource for the Detection of Anticancer Drug Pairs with Enhanced Therapeutic Activity. Cancer Res 1 July 2017; 77 (13): 3564–3576. https://doi.org/10.1158/0008-5472.CAN-17-0489
+#'
+#' @docType data
+#' @name nci_TRE_small
+#' @usage data(nci_TRE_small)
+#' @keywords datasets
+#' @format TreatmentResponseExperiment object
+NULL
