@@ -221,9 +221,13 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, ..., value) {
 
     ## TODO:: Throw error if user tries to modify ID columns
 
-    duplicatedIDcols <- value[, .N, by=c(sharedRowIDCols)][, duplicated(N)]
-    if (any(duplicatedIDcols)) warning(.warnMsg("\n[CoreGx::rowData<-] The ",
-        "ID columns are duplicated for rows ", .collapse(which(duplicatedIDcols))))
+    duplicatedIDcols <- value[, .N, by=c(sharedRowIDCols)][, N > 1]
+    if (any(duplicatedIDcols))
+        warning(.warnMsg("\n[CoreGx::rowData<-,", class(x)[1], "-method] The ",
+            "ID columns are duplicated for rows ",
+            .collapse(which(duplicatedIDcols)),
+            "! These rows will be dropped before assignment."),
+        call.=FALSE)
 
     rowData <- rowIDs[unique(value), on=.NATURAL, allow.cartesian=FALSE]
     rowData[, rowKey := .I]
