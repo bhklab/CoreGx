@@ -50,7 +50,7 @@ testthat::test_that("`LongTable` constructor method works with valid inputs", {
     #                      colIDs   = col_ids,
     #                      assays   = assays_,
     #                      assayIDs = array_ids)
-    #}, 
+    #},
     #    regexp = paste0(".*Row IDs not in rowData: ",
     #                    setdiff(row_ids, row_ids[1:2]),
     #                    collapse = ",")
@@ -120,18 +120,18 @@ testthat::test_that("`rowData<-` rowData must be updated with data.table or data
 ##     It will return the row indices of all the unique row data,
 ##     and duplicated rows whose N are the same.
 ## The fix is simple: we can simply use which(duplicated(value)) on line 226
-testthat::test_that("`rowData<-`prevent from breaking referential integrity on purpose", {
+testthat::test_that("`rowData<-` prevent from breaking referential integrity on purpose", {
    ntre <- copy(tre)
    rowData_bad <- rowData(ntre)
    rowData_bad <- rbind(rowData_bad, rowData_bad[.N, ])
    testthat::expect_warning({ rowData(ntre) <- rowData_bad },
-       regexp = ".*ID columns are duplicated for rows.*"
+       regexp = ".*The ID columns are duplicated for rows [0-9]+! These rows will be dropped before assignment."
    )
 })
 
 # This warning doesn't trigger if we remove another ID column.
 # Instead, an error like in the NCI-ALMANAC script will occur. (Too many duplicate rows)
-testthat::test_that("`rowData<-` ensure necessary row ID columns present in the replacement rowData", {
+testthat::test_that("`rowData<-` ensures necessary row ID columns present in the replacement rowData", {
     ntre <- copy(tre)
     rowData_missingID <- rowData(ntre)
     rowIDcols <- rowIDs(ntre)
@@ -156,7 +156,7 @@ testthat::test_that("`colData<-` colData must be updated with data.table or data
 
 testthat::test_that("`assay` invalid assay name and index", {
     testthat::expect_error({ assay(tre, c(1, 2)) },
-        regexp = ".*Please specifying a single string assay name or integer index.*"
+        regexp = ".*Please specifying a single string assay name or integer.*"
     )
     testthat::expect_error({ assay(tre, paste(assayNames(tre), collapse = '')) },
         regexp = ".*There is no assay.*"
@@ -166,7 +166,7 @@ testthat::test_that("`assay` invalid assay name and index", {
 testthat::test_that("`assay<-` invalid assay slot assignment", {
     ntre <- copy(tre)
     testthat::expect_error({ assay(ntre, i = "sensitivity", withDimnames = FALSE) <- NULL },
-        regexp = ".*Only a data\\.frame or data\\.table can be assiged to the assay slot!.*"
+        regexp = ".*Only a\ndata.frame or data.table can be assiged to the assay slot!.*"
     ) ## FIXME:: If an integer assay slot index is used for i instead, it can bypass this check
 })
 
@@ -175,7 +175,6 @@ testthat::test_that("`assay,LongTable-method` and `assays,LongTable-method` retu
         x=tre, withDimnames=TRUE)
     assays_ <- assays(tre)
     for (i in seq_along(assay_list)) {
-        print(i)
         testthat::expect_true(all.equal(assay_list[[i]], assays_[[i]]))
     }
 })
@@ -183,7 +182,6 @@ testthat::test_that("`assay,LongTable-method` and `assays,LongTable-method` retu
 testthat::test_that("`assay<-LongTable-method` assignment does not corrupt data relationships", {
     ntre <- copy(tre)
     for (nm in assayNames(tre)) {
-        print(nm)
         ntre[[nm]] <- ntre[[nm]]
         testthat::expect_true(all.equal(ntre[[nm]], tre[[nm]]))
         testthat::expect_true(all.equal(assays(ntre, raw=TRUE)[[nm]], assays(tre, raw=TRUE)[[nm]]))
@@ -194,7 +192,7 @@ testthat::test_that("`assay<-LongTable-method` assignment does not corrupt data 
 testthat::test_that("`assay<-LongTable-method` allows non-id column updates", {
     ntre <- copy(tre)
     assay_ <- ntre[["sensitivity"]]
-    assay_[, viabilitrey := rnorm(.N)]
+    assay_[, viability := rnorm(.N)]
     ntre[["sensitivity"]] <- assay_
     testthat::expect_true(all.equal(ntre[["sensitivity"]], assay_))
     testthat::expect_false(isTRUE(all.equal(ntre[["sensitivity"]], tre[["sensitivity"]])))
@@ -257,7 +255,7 @@ testthat::test_that("`assay<-LongTable-method` summary assignment doesn't break 
     }
 })
 
-testthat::test_that("`assay<-LongTable-method` prevents modified row ID in new assay from breaking referential integrity", {
+testthat::test_that("`assay<-,LongTable-method` prevents modified row ID in new assay from breaking referential integrity", {
     ntre <- copy(tre)
     sens <- ntre$sensitivity
     sens_sum <- sens[,
@@ -280,7 +278,7 @@ testthat::test_that("`assay<-LongTable-method` prevents modified row ID in new a
     )
 })
 
-testthat::test_that("`assay<-LongTable-method` prevents modified column ID in new assay from breaking referential integrity", {
+testthat::test_that("`assay<-,LongTable-method` prevents modified column ID in new assay from breaking referential integrity", {
     ntre <- copy(tre)
     sens <- ntre$sensitivity
     sens_sum <- sens[,
@@ -471,7 +469,7 @@ testthat::test_that("`reindex,LongTable-method` does not corrupt data relationsh
         assay1 <- assay(tre, i, withDimnames=TRUE)
         setkeyv(assay1, idCols(tre))
         assay2 <- assay(ntre, i, withDimnames=TRUE)
-        setkeyv(assay2, idCols(tre))
+        setkeyv(assay2, idCols(ntre))
         testthat::expect_true(all.equal(assay1, assay2))
     }
     assayL1 <- assays(tre)
