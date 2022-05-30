@@ -81,7 +81,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
 
     # handle missing parameters
     isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
-        colIDs=missing(colIDs), assays=missing(assays),
+        colIDs=missing(colIDs), colData=missing(colData), assays=missing(assays),
         assayIDs=missing(assayIDs))
 
     if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
@@ -125,6 +125,16 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     }
     assays <- copy(assays)
 
+    ## FIXME:: Move all validity checks to top of the function to prevent wasted
+    ## computation or into class validity method
+
+    # capture row internal metadata
+    if (is.numeric(rowIDs) || is.logical(rowIDs))
+        rowIDs <- colnames(rowData)[rowIDs]
+    if (!all(rowIDs %in% colnames(rowData)))
+        stop(.errorMsg('\nRow IDs not in rowData: ',
+            setdiff(rowIDs, colnames(rowData)), collapse=', '))
+
     # Create the row and column keys for LongTable internal mappings
     if (!('rowKey' %in% colnames(rowData)))
         rowData[, c('rowKey') := .GRP, keyby=c(rowIDs)]
@@ -135,16 +145,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     # NOTE: assign parent as emptyenv to prevent leaving parent.frame on the stack
     internals <- setNames(vector("list", length=6),
         c("rowIDs", "rowMeta", "colIDs", "colMeta", "assayKeys", "assayIndex"))
-
-    ## FIXME:: Move all validity checks to top of the function to prevent wasted
-    ## computation or into class validity method
-
-    # capture row internal metadata
-    if (is.numeric(rowIDs) || is.logical(rowIDs))
-        rowIDs <- colnames(rowData)[rowIDs]
-    if (!all(rowIDs %in% colnames(rowData)))
-        stop(.errorMsg('\nRow IDs not in rowData: ',
-            setdiff(rowIDs, colnames(rowData)), collapse=', '))
     internals$rowIDs <- rowIDs
     internals$rowMeta <- setdiff(colnames(rowData[, -'rowKey']), rowIDs)
 

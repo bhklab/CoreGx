@@ -10,25 +10,23 @@ testthat::test_that("`LongTable` is coercible to TRE", {
 
 testthat::test_that("`LongTable` constructor method works with valid inputs", {
     ## Extract required parameters to create an TRE object
-    parameters       <- formalArgs(LongTable)
-    ## TODO:: check for missing colData
-    parameters       <- parameters[##Added to pass the test↓ ↓ ↓
-        !(parameters %in% c("metadata", "keep.rownames", "colData"))
+    parameters <- formalArgs(LongTable)
+    parameters <- parameters[
+        !(parameters %in% c("metadata", "keep.rownames"))
     ]
-    row_data         <- rowData(tre)
-    row_ids          <- rowIDs(tre)
-    col_data         <- colData(tre)
-    col_ids          <- colIDs(tre)
-    assays_          <- assays(tre)
-    assay_ids        <- replicate(3, idCols(tre), simplify = FALSE)
+    row_data <- rowData(tre)
+    row_ids <- rowIDs(tre)
+    col_data <- colData(tre)
+    col_ids <- colIDs(tre)
+    assays_ <- assays(tre)
+    assay_ids<- replicate(3, idCols(tre), simplify = FALSE)
     names(assay_ids) <- assayNames(tre)
     ## regex lookaheads to check for ALL missing parameters
     regex <- paste0(sprintf("(?=.*%s)", parameters), collapse = "")
     regex <- paste0("(?s)^", regex) ## handle line breaks in error messages
     ## Line 87: Report all missing parameters in error message
     testthat::expect_error({ ntre <- LongTable() },
-        regexp = regex,
-        perl   = TRUE
+        regexp = regex, perl = TRUE
     )
     ## Check for wrong input rowData class (those not coercible to data.frame)
     ## FIX-ME:: We might need extra check for rowData, colData, assays: even NULL is coercible to data.table
@@ -42,29 +40,28 @@ testthat::test_that("`LongTable` constructor method works with valid inputs", {
     #},
     #    regexp = ".*rowData must be coerceible to a data\\.frame"
     #)
-    ## FIXME:: Move line 143-156 before line 128 in LongTable-class.R
-    #testthat::expect_error({
-    #    ntre <- LongTable(rowData  = row_data[ , -row_ids[1:2], with = FALSE],
-    #                      rowIDs   = row_ids,
-    #                      colData  = col_data,
-    #                      colIDs   = col_ids,
-    #                      assays   = assays_,
-    #                      assayIDs = array_ids)
-    #}, 
-    #    regexp = paste0(".*Row IDs not in rowData: ",
-    #                    setdiff(row_ids, row_ids[1:2]),
-    #                    collapse = ",")
-    #)
+    testthat::expect_error({
+        ntre <- LongTable(rowData  = row_data[, -row_ids[1:2], with = FALSE],
+                          rowIDs   = row_ids,
+                          colData  = col_data,
+                          colIDs   = col_ids,
+                          assays   = assays_,
+                          assayIDs = array_ids)
+    }, 
+        regexp = paste0(".*Row IDs not in rowData: ",
+                        row_ids[1:2],
+                        collapse = ",")
+    )
     ## Question: should we handle the case where assays' IDs are mislabeled?
     ## Question: should we check for unequal length of names(assays) and names(assayIDs)? (refer to line 171)
     ## Line 172
     testthat::expect_error({
         names(assay_ids)[1] <- "not sensitivity"
-        ntre <- LongTable(rowData  = row_data,
-                          rowIDs   = row_ids,
-                          colData  = col_data,
-                          colIDs   = col_ids,
-                          assays   = assays_,
+        ntre <- LongTable(rowData = row_data,
+                          rowIDs = row_ids,
+                          colData = col_data,
+                          colIDs = col_ids,
+                          assays = assays_,
                           assayIDs = assay_ids)
     },
         regexp = paste0(".*Mismatched names between ",
@@ -76,8 +73,6 @@ testthat::test_that("`LongTable` constructor method works with valid inputs", {
                         ".*", collapse = "")
     )
 })
-
-## Below tested methods should live in LongTable-accessors.R
 
 testthat::test_that("`assayCols,LongTable-method` retrieves specified assay's column names",{
     testthat::expect_error({ assay_cols <- assayCols(tre, i = 1:2) },
@@ -127,6 +122,12 @@ testthat::test_that("`rowData<-`prevent from breaking referential integrity on p
    testthat::expect_warning({ rowData(ntre) <- rowData_bad },
        regexp = ".*ID columns are duplicated for rows.*"
    )
+   ## TODO:: handle duplicate column data
+   #colData_bad <- colData(ntre)
+   #colData_bad <- rbind(colData_bad, colData_bad[.N, ])
+   #testthat::expect_warning({ colData(ntre) <- colData_bad },
+   #    regexp = ".*ID columns are duplicated for columns.*"
+   #)
 })
 
 # This warning doesn't trigger if we remove another ID column.
@@ -149,8 +150,6 @@ testthat::test_that("`colData<-` colData must be updated with data.table or data
         regexp = ".*Please pass a data\\.frame or data\\.table.*"
     )
 })
-
-## TODO:: Add test case for user-modified colIDs
 
 # == @assay slot
 
@@ -407,46 +406,127 @@ testthat::test_that("`subset,LongTable-method` works with row and column names",
 })
 
 testthat::test_that("`subset,LongTable-method` doesn't produce non-existing assay observations from joining", {
-    all_assays      <- assays(tre, key = FALSE, withDimnames = TRUE)
-    select_row_idx  <- seq.int(1, dim(tre)[1], by = 2)
-    select_col_idx  <- seq.int(1, dim(tre)[2], by = 2)
-    sub_tre     <- subset(tre, i = select_row_idx, j = select_col_idx)
-    assay_names <- assayNames(tre)
-    for (a in seq_along(assay_names)) {
-        assay_sub  <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
-        obs_exists <- do.call(paste0, assay_sub) %in% # linear search only in R
-                      do.call(paste0, all_assays[[a]])# An O(mn) search :(
-        testthat::expect_true({
-            all(obs_exists)
-        })
+    all_assays <- assays(tre, key = FALSE, withDimnames = TRUE)
+    select_row_idx <- seq.int(1, dim(tre)[1], by = 2)
+    select_col_idx <- seq.int(1, dim(tre)[2], by = 2)
+    sub_tre <- subset(tre, i = select_row_idx, j = select_col_idx)
+    for (a in seq_along(all_assays)) {
+        assay_sub <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
+        obs_exists <- dim(
+            assay_sub[!all_assays[[a]], on = names(assay_sub)]
+            )[1] == 0 ## anti-join to check elements not a subset
+        testthat::expect_true({ obs_exists })
     }
 })
 
-testthat::test_that("`subset,LongTable-method` doesn't miss assay observations for selected row/columns either", {
-    all_assays     <- assays(tre, key = FALSE, withDimnames = TRUE)
-    assay_names    <- assayNames(tre)
+testthat::test_that("`subset,LongTable-method` doesn't miss assay observations for either selected row/columns", {
+    all_assays <- assays(tre, key = FALSE, withDimnames = TRUE)
     select_row_idx <- sample.int(n = dim(tre)[1], size = 1, replace = FALSE)
-    sub_tre        <- subset(tre, i = select_row_idx)
-    select_row     <- rowData(tre)[select_row_idx, rowIDs(tre), with = FALSE]
-    for (a in seq_along(assay_names)) {
+    sub_tre <- subset(tre, i = select_row_idx)
+    select_row <- rowData(tre)[select_row_idx, rowIDs(tre), with = FALSE]
+    for (a in seq_along(all_assays)) {
         assay_sub1 <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
         assay_sub2 <- all_assays[[a]][select_row, ]
         testthat::expect_equal(assay_sub1, assay_sub2)
     }
     select_col_idx <- sample.int(n = dim(tre)[2], size = 1, replace = FALSE)
-    sub_tre        <- subset(tre, j = select_col_idx)
-    select_col     <- colData(tre)[select_col_idx, colIDs(tre), with = FALSE]
+    sub_tre <- subset(tre, j = select_col_idx)
+    select_col <- colData(tre)[select_col_idx, colIDs(tre), with = FALSE]
     for (a in seq_along(assay_names)) {
         assay_sub1 <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
         assay_sub2 <- all_assays[[a]][cellid == select_col, ]
         testthat::expect_equal(assay_sub1, assay_sub2)
     }
-    sub_tre     <- tre[select_row_idx, select_col_idx]
+    sub_tre <- tre[select_row_idx, select_col_idx]
     select_both <- cbind(select_row, select_col)
     for (a in seq_along(assay_names)) {
         assay_sub1 <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
         assay_sub2 <- all_assays[[a]][select_both, ]
         testthat::expect_equal(assay_sub1, assay_sub2)
+    }
+})
+
+testthat::test_that("`subset,LongTable-method` subset indexing behaves the same as data.table", {
+    ## Line 221
+    sub_tre <- subset(tre, i = NULL) ## subset with row index by NULL
+    testthat::expect_equal(dim(sub_tre), c(0, 0))
+    sub_tre <- subset(tre, j = NULL) ## subset with column index by NULL
+    testthat::expect_equal(dim(sub_tre), c(0, 0))
+    sub_tre <- subset(tre, i = "") ## subset with row by empty rowname string
+    testthat::expect_equal(sub_tre, tre)
+    sub_tre <- subset(tre, j = "") ## subset with column by empty column name
+    testthat::expect_equal(sub_tre, tre)
+    sub_tre <- subset(tre, i = "", j = "") ## subset by empty row+column names
+    testthat::expect_equal(sub_tre, tre)
+    ## Get a subset with 2-Fluoro Ara-A of dose 6e-06 as second drug in combination therapies
+    sub_tre <- subset(tre, i = "*:2-Fluoro Ara-A:*:6e-06")
+    regex <- "(?=.*\\:2-Fluoro Ara-A)(?=.*6e-06\\:*)^" ## rowData regex
+    testthat::expect_equal(
+        rowData(tre)[grepl(regex, rownames(tre), perl = TRUE), ],
+        rowData(sub_tre)
+    ) ## much nicer to query at the TRE level
+    ## Subset containing ovarian cancer cell line
+    sub_tre <- subset(tre, j = ".*OVCAR.*")
+    testthat::expect_equal(
+        colData(tre)[grepl(".*OVCAR.*", colnames(tre), perl = TRUE), ],
+        colData(sub_tre)
+    )
+    ## Subset by negative index: TRE behaves the same as data.table
+    i <- sample.int(n = dim(tre)[1], size = 1, replace = FALSE)
+    sub_tre_1 <- tre[-i, ] ## Drop the i-th row
+    sub_tre_2 <- tre[i, ] ## Extract the i-th row
+    testthat::expect_equal(
+        rowData(tre)[!rowData(sub_tre_1), on = names(rowData(tre))],
+        rowData(sub_tre_2) # rowData(tre)\rowData(sub_tre_1)=rowData(sub_tre_2)
+    )
+    j <- sample.int(n = dim(tre)[2], size = 1, replace = FALSE)
+    sub_tre_3 <- tre[, -j] ## Drop the j-th column
+    sub_tre_4 <- tre[, j] ## Extract the j-th column
+    testthat::expect_equal(
+        colData(tre)[!colData(sub_tre_3), on = names(colData(tre))],
+        colData(sub_tre_4) # colData(tre)\colData(sub_tre_3)=colData(sub_tre_4)
+    )
+    sub_tre_5 <- tre[-i, -j] ## Drop data containing i-th row OR j-th column
+    sub_tre_6 <- tre[i, j] ## Extract i-th row AND j-th column
+    all_assays <- assays(tre, key = FALSE, withDimnames = TRUE)
+    for (a in seq_along(all_assays)) {
+        testthat::expect_equal(
+            all_assays[[a]][
+                !assay(sub_tre_1, a, key = FALSE, withDimnames = TRUE),
+            ],
+            assay(sub_tre_2, i = a, key = FALSE, withDimnames = TRUE)
+        )
+        testthat::expect_equal(
+            all_assays[[a]][
+                !assay(sub_tre_3, a, key = FALSE, withDimnames = TRUE),
+            ],
+            assay(sub_tre_4, i = a, key = FALSE, withDimnames = TRUE)
+        )
+        ## tre[i, ] UNION tre[, j] + (tre[i, ] INTERSECT tre[, j])
+        union_assay <- rbind(
+            assay(sub_tre_2, i = a, key = FALSE, withDimnames = TRUE),
+            assay(sub_tre_4, i = a, key = FALSE, withDimnames = TRUE)
+        ) ## contains double count, not a union yet
+        double_count_idx <- which(duplicated(union_assay))
+        # Show that the double counted element is the intersect
+        testthat::expect_equal(
+            union_assay[double_count_idx, ],
+            ## tre[i, ] INTERSECT tre[, j]
+            assay(sub_tre_6, i = a, key = FALSE, withDimnames = TRUE),
+            ignore_attr = TRUE
+        )
+        ## Show that these two produce equivalent union sets
+        union_assay <- setorderv(union_assay[-double_count_idx, ],
+                                 cols = idCols(tre))
+        testthat::expect_equal(
+            union_assay,
+            ## This indirect approach for tre[i, ] UNION tre[, j] is faster
+            all_assays[[a]][
+                !assay(sub_tre_5, a, key = FALSE, withDimnames = TRUE),
+                on = idCols(tre)
+            ], ## reordering done by internal reindexing
+            ignore_attr = TRUE
+        )
     }
 })
 
