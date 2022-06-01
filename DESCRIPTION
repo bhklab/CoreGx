@@ -83,6 +83,7 @@ Collate:
     'TreatmentResponseExperiment-class.R'
     'TREDataMapper-class.R'
     'adaptiveMatthewCor.R'
+    'aggregate-methods.R'
     'callingWaterfall.R'
     'connectivityScore.R'
     'cosinePerm.R'
