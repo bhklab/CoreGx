@@ -1,16 +1,14 @@
-library(CoreGx)
-library(PharmacoGx)
-library(data.table)
-library(BiocParallel)
-
-#' Functional API for data.table aggregation and capture of associated aggregate
-#' calls
+#' Functional API for data.table aggregation which allows capture of associated
+#' aggregate calls so they can be recomputed later.
 #'
 #' @param x `data.table`
-#' @param by `character` One or more valid column names in `x`.
-#' @param ... `call` One or more aggregations to compute for each by in x. If you
-#'   name items, that will be the column name of the associated column otherwise
-#'   a default name will be parsed from the function and column name.
+#' @param by `character` One or more valid column names in `x` to compute
+#'   groups using.
+#' @param ... `call` One or more aggregations to compute for each group by in x.
+#'   If you name aggregation calls, that will be the column name of the value
+#'   in the resulting `data.table` otherwise a default name will be parsed from
+#'   the function name and its first arugment, which is assumed to be the name
+#'   of the column being aggregated over.
 #' @param nthread `numeric(1)` Number of threads to use for split-apply-combine
 #'   parallelization. Uses `BiocParllel::bplapply` if nthread > 1. Does not
 #'   modify data.table threads, so be sure to use setDTthreads for reasonable
@@ -20,23 +18,35 @@ library(BiocParallel)
 #'   settings from BPPARAM. For now, a progress bar is always used.
 #'
 #' @details
-#' Arguments in ... are substituted and wrapped in a list, which is passed
-#' through to the j argument of `[.data.table` interanally. The functin currently
-#' tries to build informative column names for unnamed arguments in ... by appending
-#' the name of the call with the name of its first argument, which is assumed to
-#' be the column name being aggregated over. If an argument to ... is named,
-#' that will be the column name for the column for that aggregation.
+#' ## Use of Non-Standard Evaluation
+#' Arguments in `...` are substituted and wrapped in a list, which is passed
+#' through to the j argument of `[.data.table` internally. The functin currently
+#' tries to build informative column names for unnamed arguments in `...` by
+#' appending the name of each function call with the name of its first argument,
+#' which is assumed to be the column name being aggregated over. If an argument
+#' to `...` is named, that will be the column name of its value in the resulting
+#' `data.table`.
+#'
+#' ## Parallelization Strategies
+#' While your first instinct may be to make use of all available cores, because
+#' this method uses `data.table` internally for aggregation the optimal way
+#' to compute a set of aggregate functions is dependent on the functions being
+#' called. For functions which `data.table` optimizes intenally, such as `mean`,
+#' `sd` and other (see `?gforce` for full list of optimized functons)
 #'
 #' @return `data.table` of aggregation results.
 #'
+#' @seealso `data.table::[.data.table`, `BiocParallel::bplapply`
+#'
 #' @importFrom BiocParallel bpparam bpworkers bpprogressbar bplapply
-#' @importFrom data.table split rbindlist
+#' @importFrom data.table split rbindlist setDT
 #' @export
 aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=BiocParallel::bpparam()) {
     stopifnot(is.data.table(x))
     stopifnot(is.character(by) && all(by %in% colnames(x)))
 
-    # -- capture dots as a call and parse dot names, adding them if they are missing
+    # -- capture dots as a call and parse dot names, adding default names if
+    # --   they are missing
     agg_call <- substitute(list(...))
     dot_names <- names(agg_call)[-1L]
     if (is.null(dot_names)) dot_names <- rep(TRUE, length(agg_call) - 1)
@@ -56,7 +66,7 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=BiocParallel::bpparam()) {
         BiocParallel::bpprogressbar(BPPARAM) <- TRUE
         res <- BiocParallel::bplapply(
             x_split,
-            function(x, agg_call, by) x[, eval(agg_call), by=c(by)],
+            function(x, agg_call, by) x[, eval(substitute(agg_call)), by=c(by)],
             agg_call=agg_call, by=by,
             BPPARAM=BPPARAM
         )
@@ -67,19 +77,26 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=BiocParallel::bpparam()) {
 
 
 if (Sys.frame() == 0) {
+    library(CoreGx)
+    library(PharmacoGx)
+    library(data.table)
+    library(BiocParallel)
     sens <- fread(file.path(".local_data", "sensitivity_assay.csv"))
     # debug(aggregate2)
-    sens |>
+    sens[is.na(drug2dose)] |>
         aggregate2(
             mv=mean(viability), mean(drug1dose),
             by=c("drug1id", "drug2id", "cellid"),
             nthread=10
         )
-
-    sens[is.na(drug2dose)][drug1id %in% unique(drug1id)[1:5]] |>
-        aggregate2(
-            auc=tryCatch(computeAUC(drug1dose, viability), error=\(e) NA),
-            by=c("drug1id", "cellid")
-        ) ->
-        auc_dt
+    bench::system_time({
+        sens |>
+            subset(is.na(drug2dose)) |>
+            aggregate2(
+                auc=computeAUC(drug1dose, viability),
+                by=c("drug1id", "cellid"),
+                nthread=22
+            ) ->
+            auc_dt
+    })
 }
