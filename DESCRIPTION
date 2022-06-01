@@ -67,7 +67,7 @@ Suggests:
 License: GPL-3
 Config/testthat/edition: 3
 Roxygen: list(markdown=TRUE, r6=FALSE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Collate:
     'allGenerics.R'
     'immutable-class.R'
@@ -83,6 +83,7 @@ Collate:
     'TreatmentResponseExperiment-class.R'
     'TREDataMapper-class.R'
     'adaptiveMatthewCor.R'
+    'aggregate-methods.R'
     'callingWaterfall.R'
     'connectivityScore.R'
     'cosinePerm.R'

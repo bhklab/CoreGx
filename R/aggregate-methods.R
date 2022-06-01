@@ -1,10 +1,16 @@
+#' @include LongTable-class.R
+#' @include LongTable-accessors.R
+#' @include TreatmentResponseExperiment-class.R
+NULL
+
 #' Functional API for aggregation over a `LongTable` or inheriting class
 #'
 #' @description
 #' Compute a group-by operation over a `LongTable` object or it's inhering
 #' classes.
 #'
-#' @param x `LongTable` or inheriting class to aggregate over
+#' @param x `LongTable` or inheriting class to compute aggregation on.
+#' @param assay `character(1)` The assay to aggregate over.
 #' @param by `character` One or more valid column names in `x` to compute
 #'   groups using.
 #' @param ... `call` One or more aggregations to compute for each group by in x.
@@ -42,7 +48,7 @@
 #' @seealso `data.table::[.data.table`, `BiocParallel::bplapply`
 #'
 #' @importFrom BiocParallel bpparam bpworkers bpprogressbar bplapply
-#' @importFrom data.table split rbindlist setDT
+#' @importFrom data.table rbindlist setDT
 #' @export
 setMethod("aggregate", signature(x="LongTable"),
         function(x, assay, by, ..., nthread=1, BPPARAM=bpparam()) {
@@ -97,7 +103,7 @@ setMethod("aggregate", signature(x="LongTable"),
 #' @seealso `data.table::[.data.table`, `BiocParallel::bplapply`
 #'
 #' @importFrom BiocParallel bpparam bpworkers bpprogressbar bplapply
-#' @importFrom data.table split rbindlist setDT
+#' @importFrom data.table rbindlist setDT
 #' @export
 aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL) {
     stopifnot(is.data.table(x))
@@ -119,7 +125,7 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL) {
     if (nthread == 1) {
         res <- x[, eval(agg_call), by=c(by)]
     } else {
-        x_split <- data.table:::split.data.table(x, by=by)
+        x_split <- split(x, by=by)
         if (is.null(BPPARAM)) BPPARAM <- BiocParallel::bpparam()
         if (!is(BPPARAM, "DoparParam")) bpworkers(BPPARAM) <- nthread
         bpprogressbar(BPPARAM) <- TRUE
@@ -138,7 +144,7 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL) {
 
 
 ## TESTING CODE
-if (sys.frame() == 0) {
+if (sys.nframe() == 0) {
     library(CoreGx)
     library(PharmacoGx)
     library(data.table)
