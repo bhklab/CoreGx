@@ -72,6 +72,7 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=BiocParallel::bpparam()) {
         )
         res <- rbindlist(res)
     }
+    attributes(res)$aggregations <- list(agg_call=agg_call, by=by)
     return(res)
 }
 
