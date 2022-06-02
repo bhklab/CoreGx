@@ -1,6 +1,9 @@
 library(testthat)
 library(data.table)
 
+data(nci_TRE_small)
+tre <- nci_TRE_small
+
 # see https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation for
 # explanation
 test_that("`rowData,LongTable-method` orders data correctly", {
@@ -44,8 +47,7 @@ testthat::test_that("`rowData<-` prevent from breaking referential integrity on 
 testthat::test_that("`rowData<-` ensures necessary row ID columns present in the replacement rowData", {
     ntre <- copy(tre)
     rowData_missingID <- rowData(ntre)
-    rowIDcols <- rowIDs(ntre)
-    rowData_missingID[, rowIDcols[length(rowIDcols)] := NULL] # remove one ID column
+    rowData_missingID[, (rowIDs(ntre)[1]) := NULL] # remove one ID column
     testthat::expect_warning({ rowData(ntre) <- rowData_missingID },
         regexp = ".*The function will attempt to join with existing rowIDs, but this may fail!.*"
     )

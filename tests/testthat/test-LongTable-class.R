@@ -1,6 +1,12 @@
 library(testthat)
 library(data.table)
 
+data(nci_TRE_small)
+data(merckLongTable)
+
+lt <- merckLongTable
+tre <- nci_TRE_small
+
 # == LongTable constructor
 
 testthat::test_that("`LongTable` is coercible to TRE", {
@@ -19,7 +25,7 @@ testthat::test_that("`LongTable` constructor method works with valid inputs", {
     col_data <- colData(tre)
     col_ids <- colIDs(tre)
     assays_ <- assays(tre)
-    assay_ids<- replicate(3, idCols(tre), simplify = FALSE)
+    assay_ids <- replicate(3, idCols(tre), simplify = FALSE)
     names(assay_ids) <- assayNames(tre)
     ## regex lookaheads to check for ALL missing parameters
     regex <- paste0(sprintf("(?=.*%s)", parameters), collapse = "")

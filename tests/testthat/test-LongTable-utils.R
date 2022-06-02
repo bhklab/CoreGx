@@ -1,6 +1,9 @@
 library(testthat)
 library(data.table)
 
+data(nci_TRE_small)
+tre <- nci_TRE_small
+
 # == subset
 
 testthat::test_that("`subset,LongTable-method` works with call queries", {

@@ -123,7 +123,6 @@ setReplaceMethod("getIntern", signature(object="LongTable",
 ## ---- rowData Slot
 ## ------------------
 
-
 #' Retrieve the row metadata table from a LongTable object
 #'
 #' @examples
@@ -155,6 +154,80 @@ setMethod('rowData', signature(x='LongTable'),
     }
 })
 
+#' Helper method to share functionality between rowData and colData replace methods
+#'
+#' @param x `LongTable` or inheriting class to update dimData for.
+#' @param dim `character(1)` One of "row" or "col" indicating with dimension
+#'   to updated metadata for.
+#' @param value #' @param value A `data.table` or `data.frame` to update the
+#'   `rowData` or `colData` of `x` with.
+#'
+#' @return An updated version of `value` which meets all the requirements for
+#'   assignment to a `LongTable` or inheriting class.
+#'
+#' @noRd
+#' @keywords internal
+.update_dimData <- function(x, dim, value) {
+
+    titleDim <- paste0(toupper(substr(dim, 1, 1)), substr(dim, 2, nchar(dim)))
+    dimIDs <- get(paste0(dim, "IDs"))
+    dimKey <- paste(dim, "Key")
+    dimData <- paste0(dim, "Data")
+
+    # type check input
+    if (is(value, 'data.frame')) setDT(value)
+    if (!is(value, 'data.table'))
+        stop(.errorMsg('\n[CoreGx::', dim, 'Data<-] Please pass a data.frame or ',
+            'data.table to update the ', dim, 'Data slot. We recommend modifying the',
+            ' object returned by ', dim, 'Data(x) then reassigning it with ',
+            dim, 'Data(x)',
+            ' <- new', titleDim, 'Data'),
+            call.=FALSE
+        )
+
+    # remove key column
+    if (dimKey %in% colnames(value)) {
+        value[, (dimKey) := NULL]
+        .message('\n[CoreGx::', dim, ,'Data<-] Dropping ', dim, 'Key from replacement',
+            ' value, this function will deal with mapping the ', dim, 'Key',
+            ' automatically.')
+    }
+
+    # assemble information to select proper update method
+    dimIDCols <- dimIDs(x)
+    sharedDimIDCols <- intersect(dimIDCols, colnames(value))
+
+    # error if all the rowID columns are not present in the new rowData
+    equalDimIDs <- dimIDCols %in% sharedDimIDCols
+    if (!all(equalDimIDs)) warning(.warnMsg('\n[CoreGx::', dim,
+        'Data<-] The ID columns ', dimIDCols[!equalDimIDs],
+        ' are not present in value. The function ',
+        'will attempt to join with existing ', dim, 'IDs, but this may fail!',
+        collapse=', '), call.=FALSE)
+
+    dimIDs_ <- dimIDs(x, data=TRUE, key=TRUE)
+
+    ## TODO:: Throw error if user tries to modify ID columns
+
+    duplicatedIDcols <- value[, .N, by=c(sharedDimIDCols)][, N > 1]
+    if (any(duplicatedIDcols))
+        warning(.warnMsg("\n[CoreGx::", dim, "Data<-,", class(x)[1], "-method] The ",
+            "ID columns are duplicated for rows ",
+            .collapse(which(duplicatedIDcols)),
+            "! These rows will be dropped before assignment."),
+        call.=FALSE)
+
+    dimData <- dimIDs_[unique(value), on=.NATURAL, allow.cartesian=FALSE]
+    dimData[, (dimKey) := .I]
+    dimData <- dimData[!duplicated(get(dimKey)), ]
+    setkeyv(dimData, dimKey)
+    dimData[, .rownames := Reduce(.paste_colon, mget(dimIDCols))]
+
+    ## TODO:: Add some sanity checks before returing
+
+    return(dimData)
+}
+
 
 #' Updates the `rowData` slot as long as the ID columns are not changed.
 #'
@@ -166,9 +239,6 @@ setMethod('rowData', signature(x='LongTable'),
 #'   value.
 #'
 #' @param x A `LongTable` object to modify.
-# ' @param join A `logical` vector. If `TRUE` and not all existing rowIDs are
-# '   in the  `value` object, the function will attempt to a left join with
-# '   the existing `rowData` in `x`.
 #' @param value A `data.table` or `data.frame` to update the `rowData` of
 #'   `x` with.
 #' @param ... For developer use only! Pass raw=TRUE to modify the slot
@@ -190,54 +260,7 @@ setReplaceMethod('rowData', signature(x='LongTable'), function(x, ..., value) {
         return(invisible(x))
     }
 
-    # type check input
-    if (is(value, 'data.frame')) setDT(value)
-    if (!is(value, 'data.table'))
-        .error('\n[CoreGx::rowData<-] Please pass a data.frame or ',
-            'data.table to update the rowData slot. We recommend modifying the',
-            ' object returned by rowData(x) then reassigning it with rowData(x)',
-            ' <- newRowData')
-
-    # remove key column
-    if ('rowKey' %in% colnames(value)) {
-        value[, rowKey := NULL]
-        .message('\n[CoreGx::rowData<-] Dropping rowKey from replacement',
-            ' value, this function will deal with mapping the rowKey',
-            ' automatically.')
-    }
-
-    # assemble information to select proper update method
-    rowIDCols <- rowIDs(x)
-    sharedRowIDCols <- intersect(rowIDCols, colnames(value))
-
-    # error if all the rowID columns are not present in the new rowData
-    equalRowIDs <- rowIDCols %in% sharedRowIDCols
-    if (!all(equalRowIDs)) warning(.warnMsg('\n[CoreGx::rowData<-] The ID columns ',
-        rowIDCols[!equalRowIDs], ' are not present in value. The function ',
-        'will attempt to join with existing rowIDs, but this may fail!',
-        collapse=', '), call.=FALSE)
-
-    rowIDs <- rowIDs(x, data=TRUE, key=TRUE)
-
-    ## TODO:: Throw error if user tries to modify ID columns
-
-    duplicatedIDcols <- value[, .N, by=c(sharedRowIDCols)][, N > 1]
-    if (any(duplicatedIDcols))
-        warning(.warnMsg("\n[CoreGx::rowData<-,", class(x)[1], "-method] The ",
-            "ID columns are duplicated for rows ",
-            .collapse(which(duplicatedIDcols)),
-            "! These rows will be dropped before assignment."),
-        call.=FALSE)
-
-    rowData <- rowIDs[unique(value), on=.NATURAL, allow.cartesian=FALSE]
-    rowData[, rowKey := .I]
-    rowData <- rowData[!duplicated(rowKey), ]
-    setkeyv(rowData, 'rowKey')
-    rowData[, .rownames := Reduce(.paste_colon, mget(rowIDCols))]
-
-    ## TODO:: Add some sanity checks before returing
-
-    x@rowData <- rowData
+    x@rowData <- .update_dimData(x=x, dim="row", value=value)
     return(invisible(x))
 })
 
@@ -302,45 +325,12 @@ setMethod('colData', signature(x='LongTable'),
 #' @export
 setReplaceMethod('colData', signature(x='LongTable'),
         function(x, ..., value) {
-
     if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
         x@colData <- value
-        return(x)
+        return(invisible(x))
     }
-
-    # type check input
-    if (is(value, 'data.frame')) setDT(value)
-    if (!is(value, 'data.table'))
-        .error('\n[CoreGx::colData<-] Please pass a data.frame or ',
-            'data.table to update the rowData slot. We recommend modifying the ',
-            'object returned by colData(x) then reassigning it with colData(x) ',
-            '<- newColData')
-
-    # remove key column
-    if ('colKey' %in% colnames(value)) {
-        value[, colKey := NULL]
-        .message('\n[CoreGx::colData<-] Dropping colKey from replacement',
-            ' value, this function will deal with mapping the colKey',
-            ' automatically.')
-    }
-    colIDcols <- colIDs(x)
-
-    ## TODO:: Throw error if user tries to modify colIDs
-
-    existingColDataDT <- colData(x, key=TRUE)
-    colDataDT <- existingColDataDT[unique(value), on=.NATURAL,
-            allow.cartesian=FALSE]
-    colDataDT[, colKey := .I]
-    colDataDT <- colDataDT[!duplicated(colKey), ]
-
-    setkeyv(colDataDT, 'colKey')
-    colDataDT[, .colnames := Reduce(.paste_colon, mget(colIDcols))]
-
-
-    ## TODO:: Sanity checks that this works as expected
-
-    x@colData <- colDataDT
-    x
+    x@colData <- .update_dimData(x=x, dim="col", value=value)
+    return(invisible(x))
 })
 
 ## ==================
