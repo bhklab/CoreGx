@@ -4,6 +4,9 @@ library(data.table)
 data(nci_TRE_small)
 tre <- nci_TRE_small
 
+## tre = TreatmentResponseExperiment
+## ntre = New TreatmentResponseExperiment
+
 # see https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation for
 # explanation
 test_that("`rowData,LongTable-method` orders data correctly", {
@@ -12,8 +15,6 @@ test_that("`rowData,LongTable-method` orders data correctly", {
 
 # == @rowData slot
 
-## tre = TreatmentResponseExperiment
-## ntre = New TreatmentResponseExperiment
 testthat::test_that("`rowData<-` rowData must be updated with data.table or data.frame", {
     ntre <- copy(tre)
     testthat::expect_error({ rowData(ntre) <- NULL }, ## rowData slot
@@ -21,25 +22,23 @@ testthat::test_that("`rowData<-` rowData must be updated with data.table or data
     )
 })
 
-## Case handled, but on line 224, [, duplicated(N)] shouldn't be used:
-##     Consider the case where the duplicated items have N != 1,
-##     while all the unique elements have N == 1.
-##     It will return the row indices of all the unique row data,
-##     and duplicated rows whose N are the same.
-## The fix is simple: we can simply use which(duplicated(value)) on line 226
-testthat::test_that("`rowData<-` prevent from breaking referential integrity on purpose", {
-   ntre <- copy(tre)
-   rowData_bad <- rowData(ntre)
-   rowData_bad <- rbind(rowData_bad, rowData_bad[.N, ])
-   testthat::expect_warning({ rowData(ntre) <- rowData_bad },
-       regexp = ".*The ID columns are duplicated for rows [0-9]+! These rows will be dropped before assignment."
-   )
-   ## TODO:: handle duplicate column data
-   #colData_bad <- colData(ntre)
-   #colData_bad <- rbind(colData_bad, colData_bad[.N, ])
-   #testthat::expect_warning({ colData(ntre) <- colData_bad },
-   #    regexp = ".*ID columns are duplicated for columns.*"
-   #)
+
+testthat::test_that("`rowData<-` prevents intentionally breaking referential integrity", {
+    ntre <- copy(tre)
+    rowData_bad <- rowData(ntre)
+    rowData_bad <- rbind(rowData_bad, rowData_bad[.N, ])
+    testthat::expect_warning({ rowData(ntre) <- rowData_bad },
+        regexp = ".*The ID columns are duplicated for rows [0-9]+! These rows will be dropped before assignment."
+    )
+})
+
+testthat::test_that("`colData<-` prevents intentionally breaking referential integrity", {
+    ntre <- copy(tre)
+    colData_bad <- colData(ntre)
+    colData_bad <- rbind(colData_bad, colData_bad[.N, ])
+    testthat::expect_warning({ colData(ntre) <- colData_bad },
+        regexp =  ".*The ID columns are duplicated for rows [0-9]+! These rows will be dropped before assignment."
+    )
 })
 
 # This warning doesn't trigger if we remove another ID column.
@@ -73,7 +72,7 @@ testthat::test_that("`assay` invalid assay name and index", {
     )
 })
 
-testthat::test_that("`assay<-` invalid assay slot assignment", {
+testthat::test_that("`assay<-,LongTable-meothd` prevents invalid assay slot assignment", {
     ntre <- copy(tre)
     testthat::expect_error({ assay(ntre, i = "sensitivity", withDimnames = FALSE) <- NULL },
         regexp = ".*Only a\ndata.frame or data.table can be assiged to the assay slot!.*"
@@ -89,7 +88,7 @@ testthat::test_that("`assay,LongTable-method` and `assays,LongTable-method` retu
     }
 })
 
-testthat::test_that("`assay<-LongTable-method` assignment does not corrupt data relationships", {
+testthat::test_that("`assay<-,LongTable-method` assignment does not corrupt data relationships", {
     ntre <- copy(tre)
     for (nm in assayNames(tre)) {
         ntre[[nm]] <- ntre[[nm]]

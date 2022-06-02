@@ -135,6 +135,7 @@ NULL
 #'
 #' @importMethodsFrom BiocGenerics subset
 #' @importFrom crayon magenta cyan
+#' @importFrom MatrixGenerics rowAnys
 #' @import data.table
 #' @export
 setMethod('subset', signature('LongTable'),
@@ -222,6 +223,16 @@ setMethod('subset', signature('LongTable'),
         rowKey %in% rows & colKey %in% cols,
         .SD,
         .SDcols=c("rowKey", "colKey", assayNames(x)[keepAssays])
+    ]
+    # -- drop rowKeys or colKeys which no longer have any assay observation
+    #   after the initial subset
+    validKeys <- idx[
+        which(rowAnys(!is.na(idx[, assayNames(x)[keepAssays], with=FALSE]))),
+        .(rowKey, colKey)
+    ]
+    idx <- idx[
+        rowKey %in% unique(validKeys$rowKey) &
+            colKey %in% unique(validKeys$colKey),
     ]
     assays(x, raw=TRUE)[!keepAssays] <- NULL  # delete assays being dropped
 
