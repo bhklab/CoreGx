@@ -51,7 +51,7 @@ NULL
 #' @importFrom data.table rbindlist setDT
 #' @export
 setMethod("aggregate", signature(x="LongTable"),
-        function(x, assay, by, ..., nthread=1, BPPARAM=bpparam()) {
+        function(x, assay, by, ..., nthread=1, BPPARAM=NULL) {
     aggregate2(x[[assay]], by=by, ..., nthread=nthread, BPPARAM=BPPARAM)
 })
 
@@ -153,6 +153,23 @@ if (sys.nframe() == 0) {
 
     # Load example assay
     sens <- fread(file.path(".local_data", "sensitivity_assay.csv"))
+    tre <- qs::qread(
+        file.path(".local_data", "nci_treatment_response_exp.qs"),
+        nthread=10
+    )
+
+    ## TreatmentResponseExperiment method
+    bench::system_time({
+        tre |>
+            subset(is.na(drug2dose)) |>
+            aggregate(
+                assay="sensitivity",
+                auc=PharmacoGx::computeAUC(drug1dose, viability),
+                by=c("drug1id", "cellid"),
+                nthread=22
+            ) ->
+            profiles
+    })
 
     # debug(aggregate2)
 
@@ -227,4 +244,5 @@ if (sys.nframe() == 0) {
                 auc_dt
         }
     )
+
 }

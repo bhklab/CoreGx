@@ -4,7 +4,7 @@
 \alias{aggregate,LongTable-method}
 \title{Functional API for aggregation over a \code{LongTable} or inheriting class}
 \usage{
-\S4method{aggregate}{LongTable}(x, assay, by, ..., nthread = 1, BPPARAM = bpparam())
+\S4method{aggregate}{LongTable}(x, assay, by, ..., nthread = 1, BPPARAM = NULL)
 }
 \arguments{
 \item{x}{\code{LongTable} or inheriting class to compute aggregation on.}
