@@ -531,12 +531,12 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
 
     # -- update rowKey and colKey in the asssayIndex, if they have changed
     if (rData[, any(rowKey != .rowKey)]) {
-        index[rData, rowKey := .rowKey]
+        index[rData, rowKey := .rowKey, on="rowKey"]
         rData[, rowKey := .rowKey]
         setkeyv(rData, "rowKey")
     }
     if (cData[, any(colKey != .colKey)]) {
-        index[cData, colKey := .colKey]
+        index[cData, colKey := .colKey, on="colKey"]
         cData[, colKey := .colKey]
         setkeyv(cData, "colKey")
     }

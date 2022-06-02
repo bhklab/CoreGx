@@ -113,7 +113,7 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL) {
     # --   they are missing
     agg_call <- substitute(list(...))
     dot_names <- names(agg_call)[-1L]
-    if (is.null(dot_names)) dot_names <- rep(TRUE, length(agg_call) - 1)
+    if (is.null(dot_names)) dot_names <- rep("", length(agg_call) - 1)
     for (i in which(dot_names == "")) {
         dot_call <- agg_call[[i + 1]]
         # assumes the first argument in a function call is always the column name!
@@ -153,12 +153,16 @@ if (sys.nframe() == 0) {
 
     # Load example assay
     sens <- fread(file.path(".local_data", "sensitivity_assay.csv"))
+    tre <- qs::qread(
+        file.path(".local_data", "nci_treatment_response_exp.qs"),
+        nthread=10
+    )
 
     # debug(aggregate2)
 
     # data.table aggregation
     sens[is.na(drug2dose)] |>
-        aggregate2(
+        aggregate(
             mv=mean(viability), mean(drug1dose),
             by=c("drug1id", "drug2id", "cellid")
         )
@@ -166,7 +170,7 @@ if (sys.nframe() == 0) {
     ## MultiCoreParam
     bp <- bpparam()
     bench::system_time({
-        sens |>
+        sens[drug1id %in% unique(drug1id)[1:3]] |>
             subset(is.na(drug2dose)) |>
             aggregate2(
                 auc=PharmacoGx::computeAUC(drug1dose, viability),
@@ -206,15 +210,14 @@ if (sys.nframe() == 0) {
 
     ## Apples to apples comparison (hopefully)
     bmark <- bench::mark(
-        mutl={
+        multicore={
             sens |>
                 subset(is.na(drug2dose)) |>
                 aggregate2(
                     auc=computeAUC(drug1dose, viability),
                     by=c("drug1id", "cellid"),
                     BPPARAM=bp, nthread=22
-                ) ->
-                auc_dt
+                ); NULL
         },
         dopar={
             sens |>
@@ -223,8 +226,20 @@ if (sys.nframe() == 0) {
                     auc=computeAUC(drug1dose, viability),
                     by=c("drug1id", "cellid"),
                     BPPARAM=bp2, nthread=22
-                ) ->
-                auc_dt
-        }
+                ); NULL
+        },
+        max_iterations=1,
+        memory=FALSE
     )
+
+    tre |>
+        subset(is.na(drug2dose)) |>
+        aggregate(
+            assay="sensitivity",
+            auc=computeAUC(drug1dose, viability),
+            by=c("drug1id", "cellid"),
+            BPPARAM=bp,
+            nthread=22
+        ) ->
+        profiles
 }
