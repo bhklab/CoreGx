@@ -80,6 +80,9 @@ NULL
 #'   the names or integer indexes of the column data identifier columns. These
 #'   columns will be pasted together to make up the colnames of the
 #'   `TreatmentResponseExperiment` object.
+#' @param assayIDs `list` A list of `character` vectors specifying the columns
+#'   needed to uniquely identify each row in an `assay`. Names must match the
+#'   `assays` list.
 #' @param assays A `list` containing one or more objects coercible to a
 #'   `data.table`, and keyed by rowIDs and colIDs corresponding to the rowID and
 #'   colID columns in colData and rowData.
@@ -98,8 +101,8 @@ NULL
 #'
 #' @import data.table
 #' @export
-TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
-        metadata=list(), keep.rownames=FALSE) {
+TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs, 
+        assays, assayIDs, metadata=list(), keep.rownames=FALSE) {
     if (!missing(rowData) && is(rowData, "LongTable")) {
         LT <- rowData
     } else {
