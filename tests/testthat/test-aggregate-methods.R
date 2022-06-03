@@ -134,11 +134,13 @@ testthat::test_that("`Assignment doesn't modify summarized assay data", {
     ntre$sens_summary <- sens_summary
     sens_summary2 <- unique(ntre$sens_summary[, .SD, .SDcols=colnames(sens_summary)])
     testthat::expect_true(all.equal(
-
+        sens_summary,
+        sens_summary2,
+        check.attributes=FALSE  # Should we fix this so they also have the same key?
     ))
 })
 
-testthat::test_that("`reindex,LongTable-method` no longer corrupts referrential integrity of summarized assays", {
+testthat::test_that("`reindex,LongTable-method` doesn't corrupts referrential integrity of summarized assays", {
     ntre <- copy(tre)
     sens_summary <- tre |>
         aggregate(
@@ -155,3 +157,19 @@ testthat::test_that("`reindex,LongTable-method` no longer corrupts referrential 
     ))
 })
 
+testthat::test_that("`subset,LongTable-method` works correctly with summary assays", {
+    ntre <- copy(tre)
+    sens_summary <- tre |>
+        aggregate(
+            "sensitivity",
+            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
+                mean_drug2dose=mean(drug2dose),
+            by=by
+        )
+    ntre$sens_summary <- sens_summary
+    stre <- subset(ntre, drug1id %in% drug1id[1:5])
+    testthat::expect_true(CoreGx:::.table_is_subset(
+        stre$sens_summary,
+        ntre$sens_summary[drug1id %in% drug1id[1:5]]
+    ))
+})
