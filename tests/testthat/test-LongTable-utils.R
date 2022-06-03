@@ -1,4 +1,5 @@
 library(testthat)
+library(CoreGx)
 library(data.table)
 
 data(nci_TRE_small)

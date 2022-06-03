@@ -5,7 +5,7 @@
 #' @title .formatMessage
 #'
 #' @description Format one or more strings to fit nicely displayed in the
-#' R console at any given width. 
+#' R console at any given width.
 #'
 #' @param ... One or more `character` vectors containing the strings to be
 #' formatted
@@ -42,7 +42,7 @@
     optionIsTRUE <- !is.null(getOption(optionName)) && getOption(optionName)
     verboseIsTRUE <- getOption('verbose')
     if (optionIsTRUE || verboseIsTRUE)
-        message(blue$bold(.formatMessage(...)))
+        message(crayon::blue$bold(.formatMessage(...)))
 }
 
 #' @title .warning
@@ -63,12 +63,12 @@
 #' @export
 #' @noRd
 .warning <- function(...) {
-    warning(cyan$bold(.formatMessage(...)), call.=FALSE)
+    warning(crayon::cyan$bold(.formatMessage(...)), call.=FALSE)
 }
 
 #' @title .error
 #'
-#' @description Alternative to error which formats the error to fit the 
+#' @description Alternative to error which formats the error to fit the
 #' console and prints it in magenta.
 #'
 #' @details
@@ -82,7 +82,7 @@
 #' @export
 #' @noRd
 .error <- function(...) {
-    stop(magenta$bold(.formatMessage(...)), call.=FALSE)
+    stop(crayon::magenta$bold(.formatMessage(...)), call.=FALSE)
 }
 
 #' @title .funContext
@@ -94,7 +94,7 @@
 #' @param funName `character(1)` A string with the function name, prepended
 #'   with the correct connection to the package NAMESPACE. For exported functions
 #'   use '::', for non-exported functions use ':::'.
-#' 
+#'
 #' @keywords internal
 #' @export
 #' @noRd
@@ -103,7 +103,7 @@
 
 #' @title .parseToRoxygen
 #'
-#' @description Takes a string block of roxygen2 tags sepearated by new-line 
+#' @description Takes a string block of roxygen2 tags sepearated by new-line
 #'   characteres and parses it to the appropriate format for the @eval tag,
 #'   subtituting any string in { } for the argument of the same name in `...`.
 #'

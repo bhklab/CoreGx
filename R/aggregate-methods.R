@@ -49,6 +49,7 @@ NULL
 #'
 #' @importFrom BiocParallel bpparam bpworkers bpprogressbar bplapply
 #' @importFrom data.table rbindlist setDT
+#' @importFrom stats aggregate
 #' @export
 setMethod("aggregate", signature(x="LongTable"),
         function(x, assay, by, ..., nthread=1, BPPARAM=NULL) {
