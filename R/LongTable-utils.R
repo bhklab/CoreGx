@@ -559,7 +559,9 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     assays_ <- setdiff(colnames(index), c("rowKey", "colKey"))
     assayEqualKeys <- setNames(vector("logical", length(assays_)), assays_)
     for (nm in assays_) {
-        index[!is.na(get(nm)), paste0(".", nm) := .I]
+        ## Added by to maintain carinality of the each assayKey
+        ## Required to fix #147 and ensure summary assays, with repeated keys
+        index[!is.na(get(nm)), paste0(".", nm) := .GRP, by=c(nm)]
         assayEqualKeys[nm] <- index[!is.na(get(nm)), all(get(paste0(".", nm)) == get(nm))]
     }
 

@@ -38,6 +38,10 @@ columns will be pasted together to make up the colnames of the
 \code{data.table}, and keyed by rowIDs and colIDs corresponding to the rowID and
 colID columns in colData and rowData.}
 
+\item{assayIDs}{\code{list} A list of \code{character} vectors specifying the columns
+needed to uniquely identify each row in an \code{assay}. Names must match the
+\code{assays} list.}
+
 \item{metadata}{A \code{list} of metadata associated with the
 \code{TreatmentResponseExperiment} object being constructed}
 
