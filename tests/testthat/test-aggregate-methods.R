@@ -10,35 +10,38 @@ testthat::test_that("`aggregate2` is equivalent to raw data.table aggregation", 
     sens <- tre$sensitivity
     by <- c("drug1id", "drug2id", "cellid")
     ## Single threaded case
-    agg_res <- sens |> aggregate2(
-        mean(drug1dose),
-        mean(drug2dose),
-        mean(viability),
-        by=by
-    )
+    agg_res <- sens |> 
+        subset(drug1id %in% unique(drug1id)[1:3]) |>
+        aggregate2(
+            mean(drug1dose), mean(drug2dose), mean(viability),
+            by=by
+        )
     ## Mutlithreaded case (via bplapply)
-    agg_res_parallel <- sens |> aggregate2(
-        mean(drug1dose),
-        mean(drug2dose),
-        mean(viability),
-        by=by,
-        nthread=2
-    )
+    agg_res_parallel <- sens |> 
+        subset(drug1id %in% unique(drug1id)[1:3]) |>
+        aggregate2(
+            mean(drug1dose), mean(drug2dose), mean(viability),
+            by=by,
+            nthread=2
+        )
     ## data.table default
-    dt_res <- sens[,
+    dt_res <- sens[
+        drug1id %in% unique(drug1id)[1:3],
         .(
             mean_drug1dose=mean(drug1dose),
             mean_drug2dose=mean(drug2dose),
-            mean_viability=mean(viability),
+            mean_viability=mean(viability)
         ),
         by=by
     ]
     expect_true(all.equal(
         agg_res,
-        dt_res
+        dt_res,
+        check.attributes=FALSE  # to allow addition of aggregate call as attribute
     ))
     expect_true(all.equal(
         agg_res_parallel,
-        dt_res
+        dt_res,
+        check.attributes=FALSE
     ))
 })
