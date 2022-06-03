@@ -5,14 +5,14 @@ library(data.table)
 
 data(nci_TRE_small)
 tre <- copy(nci_TRE_small)
+by <- c("drug1id", "drug2id", "cellid")
+sens <- tre$sensitivity
 
 
 ## -- Computing aggregations
 
 
 testthat::test_that("`aggregate2` is equivalent to raw data.table aggregation", {
-    sens <- tre$sensitivity
-    by <- c("drug1id", "drug2id", "cellid")
     ## Single threaded case
     agg_res <- sens |> 
         subset(drug1id %in% unique(drug1id)[1:3]) |>
@@ -51,7 +51,6 @@ testthat::test_that("`aggregate2` is equivalent to raw data.table aggregation", 
 })
 
 testthat::test_that("`aggregate,LongTable-method` is equivalent to aggregating the raw assay data.table", {
-    by <- c("drug1id", "drug2id", "cellid")
     agg_tre <- tre |>
         aggregate("sensitivity",
             mean_viability=mean(viability),
@@ -74,23 +73,51 @@ testthat::test_that("`aggregate,LongTable-method` is equivalent to aggregating t
         by=by
     ]
     expect_true(all.equal(
-        agg_tre,
-        agg_dt,
+        agg_tre, agg_dt, 
         check.attributes=FALSE
     ))
     expect_true(all.equal(
-        agg_tre_parallel,
-        agg_dt_small,
+        agg_tre_parallel, agg_dt_small, 
         check.attributes=FALSE
     ))
 })
 
-# testthat::test_that("`aggregate2` automatic naming works correctly", {
-#     agg_named
-#     sens <- tre$sensitivity
-#     by <- c("drug1id", "drug2id", "cellid")
-# })
-
+testthat::test_that("`aggregate2` and `aggregate,LongTable-method` automatic naming works correctly", {
+    ## aggregate2
+    agg2_named <- sens |>
+        aggregate2(
+            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
+                mean_drug2dose=mean(drug2dose),
+            by=by
+        )
+    agg2_unnamed <- sens |>
+        aggregate2(
+            mean(viability), mean(drug1dose), mean(drug2dose),
+            by=by
+        )
+    testthat::expect_true(all.equal(
+        agg2_named, agg2_unnamed, 
+        check.attributes=FALSE
+    ))
+    ## aggregate,LongTable-method
+    agg_named <- tre |>
+        aggregate(
+            "sensitivity",
+            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
+                mean_drug2dose=mean(drug2dose),
+            by=by
+        )
+    agg_unnamed <- tre |>
+        aggregate(
+            "sensitivity",
+            mean(viability), mean(drug1dose), mean(drug2dose),
+            by=by
+        )
+    testthat::expect_true(all.equal(
+        agg_named, agg_unnamed,
+        check.attributes=FALSE
+    ))
+})
 
 
 ## -- Assigning aggregated assays
