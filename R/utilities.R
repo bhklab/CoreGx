@@ -880,6 +880,22 @@
 
 # Set Operations ----------------------------------------------------------
 
+#' Tests of table 1 is a subset of table2, in which case there will be no rows
+#' is the set difference
+#' 
+#' @importFrom data.table fsetdiff as.data.table 
+#'
+#' @noRd``
+#' @keywords internal
+.table_is_subset <- function(table1, table2) {
+    if (!is(table1, "data.table")) table1 <- as.data.table(table1)
+    if (!is(table2, "data.table")) table2 <- as.data.table(table2)
+    nrow(fsetdiff(
+        table1,
+        table2,
+    )) == 0
+}
+
 ## TODO:: Can we implement this as an extension of the BiocGenerics::setdiff?
 #' Utility to find the symmetric set difference of a list of two or more
 #' vectors or lists

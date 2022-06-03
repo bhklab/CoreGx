@@ -7,19 +7,38 @@ tre <- nci_TRE_small
 
 # == subset
 
+# tests of table 1 is a subset of table2, which
+.datatable_is_subset <- function(table1, table2) {
+    nrow(fsetdiff(
+        table1,
+        table2,
+    )) == 0
+}
+
 testthat::test_that("`subset,LongTable-method` works with call queries", {
     ntre <- subset(tre,
         drug1id %in% unique(drug1id)[1:5],
         cellid %in% unique(cellid)[1:5]
     )
     testthat::expect_s4_class(ntre, "LongTable")
-    testthat::expect_equal(
-        rowData(ntre),
-        rowData(tre)[drug1id %in% unique(drug1id)[1:5]]
+    ## These tests need to be updated to use fsetdiff instead of expect_equal
+    ## due the fact that the subset,LongTable-method will drop additional
+    ## rowKey or colKey values than those in the initial subset statement if
+    ## there are no assay observations using those keys.
+    ## This change fixed #148, but now makes it impossible to store metadata
+    ## when there are no observations, which may not be ideal?
+    ## Alternative would be to rework the assayIndex to be free of NA values
+    testthat::expect_true(
+        .datatable_is_subset(
+            rowData(ntre2),
+            rowData(tre)[drug1id %in% unique(drug1id)[1:5]]
+        )
     )
-    testthat::expect_equal(
-        colData(ntre),
-        colData(tre)[cellid %in% unique(cellid)[1:5]]
+    testthat::expect_true(
+        .datatable_is_subset
+            colData(ntre),
+            colData(tre)[cellid %in% unique(cellid)[1:5]]
+        )
     )
     # check for NA values in the key column of the assay
     testthat::expect_true(

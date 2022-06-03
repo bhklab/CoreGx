@@ -19,7 +19,7 @@ test_that("`rowData,LongTable-method` orders data correctly", {
 testthat::test_that("`rowData<-` rowData must be updated with data.table or data.frame", {
     ntre <- copy(tre)
     testthat::expect_error({ rowData(ntre) <- NULL }, ## rowData slot
-        regexp = ".*Please pass a data.frame or data.table to update\nthe rowData slot.*"
+        regexp = ".*Please pass a data.frame or data.table to update.the rowData slot.*"
     )
 })
 

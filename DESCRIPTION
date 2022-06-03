@@ -104,4 +104,5 @@ Collate:
     'utilities.R'
     'utils-iteration.R'
     'utils-messages.R'
+    'utils-testing.R'
     'utils-updateS4.R'
