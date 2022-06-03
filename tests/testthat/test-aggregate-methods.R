@@ -6,6 +6,10 @@ library(data.table)
 data(nci_TRE_small)
 tre <- copy(nci_TRE_small)
 
+
+## -- Computing aggregations
+
+
 testthat::test_that("`aggregate2` is equivalent to raw data.table aggregation", {
     sens <- tre$sensitivity
     by <- c("drug1id", "drug2id", "cellid")
@@ -45,3 +49,48 @@ testthat::test_that("`aggregate2` is equivalent to raw data.table aggregation", 
         check.attributes=FALSE
     ))
 })
+
+testthat::test_that("`aggregate,LongTable-method` is equivalent to aggregating the raw assay data.table", {
+    by <- c("drug1id", "drug2id", "cellid")
+    agg_tre <- tre |>
+        aggregate("sensitivity",
+            mean_viability=mean(viability),
+            by=by
+        )
+    agg_tre_parallel <- tre |>
+        subset(drug1id %in% unique(drug1id)[1:3]) |>
+        aggregate("sensitivity",
+            mean_viability=mean(viability),
+            by=by,
+            nthread=2
+        )
+    agg_dt <- tre$sensitivity[,
+        .(mean_viability=mean(viability)),
+        by=by
+    ]
+    agg_dt_small <- tre$sensitivity[
+        drug1id %in% unique(drug1id)[1:3],
+        .(mean_viability=mean(viability)),
+        by=by
+    ]
+    expect_true(all.equal(
+        agg_tre,
+        agg_dt,
+        check.attributes=FALSE
+    ))
+    expect_true(all.equal(
+        agg_tre_parallel,
+        agg_dt_small,
+        check.attributes=FALSE
+    ))
+})
+
+# testthat::test_that("`aggregate2` automatic naming works correctly", {
+#     agg_named
+#     sens <- tre$sensitivity
+#     by <- c("drug1id", "drug2id", "cellid")
+# })
+
+
+
+## -- Assigning aggregated assays
