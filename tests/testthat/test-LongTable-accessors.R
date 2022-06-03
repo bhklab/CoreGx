@@ -47,7 +47,7 @@ testthat::test_that("`colData<-` prevents intentionally breaking referential int
 testthat::test_that("`rowData<-` ensures necessary row ID columns present in the replacement rowData", {
     ntre <- copy(tre)
     rowData_missingID <- rowData(ntre)
-    rowData_missingID[, (rowIDs(ntre)[1]) := NULL] # remove one ID column
+    rowData_missingID[, (rowIDs(ntre)[4]) := NULL] # remove one ID column
     testthat::expect_warning({ rowData(ntre) <- rowData_missingID },
         regexp = ".*The function will attempt to join with existing rowIDs, but this may fail!.*"
     )

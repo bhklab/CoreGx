@@ -114,7 +114,7 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL) {
     # --   they are missing
     agg_call <- substitute(list(...))
     dot_names <- names(agg_call)[-1L]
-    if (is.null(dot_names)) dot_names <- rep(TRUE, length(agg_call) - 1)
+    if (is.null(dot_names)) dot_names <- rep("", length(agg_call) - 1)
     for (i in which(dot_names == "")) {
         dot_call <- agg_call[[i + 1]]
         # assumes the first argument in a function call is always the column name!
