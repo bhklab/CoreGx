@@ -14,14 +14,14 @@ sens <- tre$sensitivity
 
 testthat::test_that("`aggregate2` is equivalent to raw data.table aggregation", {
     ## Single threaded case
-    agg_res <- sens |> 
+    agg_res <- sens |>
         subset(drug1id %in% unique(drug1id)[1:3]) |>
         aggregate2(
             mean(drug1dose), mean(drug2dose), mean(viability),
             by=by
         )
     ## Mutlithreaded case (via bplapply)
-    agg_res_parallel <- sens |> 
+    agg_res_parallel <- sens |>
         subset(drug1id %in% unique(drug1id)[1:3]) |>
         aggregate2(
             mean(drug1dose), mean(drug2dose), mean(viability),
@@ -121,3 +121,37 @@ testthat::test_that("`aggregate2` and `aggregate,LongTable-method` automatic nam
 
 
 ## -- Assigning aggregated assays
+
+testthat::test_that("`Assignment doesn't modify summarized assay data", {
+    ntre <- copy(tre)
+    sens_summary <- tre |>
+        aggregate(
+            "sensitivity",
+            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
+                mean_drug2dose=mean(drug2dose),
+            by=by
+        )
+    ntre$sens_summary <- sens_summary
+    sens_summary2 <- unique(ntre$sens_summary[, .SD, .SDcols=colnames(sens_summary)])
+    testthat::expect_true(all.equal(
+
+    ))
+})
+
+testthat::test_that("`reindex,LongTable-method` no longer corrupts referrential integrity of summarized assays", {
+    ntre <- copy(tre)
+    sens_summary <- tre |>
+        aggregate(
+            "sensitivity",
+            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
+                mean_drug2dose=mean(drug2dose),
+            by=by
+        )
+    ntre$sens_summary <- sens_summary
+    ntre2 <- reindex(ntre)
+    expect_true(all.equal(
+        ntre$sens_summary,
+        ntre2$sens_summary
+    ))
+})
+
