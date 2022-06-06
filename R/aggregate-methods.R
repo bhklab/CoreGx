@@ -128,7 +128,8 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL) {
     } else {
         x_split <- split(x, by=by)
         if (is.null(BPPARAM)) BPPARAM <- BiocParallel::bpparam()
-        if (!is(BPPARAM, "DoparParam")) bpworkers(BPPARAM) <- nthread
+        if (hasMethod("bpworkers<-", signature=BPPARAM))
+            bpworkers(BPPARAM) <- nthread
         bpprogressbar(BPPARAM) <- TRUE
         res <- BiocParallel::bplapply(
             x_split,

@@ -53,7 +53,6 @@ testthat::test_that("`aggregate2` is equivalent to raw data.table aggregation", 
 testthat::test_that("`aggregate,LongTable-method` is equivalent to aggregating the raw assay data.table", {
     agg_tre <- tre |>
         aggregate(
-            x=_,
             assay="sensitivity",
             mean_viability=mean(viability),
             by=by
@@ -99,7 +98,7 @@ testthat::test_that("`aggregate2` and `aggregate,LongTable-method` automatic nam
             by=by
         )
     testthat::expect_true(all.equal(
-        agg2_named, agg2_unnamed, 
+        agg2_named, agg2_unnamed,
         check.attributes=FALSE
     ))
     ## aggregate,LongTable-method
@@ -143,7 +142,7 @@ testthat::test_that("`Assignment doesn't modify summarized assay data", {
     ))
 })
 
-testthat::test_that("`reindex,LongTable-method` doesn't corrupts referrential integrity of summarized assays", {
+testthat::test_that("`reindex,LongTable-method` doesn't corrupt referrential integrity of summarized assays", {
     ntre <- copy(tre)
     sens_summary <- tre |>
         aggregate(
