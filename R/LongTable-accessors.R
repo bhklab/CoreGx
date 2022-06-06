@@ -530,7 +530,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         with=FALSE
     ])))
     setkeyv(assayIndex, assayName)
-    assayData <- assayData[assayIndex, ]
+    assayData <- assayData[assayIndex, on=assayName]
     setkeyv(assayData, "rowKey")
     if (withDimnames && !metadata) {
         assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, ]
@@ -691,7 +691,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     ## TODO:: Do we want to allow mutating rowData and colData via assay method?
     throwAwayCols <- c(idCols(x), rowMeta(x), colMeta(x))
     keepCols <- setdiff(colnames(value), throwAwayCols)
-    assayValue <- value[, keepCols, with=FALSE]
+    assayValue <- unique(value[, keepCols, with=FALSE])
     setkeyv(assayValue, i)
 
     # -- update the object

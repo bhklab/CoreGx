@@ -68,6 +68,8 @@ NULL
     # -- update object
     # delete row-/colKeys by reference
     for (a in assays) a[, (metaKeys) := NULL]
+    # ensure uniqueness for summary assays, fixes #149
+    assays <- lapply(assays, unique)
     # raw=TRUE allows direct modification of slots
     setkeyv(rData, "rowKey")
     rowData(x, raw=TRUE) <- rData
@@ -555,7 +557,7 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     cData[, .colKey := NULL]
 
     # -- add new indices for assayKeys to index
-    setkeyv(index, c("rowKey", "colKey"))  #
+    setkeyv(index, c("rowKey", "colKey"))
     assays_ <- setdiff(colnames(index), c("rowKey", "colKey"))
     assayEqualKeys <- setNames(vector("logical", length(assays_)), assays_)
     for (nm in assays_) {
