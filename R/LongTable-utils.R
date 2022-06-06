@@ -69,7 +69,7 @@ NULL
     # delete row-/colKeys by reference
     for (a in assays) a[, (metaKeys) := NULL]
     # ensure uniqueness for summary assays, fixes #149
-    assays <- lapply(assays, unique)
+    assays <- lapply(assays, FUN=unique)
     # raw=TRUE allows direct modification of slots
     setkeyv(rData, "rowKey")
     rowData(x, raw=TRUE) <- rData
@@ -227,7 +227,7 @@ setMethod('subset', signature('LongTable'),
         .SDcols=c("rowKey", "colKey", assayNames(x)[keepAssays])
     ]
     # -- drop rowKeys or colKeys which no longer have any assay observation
-    #   after the initial subset
+    #   after the initial subset, fixes #148
     validKeys <- idx[
         which(rowAnys(!is.na(idx[, assayNames(x)[keepAssays], with=FALSE]))),
         .(rowKey, colKey)
