@@ -52,13 +52,16 @@ testthat::test_that("`aggregate2` is equivalent to raw data.table aggregation", 
 
 testthat::test_that("`aggregate,LongTable-method` is equivalent to aggregating the raw assay data.table", {
     agg_tre <- tre |>
-        aggregate("sensitivity",
+        aggregate(
+            x=_,
+            assay="sensitivity",
             mean_viability=mean(viability),
             by=by
         )
     agg_tre_parallel <- tre |>
         subset(drug1id %in% unique(drug1id)[1:3]) |>
-        aggregate("sensitivity",
+        aggregate(
+            assay="sensitivity",
             mean_viability=mean(viability),
             by=by,
             nthread=2
