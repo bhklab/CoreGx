@@ -20,7 +20,7 @@
     funContext <- .funContext(':::.sensitivitySlotToLongTable')
     if (!is(object, 'CoreSet')) .error(funContext, ' object must inherit from
         the CoreSet class.')
-    oldSensitivity <- sensitivitySlot(object)
+    oldSensitivity <- treatmentResponse(object)
 
     if (!is(oldSensitivity, 'list')) .error(funContext, ' @sensitivty slot
         is not a `list`?')

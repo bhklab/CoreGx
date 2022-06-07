@@ -101,7 +101,7 @@ NULL
 #'
 #' @import data.table
 #' @export
-TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs, 
+TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
         assays, assayIDs, metadata=list(), keep.rownames=FALSE) {
     if (!missing(rowData) && is(rowData, "LongTable")) {
         LT <- rowData
@@ -119,6 +119,9 @@ TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
     )
 }
 
+#' @name as
+#'
+#' @title
 #' Coerce a `LongTable` to a `TreatmentResponseExperiment`
 #'
 #' @param from `LongTable` object to coerce to a `TreatmentResponseExperiment`.
@@ -130,10 +133,10 @@ TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
 #'
 #' @examples
 #' data(clevelandSmall_cSet)
-#' TRE <- as(molecularProfilesSlot(clevelandSmall_cSet),
+#' TRE <- as(treatmentResponse(clevelandSmall_cSet),
 #'     "TreatmentResponseExperiment")
 #' TRE
-#' s
+#'
 #' @md
 #' @export
 setAs("LongTable", "TreatmentResponseExperiment", function(from) {

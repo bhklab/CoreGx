@@ -250,7 +250,7 @@ subset.immutable <- function(x, ...) {
 #'
 #' @return The `object` with the "immutable" class stripped from it.
 #'
-#' @example
+#' @examples
 #' immut_list <- immutable(list())
 #' mutable(immut_list)
 #'

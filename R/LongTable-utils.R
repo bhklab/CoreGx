@@ -30,7 +30,7 @@ NULL
 #'
 #' @param x `LongTable`
 #' @param index `data.frame` Table with columns "rowKey", "colKey" and
-#'   ".<assayName>", were <assayName> is the value for each `assayNames(x)`.
+#'   ".\<assayName\>", where \<assayName\> is the value for each `assayNames(x)`.
 #'   Warning: rownames are dropped internally in coercion to `data.table`,
 #' @param reindex `logical(1)` Should index values be reset such that they
 #'   are the smallest possible set of consecutive integers. Modifies the

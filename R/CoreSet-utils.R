@@ -110,8 +110,8 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
         .subsetMolecularProfilesBySample(molecSlot, samples)
 
     # -- sensitivity slot
-    sensSlot <- sensitivitySlot(x)
-    sensitivitySlot(x) <- .subsetSensitivityBySample(sensSlot, samples)
+    sensSlot <- treatmentResponse(x)
+    treatmentResponse(x) <- .subsetSensitivityBySample(sensSlot, samples)
 
     # -- perturbatiion slot
     ##TODO:: do we still need this?
@@ -213,8 +213,8 @@ setMethod('subsetByTreatment', signature('CoreSet'),
         treatments <- union(treatments, treatmentNames)
     }
     # -- sensitivity slot
-    sensSlot <- sensitivitySlot(x)
-    sensitivitySlot(x) <- .subsetSensitivityByTreatment(sensSlot, treatments,
+    sensSlot <- treatmentResponse(x)
+    treatmentResponse(x) <- .subsetSensitivityByTreatment(sensSlot, treatments,
         treatmentType=treatmentType)
 
     # -- perturbation slot

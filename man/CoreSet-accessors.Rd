@@ -93,12 +93,14 @@
 \alias{sensitivityProfiles<-,CoreSet,data.frame-method}
 \alias{sensitivityRaw,CoreSet-method}
 \alias{sensitivityRaw<-,CoreSet,array-method}
-\alias{sensitivitySlot,CoreSet-method}
+\alias{treatmentResponse,CoreSet-method}
+\alias{treatmentResponse}
 \alias{sensitivitySlot}
-\alias{sensitivitySlot<-,CoreSet,list_OR_LongTable-method}
+\alias{treatmentResponse<-,CoreSet,list_OR_LongTable-method}
+\alias{treatmentResponse<-}
+\alias{treamentResponse<-,CoreSet,list-method}
+\alias{treatmentResponse<-,CoreSet,LongTable-method}
 \alias{sensitivitySlot<-}
-\alias{sensitivitySlot<-,CoreSet,list-method}
-\alias{sensitivitySlot<-,CoreSet,LongTable-method}
 \alias{sensNumber,CoreSet-method}
 \alias{sensNumber}
 \alias{sensNumber<-,CoreSet,matrix-method}
@@ -185,9 +187,9 @@
 
 \S4method{sensitivityRaw}{CoreSet,array}(object) <- value
 
-\S4method{sensitivitySlot}{CoreSet}(object)
+\S4method{treatmentResponse}{CoreSet}(object)
 
-\S4method{sensitivitySlot}{CoreSet,list_OR_LongTable}(object) <- value
+\S4method{treatmentResponse}{CoreSet,list_OR_LongTable}(object) <- value
 
 \S4method{sensNumber}{CoreSet}(object)
 
@@ -604,9 +606,9 @@ head(sensitivityRaw(clevelandSmall_cSet))
 
 sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
 
-sensitivitySlot(clevelandSmall_cSet)
+treatmentResponse(clevelandSmall_cSet)
 
-sensitivitySlot(clevelandSmall_cSet) <- sensitivitySlot(clevelandSmall_cSet)
+treatmentResponse(clevelandSmall_cSet) <- treatmentResponse(clevelandSmall_cSet)
 
 sensNumber(clevelandSmall_cSet)
 

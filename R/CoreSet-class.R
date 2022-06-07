@@ -447,8 +447,8 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
         }
     }
     cat("Treatment response:\n")
-    if (is(sensitivitySlot(object), "LongTable")) {
-        showLT <- capture.output(show(sensitivitySlot(object)))
+    if (is(treatmentResponse(object), "LongTable")) {
+        showLT <- capture.output(show(treatmentResponse(object)))
         cat(space, paste0(showLT, collapse="\n  "), "\n")
     } else {
         cat("Drug pertubation:\n")
@@ -486,11 +486,11 @@ updateSampleId <- function(object, new.ids=vector("character")) {
     if (datasetType(object) == "sensitivity" || datasetType(object) == "both") {
         myx <- match(sensitivityInfo(object)[, "sampleid"],
             rownames(sampleInfo(object)))
-        if (is(sensitivitySlot(object), 'LongTable')) {
-            LT <- sensitivitySlot(object)
+        if (is(treatmentResponse(object), 'LongTable')) {
+            LT <- treatmentResponse(object)
             whichSampleIds <- which(colData(LT)$sampleid %in% sampleNames(object))
             colData(LT)$sampleid <- new.ids[whichSampleIds]
-            sensitivitySlot(object) <- LT
+            treatmentResponse(object) <- LT
         } else {
             sensitivityInfo(object)[, "sampleid"] <- new.ids[myx]
         }
@@ -750,13 +750,13 @@ updateTreatmentId <- function(object, new.ids = vector('character')){
     }
 
     ## unique drug identifiers
-    # drugn <- sort(unique(sensitivitySlot(object)$info[ , "treatmentid"]))
+    # drugn <- sort(unique(treatmentResponse(object)$info[ , "treatmentid"]))
 
     ## consider all drugs
     drugn <- rownames(treatmentInfo(object))
 
     ## unique drug identifiers
-    # samplen <- sort(unique(sensitivitySlot(object)$info[ , "sampleid"]))
+    # samplen <- sort(unique(treatmentResponse(object)$info[ , "sampleid"]))
 
     ## consider all sample
     samplen <- rownames(sampleInfo(object))
@@ -1044,7 +1044,7 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
     msg <- character()
     # ---- Extract sensitivity data
     samples <- sampleNames(object)
-    sensSlot <- sensitivitySlot(object)
+    sensSlot <- treatmentResponse(object)
     if (!is(sensSlot, "TreatmentResponseExperiment")) {
         nmsg <- "The treatmentReponse parameter must be a
             TreatmentResponseExperiment!"

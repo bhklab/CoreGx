@@ -1243,16 +1243,16 @@ setMethod(sensitivityInfo, signature("CoreSet"),
         function(object, dimension, ...) {
     funContext <- .funContext('::sensitivityInfo')
     # case where sensitivity slot is a LongTable
-    if (is(sensitivitySlot(object), 'LongTable')) {
+    if (is(treatmentResponse(object), 'LongTable')) {
         if (!missing(dimension)) {
             switch(dimension,
-                sample={ return(colData(sensitivitySlot(object), ...)) },
-                treatment={ return(rowData(sensitivitySlot(object), ...)) },
-                assay={ return(assay(sensitivitySlot(object), 'assay_metadata')) },
+                sample={ return(colData(treatmentResponse(object), ...)) },
+                treatment={ return(rowData(treatmentResponse(object), ...)) },
+                assay={ return(assay(treatmentResponse(object), 'assay_metadata')) },
                 .error(funContext, 'Invalid value for the dimension argument.
                     Please select on of "sample", "treatment" or "assay'))
         } else {
-            return(.rebuildInfo(sensitivitySlot(object)))
+            return(.rebuildInfo(treatmentResponse(object)))
         }
     # sensitivity is a list
     } else {
@@ -1260,7 +1260,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
             .warning(funContext,' The dimension argument is only valid if the
                 sensitivity slot contains a LongTable object. Ignoring the
                 dimension and ... parameters.')
-        return(sensitivitySlot(object)$info)
+        return(treatmentResponse(object)$info)
     }
 })
 
@@ -1376,7 +1376,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
                 function(object, dimension, ..., value) {
 
     funContext <- .funContext('::sensitivityInfo<-')
-    if (is(sensitivitySlot(object), 'LongTable')) {
+    if (is(treatmentResponse(object), 'LongTable')) {
         # coerce to data.table
         if (!is.data.table(value)) value <- data.table(value)
         if (missing(dimension)) {
@@ -1499,13 +1499,13 @@ setReplaceMethod('sensitivityMeasures',
 #' @eval .docs_CoreSet_get_sensitivityProfiles(class_=.local_class, data_=.local_data)
 setMethod(sensitivityProfiles, "CoreSet", function(object) {
     funContext <- .funContext('::sensitivityProfiles')
-    if (is(sensitivitySlot(object), 'LongTable')) {
-        if (!('profiles' %in% assayNames(sensitivitySlot(object)))) {
+    if (is(treatmentResponse(object), 'LongTable')) {
+        if (!('profiles' %in% assayNames(treatmentResponse(object)))) {
             .error(funContext, 'The LongTable onject in the sensivitiy slot
                 is not formatted correctly: it must contain an assay
                 named "profiles"!')
         } else {
-            .rebuildProfiles(sensitivitySlot(object))
+            .rebuildProfiles(treatmentResponse(object))
         }
     } else {
         return(object@treatmentResponse$profiles)
@@ -1552,7 +1552,7 @@ setReplaceMethod("sensitivityProfiles",
     signature(object="CoreSet", value="data.frame"),
     function(object, value)
 {
-    if (is(sensitivitySlot(object), 'LongTable'))
+    if (is(treatmentResponse(object), 'LongTable'))
         warning(.warnMsg("The ", class(object)[1], " class structure has been",
             " updated! Assignment via sensitivityProfiles no long works, please",
             " see vignette('The LongTable Class', package='CoreGx') for more",
@@ -1587,8 +1587,8 @@ setReplaceMethod("sensitivityProfiles",
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_sensitivityRaw(class_=.local_class, data_=.local_data)
 setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
-    if (is(sensitivitySlot(object), 'LongTable'))
-        return(.rebuildRaw(sensitivitySlot(object)))
+    if (is(treatmentResponse(object), 'LongTable'))
+        return(.rebuildRaw(treatmentResponse(object)))
     else
         return(object@treatmentResponse$raw)
 })
@@ -1701,10 +1701,10 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
     function(object, value)
 {
     funContext <- .funContext("::sensitivityRaw<-")
-    if (is(sensitivitySlot(object), 'LongTable')) {
+    if (is(treatmentResponse(object), 'LongTable')) {
 
         ## TODO:: validate value
-        longTable <- sensitivitySlot(object)
+        longTable <- treatmentResponse(object)
 
         viabilityCols <- setdiff(colnames(assay(longTable, 'sensitivity',
             metadata=FALSE, key=FALSE)), "sensitivity")
@@ -1740,7 +1740,7 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
         }
 
         # Update the object
-        sensitivitySlot(object) <- longTable
+        treatmentResponse(object) <- longTable
     } else {
         if (!is.array(value)) .error(funContext, "Values assigned to the
             sensitivityRaw slot must be an array of experiment by dose by
@@ -1757,42 +1757,45 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
 
 
 #' @export
-setGeneric("sensitivitySlot", function(object, ...) standardGeneric("sensitivitySlot"))
+setGeneric("treatmentResponse", function(object, ...) standardGeneric("treatmentResponse"))
 
 #' @noRd
-.docs_CoreSet_get_sensitivitySlot <- function(...) .parseToRoxygen(
+.docs_CoreSet_get_treatmentResponse <- function(...) .parseToRoxygen(
     "
-    __sensitivitySlot__: Retrive the contents of `@treatmentResponse` from a `{class_}`
+    __treatmentResponse__: Retrive the contents of `@treatmentResponse` from a `{class_}`
     object.
 
     @examples
-    sensitivitySlot({data_})
+    treatmentResponse({data_})
 
     @md
-    @aliases sensitivitySlot,{class_}-method sensitivitySlot
-    @exportMethod sensitivitySlot
+    @aliases treatmentResponse,{class_}-method treatmentResponse
+    @aliases sensitivitySlot
+    @exportMethod treatmentResponse
     ",
     ...
 )
 
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_get_sensitivitySlot(class_=.local_class,
+#' @eval .docs_CoreSet_get_treatmentResponse(class_=.local_class,
 #'   data_=.local_data)
-setMethod("sensitivitySlot", signature("CoreSet"), function(object) {
+setMethod("treatmentResponse", signature("CoreSet"), function(object) {
     object@treatmentResponse
 })
+#' @export
+sensitivitySlot <- function(...) treatmentResponse(...)
 
 
 #' @export
-setGeneric("sensitivitySlot<-", function(object, ..., value)
-    standardGeneric("sensitivitySlot<-"))
+setGeneric("treatmentResponse<-", function(object, ..., value)
+    standardGeneric("treatmentResponse<-"))
 
-.docs_CoreSet_set_sensitivitySlot <- function(...) .parseToRoxygen(
+.docs_CoreSet_set_treatmentResponse <- function(...) .parseToRoxygen(
     "
-    __sensitivitySlot<-__: Assign data to the `@treatmentResponse` slot of a
+    __treatmentResponse<-__: Assign data to the `@treatmentResponse` slot of a
     `{class_}` object.
-    - value: Either a `LongTable` class object, or a list with an 'info'
-    `data.frame` of experiment metadata, 'profiles' `data.frame` with
+    - value: Either a `TreatmentResponseExperiment` class object, or a list with
+    an 'info' `data.frame` of experiment metadata, 'profiles' `data.frame` with
     summary statistics from the sensitivity experiment and a 'raw' 3D array
     where rows are experiments, columns are replicates and pages are 'Dose'
     or 'Viability' containing their respective values for that treatment by sample
@@ -1800,12 +1803,13 @@ setGeneric("sensitivitySlot<-", function(object, ..., value)
     slot of the `{class_}` object.
 
     @examples
-    sensitivitySlot({data_}) <- sensitivitySlot({data_})
+    treatmentResponse({data_}) <- treatmentResponse({data_})
 
     @md
-    @aliases sensitivitySlot<- sensitivitySlot<-,{class_},list-method
-    sensitivitySlot<-,{class_},LongTable-method
-    @exportMethod sensitivitySlot<-
+    @aliases treatmentResponse<- treamentResponse<-,{class_},list-method
+    treatmentResponse<-,{class_},LongTable-method
+    @aliases sensitivitySlot<-
+    @exportMethod treatmentResponse<-
     ",
     ...
 )
@@ -1813,8 +1817,8 @@ setGeneric("sensitivitySlot<-", function(object, ..., value)
 
 #' @rdname CoreSet-accessors
 #' @include LongTable-class.R
-#' @eval .docs_CoreSet_set_sensitivitySlot(class_=.local_class, data_=.local_data)
-setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_OR_LongTable"),
+#' @eval .docs_CoreSet_set_treatmentResponse(class_=.local_class, data_=.local_data)
+setReplaceMethod("treatmentResponse", signature(object="CoreSet", value="list_OR_LongTable"),
     function(object, value)
 {
     # funContext <- .S4MethodContext('sensitivitySlot<-', class(object), class(value))
@@ -1825,6 +1829,8 @@ setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_OR_L
     object@treatmentResponse <- value
     return(object)
 })
+#' @export
+`sensitivitySlot<-` <- function(..., value) `treatmentResponse<-`(..., value=value)
 
 
 ##
@@ -1922,7 +1928,7 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
 setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"),
     function(object, value)
 {
-    if (is(sensitivitySlot(object), 'LongTable')) {
+    if (is(treatmentResponse(object), 'LongTable')) {
         object
     } else {
         object@treatmentResponse$n <- value
