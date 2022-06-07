@@ -25,6 +25,9 @@ NULL
 #' @param BPPARAM `BiocParallelParam` object. Use to customized the
 #'   the parallization back-end of bplapply. Note, nthread over-rides any
 #'   settings from BPPARAM. For now, a progress bar is always used.
+#' @param enlist `logical(1)` Default is `TRUE`. Set to `FALSE` to evaluate
+#'   the first call in `...` within `data.table` groups. This is indended for
+#'   advanced users, only change if you know what you are doing!
 #'
 #' @details
 #' ## Use of Non-Standard Evaluation
@@ -52,8 +55,12 @@ NULL
 #' @importMethodsFrom S4Vectors aggregate
 #' @export
 setMethod("aggregate", signature(x="LongTable"),
-        function(x, assay, by, ..., nthread=1, BPPARAM=NULL) {
-    aggregate2(x[[assay]], by=by, ..., nthread=nthread, BPPARAM=BPPARAM)
+        function(x, assay, by, ..., nthread=1, BPPARAM=NULL, enlist=TRUE) {
+    aggregate2(
+        x[[assay]],
+        by=by,
+        ...,
+        nthread=nthread, BPPARAM=BPPARAM, enlist=enlist)
 })
 
 
@@ -75,6 +82,9 @@ setMethod("aggregate", signature(x="LongTable"),
 #' @param BPPARAM `BiocParallelParam` object. Use to customized the
 #'   the parallization back-end of bplapply. Note, nthread over-rides any
 #'   settings from BPPARAM. For now, a progress bar is always used.
+#' @param enlist `logical(1)` Default is `TRUE`. Set to `FALSE` to evaluate
+#'   the first call in `...` within `data.table` groups. This is indended for
+#'   advanced users, only change if you know what you are doing!
 #'
 #' @details
 #' ## Use of Non-Standard Evaluation
@@ -106,21 +116,24 @@ setMethod("aggregate", signature(x="LongTable"),
 #' @importFrom BiocParallel bpparam bpworkers bpprogressbar bplapply
 #' @importFrom data.table rbindlist setDT
 #' @export
-aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL) {
+aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL, enlist=TRUE) {
     stopifnot(is.data.table(x))
     stopifnot(is.character(by) && all(by %in% colnames(x)))
 
     # -- capture dots as a call and parse dot names, adding default names if
     # --   they are missing
-    agg_call <- substitute(list(...))
-    dot_names <- names(agg_call)[-1L]
-    if (is.null(dot_names)) dot_names <- rep("", length(agg_call) - 1)
+    agg_call <- if (enlist) substitute(list(...)) else substitute(...)
+    if (!enlist && ...length() > 1) warning(.warnMsg("Only one call can be ",
+        "passed via ... when enlist=FALSE, ignoring all but first arugment!"))
+    dot_names <- if (enlist) names(agg_call)[-1L] else ...names()
+    if (is.null(dot_names) && enlist) dot_names <- rep("", length(agg_call) - 1)
     for (i in which(dot_names == "")) {
         dot_call <- agg_call[[i + 1]]
         # assumes the first argument in a function call is always the column name!
         dot_names[i] <- paste0(dot_call[1:max(2, length(dot_call))], collapse="_")
     }
-    names(agg_call)[2L:length(agg_call)] <- dot_names
+    call_idx <- if (!enlist) 2L else seq(2L, length(agg_call))
+    if (length(dot_names)) names(agg_call)[call_idx] <- dot_names
 
     # -- compute the aggregates, parallelizing if nthread > 1
     if (nthread == 1) {
@@ -129,8 +142,8 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL) {
         x_split <- split(x, by=by)
         if (is.null(BPPARAM)) BPPARAM <- BiocParallel::bpparam()
         if (hasMethod("bpworkers<-", signature=c(class(BPPARAM), "integer")))
-            bpworkers(BPPARAM) <- nthread
-        bpprogressbar(BPPARAM) <- TRUE
+            BiocParallel::bpworkers(BPPARAM) <- nthread
+        BiocParallel::bpprogressbar(BPPARAM) <- TRUE
         res <- BiocParallel::bplapply(
             x_split,
             function(x, agg_call, by) x[, eval(substitute(agg_call)), by=c(by)],
@@ -246,5 +259,33 @@ if (sys.nframe() == 0) {
                 auc_dt
         }
     )
+
+library(CoreGx)
+data(nci_TRE_small)
+nci_TRE_small |>
+    aggregate(
+        assay="sensitivity",
+        {
+            fit <- tryCatch({
+                PharmacoGx::logLogisticRegression(drug1dose, viability)
+            }, error=\(e) list(HS=NA_real_, E_inf=NA_real_, EC50=NA_real_))
+            ic50 <- tryCatch({
+                PharmacoGx::computeIC50(drug1dose, Hill_fit=fit)
+            }, error=\(e) NA_real_)
+            auc <- tryCatch({
+                PharmacoGx::computeAUC(drug1dose, Hill_fit=fit, area.type="Fitted")
+            }, error=\(e) NA_real_)
+            list(
+                HS=fit[['HS']], E_inf=fit[['E_inf']], EC50=fit[['EC50']],
+                auc=auc,
+                ic50=ic50
+            )
+        },
+        by=c("drug1id", "cellid"),
+        enlist=FALSE,
+        nthread=22
+    ) -> profiles
+nci_TRE_small$sens_profiles <- profiles
+
 
 }

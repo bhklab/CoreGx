@@ -5,7 +5,7 @@
 \title{Functional API for data.table aggregation which allows capture of associated
 aggregate calls so they can be recomputed later.}
 \usage{
-aggregate2(x, by, ..., nthread = 1, BPPARAM = NULL)
+aggregate2(x, by, ..., nthread = 1, BPPARAM = NULL, enlist = TRUE)
 }
 \arguments{
 \item{x}{\code{data.table}}
@@ -27,6 +27,10 @@ nested parallelism.}
 \item{BPPARAM}{\code{BiocParallelParam} object. Use to customized the
 the parallization back-end of bplapply. Note, nthread over-rides any
 settings from BPPARAM. For now, a progress bar is always used.}
+
+\item{enlist}{\code{logical(1)} Default is \code{TRUE}. Set to \code{FALSE} to evaluate
+the first call in \code{...} within \code{data.table} groups. This is indended for
+advanced users, only change if you know what you are doing!}
 }
 \value{
 \code{data.table} of aggregation results.
