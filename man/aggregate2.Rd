@@ -16,21 +16,23 @@ groups using.}
 \item{...}{\code{call} One or more aggregations to compute for each group by in x.
 If you name aggregation calls, that will be the column name of the value
 in the resulting \code{data.table} otherwise a default name will be parsed from
-the function name and its first arugment, which is assumed to be the name
+the function name and its first argument, which is assumed to be the name
 of the column being aggregated over.}
 
 \item{nthread}{\code{numeric(1)} Number of threads to use for split-apply-combine
 parallelization. Uses \code{BiocParllel::bplapply} if nthread > 1. Does not
 modify data.table threads, so be sure to use setDTthreads for reasonable
-nested parallelism.}
+nested parallelism. See details for performance considerations.}
 
 \item{BPPARAM}{\code{BiocParallelParam} object. Use to customized the
 the parallization back-end of bplapply. Note, nthread over-rides any
-settings from BPPARAM. For now, a progress bar is always used.}
+settings from BPPARAM. For now, a progress bar is always used. If this has
+negatively affected your mental health please feel free to open an issue
+on GitHub at bhklab/CoreGx and we will parameterize it.}
 
 \item{enlist}{\code{logical(1)} Default is \code{TRUE}. Set to \code{FALSE} to evaluate
-the first call in \code{...} within \code{data.table} groups. This is indended for
-advanced users, only change if you know what you are doing!}
+the first call in \code{...} within \code{data.table} groups. See details for more
+information.}
 }
 \value{
 \code{data.table} of aggregation results.
@@ -43,7 +45,7 @@ aggregate calls so they can be recomputed later.
 \subsection{Use of Non-Standard Evaluation}{
 
 Arguments in \code{...} are substituted and wrapped in a list, which is passed
-through to the j argument of \verb{[.data.table} internally. The functin currently
+through to the j argument of \verb{[.data.table} internally. The function currently
 tries to build informative column names for unnamed arguments in \code{...} by
 appending the name of each function call with the name of its first argument,
 which is assumed to be the column name being aggregated over. If an argument
@@ -59,11 +61,30 @@ to compute a set of aggregate functions is dependent on the functions being
 called. For functions which \code{data.table} optimizes intenally, such as \code{mean},
 \code{sd} and others (see \code{?gforce} for full list of optimized functons) it is
 almost always better to run this function with \code{nthread=1} and let
-\code{data.table} handle paralellization.
-
+\code{data.table} handle parallelization.
 However, for functions not internally optimized by \code{data.table}, such as
-different statistical modelling method, compute time can be reduced by adding
+fitting statistical models, compute time can be reduced by adding
 more cores at the cost of additional memory usage.
+}
+
+\subsection{Enlisting}{
+
+The primary use case for \code{enlist=FALSE} is to allow computation of dependent
+aggregations, where the output from a previous aggregation is required in a
+subsequent one. For this case, wrap your call in \verb{\{} and assign intermediate
+results to variables, returning the final results as a list where each list
+item will become a column in the final table with the corresponding name.
+Name inference is disabled for this case, since it is assumed you will name
+the returned list items appropriately.
+A major advantage over multiple calls to \code{aggregate} is that
+the overhead of parallelization is paid only once even for complex multi-step
+computations like fitting a model, capturing its paramters, and making
+predictions using it. It also allows capturing arbitrarily complex calls
+which can be recomputed later using the
+\verb{update,TreatmentResponseExperiment-method}
+A potential disadvantage is increased RAM usage per
+thread due to storing intermediate values in variables, as well as any
+memory allocation overhead associate therewith.
 }
 }
 \seealso{

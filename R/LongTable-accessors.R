@@ -660,11 +660,10 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     if (!(length(presentRowIDs) > 0)) stop(.errorMsg("No rowIDs(x) present in",
         "value! Cannot summarize over an entire dimension."), call.=FALSE)
     ## set check.attributes=FALSE to allow unequal table keys
-    equalRowIDs <- all.equal(
+    equalRowIDs <- .table_is_subset(
         unique(value[, presentRowIDs, with=FALSE])[order(mget(presentRowIDs))],
         unique(rowIDs(x, data=TRUE)[order(mget(presentRowIDs)), presentRowIDs,
-            with=FALSE]),
-        check.attributes=FALSE
+            with=FALSE])
     )
     if (!isTRUE(equalRowIDs))
         stop(.errorMsg("One or more rowIDs(x) columns have been modified.",
@@ -675,11 +674,10 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     presentColIDs <- intersect(colIDs(x), colnames(value))  # allow summary over some keys
     if (!(length(presentColIDs) > 0)) stop(.errorMsg("No colIDs(x) present in",
         "value! Cannot summarize over an entire dimension."), call.=FALSE)
-    equalColIDs <- all.equal(
+    equalColIDs <- .table_is_subset(
         unique(value[, presentColIDs, with=FALSE])[order(mget(presentColIDs))],
         unique(colIDs(x, data=TRUE)[order(mget(presentColIDs)), presentColIDs,
-            with=FALSE]),
-        check.attributes=FALSE
+            with=FALSE])
     )
     if (!isTRUE(equalColIDs))
         stop(.errorMsg("One or more colIDs(x) column have been modified.",
