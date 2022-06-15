@@ -255,37 +255,156 @@ if (sys.nframe() == 0) {
         }
     )
 
-library(CoreGx)
-data(nci_TRE_small)
-# fix use of wrong column for sensitivity
-nci_TRE_small$sensitivity <- nci_TRE_small$sensitivity[,
-    `:=`(PERCENTGROWTH=viability, viability=PERCENTGROWTHNOTZ)
-]
-nci_TRE_small |>
-    subset(is.na(drug2id)) |>
-    aggregate(
-        assay="sensitivity",
-        {
-            fit <- tryCatch({
-                PharmacoGx::logLogisticRegression(drug1dose, viability)
-            }, error=\(e) list(HS=NA_real_, E_inf=NA_real_, EC50=NA_real_))
-            ic50 <- tryCatch({
-                PharmacoGx::computeIC50(drug1dose, Hill_fit=fit)
-            }, error=\(e) NA_real_)
-            auc <- tryCatch({
-                PharmacoGx::computeAUC(drug1dose, Hill_fit=fit, area.type="Fitted")
-            }, error=\(e) NA_real_)
-            list(
-                HS=fit[['HS']], E_inf=fit[['E_inf']], EC50=fit[['EC50']],
-                auc=auc,
-                ic50=ic50
+    library(CoreGx)
+    library(data.table)
+    tre <- qs::qread(
+        file.path(".local_data", "nci_treatment_response_exp.qs"),
+        nthread=10
+    )
+    #data(nci_TRE_small)
+    # fix use of wrong column for sensitivity
+    # tre$sensitivity <- tre$sensitivity[,
+    #     `:=`(PERCENTGROWTH=viability, viability=(TESTVALUE/CONTROLVALUE)*100)
+    # ]
+    tre |>
+        subset(is.na(drug2id)) |>
+        aggregate(
+            assay="sensitivity",
+            viability=mean(viability),
+            by=c("drug1id", "drug1dose", "cellid")
+        ) |>
+        aggregate2(
+            {
+                fit <- tryCatch({
+                    PharmacoGx::logLogisticRegression(drug1dose, viability)
+                }, error=\(e) list(HS=NA_real_, E_inf=NA_real_, EC50=NA_real_))
+                ic50 <- tryCatch({
+                    PharmacoGx::computeIC50(drug1dose, Hill_fit=fit)
+                }, error=\(e) NA_real_)
+                auc <- tryCatch({
+                    PharmacoGx::computeAUC(drug1dose, Hill_fit=fit, area.type="Fitted")
+                }, error=\(e) NA_real_)
+                list(
+                    HS=fit[['HS']], E_inf=fit[['E_inf']], EC50=fit[['EC50']],
+                    Rsq=as.numeric(unlist(attributes(fit))),
+                    auc=auc,
+                    ic50=ic50
+                )
+            },
+            by=c("drug1id", "cellid"),
+            enlist=FALSE,
+            nthread=20
+        ) -> mono_profiles
+    tre$mono_profiles <- mono_profiles
+
+    # -- extract monotherapy drug observations
+    ## FIXME:: This drops the aggregations attribute... Do we need it?
+    mono_profiles <- tre$mono_profiles
+    ## TODO:: Add helper methods to make finding these columns easier!
+    mono_cols <- setdiff(  # identify assay specific columns
+        colnames(mono_profiles),
+        c(colnames(rowData(tre)), colnames(colData(tre)))
+    )
+    mono_profiles <- unique(mono_profiles[
+        !is.na(HS) & Rsq > 0.75,  # drop failed fits and not passing Rsq test
+        mget(setdiff(mono_cols, c("auc", "ic50"))),
+        by=c("drug1id", "cellid")
+    ])
+
+    # -- build out combination modelling table with dose! Needed for Loewe
+    combo_profiles <- tre$sensitivity[
+        !is.na(drug2id),
+        .(
+            mean_viability=mean(viability),
+            mean_drug1dose=mean(drug1dose),
+            mean_drug2dose=mean(drug2dose)
+        ),
+        by=.(drug1id, drug2id, cellid)
+    ]
+    # TODO:: Do we want to keep NA values? Add all.x=TRUE if so.
+    combo_profiles <- merge.data.table(
+        combo_profiles, mono_profiles,
+        by=c("drug1id", "cellid")
+    )
+    combo_profiles <- merge.data.table(
+        combo_profiles, mono_profiles,
+        by.x=c("drug2id", "cellid"), by.y=c("drug1id", "cellid"),
+        suffixes=c("_2", "_1")
+    )
+    setkeyv(combo_profiles, c("drug1id", "drug2id", "cellid"))
+    setcolorder(combo_profiles, c("drug1id", "drug2id", "cellid"))
+
+    # -- compute synergy metrics
+    ## Here score ~ combination index
+    combo_profiles |>
+        aggregate2({
+            # predict single agent viability for this combo
+            v1 <- min(PharmacoGx:::.Hill(
+                log10(mean_drug1dose),
+                c(HS_1, E_inf_1, log10(EC50_1))
+            ) / 100, 1)
+            v2 <- min(PharmacoGx:::.Hill(
+                log10(mean_drug2dose),
+                c(HS_2, E_inf_2, log10(EC50_2))
+            ) / 100, 1)
+            # alias variables for readable math
+            v <- min(mean_viability / 100, 1)
+            r1 <- 1 - v1
+            r2 <- 1 - v2
+            r <- 1 - v
+            rmax1 <- 1 - (E_inf_1 / 100)
+            rmax2 <- 1 - (E_inf_2 / 100)
+            rmin <- 0
+            # do math
+            HSA <- max(r1, r2)
+            HSA_score <- HSA / r
+            BLISS <- r1 + r2 - (r1 * r2)
+            BLISS_score <- BLISS / r
+            LOEWE_1 <- (d1 / EC50_1) * (1 / ((emin1 - v) / (v - emax1)) ^ (1 / HS_1))
+            LOEWE_2 <- (d2 / EC50_2) * (1 / ((emin2 - v) / (v - emax2)) ^ (1 / HS_2))
+            LOEWE_score <- LOEWE_1 + LOEWE_2
+            # return list
+            list(r1=r1, d1=mean_drug1dose, d2=mean_drug2dose, r2=r2, r=r, HSA=HSA, HSA_score=HSA_score, BLISS=BLISS,
+                BLISS_score=BLISS_score,
+                LOEWE_score=LOEWE_score
             )
         },
-        by=c("drug1id", "cellid"),
+        by=c("drug1id", "drug2id", "cellid"),
         enlist=FALSE,
-        nthread=22
-    ) -> profiles
-nci_TRE_small$mono_profiles <- profiles
+        nthread=1
+        ) -> prof2
 
+    ## synergyfinder checks
+    library(CoreGx)
+    library(data.table)
+    library(synergyfinder)
+    library(BiocParallel)
+    tre <- qs::qread(
+        file.path(".local_data", "nci_treatment_response_exp.qs"),
+        nthread=10
+    )
+    synergy_combos <- tre$sensitivity
+    setnames(synergy_combos,
+        old=c("drug1id", "drug2id", "drug1dose", "drug2dose", "viability"),
+        new=c("drug1", "drug2", "conc1", "conc2", "response")
+    )
+    synergy_combos[, conc_unit := "M"]
+    synergy_combos[, block_id := .GRP, by=.(drug1, drug2, cellid)]
+
+    # reshape data to fit their format
+    bench::system_time({
+        synergy_data <- ReshapeData(
+            synergy_combos,
+            data_type="viability"
+        )
+    })
+
+    # calculate synergy scores
+    bench::system_time({
+        synergy_scores <- CalculateSynergy(
+            synergy_data,
+            correct_baseline="all"
+        )
+    })
 
 }
