@@ -1279,3 +1279,78 @@ is.items <- function(list, ..., FUN=is)
         paste0(formals@target@.Data, collapse=','), '-method`') # what is the method signature
     return(context)
 }
+
+#' Grouping monotherapy responses with dual-therapy responses
+#'   within an assay.
+#' 
+#' For preparing an input to synergy score method.
+#' 
+#' @param assay_dt A `data.table` that must contain fields `drug1id`, `drug2id`,
+#'   `drug1dose`, `drug2dose`, `cellid`, and `viability`.
+#'   The input assay data table contains both monotherapeutic observations
+#'   and dual-therapeutic observations.
+#'   Monotherapeutic observations have `NA` for either `drug1id` and `drug1dose`,
+#'   or `drug2id` and `drug2dose`. 
+#' 
+#' 
+#' @return A `data.table` containing fields
+#'   `drug1id`, `drug1dose`, `drug2id`, `drug2dose`, `cellid`,
+#'   `viability`, `avg_viability_1`, and `avg_viability_2`.
+#'   Each `avg_viability_*` is the response of a single-agent in the combination
+#'   averaged over its monotherapeutic replicates.
+#' 
+#' @import data.table
+#' @export
+comboResponse <- function(assay_dt) {
+    ## TODO:: Need a better name for this method
+    ## TODO:: Add input validaty check
+    comb_keys <- key(assay_dt)[!key(assay_dt) %in% "replicate_id"]
+    ## Extract drug1 observations from assay table
+    drug1_response <- assay_dt[is.na(drug2id),
+                               c("drug1id", "drug1dose", "cellid", "viability")
+                               ][,
+                                 .(avg_viability = mean(viability)),
+                                 by = c("drug1id", "drug1dose", "cellid")
+                               ][,
+                                 `:=`(drugid = drug1id,
+                                      dose = drug1dose,
+                                      drug1id = NULL,
+                                      drug1dose = NULL)
+                                ]
+    ## Extract drug2 observations from assay table
+    drug2_response <- assay_dt[is.na(drug1id),
+                               c("drug2id", "drug2dose", "cellid", "viability")
+                               ][,
+                                 .(avg_viability = mean(viability)),
+                                 by = c("drug2id", "drug2dose", "cellid")
+                               ][,
+                                 `:=`(drugid = drug2id,
+                                      dose = drug2dose,
+                                      drug2id = NULL,
+                                      drug2dose = NULL)
+                                ]
+    ## Group monotherapy observations of drug1 and drug2 into a table
+    mono_keys <- c("drugid", "dose", "cellid")
+    mono_response <- rbind(drug1_response, drug2_response)
+    ## Extract dual-therapy observations from input assay data table
+    comb_response <- assay_dt[!is.na(drug1id) & !is.na(drug2id),
+                              c(comb_keys, "viability"),
+                              with = FALSE
+                             ]
+    setkeyv(mono_response, mono_keys)
+    setkeyv(comb_response, comb_keys)
+    ## Merge monotherapy table with combination table for drug1
+    comb_response[mono_response,
+                  avg_viability_1 := avg_viability,
+                  on = c(drug1id = "drugid",
+                         drug1dose = "dose",
+                         cellid = "cellid")
+                    ]
+    ## Merge monotherapy table with combination table for drug2
+    comb_response[mono_response,
+                  avg_viability_2 := avg_viability,
+                  on = c(drug2id = "drugid",
+                         drug2dose = "dose",
+                         cellid = "cellid")]
+    return(comb_response[!is.na(avg_viability_1) & !is.na(avg_viability_2)])
+}

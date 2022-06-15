@@ -200,8 +200,8 @@ testthat::test_that("`assay<-,LongTable-method` prevents modified column ID in n
         by=.(drug1id, drug2id, cellid)
     ]
     set(sens_sum,
-        i     = which(sens_sum[["cellid"]] == sens_sum[1, cellid]),
-        j     = "cellid",             # column ID to modify
+        i = which(sens_sum[["cellid"]] == sens_sum[1, cellid]),
+        j = "cellid",             # column ID to modify
         value = sens_sum[1, drug2id]) # Replace a cell ID with a drug ID
     testthat::expect_error({ ntre$sens_sum <- sens_sum },
         regexp = paste(

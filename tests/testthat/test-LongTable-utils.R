@@ -163,89 +163,89 @@ testthat::test_that("`subset,LongTable-method` doesn't miss assay observations f
     }
 })
 
-# testthat::test_that("`subset,LongTable-method` subset indexing behaves the same as data.table", {
-#     ## Line 221
-#     sub_tre <- subset(tre, i = NULL) ## subset with row index by NULL
-#     testthat::expect_equal(dim(sub_tre), c(0, 0))
-#     sub_tre <- subset(tre, j = NULL) ## subset with column index by NULL
-#     testthat::expect_equal(dim(sub_tre), c(0, 0))
-#     sub_tre <- subset(tre, i = "") ## subset with row by empty rowname string
-#     testthat::expect_equal(sub_tre, tre)
-#     sub_tre <- subset(tre, j = "") ## subset with column by empty column name
-#     testthat::expect_equal(sub_tre, tre)
-#     sub_tre <- subset(tre, i = "", j = "") ## subset by empty row+column names
-#     testthat::expect_equal(sub_tre, tre)
-#     ## Get a subset with 2-Fluoro Ara-A of dose 6e-06 as second drug in combination therapies
-#     sub_tre <- subset(tre, i = "*:2-Fluoro Ara-A:*:6e-06")
-#     regex <- "(?=.*\\:2-Fluoro Ara-A)(?=.*6e-06\\:*)^" ## rowData regex
-#     testthat::expect_equal(
-#         rowData(tre)[grepl(regex, rownames(tre), perl = TRUE), ],
-#         rowData(sub_tre)
-#     ) ## much nicer to query at the TRE level
-#     ## Subset containing ovarian cancer cell line
-#     sub_tre <- subset(tre, j = ".*OVCAR.*")
-#     testthat::expect_equal(
-#         colData(tre)[grepl(".*OVCAR.*", colnames(tre), perl = TRUE), ],
-#         colData(sub_tre)
-#     )
-#     ## Subset by negative index: TRE behaves the same as data.table
-#     i <- sample.int(n = dim(tre)[1], size = 1, replace = FALSE)
-#     sub_tre_1 <- tre[-i, ] ## Drop the i-th row
-#     sub_tre_2 <- tre[i, ] ## Extract the i-th row
-#     testthat::expect_equal(
-#         rowData(tre)[!rowData(sub_tre_1), on = names(rowData(tre))],
-#         rowData(sub_tre_2) # rowData(tre)\rowData(sub_tre_1)=rowData(sub_tre_2)
-#     )
-#     j <- sample.int(n = dim(tre)[2], size = 1, replace = FALSE)
-#     sub_tre_3 <- tre[, -j] ## Drop the j-th column
-#     sub_tre_4 <- tre[, j] ## Extract the j-th column
-#     testthat::expect_equal(
-#         colData(tre)[!colData(sub_tre_3), on = names(colData(tre))],
-#         colData(sub_tre_4) # colData(tre)\colData(sub_tre_3)=colData(sub_tre_4)
-#     )
-#     sub_tre_5 <- tre[-i, -j] ## Drop data containing i-th row OR j-th column
-#     sub_tre_6 <- tre[i, j] ## Extract i-th row AND j-th column
-#     all_assays <- assays(tre, key = FALSE, withDimnames = TRUE)
-#     for (a in seq_along(all_assays)) {
-#         testthat::expect_equal(
-#             all_assays[[a]][
-#                 !assay(sub_tre_1, a, key = FALSE, withDimnames = TRUE),
-#             ],
-#             assay(sub_tre_2, i = a, key = FALSE, withDimnames = TRUE)
-#         )
-#         testthat::expect_equal(
-#             all_assays[[a]][
-#                 !assay(sub_tre_3, a, key = FALSE, withDimnames = TRUE),
-#             ],
-#             assay(sub_tre_4, i = a, key = FALSE, withDimnames = TRUE)
-#         )
-#         ## tre[i, ] UNION tre[, j] + (tre[i, ] INTERSECT tre[, j])
-#         union_assay <- rbind(
-#             assay(sub_tre_2, i = a, key = FALSE, withDimnames = TRUE),
-#             assay(sub_tre_4, i = a, key = FALSE, withDimnames = TRUE)
-#         ) ## contains double count, not a union yet
-#         double_count_idx <- which(duplicated(union_assay))
-#         # Show that the double counted element is the intersect
-#         testthat::expect_equal(
-#             union_assay[double_count_idx, ],
-#             ## tre[i, ] INTERSECT tre[, j]
-#             assay(sub_tre_6, i = a, key = FALSE, withDimnames = TRUE),
-#             ignore_attr = TRUE
-#         )
-#         ## Show that these two produce equivalent union sets
-#         union_assay <- setorderv(union_assay[-double_count_idx, ],
-#                                  cols = idCols(tre))
-#         testthat::expect_equal(
-#             union_assay,
-#             ## This indirect approach for tre[i, ] UNION tre[, j] is faster
-#             all_assays[[a]][
-#                 !assay(sub_tre_5, a, key = FALSE, withDimnames = TRUE),
-#                 on = idCols(tre)
-#             ], ## reordering done by internal reindexing
-#             ignore_attr = TRUE
-#         )
-#     }
-# })
+testthat::test_that("`subset,LongTable-method` subset indexing behaves the same as data.table", {
+    ## controled by .subsetByIndex
+    sub_tre <- subset(tre, i = NULL) ## subset with row index by NULL
+    testthat::expect_equal(dim(sub_tre), c(0, 0))
+    sub_tre <- subset(tre, j = NULL) ## subset with column index by NULL
+    testthat::expect_equal(dim(sub_tre), c(0, 0))
+    sub_tre <- subset(tre, i = "") ## subset with row by empty rowname string
+    testthat::expect_equal(sub_tre, tre)
+    sub_tre <- subset(tre, j = "") ## subset with column by empty column name
+    testthat::expect_equal(sub_tre, tre)
+    sub_tre <- subset(tre, i = "", j = "") ## subset by empty row+column names
+    testthat::expect_equal(sub_tre, tre)
+    ## Get a subset with 2-Fluoro Ara-A of dose 6e-06 as second drug in combination therapies
+    sub_tre <- subset(tre, i = "*:2-Fluoro Ara-A:*:6e-06")
+    regex <- "(?=.*\\:2-Fluoro Ara-A)(?=.*6e-06\\:*)^" ## rowData regex
+    testthat::expect_equal(
+        rowData(tre)[grepl(regex, rownames(tre), perl = TRUE), ],
+        rowData(sub_tre)
+    ) ## much nicer to query at the TRE level
+    ## Subset containing ovarian cancer cell line
+    sub_tre <- subset(tre, j = ".*OVCAR.*")
+    testthat::expect_equal(
+        colData(tre)[grepl(".*OVCAR.*", colnames(tre), perl = TRUE), ],
+        colData(sub_tre)
+    )
+    ## Subset by negative index: TRE behaves the same as data.table
+    i <- sample.int(n = dim(tre)[1], size = 1, replace = FALSE)
+    sub_tre_1 <- tre[-i, ] ## Drop the i-th row
+    sub_tre_2 <- tre[i, ] ## Extract the i-th row
+    testthat::expect_equal(
+        rowData(tre)[!rowData(sub_tre_1), on = names(rowData(tre))],
+        rowData(sub_tre_2) # rowData(tre)\rowData(sub_tre_1)=rowData(sub_tre_2)
+    )
+    j <- sample.int(n = dim(tre)[2], size = 1, replace = FALSE)
+    sub_tre_3 <- tre[, -j] ## Drop the j-th column
+    sub_tre_4 <- tre[, j] ## Extract the j-th column
+    testthat::expect_equal(
+        colData(tre)[!colData(sub_tre_3), on = names(colData(tre))],
+        colData(sub_tre_4) # colData(tre)\colData(sub_tre_3)=colData(sub_tre_4)
+    )
+    sub_tre_5 <- tre[-i, -j] ## Drop data containing i-th row OR j-th column
+    sub_tre_6 <- tre[i, j] ## Extract i-th row AND j-th column
+    all_assays <- assays(tre, key = FALSE, withDimnames = TRUE)
+    for (a in seq_along(all_assays)) {
+        testthat::expect_equal(
+            all_assays[[a]][
+                !assay(sub_tre_1, a, key = FALSE, withDimnames = TRUE),
+            ],
+            assay(sub_tre_2, i = a, key = FALSE, withDimnames = TRUE)
+         )
+        testthat::expect_equal(
+            all_assays[[a]][
+                !assay(sub_tre_3, a, key = FALSE, withDimnames = TRUE),
+            ],
+            assay(sub_tre_4, i = a, key = FALSE, withDimnames = TRUE)
+        )
+        ## tre[i, ] UNION tre[, j] + (tre[i, ] INTERSECT tre[, j])
+        union_assay <- rbind(
+            assay(sub_tre_2, i = a, key = FALSE, withDimnames = TRUE),
+            assay(sub_tre_4, i = a, key = FALSE, withDimnames = TRUE)
+        ) ## contains double count, not a union yet
+        double_count_idx <- which(duplicated(union_assay))
+        # Show that the double counted element is the intersect
+        testthat::expect_equal(
+            union_assay[double_count_idx, ],
+            ## tre[i, ] INTERSECT tre[, j]
+            assay(sub_tre_6, i = a, key = FALSE, withDimnames = TRUE),
+            ignore_attr = TRUE
+        )
+        ## Show that these two produce equivalent union sets
+        union_assay <- setorderv(union_assay[-double_count_idx, ],
+                                 cols = idCols(tre))
+        testthat::expect_equal(
+            union_assay,
+            ## This indirect approach for tre[i, ] UNION tre[, j] is faster
+            all_assays[[a]][
+                !assay(sub_tre_5, a, key = FALSE, withDimnames = TRUE),
+                on = idCols(tre)
+            ], ## reordering done by internal reindexing
+            ignore_attr = TRUE
+        )
+    }
+})
 
 # == reindex
 
