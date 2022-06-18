@@ -374,37 +374,103 @@ if (sys.nframe() == 0) {
         nthread=1
         ) -> prof2
 
-    ## synergyfinder checks
-    library(CoreGx)
-    library(data.table)
-    library(synergyfinder)
-    library(BiocParallel)
-    tre <- qs::qread(
-        file.path(".local_data", "nci_treatment_response_exp.qs"),
-        nthread=10
-    )
-    synergy_combos <- tre$sensitivity
-    setnames(synergy_combos,
-        old=c("drug1id", "drug2id", "drug1dose", "drug2dose", "viability"),
-        new=c("drug1", "drug2", "conc1", "conc2", "response")
-    )
-    synergy_combos[, conc_unit := "M"]
-    synergy_combos[, block_id := .GRP, by=.(drug1, drug2, cellid)]
+    ## PERCENTGROWTHNOTZ has missing values
+    ## compute viability from T_72 / C_72
+    viability <- tre[["sensitivity"]][,
+            c(idCols(tre), "TESTVALUE", "CONTROLVALUE"),
+            with = FALSE
+        ]
+    ## We have negative TESTVALUE => nagtive viability, meaning
+    ## blank absorbance reading is for some reason higher than the sample
+    ## either because the measurements are close to machine error value
+    ## or the blank was contaminated
+    viability[TESTVALUE < 0,]
+    ## negative TESTVALUE in a very marginal range, replace them with 0
+    viability[TESTVALUE < 0, TESTVALUE := 0]
+    ## logLogisticRegression will bark for viability exceeding negative control
+    viability[, `:=`(
+        viability =  ifelse(
+            TESTVALUE > CONTROLVALUE,
+            100, ## Cap E_min with 100
+            (TESTVALUE / CONTROLVALUE) * 100
+            ),
+        TESTVALUE = NULL,
+        CONTROLVALUE = NULL
+    )]
+    tre[[".viability"]] <- viability
+    mono_response <- viability |> getMonoResponse()
+    #mono_params <- qs::qread("/home/lifeifei/data/mono_params.qs")
+    mono_params <- mono_response |>
+        aggregate2(PharmacoGx::logLogisticRegression(dose, avg_viability),
+                   by = c("drugid", "cellid"), enlist = FALSE
+    ) ## should run without warnings or errors
 
-    # reshape data to fit their format
-    bench::system_time({
-        synergy_data <- ReshapeData(
-            synergy_combos,
-            data_type="viability"
+    combo_response <- tre[["sensitivity"]][
+        !is.na(drug1id) & !is.na(drug2id),
+        c(idCols(tre), "TESTVALUE", "CONTROLVALUE"),
+        with = FALSE
+        ][,
+        `:=`(
+        viability =  ifelse(
+            TESTVALUE > CONTROLVALUE,
+            100, ## Cap E_min with 100
+            (TESTVALUE / CONTROLVALUE) * 100
+            ),
+        TESTVALUE = NULL,
+        CONTROLVALUE = NULL)
+    ][,
+        viability := mean(viability),
+        by = .(drug1id, drug2id, drug1dose, drug2dose, cellid)
+    ][, replicate_id := NULL]
+
+    loewe_input <- combo_response[mono_params,
+        on = c(drug1id = "drugid", cellid = "cellid")
+    ]
+    param_names <- setdiff(colnames(loewe_input), colnames((combo_response)))
+    setnames(loewe_input,
+             old = param_names,
+             new = paste(param_names, "1", sep = "_"))
+    loewe_input <- loewe_input[mono_params,
+        on = c(drug2id = "drugid", cellid = "cellid")
+    ]
+    setnames(loewe_input,
+             old = param_names,
+             new = paste(param_names, "2", sep = "_"))
+    loewe_input <- loewe_input[!is.na(viability)]
+    effectToDose <- function(E, HS, EC50, E_inf) {
+        return(
+            EC50 * (100 - E) / (E - E_inf)
         )
-    })
+    }
+    computeLoewe <- function(
+        dose1, dose2, HS_1, HS_2, E_inf_1, E_inf_2, EC50_1, EC50_2, E
+    ) {
+        ## TODO:: this merely computes Loewe combination score
+        ## need to find a way to estimate E_loewe
+        dose_ratio_1 <- dose1 / effectToDose(E = E, HS = HS_1, E_inf = E_inf_1, EC50 = EC50_1)
+        dose_ratio_2 <- dose2 / effectToDose(E = E, HS = HS_2, E_inf = E_inf_2, EC50 = EC50_2)
+        CI <- dose_ratio_1 + dose_ratio_2
+        return(CI)
+    }
 
-    # calculate synergy scores
-    bench::system_time({
-        synergy_scores <- CalculateSynergy(
-            synergy_data,
-            correct_baseline="all"
-        )
-    })
-
+    Loewe_CI <- loewe_input |>
+        aggregate2(
+            Loewe_CI = computeLoewe(
+                dose1 = drug1dose,
+                dose2 = drug2dose,
+                HS_1 = HS_1,
+                HS_2 = HS_2,
+                E_inf_1 = E_inf_1,
+                E_inf_2 = E_inf_2,
+                EC50_1 = EC50_1,
+                EC50_2 = EC50_2,
+                E = viability
+            ),
+            by = c("drug1id",
+                   "drug2id",
+                   "cellid",
+                   "drug1dose",
+                   "drug2dose",
+                   "viability")
+    )
 }
