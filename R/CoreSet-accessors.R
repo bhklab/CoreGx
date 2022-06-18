@@ -1515,16 +1515,21 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
 #' @keywords internal
 .rebuildProfiles <- function(object) {
     profDT <- object$profiles
-    rowCols <- rowIDs(object)[
-        !grepl("treatment[0-9]*dose|drug[0-9]*dose|replicate.*id", rowIDs(object))
-    ]
-    colCols <- colIDs(object)
-    profDT[, sample_uid := Reduce(.paste_colon, mget(colCols))]
-    profDT[, treatment_uid := Reduce(.paste_colon, mget(rowCols))]
-    profDT[, exp_id := .paste_(treatment_uid, sample_uid)]
+    rowCols <- lapply(rowIDs(object)[
+        !grepl("treatment[0-9]*dose|drug[0-9]*dose", rowIDs(object))
+    ], as.name)
+    colCols <- lapply(colIDs(object), as.name)
+    trt <- bquote(paste(..(rowCols), sep=":"), splice=TRUE)
+    smp <- bquote(paste(..(colCols), sep=":"), splice=TRUE)
+    profDT[, treatment_uid := eval(trt), by=.I]
+    profDT[, sample_uid := eval(smp), by=.I]
+    profDT[, exp_id := paste0(treatment_uid, "_", sample_uid), by=.I]
     assayCols <- setdiff(colnames(assay(object, "profiles", raw=TRUE)), "profiles")
-    sensProf <- as.data.frame(unique(profDT[, .SD, .SDcols=assayCols]))
-    rownames(sensProf) <- unique(profDT$exp_id)
+    sensProf <- unique(profDT[, .SD, .SDcols=c(assayCols, "exp_id")])
+    obsPerExpId <- sensProf[, .N, by="exp_id"][, max(N)]
+    if (obsPerExpId > 1) warning(.warnMsg("Multiple profile values per",
+        " experiment id, summarizing with mean!"), call.=FALSE)
+    sensProf <- sensProf[, lapply(.SD, mean, na.rm=TRUE), by="exp_id"]
     return(sensProf)
 }
 
