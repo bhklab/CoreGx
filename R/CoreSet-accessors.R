@@ -716,7 +716,8 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
     __molecularProfiles__: `matrix()` Retrieve an assay in a
     `SummarizedExperiment` from the `molecularProfiles` slot of a `{class_}`
     object with the specified `mDataType`. Valid `mDataType` arguments can be
-    found with `mDataNames(object)`. Arguments:
+    found with `mDataNames(object)`. Exclude `mDataType` and `assay` to
+    access the entire slot. Arguments:
     - assay: Optional `character(1)` vector specifying an assay in the
     `SummarizedExperiment` of the `molecularProfiles` slot of the
     `{class_}` object for the specified `mDataType`. If excluded,
@@ -736,21 +737,21 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_molecularProfiles(class_=.local_class, data_=.local_data)
 setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
-  funContext <- .funContext('::molecularProlfiles,CoreSet-method')
-  ## TODO:: Add an all option that returns a list?
-  if (mDataType %in% names(object@molecularProfiles)) {
-    if (!missing(assay)) {
-      if (assay %in% assayNames(object@molecularProfiles[[mDataType]])) {
-        return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay))
-      } else {
-        .error(funContext, (paste('Assay', assay, 'not found in the SummarizedExperiment object!')))
-      }
+    funContext <- .funContext(paste0('::molecularProlfiles,', class(object), '-method'))
+    if (missing(mDataType) && missing(assay)) return(object@molecularProfiles)
+    if (mDataType %in% names(object@molecularProfiles)) {
+        if (!missing(assay)) {
+            if (assay %in% assayNames(object@molecularProfiles[[mDataType]])) {
+                return(assay(object@molecularProfiles[[mDataType]], assay))
+            } else {
+                .error(funContext, (paste('Assay', assay, 'not found in the SummarizedExperiment object!')))
+            }
+        } else {
+            return(assay(object@molecularProfiles[[mDataType]], 1))
+        }
     } else {
-      return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1))
+        stop(paste0('mDataType ', mDataType, ' not found the object!'))
     }
-  } else {
-    stop(paste0('mDataType ', mDataType, ' not found the object!'))
-  }
 })
 
 #' @export
@@ -764,7 +765,7 @@ setGeneric("molecularProfiles<-", function(object, mDataType, assay, value)
     __molecularProfiles<-__: Update an assay in a `SummarizedExperiment` from
     the `molecularProfiles` slot of a {class_} object with the specified
     `mDataType`. Valid `mDataType` arguments can be found with
-    `mDataNames(object)`.
+    `mDataNames(object)`. Omit `mDataType` and `assay` to update the slot.
     - assay: Optional `character(1)` vector specifying an assay in the
     `SummarizedExperiment` of the `molecularProfiles` slot of the
     `{class_}` object for the specified `mDataType`. If excluded,
@@ -781,9 +782,14 @@ setGeneric("molecularProfiles<-", function(object, mDataType, assay, value)
     molecularProfiles({data_}, 'rna', 'exprs') <-
         molecularProfiles({data_}, 'rna', 'exprs')
 
+    # Replace the whole slot
+    molecularProfiles({data_}) <- molecularProfiles({data_})
+
     @md
     @aliases molecularProfiles<-,{class_},character,character,matrix-method
     molecularProfiles<-,{class_},character,missing,matrix-method
+    molecularProfiles<-,{class_},missing,missing,list-method
+    molecularProfiles<-,{class_},missing,missing,MutliAssayExperiment-method
     molecularProfiles<-
     @importFrom SummarizedExperiment assay
     @exportMethod molecularProfiles<-
@@ -797,19 +803,25 @@ setReplaceMethod("molecularProfiles", signature(object="CoreSet",
     mDataType ="character", assay="character", value="matrix"),
     function(object, mDataType, assay, value)
 {
-  if (mDataType %in% names(object@molecularProfiles)) {
-    SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay) <- value
-  }
-  object
+    if (mDataType %in% names(object@molecularProfiles)) {
+        assay(object@molecularProfiles[[mDataType]], assay) <- value
+    }
+    object
 })
 setReplaceMethod("molecularProfiles",
     signature(object="CoreSet", mDataType ="character", assay="missing",
         value="matrix"), function(object, mDataType, assay, value)
 {
-  if (mDataType %in% names(object@molecularProfiles)) {
-    SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1) <- value
-  }
-  object
+    if (mDataType %in% names(object@molecularProfiles)) {
+        assay(object@molecularProfiles[[mDataType]], 1) <- value
+    }
+    object
+})
+setReplaceMethod("molecularProfiles", signature(object="CoreSet",
+        mDataType="missing", assay="missing", value="list_OR_MAE"),
+        function(object, mDataType, assay, value) {
+    object@molecularProfiles <- value
+    object
 })
 
 
@@ -846,11 +858,11 @@ setGeneric("featureInfo", function(object, mDataType, ...)
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_featureInfo(class_=.local_class, data_=.local_data)
 setMethod(featureInfo, "CoreSet", function(object, mDataType) {
-  if (mDataType %in% names(object@molecularProfiles)) {
-    return(rowData(object@molecularProfiles[[mDataType]]))
-  } else{
-    return(NULL)
-  }
+    if (mDataType %in% names(object@molecularProfiles)) {
+        return(rowData(object@molecularProfiles[[mDataType]]))
+    } else{
+        return(NULL)
+    }
 })
 
 #' @export
@@ -885,9 +897,9 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
     mDataType ="character",value="data.frame"),
     function(object, mDataType, value)
 {
-    if(mDataType %in% names(object@molecularProfiles)){
+    if (mDataType %in% names(object@molecularProfiles)) {
         rowData(object@molecularProfiles[[mDataType]]) <-
-            S4Vectors::DataFrame(value, rownames = rownames(value))
+            DataFrame(value, rownames = rownames(value))
     }
     object
 })
@@ -895,11 +907,11 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
     mDataType ="character",value="DataFrame"),
     function(object, mDataType, value)
 {
-  if(mDataType %in% names(object@molecularProfiles)){
-    rowData(object@molecularProfiles[[mDataType]]) <-
-        S4Vectors::DataFrame(value, rownames = rownames(value))
-  }
-  object
+    if (mDataType %in% names(object@molecularProfiles)) {
+        rowData(object@molecularProfiles[[mDataType]]) <-
+            DataFrame(value, rownames = rownames(value))
+    }
+    object
 })
 
 
@@ -1156,7 +1168,7 @@ setMethod("molecularProfilesSlot", signature("CoreSet"), function(object) {
 
 #' @export
 setGeneric("molecularProfilesSlot<-",
-           function(object, value) standardGeneric("molecularProfilesSlot<-"))
+    function(object, value) standardGeneric("molecularProfilesSlot<-"))
 
 #' @noRd
 .docs_CoreSet_set_molecularProfilesSlot <- function(...) .parseToRoxygen(
@@ -1183,8 +1195,7 @@ setGeneric("molecularProfilesSlot<-",
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_molecularProfilesSlot(class_=.local_class, data_=.local_data)
 setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_OR_MAE"),
-                 function(object, value)
-{
+    function(object, value) {
     # funContext <- .S4MethodContext('molecularProfilesSlot<-', class(object),
     #     class(value))
     # if (!is(value, class(object@molecularProfiles)[1])) .error(funContext,

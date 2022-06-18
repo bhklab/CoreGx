@@ -54,6 +54,8 @@
 \alias{molecularProfiles}
 \alias{molecularProfiles<-,CoreSet,character,character,matrix-method}
 \alias{molecularProfiles<-,CoreSet,character,missing,matrix-method}
+\alias{molecularProfiles<-,CoreSet,missing,missing,list-method}
+\alias{molecularProfiles<-,CoreSet,missing,missing,MutliAssayExperiment-method}
 \alias{molecularProfiles<-}
 \alias{featureInfo,CoreSet-method}
 \alias{featureInfo}
@@ -334,7 +336,8 @@ or 'both'
 \strong{molecularProfiles}: \code{matrix()} Retrieve an assay in a
 \code{SummarizedExperiment} from the \code{molecularProfiles} slot of a \code{CoreSet}
 object with the specified \code{mDataType}. Valid \code{mDataType} arguments can be
-found with \code{mDataNames(object)}. Arguments:
+found with \code{mDataNames(object)}. Exclude \code{mDataType} and \code{assay} to
+access the entire slot. Arguments:
 \itemize{
 \item assay: Optional \code{character(1)} vector specifying an assay in the
 \code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
@@ -347,7 +350,7 @@ the given \code{mDataType}.
 \strong{molecularProfiles<-}: Update an assay in a \code{SummarizedExperiment} from
 the \code{molecularProfiles} slot of a CoreSet object with the specified
 \code{mDataType}. Valid \code{mDataType} arguments can be found with
-\code{mDataNames(object)}.
+\code{mDataNames(object)}. Omit \code{mDataType} and \code{assay} to update the slot.
 \itemize{
 \item assay: Optional \code{character(1)} vector specifying an assay in the
 \code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
@@ -569,6 +572,9 @@ molecularProfiles(clevelandSmall_cSet, 'rna') <- molecularProfiles(clevelandSmal
 # Specific assay
 molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs') <-
     molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs')
+
+# Replace the whole slot
+molecularProfiles(clevelandSmall_cSet) <- molecularProfiles(clevelandSmall_cSet)
 
 featureInfo(clevelandSmall_cSet, 'rna')
 
