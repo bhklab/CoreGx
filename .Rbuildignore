@@ -26,3 +26,5 @@ local_data
 .*sql
 .vscode
 .VSCodeCounter
+.local_data
+.scripts
