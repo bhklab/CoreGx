@@ -5,7 +5,7 @@ NULL
 
 #' @importFrom BiocParallel bpparam bpworkers<- bpworkers bpprogressbar<-
 #' bpprogressbar bplapply
-#' @importFrom data.table rbindlist setDT
+#' @importFrom data.table rbindlist setDT merge.data.table
 #' @importMethodsFrom S4Vectors aggregate
 NULL
 

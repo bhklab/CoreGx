@@ -7,10 +7,11 @@ inheriting class}
 \usage{
 \S4method{endoaggregate}{LongTable}(
   x,
+  ...,
   assay,
   target = assay,
   by,
-  ...,
+  subset = TRUE,
   nthread = 1,
   progress = TRUE,
   BPPARAM = NULL,
@@ -21,6 +22,12 @@ inheriting class}
 \arguments{
 \item{x}{\code{LongTable} or inheriting class to compute aggregation on.}
 
+\item{...}{\code{call} One or more aggregations to compute for each group by in x.
+If you name aggregation calls, that will be the column name of the value
+in the resulting \code{data.table} otherwise a default name will be parsed from
+the function name and its first argument, which is assumed to be the name
+of the column being aggregated over.}
+
 \item{assay}{\code{character(1)} The assay to aggregate over.}
 
 \item{target}{\code{character(1)} The assay to assign the results to. Defaults
@@ -28,12 +35,6 @@ to \code{assay}.}
 
 \item{by}{\code{character} One or more valid column names in \code{x} to compute
 groups using.}
-
-\item{...}{\code{call} One or more aggregations to compute for each group by in x.
-If you name aggregation calls, that will be the column name of the value
-in the resulting \code{data.table} otherwise a default name will be parsed from
-the function name and its first argument, which is assumed to be the name
-of the column being aggregated over.}
 
 \item{nthread}{\code{numeric(1)} Number of threads to use for split-apply-combine
 parallelization. Uses \code{BiocParllel::bplapply} if nthread > 1 or you pass in

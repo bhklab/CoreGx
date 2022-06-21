@@ -28,10 +28,13 @@ NULL
 #'
 #' @export
 setMethod("endoaggregate", signature(x="LongTable"),
-        function(x, assay, target=assay, by, ..., nthread=1, progress=TRUE,
-        BPPARAM=NULL, enlist=TRUE, strategy=c("merge", "rbind", "cbind")) {
+        function(x, ..., assay, target=assay, by, subset=TRUE, nthread=1,
+        progress=TRUE, BPPARAM=NULL, enlist=TRUE,
+        strategy=c("merge", "rbind", "cbind")) {
+    i <- substitute(subset)
+    assay_ <- x[[assay]][eval(i), ]
     res <- aggregate2(
-        x[[assay]],
+        assay_,
         by=by,
         ...,
         nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist)
@@ -53,20 +56,26 @@ if (sys.nframe() == 0) {
     tre |>
         endoaggregate(
             assay="sensitivity",
-            target="mono_profiles",
-            mean(viability),
+            target="sensitivity_no_reps",
             mean(treatment1dose),
             mean(treatment2dose),
-            by=c("treatment1id", "treatment2id", "sampleid")
+            mean(viability),
+            by=c("treatment1id", "treatment1dose", "treatment2id", "treatment2dose", "sampleid")
         ) ->
         ntre
     ntre |>
-        aggregate(
-            assay="mono_profiles",
-            PharmacoGx:::logLogisticRegression(treatment1dose, mean_viability),
+        endoaggregate(
+            assay="sensitivity_no_reps",
+            target="mono_profiles",
+            subset=treatment2id == "",
+            PharmacoGx::logLogisticRegression(
+                mean_treatment1dose,
+                mean_viability
+            ),
             by=c("treatment1id", "treatment2id", "sampleid"),
-            enlist=FALSE,
-            nthread=6
-        ) -> test
+            nthread=20,
+            enlist=FALSE
+        ) ->
+        ntre2
 
 }

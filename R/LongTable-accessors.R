@@ -650,7 +650,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
 
     # -- update assayIndex with the new assay
     setkeyv(annotatedIndex, assayKey)
-    annotatedIndex[value, (i) := get(i)]
+    annotatedIndex[value, (i) := get(i), by=.EACHI]
     annotatedIndex[, (assayKey) := NULL]
     setkeyv(annotatedIndex, unique(c(assayNames(x), i)))
 
