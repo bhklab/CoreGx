@@ -68,14 +68,31 @@ if (sys.nframe() == 0) {
             assay="sensitivity_no_reps",
             target="mono_profiles",
             subset=treatment2id == "",
-            PharmacoGx::logLogisticRegression(
+            c(PharmacoGx::logLogisticRegression(
                 mean_treatment1dose,
-                mean_viability
+                mean_viability),
+            list(
+                mean_treatment1dose=mean_treatment1dose,
+                mean_viability)
             ),
             by=c("treatment1id", "treatment2id", "sampleid"),
             nthread=20,
             enlist=FALSE
         ) ->
         ntre2
+    ntre2 |>
+        endoaggregate(
+            assay="mono_profiles",
+            auc_recomputed = PharmacoGx::computeAUC(
+                mean_treatment1dose,
+                Hill_fit=c(unique(HS), unique(E_inf), unique(IC50))
+            ),
+            ic50_recomputed = PharmacoGx::computeIC50(
+                mean_treatment1dose,
+                Hill_fit=c(unique(HS), unique(E_inf), unique(IC50))
+            ),
+            by=c("treatment1id", "treatment2id", "sampleid")
+        ) ->
+        ntre3
 
 }
