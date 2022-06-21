@@ -3,7 +3,8 @@
 #' @include TreatmentResponseExperiment-class.R
 NULL
 
-#' @importFrom BiocParallel bpparam bpworkers bpprogressbar bplapply
+#' @importFrom BiocParallel bpparam bpworkers<- bpworkers bpprogressbar<-
+#' bpprogressbar bplapply
 #' @importFrom data.table rbindlist setDT
 #' @importMethodsFrom S4Vectors aggregate
 NULL

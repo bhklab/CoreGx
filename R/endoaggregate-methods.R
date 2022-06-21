@@ -58,14 +58,15 @@ if (sys.nframe() == 0) {
             mean(treatment1dose),
             mean(treatment2dose),
             by=c("treatment1id", "treatment2id", "sampleid")
-        ) -> ntre
+        ) ->
+        ntre
     ntre |>
         aggregate(
             assay="mono_profiles",
             PharmacoGx:::logLogisticRegression(treatment1dose, mean_viability),
             by=c("treatment1id", "treatment2id", "sampleid"),
             enlist=FALSE,
-            nthread=20
-        )
+            nthread=6
+        ) -> test
 
 }
