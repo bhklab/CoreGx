@@ -736,18 +736,18 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_molecularProfiles(class_=.local_class, data_=.local_data)
-setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
+setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay) {
     funContext <- .funContext(paste0('::molecularProlfiles,', class(object), '-method'))
     if (missing(mDataType) && missing(assay)) return(object@molecularProfiles)
     if (mDataType %in% names(object@molecularProfiles)) {
         if (!missing(assay)) {
             if (assay %in% assayNames(object@molecularProfiles[[mDataType]])) {
-                return(assay(object@molecularProfiles[[mDataType]], assay))
+                return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay))
             } else {
                 .error(funContext, (paste('Assay', assay, 'not found in the SummarizedExperiment object!')))
             }
         } else {
-            return(assay(object@molecularProfiles[[mDataType]], 1))
+            return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1))
         }
     } else {
         stop(paste0('mDataType ', mDataType, ' not found the object!'))
