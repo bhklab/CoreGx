@@ -242,6 +242,22 @@ setGeneric('buildLongTable',
     function(from, ...) standardGeneric('buildLongTable'))
 
 
+#' Perform aggregation over an S4 object, but return an object of the same
+#' class.
+#'
+#' @examples
+#' print("Generics shouldn't need examples?")
+#'
+#' @param x An `S4` method to endomorphically aggregate over.
+#' @param ... `pairlist` Allow definition of new parameters for
+#'     implementations of this generic.
+#'
+#' @return An object with the same class as `x`.
+#'
+#' @export
+setGeneric("endoaggregate", function(x, ...) standardGeneric("endoaggregate"))
+
+
 # ===== Other Generics
 
 

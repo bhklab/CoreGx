@@ -3,6 +3,11 @@
 #' @include TreatmentResponseExperiment-class.R
 NULL
 
+#' @importFrom BiocParallel bpparam bpworkers bpprogressbar bplapply
+#' @importFrom data.table rbindlist setDT
+#' @importMethodsFrom S4Vectors aggregate
+NULL
+
 #' @noRd
 .docs_CoreGx_aggregate <- function(...) CoreGx:::.parseToRoxygen(
     "
@@ -14,14 +19,16 @@ NULL
     the function name and its first argument, which is assumed to be the name
     of the column being aggregated over.
     @param nthread `numeric(1)` Number of threads to use for split-apply-combine
-    parallelization. Uses `BiocParllel::bplapply` if nthread > 1. Does not
-    modify data.table threads, so be sure to use setDTthreads for reasonable
-    nested parallelism. See details for performance considerations.
+    parallelization. Uses `BiocParllel::bplapply` if nthread > 1 or you pass in
+    `BPPARAM`. Does not modify data.table threads, so be sure to use
+    setDTthreads for reasonable nested parallelism. See details for performance
+    considerations.
+    @param progress `logical(1)` Display a progress bar for parallelized
+    computations? Only works if `bpprogressbar<-` is defined for the current
+    BiocParallel back-end.
     @param BPPARAM `BiocParallelParam` object. Use to customized the
     the parallization back-end of bplapply. Note, nthread over-rides any
-    settings from BPPARAM. For now, a progress bar is always used. If this has
-    negatively affected your mental health please feel free to open an issue
-    on GitHub at bhklab/CoreGx and we will parameterize it.
+    settings from BPPARAM as long as `bpworkers<-` is defined for that class.
     @param enlist `logical(1)` Default is `TRUE`. Set to `FALSE` to evaluate
     the first call in `...` within `data.table` groups. See details for more
     information.
@@ -84,19 +91,44 @@ NULL
 #'
 #' @seealso `data.table::[.data.table`, `BiocParallel::bplapply`
 #'
-#' @importFrom BiocParallel bpparam bpworkers bpprogressbar bplapply
-#' @importFrom data.table rbindlist setDT
-#' @importMethodsFrom S4Vectors aggregate
 #' @export
 setMethod("aggregate", signature(x="LongTable"),
-        function(x, assay, by, ..., nthread=1, BPPARAM=NULL, enlist=TRUE) {
+        function(x, assay, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
+        enlist=TRUE) {
     aggregate2(
         x[[assay]],
         by=by,
         ...,
-        nthread=nthread, BPPARAM=BPPARAM, enlist=enlist)
+        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist)
 })
 
+
+#' Functional S4 API for aggregation over a `data.table` object.
+#'
+#' @description
+#' Compute a group-by operation over a `data.table` in a functional, pipe
+#' compatible format.
+#'
+#' @details
+#' This S4 method override the default `aggregate` method for a `data.frame`
+#' and as such you need to call `aggregate.data.frame` directly to get the
+#' original S3 method for a `data.table`.
+#'
+#' @param x `data.table` to compute aggregation over.
+#' @eval .docs_CoreGx_aggregate(curly="{")
+#'
+#' @return `data.table` of aggregated results with an `aggregations` attribute
+#' capturing metadata about the last aggregation performed on the table.
+#'
+#' @export
+setMethod("aggregate", signature="data.table",
+        function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL, enlist=TRUE) {
+    aggregate2(
+        x,
+        by=by,
+        ...,
+        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist)
+})
 
 #' Functional API for data.table aggregation which allows capture of associated
 #' aggregate calls so they can be recomputed later.
@@ -108,12 +140,13 @@ setMethod("aggregate", signature(x="LongTable"),
 #'
 #' @seealso `data.table::[.data.table`, `BiocParallel::bplapply`
 #'
-#' @importFrom BiocParallel bpparam bpworkers bpprogressbar bplapply
-#' @importFrom data.table rbindlist setDT
 #' @export
-aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL, enlist=TRUE) {
+aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
+        enlist=TRUE) {
     stopifnot(is.data.table(x))
     stopifnot(is.character(by) && all(by %in% colnames(x)))
+    stopifnot(is.logical(progress) && length(progress) == 1)
+    stopifnot(is.logical(enlist) && length(enlist) == 1)
 
     # -- capture dots as a call and parse dot names, adding default names if
     # --   they are missing
@@ -131,14 +164,28 @@ aggregate2 <- function(x, by, ..., nthread=1, BPPARAM=NULL, enlist=TRUE) {
     if (length(dot_names)) names(agg_call)[call_idx] <- dot_names
 
     # -- compute the aggregates, parallelizing if nthread > 1
-    if (nthread == 1) {
+    if (nthread == 1 && is.null(BPPARAM)) {
         res <- x[, eval(agg_call), by=c(by)]
     } else {
         x_split <- split(x, by=by)
-        if (is.null(BPPARAM)) BPPARAM <- BiocParallel::bpparam()
-        if (hasMethod("bpworkers<-", signature=c(class(BPPARAM), "integer")))
+        if (is.null(BPPARAM)) {
+            BPPARAM <- BiocParallel::bpparam()
+        }
+        # optionally add progresbar
+        if (hasMethod("bpprogressbar<-", signature=c(class(BPPARAM), "logical"))) {
+            BiocParallel::bpprogressbar(BPPARAM) <- progress
+        } else if (isTRUE(progress)) {
+            warning(.warnMsg(
+                "Unable to set progressbar for BiocParallel backend: ",
+                class(BPPARAM)), .call=FALSE)
+        }
+        # optionally set nthread
+        if (hasMethod("bpworkers<-", signature=c(class(BPPARAM), "integer"))) {
             BiocParallel::bpworkers(BPPARAM) <- nthread
-        BiocParallel::bpprogressbar(BPPARAM) <- TRUE
+        } else if (nthread > 1) {
+            warning(.warnMsg("Unable to set nthread for BiocParallel backend: ",
+                class(BPPARAM)), .call=FALSE)
+        }
         res <- BiocParallel::bplapply(
             x_split,
             function(x, agg_call, by) x[, eval(substitute(agg_call)), by=c(by)],
@@ -176,10 +223,23 @@ if (sys.nframe() == 0) {
                 assay="sensitivity",
                 auc=PharmacoGx::computeAUC(drug1dose, viability),
                 by=c("drug1id", "cellid"),
-                nthread=22
+                nthread=6
             ) ->
             profiles
     })
+
+        bench::system_time({
+tre |>
+    subset(is.na(drug2dose)) |>
+    aggregate(
+        assay="sensitivity",
+        if (.N > 3) .SD,
+        by=c("drug1id", "cellid"),
+        nthread=1,
+        enlist=FALSE
+    ) ->
+    test
+        })
 
     # debug(aggregate2)
 
@@ -261,11 +321,6 @@ if (sys.nframe() == 0) {
         file.path(".local_data", "nci_treatment_response_exp.qs"),
         nthread=10
     )
-    #data(nci_TRE_small)
-    # fix use of wrong column for sensitivity
-    # tre$sensitivity <- tre$sensitivity[,
-    #     `:=`(PERCENTGROWTH=viability, viability=(TESTVALUE/CONTROLVALUE)*100)
-    # ]
     tre |>
         subset(is.na(drug2id)) |>
         aggregate(
@@ -273,7 +328,7 @@ if (sys.nframe() == 0) {
             viability=mean(viability),
             by=c("drug1id", "drug1dose", "cellid")
         ) |>
-        aggregate2(
+        aggregate(
             {
                 fit <- tryCatch({
                     PharmacoGx::logLogisticRegression(drug1dose, viability)
@@ -337,7 +392,7 @@ if (sys.nframe() == 0) {
     # -- compute synergy metrics
     ## Here score ~ combination index
     combo_profiles |>
-        aggregate2({
+        aggregate({
             # predict single agent viability for this combo
             v1 <- min(PharmacoGx:::.Hill(
                 log10(mean_drug1dose),

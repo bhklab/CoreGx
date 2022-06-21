@@ -89,6 +89,7 @@ Collate:
     'cosinePerm.R'
     'datasets.R'
     'deprecated.R'
+    'endoaggregate-methods.R'
     'globals.R'
     'gwc.R'
     'matthewCor.R'

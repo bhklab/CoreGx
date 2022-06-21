@@ -7,7 +7,7 @@
 \alias{as.data.frame.long.table}
 \title{Coerce a \code{LongTable} to a \code{TreatmentResponseExperiment}}
 \usage{
-\method{as.data.table}{long.table}(from)
+as.data.table.long.table(from)
 
 \method{as.data.frame}{long.table}(x, row.names, optional = TRUE, ...)
 }

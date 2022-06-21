@@ -5,7 +5,15 @@
 \title{Functional API for data.table aggregation which allows capture of associated
 aggregate calls so they can be recomputed later.}
 \usage{
-aggregate2(x, by, ..., nthread = 1, BPPARAM = NULL, enlist = TRUE)
+aggregate2(
+  x,
+  by,
+  ...,
+  nthread = 1,
+  progress = TRUE,
+  BPPARAM = NULL,
+  enlist = TRUE
+)
 }
 \arguments{
 \item{x}{\code{data.table}}
@@ -20,15 +28,18 @@ the function name and its first argument, which is assumed to be the name
 of the column being aggregated over.}
 
 \item{nthread}{\code{numeric(1)} Number of threads to use for split-apply-combine
-parallelization. Uses \code{BiocParllel::bplapply} if nthread > 1. Does not
-modify data.table threads, so be sure to use setDTthreads for reasonable
-nested parallelism. See details for performance considerations.}
+parallelization. Uses \code{BiocParllel::bplapply} if nthread > 1 or you pass in
+\code{BPPARAM}. Does not modify data.table threads, so be sure to use
+setDTthreads for reasonable nested parallelism. See details for performance
+considerations.}
+
+\item{progress}{\code{logical(1)} Display a progress bar for parallelized
+computations? Only works if \verb{bpprogressbar<-} is defined for the current
+BiocParallel back-end.}
 
 \item{BPPARAM}{\code{BiocParallelParam} object. Use to customized the
 the parallization back-end of bplapply. Note, nthread over-rides any
-settings from BPPARAM. For now, a progress bar is always used. If this has
-negatively affected your mental health please feel free to open an issue
-on GitHub at bhklab/CoreGx and we will parameterize it.}
+settings from BPPARAM as long as \verb{bpworkers<-} is defined for that class.}
 
 \item{enlist}{\code{logical(1)} Default is \code{TRUE}. Set to \code{FALSE} to evaluate
 the first call in \code{...} within \code{data.table} groups. See details for more
