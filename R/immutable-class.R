@@ -25,7 +25,7 @@
 #' to extend their functionality. In general, this helper class will only work
 #' for objects with an S3 interface.
 #'
-#' @param object,x Any R object
+#' @param object,x Any R object which uses S3 method dispatch
 #'
 #' @return The `object` with "immutable" prepended to its class attribute.
 #'
@@ -36,7 +36,7 @@
 #' tryCatch({ immutable_list$new <- 1 }, error=print)
 #'
 #' @seealso
-#' [`assignment-immutable`], [`setOpts-immutable`]
+#' [`assignment-immutable`], [`setOps-immutable`]
 #'
 #' @md
 #' @rdname immutable
@@ -61,9 +61,6 @@ setClassUnion("immutable_list", c("immutable", "list"))
 
 #' @title Check if an R object inherits from the immutable S3-class.
 #'
-#' @param object Any R object to check if it inherits from the "immutable"
-#' S3-class.
-#'
 #' @return `logical(1)` Does the object inherit from the "immutable" S3-class?
 #'
 #' @examples
@@ -79,7 +76,6 @@ is.immutable <- function(object) {
 
 #' @title Print method for objects inheriting from the "immutable" S3-class
 #'
-#' @param x An object inheriting from the "immutable" S3-class.
 #' @param ... Fallthrough arguments to `print.default`.
 #'
 #' @return None, `invisible(NULL)`
@@ -101,8 +97,7 @@ show.immutable <- function(x) print(x)
 
 # -- Intercept subset and concatentate operations to return another "immutable"
 
-#' @title Intercept concatenation for "immutable" class objects to return
-#' another "immutable" class object.
+#' @title Intercept concatenation for "immutable" class objects to return another "immutable" class object.
 #'
 #' @description
 #' Ensures that `c` and `append` to an "immutable" class object return an

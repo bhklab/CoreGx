@@ -57,6 +57,7 @@
 \alias{molecularProfiles<-,CoreSet,missing,missing,list-method}
 \alias{molecularProfiles<-,CoreSet,missing,missing,MutliAssayExperiment-method}
 \alias{molecularProfiles<-}
+\alias{molecularProfiles<-,CoreSet,missing,missing,list_OR_MAE-method}
 \alias{featureInfo,CoreSet-method}
 \alias{featureInfo}
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
@@ -152,6 +153,10 @@
 \S4method{molecularProfiles}{CoreSet}(object, mDataType, assay)
 
 \S4method{molecularProfiles}{CoreSet,character,character,matrix}(object, mDataType, assay) <- value
+
+\S4method{molecularProfiles}{CoreSet,character,missing,matrix}(object, mDataType, assay) <- value
+
+\S4method{molecularProfiles}{CoreSet,missing,missing,list_OR_MAE}(object, mDataType, assay) <- value
 
 \S4method{featureInfo}{CoreSet}(object, mDataType)
 

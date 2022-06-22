@@ -2,8 +2,7 @@
 % Please edit documentation in R/immutable-class.R
 \name{c.immutable}
 \alias{c.immutable}
-\title{Intercept concatenation for "immutable" class objects to return
-another "immutable" class object.}
+\title{Intercept concatenation for "immutable" class objects to return another "immutable" class object.}
 \usage{
 \method{c}{immutable}(x, ...)
 }

@@ -13,6 +13,10 @@ NULL
 #' @param assay `character(1)` The assay to aggregate over.
 #' @param target `character(1)` The assay to assign the results to. Defaults
 #' to `assay`.
+#' @param subset `call` An R call to evaluate before perfoming an aggregate.
+#' This allows you to aggregate over a subset of columns in an assay but have
+#' it be assigned to the parent object. Default is TRUE, which includes all
+#' rows. Passed through as the `i` argument in `[.data.table`.
 ## TODO:: Do we need this parameter? Is there any case where a join wouldn't work?
 #' @param strategy `character(1)` Assuming `target` is an existing assay
 #' in the `LongTable`, how should the assays be merged? Options are `cbind`,

@@ -16,8 +16,8 @@
 \alias{colDataMap<-TREDataMapper,List-method}
 \alias{colDataMap<-}
 \alias{assayMap,TREDataMapper-method}
-\alias{assayMap,LongTableDataMapper,list-method}
-\alias{assayMap,LongTableDataMapper,List-method}
+\alias{assayMap,TREDataMapper,list-method}
+\alias{assayMap,TREDataMapper,List-method}
 \alias{assayMap}
 \alias{assayMap<-,TREDataMapper,list_OR_List-method}
 \alias{assayMap<-,TREDataMapper,list-method}

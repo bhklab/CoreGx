@@ -36,6 +36,11 @@ to \code{assay}.}
 \item{by}{\code{character} One or more valid column names in \code{x} to compute
 groups using.}
 
+\item{subset}{\code{call} An R call to evaluate before perfoming an aggregate.
+This allows you to aggregate over a subset of columns in an assay but have
+it be assigned to the parent object. Default is TRUE, which includes all
+rows. Passed through as the \code{i} argument in \verb{[.data.table}.}
+
 \item{nthread}{\code{numeric(1)} Number of threads to use for split-apply-combine
 parallelization. Uses \code{BiocParllel::bplapply} if nthread > 1 or you pass in
 \code{BPPARAM}. Does not modify data.table threads, so be sure to use

@@ -201,7 +201,7 @@ setGeneric('rowDataMap<-', function(object, ..., value)
     {dim_}DataMap({data_}) <- list(c('{id_col_}'), c())
 
     @md
-    @aliases rowDataMap<-,{class_},list-method {dim_}DataMap<-{class_},List-method {dim_}DataMap<-
+    @aliases rowDataMap<-,{class_},list-method {dim_}DataMap<-{class_},List-method
     @exportMethod {dim_}DataMap<-
     ",
     ...

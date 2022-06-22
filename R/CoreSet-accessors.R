@@ -808,6 +808,7 @@ setReplaceMethod("molecularProfiles", signature(object="CoreSet",
     }
     object
 })
+#' @rdname CoreSet-accessors
 setReplaceMethod("molecularProfiles",
     signature(object="CoreSet", mDataType ="character", assay="missing",
         value="matrix"), function(object, mDataType, assay, value)
@@ -817,6 +818,7 @@ setReplaceMethod("molecularProfiles",
     }
     object
 })
+#' @rdname CoreSet-accessors
 setReplaceMethod("molecularProfiles", signature(object="CoreSet",
         mDataType="missing", assay="missing", value="list_OR_MAE"),
         function(object, mDataType, assay, value) {

@@ -9,11 +9,9 @@
 \alias{rowDataMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{rowDataMap<-,LongTableDataMapper,list-method}
 \alias{rowDataMap<-LongTableDataMapper,List-method}
-\alias{rowDataMap<-}
 \alias{colDataMap,LongTableDataMapper-method}
 \alias{colDataMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{colDataMap<-LongTableDataMapper,List-method}
-\alias{colDataMap<-}
 \alias{assayMap,LongTableDataMapper-method}
 \alias{assayMap,LongTableDataMapper,list-method}
 \alias{assayMap,LongTableDataMapper,List-method}

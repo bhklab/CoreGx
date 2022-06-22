@@ -18,14 +18,9 @@ is.immutable(object)
 show.immutable(x)
 }
 \arguments{
-\item{object, x}{Any R object}
-
-\item{x}{An object inheriting from the "immutable" S3-class.}
+\item{object, x}{Any R object which uses S3 method dispatch}
 
 \item{...}{Fallthrough arguments to \code{print.default}.}
-
-\item{object}{Any R object to check if it inherits from the "immutable"
-S3-class.}
 }
 \value{
 The \code{object} with "immutable" prepended to its class attribute.
@@ -70,5 +65,5 @@ is.immutable(immutable_list)
 
 }
 \seealso{
-\code{\link{assignment-immutable}}, \code{\link{setOpts-immutable}}
+\code{\link{assignment-immutable}}, \code{\link{setOps-immutable}}
 }
