@@ -1720,21 +1720,19 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
     if (is(treatmentResponse(object), 'LongTable')) {
 
         ## TODO:: validate value
-        longTable <- treatmentResponse(object)
+        tre <- treatmentResponse(object)
 
-        viabilityCols <- setdiff(colnames(assay(longTable, 'sensitivity',
-            metadata=FALSE, key=FALSE)), "sensitivity")
+        viabilityCols <- assayCols(tre, "sensitivity")
         # Handle the non-treatment combo case
         if (length(viabilityCols) != ncol(value)) {
             valueDT <- as.data.table(value)
             valueDT <- dcast(valueDT, V1 + V2 ~ V3, value.var='value')
-            valueDT[, V2 := NULL] # drop the column names
             setnames(valueDT, old=c('Dose', 'Viability'),
                 new=c('treatment1dose', 'viability'))
-            valueDT[, c('treatment1id', 'sample_uid') := tstrsplit(V1, '_', type.convert=TRUE)]
-            valueDT[, (colIDs(longTable)) := tstrsplit(sample_uid, ':', type.convert=TRUE)]
-            valueDT[, c('V1', 'sample_uid') := NULL]
-            assay(longTable, i='sensitivity') <- valueDT
+            valueDT[, V2 := NULL]  # delete the array column names
+            valueDT[, (idCols(tre)) := tstrsplit(V1, ':|_', type.convert=TRUE)]
+            valueDT[, V1 := NULL]
+            assay(tre, i='sensitivity') <- valueDT
         } else {
             # Process into a the proper format for the sensitivity assay
             # NOTE: as.matrix deals with the case where there is only a single
@@ -1745,22 +1743,16 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
                 keep.rownames='rn', na.rm=FALSE)
             coerceCols <- colnames(raw)[-1]
             raw[, (coerceCols) := lapply(.SD, as.numeric), .SDcols=!'rn']
-            raw[, c('row_id', 'col_id') := tstrsplit(rn, '_')]
-            raw[, (rowIDs(longTable)) := tstrsplit(row_id, ':', type.convert=TRUE)]
-            raw[, (colIDs(longTable)) := tstrsplit(col_id, ':', type.convert=TRUE)]
-            raw[, c('row_id', 'col_id', 'rn') := NULL]
-            colnames(raw) <- gsub('^dose|^V', 'viability', colnames(raw))
-
+            raw[, (idCols(tre)) := tstrsplit(rn, ':|_', type.convert=TRUE)]
+            raw[, c('rn') := NULL]
+            colnames(raw) <- gsub('^dose\\d*|^V\\d*', 'viability', colnames(raw))
             # Update the assay
-            assay(longTable, i='sensitivity') <- raw
+            assay(tre, i='sensitivity') <- raw
         }
 
         # Update the object
-        treatmentResponse(object) <- longTable
+        treatmentResponse(object) <- tre
     } else {
-        if (!is.array(value)) .error(funContext, "Values assigned to the
-            sensitivityRaw slot must be an array of experiment by dose by
-            values!")
         object@treatmentResponse$raw <- value
         object
     }

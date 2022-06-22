@@ -484,9 +484,9 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'),
 #'   joined to the assay. This retrieves both the row and column identifiers
 #'   and returns them joined to the assay. For
 #' @param summarize `logical(1)` If the assays is a summary where some of
-#' `idCols(x)` are no in the key for the assay `i`, then those missing columns
-#' are dropped. Defaults to `withDimnames`. When `metadata` is `TRUE`, only
-#' metadata columns with 1:1 cardinality with the assay key for `i`.
+#'   `idCols(x)` are not in `assayKeys(x, i)`, then those missing columns
+#'   are dropped. Defaults to `FALSE`. When `metadata` is `TRUE`, only
+#'   metadata columns with 1:1 cardinality with the assay keys for `i`.
 #' @param metadata `logical(1)` Should all of the metadata also be joined to
 #'   the assay. This is useful when modifying assays as the resulting list
 #'   has all the information needed to recreated the LongTable object. Defaults
@@ -503,7 +503,7 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'),
 #' @import data.table
 #' @export
 setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
-        summarize=withDimnames, metadata=withDimnames,
+        summarize=FALSE, metadata=withDimnames,
         key=!(summarize || withDimnames), ...) {
     # secret arguments for internal use
     if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {

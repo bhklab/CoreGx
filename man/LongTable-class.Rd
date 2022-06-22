@@ -64,7 +64,7 @@
   x,
   i,
   withDimnames = TRUE,
-  summarize = withDimnames,
+  summarize = FALSE,
   metadata = withDimnames,
   key = !(summarize || withDimnames),
   ...
@@ -74,7 +74,14 @@
 
 \S4method{assayNames}{LongTable}(x)
 
-\S4method{[[}{LongTable,ANY,ANY}(x, i, withDimnames = TRUE, metadata = withDimnames, keys = !withDimnames)
+\S4method{[[}{LongTable,ANY,ANY}(
+  x,
+  i,
+  withDimnames = TRUE,
+  summarize = withDimnames,
+  metadata = withDimnames,
+  keys = !withDimnames
+)
 
 \S4method{dim}{LongTable}(x)
 
@@ -94,7 +101,7 @@ instead of the column names? Default is FALSE.}
 !withDimnames. This is incompatible with \code{summarize=TRUE}, which will
 drop the key columns regardless of the value of this argument.}
 
-\item{i}{\code{character} name or \code{integer} index of the desired assay.}
+\item{i}{\code{character(1)} name or \code{integer} index of the desired assay.}
 
 \item{x}{The \code{LongTable} object to retrieve the dimnames for.}
 
@@ -115,17 +122,15 @@ assay has only some of the row or column indentifiers and an assay,
 \code{i}, already exists in \code{x}, then try join=TRUE to attempt to join with
 existing data.}
 
-\item{withDimnames}{\code{logical} Should the row and column IDs be joined to
+\item{withDimnames}{\code{logical(1)} Should the row and column IDs be joined to
 the assay. Default is TRUE to allow easy use of group by arguments when
 performing data aggregation using the \code{data.table} API.}
 
 \item{metadata}{\code{logical} Should the row and column metadata also
 be joined to the to the returned assay. Default is withDimnames.}
 
-\item{summarize}{\code{logical(1)} If the assays is a summary where some of
-\code{idCols(x)} are no in the key for the assay \code{i}, then those missing columns
-are dropped. Defaults to \code{withDimnames}. When \code{metadata} is \code{TRUE}, only
-metadata columns with 1:1 cardinality with the assay key for \code{i}.}
+\item{summarize}{\code{logical(1)} For summarized assays, should columns which
+were aggregated over be dropped?}
 
 \item{keys}{\code{logical} Should the row and column keys also be returned?
 Defaults to !withDimnames.}

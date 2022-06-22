@@ -405,10 +405,12 @@ setMethod('[', signature('LongTable'),
 #' merckLongTable[['sensitivity']]
 #'
 #' @param x `LongTable` object to retrieve assays from
-#' @param i `character` name or `integer` index of the desired assay.
-#' @param withDimnames `logical` Should the row and column IDs be joined to
+#' @param i `character(1)` name or `integer` index of the desired assay.
+#' @param withDimnames `logical(1)` Should the row and column IDs be joined to
 #'    the assay. Default is TRUE to allow easy use of group by arguments when
 #'    performing data aggregation using the `data.table` API.
+#' @param summarize `logical(1)` For summarized assays, should columns which
+#' were aggregated over be dropped?
 #' @param metadata `logical` Should the row and column metadata also
 #'    be joined to the to the returned assay. Default is withDimnames.
 #' @param keys `logical` Should the row and column keys also be returned?
@@ -418,7 +420,7 @@ setMethod('[', signature('LongTable'),
 #' @import data.table
 #' @export
 setMethod('[[', signature('LongTable'), function(x, i, withDimnames=TRUE,
-        metadata=withDimnames, keys=!withDimnames) {
+        summarize=withDimnames, metadata=withDimnames, keys=!withDimnames) {
     funContext <- .S4MethodContext('[[', class(x))
 
     if (metadata && !withDimnames) {
