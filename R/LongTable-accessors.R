@@ -380,7 +380,7 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
             call.=FALSE)
 
     # optionally join with rowData and colData
-    assayIndex <- mutable(getIntern(x)$assayIndex)
+    assayIndex <- assayIndex(x)
     if (metadata) {
         rData <- rowData(x, key=TRUE)
         cData <- colData(x, key=TRUE)
@@ -543,7 +543,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
     ]))
 
     # handle summarized assays
-    aKeys <- assayKey(x, assayName)
+    aKeys <- assayKeys(x, assayName)
     # only compute summaries for assays that are summarized actually summarized
     summarize <- summarize && !all(idCols(x) %in% aKeys)
     if (summarize) {
@@ -597,7 +597,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
         }
         # use of %in% should maintain column ordering gaurantees
         assayData <- assayData[, colnames(assayData) %in% summaryCols, with=FALSE]
-        setkeyv(assayData, aKeyss)
+        setkeyv(assayData, aKeys)
     }
 
     ## Add [] to ensure assay always prints, even after modify by reference

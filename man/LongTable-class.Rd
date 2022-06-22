@@ -124,9 +124,8 @@ be joined to the to the returned assay. Default is withDimnames.}
 
 \item{summarize}{\code{logical(1)} If the assays is a summary where some of
 \code{idCols(x)} are no in the key for the assay \code{i}, then those missing columns
-are dropped. Defaults to \code{withDimnames}. Incompatible with \code{metadata=TRUE}.
-Set to \code{FALSE} to return the \code{idCols} which were summarized over in the
-\code{aggregate} call.}
+are dropped. Defaults to \code{withDimnames}. When \code{metadata} is \code{TRUE}, only
+metadata columns with 1:1 cardinality with the assay key for \code{i}.}
 
 \item{keys}{\code{logical} Should the row and column keys also be returned?
 Defaults to !withDimnames.}

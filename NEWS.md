@@ -15,6 +15,8 @@ but assigns the result back to the object and returns the updated object.
 Thus this method is an endomorphic version of aggregate.
 * Added new argument `summarize` to `assay,LongTable-method` which only
 attaches columns which have been summarized over if `FALSE`
+* Added `assayCols` and `assayKeys` helper methods to retrive valid assay
+column names or the key columns for an assay, respectively.
 
 
 ## v 2.1.2

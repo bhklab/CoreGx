@@ -513,7 +513,7 @@ setMethod("assayIndex", signature(x="LongTable"), function(x) {
 #' @return A `mutable` copy of the "assayIndex" for `x`
 #'
 #' @export
-setMethod("assayKey", signature(x="LongTable"), function(x, i) {
+setMethod("assayKeys", signature(x="LongTable"), function(x, i) {
     keys <- mutable(getIntern(x, "assayKeys"))
     # error handling occurs in `[[`
     if (!missing(i)) keys[[i]] else keys
@@ -541,7 +541,13 @@ setMethod("assayKey", signature(x="LongTable"), function(x, i) {
 #' @export
 setMethod('assayCols', signature(object='LongTable'),
         function(object, i) {
-    keys <- assayKey(object)
+    if (!missing(i)) {
+        stopifnot(is.numeric(i) || is.character(i))
+        stopifnot(length(i) == 1)
+        stopifnot(i %in% assayNames(object) ||
+            i %in% seq_along(assayNames(object)))
+    }
+    keys <- assayKeys(object)
     assayColnames <- Map(setdiff,
         x=lapply(assays(object, raw=TRUE), FUN=colnames),
         y=as.list(assayNames(object))

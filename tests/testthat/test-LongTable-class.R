@@ -87,17 +87,7 @@ testthat::test_that("`LongTable` constructor method works with valid inputs", {
 # == assayCols
 
 testthat::test_that("`assayCols,LongTable-method` retrieves specified assay's column names",{
-    testthat::expect_error({ assay_cols <- assayCols(tre, i = 1:2) },
-        regexp = ".*The i parameter only accepts a single assay name or index.*"
-    )
-    testthat::expect_error({
-        assay_cols <- assayCols(tre, i = (length(assayNames(tre)) + 1))
-        },
-        regexp = ".*The specified index is invalid.*"
-    )
-    testthat::expect_error({
-        assay_cols <- assayCols(tre, i = paste0(assayNames(tre), collapse = ""))
-        },
-        regexp = ".*The specified index is invalid.*"
-    )
+    testthat::expect_error({ assayCols(tre, i = 1:2) })
+    testthat::expect_error({ assayCols(tre, i = (length(assayNames(tre))) + 1) })
+    testthat::expect_error({ assayCols(tre, i = paste0(assayNames(tre), collapse = "")) })
 })

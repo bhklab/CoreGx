@@ -1,5 +1,6 @@
 #' @include CoreSet-class.R LongTable-class.R
 #' @importClassesFrom MultiAssayExperiment MultiAssayExperiment
+#' @importFrom MultiAssayExperiment MultiAssayExperiment
 #' @import checkmate
 NULL
 

@@ -130,14 +130,22 @@ testthat::test_that("`assay<-LongTable-method` allows simple summary assignments
         by=.(drug1id, drug2id, cellid)
     ]
     testthat::expect_silent(ntre$sens_sum <- sens_sum)
+    # ensure that the returned assay matches the assigned assay when
+    #   summarize=TRUE (the default)
+    testthat::expect_true(all.equal(
+        sens_sum,
+        ntre$sens_sum[, colnames(sens_sum), with=FALSE],
+        check.attributes=FALSE
+    ))
+    # test that summarzie=FALSE attaches all original data
     testthat::expect_true(all.equal(
         rowIDs(tre, data=TRUE),
-        unique(ntre$sens_sum[, rowIDs(ntre), with=FALSE]),
+        unique(assay(ntre, "sens_sum", summarize=FALSE)[, rowIDs(ntre), with=FALSE]),
         check.attributes=FALSE
     ))
     testthat::expect_true(all.equal(
         colIDs(tre, data=TRUE),
-        unique(ntre$sens_sum[, colIDs(ntre), with=FALSE])[order(mget(colIDs(ntre)))],
+        unique(assay(ntre, "sens_sum", summarize=FALSE)[, colIDs(ntre), with=FALSE]),
         check.attributes=FALSE
     ))
 })

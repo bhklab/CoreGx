@@ -22,7 +22,8 @@
 #' WARNING: This implementation is unable to intercept modifications to a
 #' `data.table` via the `set*` group of methods. This is because these methods
 #' are not S3 generics and therefore no mechanism exists for hooking into them
-#' to extend their functionality.
+#' to extend their functionality. In general, this helper class will only work
+#' for objects with an S3 interface.
 #'
 #' @param object,x Any R object
 #'
@@ -34,6 +35,12 @@
 #' # errors during assignment operations
 #' tryCatch({ immutable_list$new <- 1 }, error=print)
 #'
+#' @seealso
+#' [`assignment-immutable`], [`setOpts-immutable`]
+#'
+#' @md
+#' @rdname immutable
+#' @name immutable
 #' @export
 immutable <- function(object) {
     if (isS4(object)) stop("Can only set immutability for base and S3 classes!")
@@ -42,6 +49,8 @@ immutable <- function(object) {
 }
 
 # register the new S3 class, so it can be used in S4 method dispatch
+#' @rdname immutable
+#' @name immutable
 #' @export
 setOldClass("immutable")
 
@@ -61,6 +70,7 @@ setClassUnion("immutable_list", c("immutable", "list"))
 #' immutable_list <- immutable(as.list(1:5))
 #' is.immutable(immutable_list)
 #'
+#' @rdname immutable
 #' @export
 is.immutable <- function(object) {
     is(object, "immutable")
@@ -74,6 +84,7 @@ is.immutable <- function(object) {
 #'
 #' @return None, `invisible(NULL)`
 #'
+#' @rdname immutable
 #' @md
 #' @export
 print.immutable <- function(x, ...) {
@@ -127,7 +138,7 @@ c.immutable <- function(x, ...) {
 #' immut_mat[1:5, 1:5]
 #'
 #' @md
-#' @aliases subset, [, [[, $
+#' @aliases subset.immutable, [.immutable, [[.immutable, $.immutable
 #' @export
 subset.immutable <- function(x, ...) {
     sub_obj <- NextMethod()
@@ -193,7 +204,9 @@ subset.immutable <- function(x, ...) {
 #'
 #' @md
 #' @usage \\method{subset}{immutable}(object, ...) <- value
-#' @aliases subset<-, [<-, [[<-, $<-, colnames<-, rownames<-, dimnames<-, names<-
+#' @aliases subset<-.immutable, [<-.immutable, [[<-.immutable, $<-.immubtale,
+#' colnames<-.immutable, rownames<-.immutable, dimnames<-.immutable,
+#' names<-.immutable
 #' @export
 `subset<-.immutable` <- function(object, ..., value) {
     stop(.immutable_emsg, call.=FALSE)

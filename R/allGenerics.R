@@ -269,7 +269,7 @@ setGeneric("endoaggregate", function(x, ...) standardGeneric("endoaggregate"))
 #' @return An object representing the "assayKeys" of an `S4` object.
 #'
 #' @export
-setGeneric("assayKey", function(x, ...) standardGeneric("assayKey"))
+setGeneric("assayKeys", function(x, ...) standardGeneric("assayKeys"))
 
 
 #' Retrieve and assayIndex

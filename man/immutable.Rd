@@ -4,18 +4,35 @@
 \name{immutable}
 \alias{immutable}
 \alias{immutable_list-class}
+\alias{is.immutable}
+\alias{print.immutable}
 \alias{show.immutable}
 \title{Constructor for "immutable" S3-class property}
 \usage{
 immutable(object)
 
+is.immutable(object)
+
+\method{print}{immutable}(x, ...)
+
 show.immutable(x)
 }
 \arguments{
 \item{object, x}{Any R object}
+
+\item{x}{An object inheriting from the "immutable" S3-class.}
+
+\item{...}{Fallthrough arguments to \code{print.default}.}
+
+\item{object}{Any R object to check if it inherits from the "immutable"
+S3-class.}
 }
 \value{
 The \code{object} with "immutable" prepended to its class attribute.
+
+\code{logical(1)} Does the object inherit from the "immutable" S3-class?
+
+None, \code{invisible(NULL)}
 }
 \description{
 This method should allow any S3 object in R to become immutable by
@@ -39,7 +56,8 @@ environment in both the original and copy of the object.
 WARNING: This implementation is unable to intercept modifications to a
 \code{data.table} via the \verb{set*} group of methods. This is because these methods
 are not S3 generics and therefore no mechanism exists for hooking into them
-to extend their functionality.
+to extend their functionality. In general, this helper class will only work
+for objects with an S3 interface.
 }
 \examples{
 immutable_list <- immutable(as.list(1:5))
@@ -47,4 +65,10 @@ class(immutable_list)
 # errors during assignment operations
 tryCatch({ immutable_list$new <- 1 }, error=print)
 
+immutable_list <- immutable(as.list(1:5))
+is.immutable(immutable_list)
+
+}
+\seealso{
+\code{\link{assignment-immutable}}, \code{\link{setOpts-immutable}}
 }
