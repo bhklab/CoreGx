@@ -8,7 +8,7 @@ class.}
 endoaggregate(x, ...)
 }
 \arguments{
-\item{x}{An \code{S4} method to endomorphically aggregate over.}
+\item{x}{An \code{S4} object to endomorphically aggregate over.}
 
 \item{...}{\code{pairlist} Allow definition of new parameters for
 implementations of this generic.}

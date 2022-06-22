@@ -63,9 +63,10 @@
 \S4method{assay}{LongTable,ANY}(
   x,
   i,
-  withDimnames = FALSE,
+  withDimnames = TRUE,
+  summarize = withDimnames,
   metadata = withDimnames,
-  key = !withDimnames,
+  key = !(summarize || withDimnames),
   ...
 )
 
@@ -90,7 +91,8 @@
 instead of the column names? Default is FALSE.}
 
 \item{key}{\code{logical} Should the key columns also be returned? Defaults to
-!withDimnames.}
+!withDimnames. This is incompatible with \code{summarize=TRUE}, which will
+drop the key columns regardless of the value of this argument.}
 
 \item{i}{\code{character} name or \code{integer} index of the desired assay.}
 
@@ -119,6 +121,12 @@ performing data aggregation using the \code{data.table} API.}
 
 \item{metadata}{\code{logical} Should the row and column metadata also
 be joined to the to the returned assay. Default is withDimnames.}
+
+\item{summarize}{\code{logical(1)} If the assays is a summary where some of
+\code{idCols(x)} are no in the key for the assay \code{i}, then those missing columns
+are dropped. Defaults to \code{withDimnames}. Incompatible with \code{metadata=TRUE}.
+Set to \code{FALSE} to return the \code{idCols} which were summarized over in the
+\code{aggregate} call.}
 
 \item{keys}{\code{logical} Should the row and column keys also be returned?
 Defaults to !withDimnames.}

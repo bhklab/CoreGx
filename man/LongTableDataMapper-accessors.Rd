@@ -6,13 +6,11 @@
 \alias{rawdata,LongTableDataMapper-method}
 \alias{rawdata<-,LongTableDataMapper,list-method}
 \alias{rowDataMap,LongTableDataMapper-method}
-\alias{rowDataMap}
 \alias{rowDataMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{rowDataMap<-,LongTableDataMapper,list-method}
 \alias{rowDataMap<-LongTableDataMapper,List-method}
 \alias{rowDataMap<-}
 \alias{colDataMap,LongTableDataMapper-method}
-\alias{colDataMap}
 \alias{colDataMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{colDataMap<-LongTableDataMapper,List-method}
 \alias{colDataMap<-}
@@ -25,10 +23,8 @@
 \alias{assayMap<-,LongTableDataMapper,List-methhod}
 \alias{assayMap<-}
 \alias{metadataMap,LongTableDataMapper-method}
-\alias{metadataMap}
 \alias{metadataMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{metadataMap<-,LongTableDataMapper-method}
-\alias{metadataMap<-}
 \title{Accessing and modifying data in a \code{LongTableDataMapper} object.}
 \usage{
 \S4method{rawdata}{LongTableDataMapper,list}(object) <- value

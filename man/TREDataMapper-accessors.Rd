@@ -24,10 +24,8 @@
 \alias{assayMap<-,TREDataMapper,List-methhod}
 \alias{assayMap<-}
 \alias{metadataMap,TREDataMapper-method}
-\alias{metadataMap}
 \alias{metadataMap<-,TREDataMapper,list_OR_List-method}
 \alias{metadataMap<-,TREDataMapper-method}
-\alias{metadataMap<-}
 \title{Accessing and modifying data in a \code{TREDataMapper} object.}
 \usage{
 \S4method{rawdata}{TREDataMapper,list}(object) <- value

@@ -1,4 +1,5 @@
 #' @include immutable-class.R
+#' @include allGenerics.R
 NULL
 
 #' @title LongTable class definition
@@ -474,6 +475,51 @@ setMethod('colMeta', signature(object='LongTable'),
     if (data) colData(object, key=TRUE)[, ..cols] else cols
 })
 
+
+
+#' Retrieve the unique identifier columns used for primary keys in rowData and
+#'    colData.
+#'
+#' @examples
+#' idCols(merckLongTable)
+#'
+#' @param object `LongTable`
+#'
+#' @return `character` A character vector containing the unique rowIDs and
+#'   colIDs in a LongTable object.
+#'
+#' @export
+setMethod('idCols', signature('LongTable'),
+    function(object) {
+    return(unique(c(rowIDs(object), colIDs(object))))
+})
+
+#' Retrieve a copy of the assayIndex from the `@.intern` slot.
+#'
+#' @param `x` A `LongTable` or inheriting class.
+#'
+#' @return A `mutable` copy of the "assayIndex" for `x`
+#'
+#' @export
+setMethod("assayIndex", signature(x="LongTable"), function(x) {
+    mutable(getIntern(x, "assayIndex"))
+})
+
+#' Retrieve a copy of the assayKey from the `@.intern` slot.
+#'
+#' @param `x` A `LongTable` or inheriting class.
+#' @param `i` An optional valid assay name or index in `x`.
+#'
+#' @return A `mutable` copy of the "assayIndex" for `x`
+#'
+#' @export
+setMethod("assayKey", signature(x="LongTable"), function(x, i) {
+    keys <- mutable(getIntern(x, "assayKeys"))
+    # error handling occurs in `[[`
+    if (!missing(i)) keys[[i]] else keys
+})
+
+
 #' Retrieve the value columns for the assays in a LongTable
 #'
 #' @examples
@@ -494,36 +540,12 @@ setMethod('colMeta', signature(object='LongTable'),
 #' @import data.table
 #' @export
 setMethod('assayCols', signature(object='LongTable'),
-    function(object, i) {
-
-    colNameList <- lapply(assays(object, key=FALSE), names)
-    if (!missing(i)) {
-        if (length(i) > 1) stop(.errorMsg('The i parameter only accepts a ',
-            'single assay name or index'))
-
-        if ((is.numeric(i) && i < length(colNameList)) ||
-            (is.character(i) && i %in% names(colNameList)))
-            colNameList[[i]]
-        else
-            stop(.errorMsg("The specified index is invalid!"))
-    } else {
-        colNameList
-    }
-})
-
-#' Retrieve the unique identifier columns used for primary keys in rowData and
-#'    colData.
-#'
-#' @examples
-#' idCols(merckLongTable)
-#'
-#' @param object `LongTable`
-#'
-#' @return `character` A character vector containing the unique rowIDs and
-#'   colIDs in a LongTable object.
-#'
-#' @export
-setMethod('idCols', signature('LongTable'),
-    function(object) {
-    return(unique(c(rowIDs(object), colIDs(object))))
+        function(object, i) {
+    keys <- assayKey(object)
+    assayColnames <- Map(setdiff,
+        x=lapply(assays(object, raw=TRUE), FUN=colnames),
+        y=as.list(assayNames(object))
+    )
+    assayCols <- Map(c, keys, assayColnames)
+    if (!missing(i)) assayCols[[i]] else assayCols
 })

@@ -126,6 +126,7 @@ setReplaceMethod("rawdata", signature=c(object="TREDataMapper",
 #' @eval
 #' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_4,
 #' data_=.local_data_4)
+#' @aliases rowDataMap
 setMethod('rowDataMap', signature(object='TREDataMapper'), function(object) {
     callNextMethod()
 })
@@ -135,6 +136,7 @@ setMethod('rowDataMap', signature(object='TREDataMapper'), function(object) {
 #' @eval
 #' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_4,
 #' data_=.local_data_4, id_col_='treatmentid')
+#' @aliases rowDataMap<-
 setReplaceMethod('rowDataMap', signature(object='TREDataMapper',
         value='list_OR_List'), function(object, value) {
     callNextMethod()
@@ -173,6 +175,7 @@ setMethod("rowData", signature(x="TREDataMapper"), function(x, key=TRUE) {
 #' @eval
 #' .docs_LongTableDataMapper_get_dimDataMap(dim_='col', class_=.local_class_4,
 #' data_=.local_data_4)
+#' @aliases colDataMap
 setMethod('colDataMap', signature(object='TREDataMapper'),
         function(object) {
     callNextMethod()
@@ -182,6 +185,7 @@ setMethod('colDataMap', signature(object='TREDataMapper'),
 #' @eval
 #' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_4,
 #' data_=.local_data_4, id_col_='sampleid')
+#' @aliases colDataMap<-
 setReplaceMethod('colDataMap',
         signature(object="TREDataMapper", value="list_OR_List"),
         function(object, value) {

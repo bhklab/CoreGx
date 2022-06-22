@@ -480,14 +480,21 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'),
 #' @param x `LongTable` The `LongTable` object to get the assay from.
 #' @param i `integer` or `character` vector containing the index or name
 #'   of the assay, respectively.
-#' @param withDimnames `logical` Should the dimension names be returned
+#' @param withDimnames `logical(1)` Should the dimension names be returned
 #'   joined to the assay. This retrieves both the row and column identifiers
-#'   and returns them joined to the assay.
-#' @param metadata `logical` Should all of the metadata also be joined to
+#'   and returns them joined to the assay. For
+#' @param summarize `logical(1)` If the assays is a summary where some of
+#' `idCols(x)` are no in the key for the assay `i`, then those missing columns
+#' are dropped. Defaults to `withDimnames`. When `metadata` is `TRUE`, only
+#' metadata columns with 1:1 cardinality with the assay key for `i`.
+#' @param metadata `logical(1)` Should all of the metadata also be joined to
 #'   the assay. This is useful when modifying assays as the resulting list
-#'   has all the information needed to recreated the LongTable object.
+#'   has all the information needed to recreated the LongTable object. Defaults
+#'   to `withDimnames`.
 #' @param key `logical` Should the key columns also be returned? Defaults to
-#'   !withDimnames.
+#'   !withDimnames. This is incompatible with `summarize=TRUE`, which will
+#'   drop the key columns regardless of the value of this argument.
+#'
 #' @param ... For developer use only! Pass raw=TRUE to return the slot for
 #'   modification by reference.
 #'
@@ -495,8 +502,9 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'),
 #' @importFrom crayon magenta cyan
 #' @import data.table
 #' @export
-setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
-        metadata=withDimnames, key=!withDimnames, ...) {
+setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
+        summarize=withDimnames, metadata=withDimnames,
+        key=!(summarize || withDimnames), ...) {
     # secret arguments for internal use
     if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {
         return(x@assays[[i]])
@@ -521,14 +529,27 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
             ' withDimnames=FALSE. Ignoring the metadata argument.'),
             call.=FALSE)
 
+    if (summarize && key)
+        warning(.warnMSg('\n[CoreGx::assay] Cannot use key=TRUE when',
+            ' summarize=TRUE. Ignoring the key argument.'))
+
     # extract the specified assay
     assayData <- copy(x@assays[[keepAssay]])
 
     # optionally join to rowData and colData
-    assayIndex <- mutable(unique(na.omit(getIntern(x, "assayIndex")[,
+    assayIndex <- na.omit(unique(assayIndex(x)[,
         c("rowKey", "colKey", assayName),
         with=FALSE
-    ])))
+    ]))
+
+    # handle summarized assays
+    aKeys <- assayKey(x, assayName)
+    # only compute summaries for assays that are summarized actually summarized
+    summarize <- summarize && !all(idCols(x) %in% aKeys)
+    if (summarize) {
+        assayIndex <- assayIndex[, first(.SD), by=assayName]
+    }
+
     setkeyv(assayIndex, assayName)
     assayData <- assayData[assayIndex, on=assayName]
     setkeyv(assayData, "rowKey")
@@ -557,6 +578,27 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=FALSE,
         if (withDimnames && metadata) c(sort(rowMeta(x)), sort(colMeta(x)))
     )
     if (!is.null(corder)) setcolorder(assayData, corder) else setcolorder(assayData)
+
+    # Drop columns with wrong cardinality from summary assays
+    if (summarize) {
+        summaryCols <- assayCols(x, assayName)
+        if (metadata) {
+            rCols <- colnames(rowData(x))
+            cCols <- colnames(colData(x))
+            rBy <- intersect(rCols, aKeys)
+            cBy <- intersect(cCols, aKeys)
+            rKeep <- rCols[
+                rowData(x)[, lapply(.SD, uniqueN), by=c(rBy)][, lapply(.SD, max)] == 1
+            ]
+            cKeep <- cCols[
+                colData(x)[, lapply(.SD, uniqueN), by=c(cBy)][, lapply(.SD, max)] == 1
+            ]
+            summaryCols <- c(summaryCols, rKeep, cKeep)
+        }
+        # use of %in% should maintain column ordering gaurantees
+        assayData <- assayData[, colnames(assayData) %in% summaryCols, with=FALSE]
+        setkeyv(assayData, aKeyss)
+    }
 
     ## Add [] to ensure assay always prints, even after modify by reference
     ## See: https://stackoverflow.com/questions/33195362/data-table-is-not-displayed-on-first-call-after-being-modified-in-a-function
@@ -701,12 +743,6 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
 
     return(x)
 })
-
-if (sys.nframe() == 0) {
-    x <- copy(lt)
-    rData <- copy(rowData(x, raw=TRUE))
-    cData <- copy(colData(x, raw=TRUE))
-}
 
 ##
 ## == assayNames

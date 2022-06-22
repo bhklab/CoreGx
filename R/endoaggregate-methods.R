@@ -72,8 +72,7 @@ if (sys.nframe() == 0) {
                 mean_treatment1dose,
                 mean_viability),
             list(
-                mean_treatment1dose=mean_treatment1dose,
-                mean_viability)
+                mean_treatment1dose=mean_treatment1dose)
             ),
             by=c("treatment1id", "treatment2id", "sampleid"),
             nthread=20,

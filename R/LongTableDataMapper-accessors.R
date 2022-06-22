@@ -164,7 +164,7 @@ setReplaceMethod('rawdata', signature=c(object='LongTableDataMapper',
     {dim_}DataMap({data_})
 
     @md
-    @aliases {dim_}DataMap,{class_}-method {dim_}DataMap
+    @aliases {dim_}DataMap,{class_}-method
     @exportMethod {dim_}DataMap
     ",
     ...
@@ -518,7 +518,7 @@ setGeneric('metadataMap', function(object, ...) standardGeneric('metadataMap'))
     metadataMap({data_})
 
     @md
-    @aliases metadataMap,{class_}-method metadataMap
+    @aliases metadataMap,{class_}-method
     @exportMethod metadataMap
     ",
     ...
@@ -552,7 +552,7 @@ setGeneric('metadataMap<-', function(object, ..., value)
     metadataMap({data_}) <- list(object_metadata=c('metadata'))
 
     @md
-    @aliases metadataMap<-,{class_}-method metadataMap<-
+    @aliases metadataMap<-,{class_}-method
     @exportMethod metadataMap<-
     ",
     ...

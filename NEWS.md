@@ -1,12 +1,22 @@
 # CoreGx News File
 
 ## v 2.1.3
-* Updated CoreSet vignette to reflect recent changes to the object structure
-* Renamed the LongTable vignette to TreatmentResponseExperiment and updated
+* Updated `CoreSet` vignette to reflect recent changes to the object structure
+* Renamed the `LongTable` vignette to `TreatmentResponseExperiment` and updated
 the content to reflect the changes in class structure from 2.1.1
-* Generated new TreatmentResponseExperiment class and structure diagrams and
-inlcuded them in the TreamentResponseExperiment vignette
+* Generated new `TreatmentResponseExperiment` class and structure diagrams and
+inlcuded them in the `TreamentResponseExperiment` vignette
+* Added new example `TreatmentResponseExperiment` object to package data
+* Added various unit tests for the `LongTable` (and therefore also the `TreatmentResponseExperiment`)
 * Added proper documentation object for the TREDataMapper-accessors
+* Added aggregate methods for `data.table` and `LongTable`
+* Added endoaggregate method for `LongTable`, which uses `aggregate` internally
+but assigns the result back to the object and returns the updated object.
+Thus this method is an endomorphic version of aggregate.
+* Added new argument `summarize` to `assay,LongTable-method` which only
+attaches columns which have been summarized over if `FALSE`
+
+
 ## v 2.1.2
 * Fix bug in `logLogisticRegression` causing tests to fail in Bioconductor 3.16
 daily builds
