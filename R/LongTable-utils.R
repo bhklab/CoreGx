@@ -7,14 +7,12 @@ NULL
 ####
 #### Warning: for dynamic docs to work, you must set
 #### Roxygen: list(markdown=TRUE, r6=FALSE)
-#### in the DESCRPTION file!
+#### in the DESCRIPTION file!
 
 
 # ===================================
 # Utility Method Documentation Object
 # -----------------------------------
-
-
 
 
 # ======================================
@@ -30,7 +28,7 @@ NULL
 #'
 #' @param x `LongTable`
 #' @param index `data.frame` Table with columns "rowKey", "colKey" and
-#'   ".<assayName>", were <assayName> is the value for each `assayNames(x)`.
+#'   ".\<assayName\>", where \<assayName\> is the value for each `assayNames(x)`.
 #'   Warning: rownames are dropped internally in coercion to `data.table`,
 #' @param reindex `logical(1)` Should index values be reset such that they
 #'   are the smallest possible set of consecutive integers. Modifies the
@@ -68,6 +66,8 @@ NULL
     # -- update object
     # delete row-/colKeys by reference
     for (a in assays) a[, (metaKeys) := NULL]
+    # ensure uniqueness for summary assays, fixes #149
+    assays <- lapply(assays, FUN=unique)
     # raw=TRUE allows direct modification of slots
     setkeyv(rData, "rowKey")
     rowData(x, raw=TRUE) <- rData
@@ -135,6 +135,7 @@ NULL
 #'
 #' @importMethodsFrom BiocGenerics subset
 #' @importFrom crayon magenta cyan
+#' @importFrom MatrixGenerics rowAnys
 #' @import data.table
 #' @export
 setMethod('subset', signature('LongTable'),
@@ -148,7 +149,7 @@ setMethod('subset', signature('LongTable'),
     .rowData <- function(...) rowData(..., key=TRUE)
     .colData <- function(...) colData(..., key=TRUE)
     .tryCatchNoWarn <- function(...) suppressWarnings(tryCatch(...))
-    .strSplitLength <- function(...) length(strsplit(...))
+    .strSplitLength <- function(...) length(unlist(strsplit(...)))
 
     # subset rowData
     ## FIXME:: Can I parameterize this into a helper that works for both row
@@ -222,6 +223,16 @@ setMethod('subset', signature('LongTable'),
         rowKey %in% rows & colKey %in% cols,
         .SD,
         .SDcols=c("rowKey", "colKey", assayNames(x)[keepAssays])
+    ]
+    # -- drop rowKeys or colKeys which no longer have any assay observation
+    #   after the initial subset, fixes #148
+    validKeys <- idx[
+        which(rowAnys(!is.na(idx[, assayNames(x)[keepAssays], with=FALSE]))),
+        .(rowKey, colKey)
+    ]
+    idx <- idx[
+        rowKey %in% unique(validKeys$rowKey) &
+            colKey %in% unique(validKeys$colKey),
     ]
     assays(x, raw=TRUE)[!keepAssays] <- NULL  # delete assays being dropped
 
@@ -394,10 +405,12 @@ setMethod('[', signature('LongTable'),
 #' merckLongTable[['sensitivity']]
 #'
 #' @param x `LongTable` object to retrieve assays from
-#' @param i `character` name or `integer` index of the desired assay.
-#' @param withDimnames `logical` Should the row and column IDs be joined to
+#' @param i `character(1)` name or `integer` index of the desired assay.
+#' @param withDimnames `logical(1)` Should the row and column IDs be joined to
 #'    the assay. Default is TRUE to allow easy use of group by arguments when
 #'    performing data aggregation using the `data.table` API.
+#' @param summarize `logical(1)` For summarized assays, should columns which
+#' were aggregated over be dropped?
 #' @param metadata `logical` Should the row and column metadata also
 #'    be joined to the to the returned assay. Default is withDimnames.
 #' @param keys `logical` Should the row and column keys also be returned?
@@ -407,7 +420,7 @@ setMethod('[', signature('LongTable'),
 #' @import data.table
 #' @export
 setMethod('[[', signature('LongTable'), function(x, i, withDimnames=TRUE,
-        metadata=withDimnames, keys=!withDimnames) {
+        summarize=withDimnames, metadata=withDimnames, keys=!withDimnames) {
     funContext <- .S4MethodContext('[[', class(x))
 
     if (metadata && !withDimnames) {
@@ -544,11 +557,13 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     cData[, .colKey := NULL]
 
     # -- add new indices for assayKeys to index
-    setkeyv(index, c("rowKey", "colKey"))  #
+    setkeyv(index, c("rowKey", "colKey"))
     assays_ <- setdiff(colnames(index), c("rowKey", "colKey"))
     assayEqualKeys <- setNames(vector("logical", length(assays_)), assays_)
     for (nm in assays_) {
-        index[!is.na(get(nm)), paste0(".", nm) := .I]
+        ## Added by to maintain cardinality of the each assayKey
+        ## Required to fix #147 and ensure summary assays, with repeated keys
+        index[!is.na(get(nm)), paste0(".", nm) := .GRP, by=c(nm)]
         assayEqualKeys[nm] <- index[!is.na(get(nm)), all(get(paste0(".", nm)) == get(nm))]
     }
 

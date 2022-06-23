@@ -38,6 +38,7 @@ currently only supports \code{data.frame} or \code{data.table} objects.
 }
 \seealso{
 Other DataMapper-accessors: 
-\code{\link{LongTableDataMapper-accessors}}
+\code{\link{LongTableDataMapper-accessors}},
+\code{\link{TREDataMapper-accessors}}
 }
 \concept{DataMapper-accessors}

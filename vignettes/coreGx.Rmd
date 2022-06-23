@@ -38,12 +38,12 @@ library(SummarizedExperiment)
 
 ## The CoreSet Class
 
-The CoreSet class is intended as a general purpose data structure for storing
+The `CoreSet` class is intended as a general purpose data structure for storing
 multiomic treatment response data. Extensions of this class have been
-customized for their respective fields of study. For example, the PharmacoSet
-class inherits from the CoreSet and is specialized for storing and analyzing
+customized for their respective fields of study. For example, the `PharmacoSet`
+class inherits from the `CoreSet` and is specialized for storing and analyzing
 drug sensitivity and perturbation experiments on cancer cell lines together with
-associated multiomic data for each sample treatment. The RadioSet class serves
+associated multiomic data for each treated sample. The RadioSet class serves
 a role similar to the PharmacoSet with radiation instead of drug treatments.
 Finally, the ToxicoSet class is used to store toxicity data for healthy
 human and rat hepatocytes along with the associated multiomic profile for each
@@ -55,45 +55,66 @@ getClass("CoreSet")
 
 The `annotation` slot holds the CoreSet name, the original constructor call, and
 a range of metadata about the R session in which the constructor was called.
-This allows easy comparison of CoreSet versions across time and ensures the
-code used to generate a CoreSet is documented and reproducible.
+This allows easy comparison of `CoreSet` versions across time and ensures the
+code used to generate a `CoreSet` is well-documented and reproducible.
 
 The `molecularProfiles` slot contains a list of `SummarizedExperiment` objects
 for each multi-omic molecular datatype available for a given experiment. Within
 the `SummarizedExperiments` are feature and sample annotations for each data
-type.
+type. We are currently in the process of adopting the `MultiAssayExperiment`
+class instead of a `list` for storing molecular profile `SummarizedExperiment`s.
+However, the `list` version of the `molecularProfiles` slot is still supported
+for backwards compatability.
 
 The `sample` slot contains a `data.frame` with annotations for samples used in
-the molecularProfiles or sensitivity slot.
+the molecularProfiles or sensitivity slot. It should at minimum have the
+standardized column 'sampleid', with a unique identifier for each sample in the
+`CoreSet`.
 
-The `treatment` slot contains a `data.frame` for treatments used in the the
-molecularProfiles or sensitivity slot.
+The `treatment` slot contains a `data.frame` of metadata for treatments applied
+to samples in the `molecularProfiles` or `treatmentResponse` slot. It should at
+minimum have the standarized column 'treatmentid', containing a unique
+identifier for each treatment in the `CoreSet`.
 
 The `datasetType` slot contains a character vector indicating the experiment
-type the `CoreSet` contains.
+type the `CoreSet` contains. This slot is soft deprecated and may be removed
+in future updates.
 
-The `sensitivty` slot contains a list of raw, curated and meta data for
-sensitivity experiments.
+The `treatmentResponse` slot contains a list of raw, curated and meta data for
+treatment-response experiments. We are currently in the process of adopting
+our new S4-class, the `TreamtentResponseExperiment` to store treatment-response
+data within a `CoreSet` and inheriting classes. However, the old `list` format
+for sensitivity experiments will continue to be support for backwards
+compatability.
 
 The `perturbation` slot contains a list of raw, curated and meta data for
-perturbation experiments.
+perturbation experiments. This slot is soft-deprecated and may be removed
+in the future. The reason is that treatment perturbation experiments can be
+efficiently stored in the `colData` slot of their respective
+`SummarizedExperiment` objects and thus no longer require their own space within
+a `CoreSet`.
 
-The `curation` slot contains a list of ground truth curations sample identifiers
-such as cell line names/ids, tissue names/ids, drug names/ids, etc. This slot
-is to assist in curating across experiment and molecular profile slots to esnure
-consistent nomenclature.
+The `curation` slot contains a list of manually curated identifiers
+such as standardized cell-line, tissue and treatment names. Inclusion of such
+identifiers ensures a consistent nomenclature is used across all datasets
+curated into the classes inheriting from the `CoreSet`, enabling results from
+such datasets to be easily compared to validate results from published studies or
+combine them for use in larger meta-analyses. The slot contains a list of
+`data.frame`s, one for each entity, and should at minimum include a mapping from
+curated identifiers used throughout the object to those used in the original
+dataset publication.
 
-The class provides a set of standardized accessor methods which allow easy
-curation, annotation and retrieval of data associated with a specfic treatment
-response experiment. All accessors are implemented as generics to allow new
-methods to be defined on classes inheriting from the CoreSet.
+The `CoreSet` class provides a set of standardized accessor methods which
+simplify curation, annotation, and retrieval of data associated with a specfic
+treatment response experiment. All accessors are implemented as generics to
+allow new methods to be defined on classes inheriting from the `CoreSet`.
 
 ```{r CoreSet_accessors}
 methods(class="CoreSet")
 ```
 
-We have provided a sample CoreSet in this package. In the below code we load the
-example cSet and demonstrate a few of the accessor methods.
+We have provided a sample `CoreSet` (cSet) in this package. In the below code
+we load the example cSet and demonstrate a few of the accessor methods.
 
 ```{r the_cSet_object}
 data(clevelandSmall_cSet)
@@ -114,7 +135,7 @@ cInfo <- sampleInfo(clevelandSmall_cSet)
 cInfo[seq_len(5), seq_len(5)]
 ```
 
-Access sensitivty data:
+Access treatment-response data:
 
 ```{r cSet_accessor_demo2}
 sensProf <- sensitivityProfiles(clevelandSmall_cSet)
@@ -153,14 +174,15 @@ methods(class="DemoSet")
 We see that all the accessors defined for the `CoreSet` are also defined for the
 inheriting `DemoSet`. These methods all assume the inherit slots have the same
 structure as the `CoreSet`. If this is not true, for example, if molecularProfiles
-holds `ExpressionSets` instead of `SummarizedExperiments`, we can redefine
+holds `ExpressionSet`s instead of `SummarizedExperiment`s, we can redefine
 existing methods as follows:
 
 ```{r defining_methods_for_a_new_class}
 clevelandSmall_dSet <- DemoSet(clevelandSmall_cSet)
 class(clevelandSmall_dSet@molecularProfiles[['rna']])
 
-expressionSets <- lapply(molecularProfilesSlot(clevelandSmall_dSet), as, 'ExpressionSet')
+expressionSets <- lapply(molecularProfilesSlot(clevelandSmall_dSet), FUN=as,
+  'ExpressionSet')
 molecularProfilesSlot(clevelandSmall_dSet) <- expressionSets
 
 # Now this will error

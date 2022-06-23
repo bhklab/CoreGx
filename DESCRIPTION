@@ -68,7 +68,7 @@ License: GPL-3
 Config/testthat/edition: 3
 Roxygen: list(markdown=TRUE, r6=FALSE)
 RoxygenNote: 7.2.0
-Collate:
+Collate: 
     'allGenerics.R'
     'immutable-class.R'
     'LongTable-class.R'
@@ -89,6 +89,7 @@ Collate:
     'cosinePerm.R'
     'datasets.R'
     'deprecated.R'
+    'endoaggregate-methods.R'
     'globals.R'
     'gwc.R'
     'matthewCor.R'
@@ -104,4 +105,5 @@ Collate:
     'utilities.R'
     'utils-iteration.R'
     'utils-messages.R'
+    'utils-testing.R'
     'utils-updateS4.R'

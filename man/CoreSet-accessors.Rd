@@ -54,7 +54,10 @@
 \alias{molecularProfiles}
 \alias{molecularProfiles<-,CoreSet,character,character,matrix-method}
 \alias{molecularProfiles<-,CoreSet,character,missing,matrix-method}
+\alias{molecularProfiles<-,CoreSet,missing,missing,list-method}
+\alias{molecularProfiles<-,CoreSet,missing,missing,MutliAssayExperiment-method}
 \alias{molecularProfiles<-}
+\alias{molecularProfiles<-,CoreSet,missing,missing,list_OR_MAE-method}
 \alias{featureInfo,CoreSet-method}
 \alias{featureInfo}
 \alias{featureInfo<-,CoreSet,character,data.frame-method}
@@ -93,12 +96,14 @@
 \alias{sensitivityProfiles<-,CoreSet,data.frame-method}
 \alias{sensitivityRaw,CoreSet-method}
 \alias{sensitivityRaw<-,CoreSet,array-method}
-\alias{sensitivitySlot,CoreSet-method}
+\alias{treatmentResponse,CoreSet-method}
+\alias{treatmentResponse}
 \alias{sensitivitySlot}
-\alias{sensitivitySlot<-,CoreSet,list_OR_LongTable-method}
+\alias{treatmentResponse<-,CoreSet,list_OR_LongTable-method}
+\alias{treatmentResponse<-}
+\alias{treamentResponse<-,CoreSet,list-method}
+\alias{treatmentResponse<-,CoreSet,LongTable-method}
 \alias{sensitivitySlot<-}
-\alias{sensitivitySlot<-,CoreSet,list-method}
-\alias{sensitivitySlot<-,CoreSet,LongTable-method}
 \alias{sensNumber,CoreSet-method}
 \alias{sensNumber}
 \alias{sensNumber<-,CoreSet,matrix-method}
@@ -149,6 +154,10 @@
 
 \S4method{molecularProfiles}{CoreSet,character,character,matrix}(object, mDataType, assay) <- value
 
+\S4method{molecularProfiles}{CoreSet,character,missing,matrix}(object, mDataType, assay) <- value
+
+\S4method{molecularProfiles}{CoreSet,missing,missing,list_OR_MAE}(object, mDataType, assay) <- value
+
 \S4method{featureInfo}{CoreSet}(object, mDataType)
 
 \S4method{featureInfo}{CoreSet,character,data.frame}(object, mDataType) <- value
@@ -185,9 +194,9 @@
 
 \S4method{sensitivityRaw}{CoreSet,array}(object) <- value
 
-\S4method{sensitivitySlot}{CoreSet}(object)
+\S4method{treatmentResponse}{CoreSet}(object)
 
-\S4method{sensitivitySlot}{CoreSet,list_OR_LongTable}(object) <- value
+\S4method{treatmentResponse}{CoreSet,list_OR_LongTable}(object) <- value
 
 \S4method{sensNumber}{CoreSet}(object)
 
@@ -332,7 +341,8 @@ or 'both'
 \strong{molecularProfiles}: \code{matrix()} Retrieve an assay in a
 \code{SummarizedExperiment} from the \code{molecularProfiles} slot of a \code{CoreSet}
 object with the specified \code{mDataType}. Valid \code{mDataType} arguments can be
-found with \code{mDataNames(object)}. Arguments:
+found with \code{mDataNames(object)}. Exclude \code{mDataType} and \code{assay} to
+access the entire slot. Arguments:
 \itemize{
 \item assay: Optional \code{character(1)} vector specifying an assay in the
 \code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
@@ -345,7 +355,7 @@ the given \code{mDataType}.
 \strong{molecularProfiles<-}: Update an assay in a \code{SummarizedExperiment} from
 the \code{molecularProfiles} slot of a CoreSet object with the specified
 \code{mDataType}. Valid \code{mDataType} arguments can be found with
-\code{mDataNames(object)}.
+\code{mDataNames(object)}. Omit \code{mDataType} and \code{assay} to update the slot.
 \itemize{
 \item assay: Optional \code{character(1)} vector specifying an assay in the
 \code{SummarizedExperiment} of the \code{molecularProfiles} slot of the
@@ -568,6 +578,9 @@ molecularProfiles(clevelandSmall_cSet, 'rna') <- molecularProfiles(clevelandSmal
 molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs') <-
     molecularProfiles(clevelandSmall_cSet, 'rna', 'exprs')
 
+# Replace the whole slot
+molecularProfiles(clevelandSmall_cSet) <- molecularProfiles(clevelandSmall_cSet)
+
 featureInfo(clevelandSmall_cSet, 'rna')
 
 featureInfo(clevelandSmall_cSet, 'rna') <- featureInfo(clevelandSmall_cSet, 'rna')
@@ -604,9 +617,9 @@ head(sensitivityRaw(clevelandSmall_cSet))
 
 sensitivityRaw(clevelandSmall_cSet) <- sensitivityRaw(clevelandSmall_cSet)
 
-sensitivitySlot(clevelandSmall_cSet)
+treatmentResponse(clevelandSmall_cSet)
 
-sensitivitySlot(clevelandSmall_cSet) <- sensitivitySlot(clevelandSmall_cSet)
+treatmentResponse(clevelandSmall_cSet) <- treatmentResponse(clevelandSmall_cSet)
 
 sensNumber(clevelandSmall_cSet)
 

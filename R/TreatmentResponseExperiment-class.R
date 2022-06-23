@@ -80,6 +80,9 @@ NULL
 #'   the names or integer indexes of the column data identifier columns. These
 #'   columns will be pasted together to make up the colnames of the
 #'   `TreatmentResponseExperiment` object.
+#' @param assayIDs `list` A list of `character` vectors specifying the columns
+#'   needed to uniquely identify each row in an `assay`. Names must match the
+#'   `assays` list.
 #' @param assays A `list` containing one or more objects coercible to a
 #'   `data.table`, and keyed by rowIDs and colIDs corresponding to the rowID and
 #'   colID columns in colData and rowData.
@@ -99,12 +102,12 @@ NULL
 #' @import data.table
 #' @export
 TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
-        assays, metadata=list(), keep.rownames=FALSE) {
+        assays, assayIDs, metadata=list(), keep.rownames=FALSE) {
     if (!missing(rowData) && is(rowData, "LongTable")) {
         LT <- rowData
     } else {
         LT <- LongTable(rowData=rowData, rowIDs=rowIDs, colData=colData,
-            colIDs=colIDs, assays=assays, metadata=metadata,
+            colIDs=colIDs, assays=assays, assayIDs=assayIDs, metadata=metadata,
             keep.rownames=keep.rownames)
     }
     .TreatmentResponseExperiment(
@@ -116,6 +119,9 @@ TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
     )
 }
 
+#' @name as
+#'
+#' @title
 #' Coerce a `LongTable` to a `TreatmentResponseExperiment`
 #'
 #' @param from `LongTable` object to coerce to a `TreatmentResponseExperiment`.
@@ -127,10 +133,10 @@ TreatmentResponseExperiment <- function(rowData, rowIDs, colData, colIDs,
 #'
 #' @examples
 #' data(clevelandSmall_cSet)
-#' TRE <- as(molecularProfilesSlot(clevelandSmall_cSet),
+#' TRE <- as(treatmentResponse(clevelandSmall_cSet),
 #'     "TreatmentResponseExperiment")
 #' TRE
-#' s
+#'
 #' @md
 #' @export
 setAs("LongTable", "TreatmentResponseExperiment", function(from) {

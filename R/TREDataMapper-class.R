@@ -1,6 +1,7 @@
 #' @include DataMapper-class.R
 #' @include LongTableDataMapper-class.R
 #' @include TreatmentResponseExperiment-class.R
+#' @include LongTableDataMapper-accessors.R
 NULL
 
 #' A Class for Mapping Between Raw Data and an `TreatmentResponseExperiment`
@@ -84,3 +85,208 @@ TREDataMapper <- function(rawdata=data.frame(),
         metadataMap=metadata(lt_dm)
     )
 }
+
+## ===========================================
+## TREDataMapper Accessors Documentation
+## -------------------------------------------
+
+.local_class_5 <- "TREDataMapper"
+.local_data_5 <- "exampleDataMapper"
+
+#' @name TREDataMapper-accessors
+#'
+#' @eval .docs_DataMapper_accessors(class_=.local_class_5)
+#' @eval .docs_DataMapper_get_rawdata(class_=.local_class_5)
+#'
+#' @param value See details.
+NULL
+
+
+## ---------------
+## -- rawdata slot
+
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_DataMapper_set_rawdata(class_=.local_class_5,
+#' class1_='list')
+setReplaceMethod("rawdata", signature=c(object="TREDataMapper",
+        value="list"), function(object, value) {
+    callNextMethod(object=object, value=value)
+})
+
+
+## --------------------
+## ---- rowDataMap slot
+
+
+##
+## -- rowDataMap
+
+#' @rdname TREDataMapper-accessors
+#' @eval
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='row', class_=.local_class_5,
+#' data_=.local_data_5)
+#' @aliases rowDataMap
+setMethod('rowDataMap', signature(object='TREDataMapper'), function(object) {
+    callNextMethod()
+})
+
+
+#' @rdname TREDataMapper-accessors
+#' @eval
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='row', class_=.local_class_5,
+#' data_=.local_data_5, id_col_='treatmentid')
+#' @aliases rowDataMap<-
+setReplaceMethod('rowDataMap', signature(object='TREDataMapper',
+        value='list_OR_List'), function(object, value) {
+    callNextMethod()
+})
+
+
+##
+## -- rowData
+
+
+#' Convenience method to subset the `rowData` out of the `rawdata` slot using
+#'   the assigned `rowDataMap` metadata.
+#'
+#' @param x `TREDataMapper` object with valid data in the `rawdata` and
+#'   `colDataMap` slots.
+#' @param key `logical(1)` Should the table be keyed according to the
+#'   `id_columns` of the `rowDataMap` slot? This will sort the table in memory.
+#'   Default is TRUE.
+#'
+#' @return `data.table` The `rowData` as specified in the `rowDataMap` slot.
+#'
+#' @export
+setMethod("rowData", signature(x="TREDataMapper"), function(x, key=TRUE) {
+    callNextMethod()
+})
+
+
+## --------------------
+## ---- colDataMap slot
+
+
+##
+## -- colDataMap
+
+#' @rdname TREDataMapper-accessors
+#' @eval
+#' .docs_LongTableDataMapper_get_dimDataMap(dim_='col', class_=.local_class_5,
+#' data_=.local_data_5)
+#' @aliases colDataMap
+setMethod('colDataMap', signature(object='TREDataMapper'),
+        function(object) {
+    callNextMethod()
+})
+
+#' @rdname TREDataMapper-accessors
+#' @eval
+#' .docs_LongTableDataMapper_set_dimDataMap(dim_='col', class_=.local_class_5,
+#' data_=.local_data_5, id_col_='sampleid')
+#' @aliases colDataMap<-
+setReplaceMethod('colDataMap',
+        signature(object="TREDataMapper", value="list_OR_List"),
+        function(object, value) {
+    callNextMethod()
+})
+
+
+##
+## -- colData
+
+
+#' Convenience method to subset the `colData` out of the `rawdata` slot using
+#'   the assigned `colDataMap` metadata.
+#'
+#' @param x `TREDataMapper` object with valid data in the `rawdata` and
+#'   `colDataMap` slots.
+#' @param key `logical(1)` Should the table be keyed according to the
+#'   `id_columns` of the `colDataMap` slot? This will sort the table in memory.
+#'   Default is TRUE.
+#'
+#' @return `data.table` The `colData` as specified in the `colDataMap` slot.
+#'
+#' @export
+setMethod("colData", signature(x="TREDataMapper"), function(x, key=TRUE) {
+    callNextMethod()
+})
+
+
+## ----------------
+## ---- assayMap slot
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_get_assayMap(class_=.local_class_5, data_=.local_data_5)
+#' @aliases assayMap
+setMethod('assayMap', signature(object='TREDataMapper'),
+        function(object) {
+    callNextMethod()
+})
+
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_set_assayMap(class_=.local_class_5, data_=.local_data_5)
+#' @aliases assayMap<-
+setReplaceMethod('assayMap', signature(object='TREDataMapper',
+        value='list_OR_List'), function(object, value) {
+    callNextMethod()
+})
+
+
+#' Extract the data for an assay from a `TREDataMapper`
+#'
+#' @param x `TREDataMapper` The object to retrive assay data form according
+#'   to the `assayMap` slot.
+#' @param i `character(1)` Name of an assay in the `assayMap` slot of `x`.
+#' @param withDimnames `logical(1)` For compatibility with
+#'   `SummarizedExperiment::assay` generic. Not used.
+#'
+#' @return `data.table` Data for the specified assay extracted from the
+#'   `rawdata` slot of `x`.
+#'
+#' @importFrom checkmate assertSubset assertCharacter
+#' @keywords internal
+setMethod("assay", signature(x="TREDataMapper"),
+        function(x, i, withDimnames=TRUE) {
+    callNextMethod()
+})
+
+
+#' Extract the data for all assays from a `TREDataMapper`
+#'
+#' @param x `TREDataMapper` The object to retrive assay data form according
+#'   to the `assayMap` slot.
+#' @param withDimnames `logical(1)` For compatibility with
+#'   `SummarizedExperiment::assay` generic. Not used.
+#'
+#' @return `list` Data for all assays extracted from the
+#'   `rawdata` slot of `x` as a `list` of `data.tables`, where the `keys` for
+#'   each table are their `id_columns`.
+#'
+#' @importFrom checkmate assertSubset assertCharacter
+#' @keywords internal
+setMethod("assays", signature(x="TREDataMapper"),
+        function(x, withDimnames=TRUE) {
+    callNextMethod()
+})
+
+# -- metadataMap
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class_5, data_=.local_data_5)
+#' @aliases metadataMap
+setMethod('metadataMap', signature(object='TREDataMapper'),
+        function(object) {
+    callNextMethod()
+})
+
+
+#' @rdname TREDataMapper-accessors
+#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_5, data_=.local_data_5, col_='metadata')
+#' @aliases metadataMap<-
+setReplaceMethod('metadataMap', signature(object='TREDataMapper',
+        value='list_OR_List'), function(object, value) {
+    callNextMethod()
+})

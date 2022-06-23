@@ -1,5 +1,24 @@
 # CoreGx News File
 
+## v 2.1.3
+* Updated `CoreSet` vignette to reflect recent changes to the object structure
+* Renamed the `LongTable` vignette to `TreatmentResponseExperiment` and updated
+the content to reflect the changes in class structure from 2.1.1
+* Generated new `TreatmentResponseExperiment` class and structure diagrams and
+inlcuded them in the `TreamentResponseExperiment` vignette
+* Added new example `TreatmentResponseExperiment` object to package data
+* Added various unit tests for the `LongTable` (and therefore also the `TreatmentResponseExperiment`)
+* Added proper documentation object for the TREDataMapper-accessors
+* Added aggregate methods for `data.table` and `LongTable`
+* Added endoaggregate method for `LongTable`, which uses `aggregate` internally
+but assigns the result back to the object and returns the updated object.
+Thus this method is an endomorphic version of aggregate.
+* Added new argument `summarize` to `assay,LongTable-method` which only
+attaches columns which have been summarized over if `FALSE`
+* Added `assayCols` and `assayKeys` helper methods to retrive valid assay
+column names or the key columns for an assay, respectively.
+
+
 ## v 2.1.2
 * Fix bug in `logLogisticRegression` causing tests to fail in Bioconductor 3.16
 daily builds
@@ -15,7 +34,7 @@ accessor methods have been renamed, then aliased to their old names. As such,
 old code should still work as expected, but will in fact be calling different
 S4 methods.
 * Added the `@treatment` slot to the `CoreSet-class`
-* Renamed `@sensitity` slot to `@treatmentResponse`
+* Renamed `@sensitivity` slot to `@treatmentResponse`
 
 ## v 1.5.8
 * Fixed imports for the CoreSet2 constructor to resolve errors in downstream package PharmacoGx

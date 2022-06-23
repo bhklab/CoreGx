@@ -17,3 +17,8 @@ The \code{object} with the "immutable" class stripped from it.
 Remove the "immutable" S3-class from an R object, allowing it to be
 modified normally again.
 }
+\examples{
+immut_list <- immutable(list())
+mutable(immut_list)
+
+}

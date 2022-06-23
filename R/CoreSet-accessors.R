@@ -716,7 +716,8 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
     __molecularProfiles__: `matrix()` Retrieve an assay in a
     `SummarizedExperiment` from the `molecularProfiles` slot of a `{class_}`
     object with the specified `mDataType`. Valid `mDataType` arguments can be
-    found with `mDataNames(object)`. Arguments:
+    found with `mDataNames(object)`. Exclude `mDataType` and `assay` to
+    access the entire slot. Arguments:
     - assay: Optional `character(1)` vector specifying an assay in the
     `SummarizedExperiment` of the `molecularProfiles` slot of the
     `{class_}` object for the specified `mDataType`. If excluded,
@@ -735,22 +736,22 @@ setGeneric("molecularProfiles", function(object, mDataType, assay, ...)
 
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_molecularProfiles(class_=.local_class, data_=.local_data)
-setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay){
-  funContext <- .funContext('::molecularProlfiles,CoreSet-method')
-  ## TODO:: Add an all option that returns a list?
-  if (mDataType %in% names(object@molecularProfiles)) {
-    if (!missing(assay)) {
-      if (assay %in% assayNames(object@molecularProfiles[[mDataType]])) {
-        return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay))
-      } else {
-        .error(funContext, (paste('Assay', assay, 'not found in the SummarizedExperiment object!')))
-      }
+setMethod(molecularProfiles, "CoreSet", function(object, mDataType, assay) {
+    funContext <- .funContext(paste0('::molecularProlfiles,', class(object), '-method'))
+    if (missing(mDataType) && missing(assay)) return(object@molecularProfiles)
+    if (mDataType %in% names(object@molecularProfiles)) {
+        if (!missing(assay)) {
+            if (assay %in% assayNames(object@molecularProfiles[[mDataType]])) {
+                return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay))
+            } else {
+                .error(funContext, (paste('Assay', assay, 'not found in the SummarizedExperiment object!')))
+            }
+        } else {
+            return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1))
+        }
     } else {
-      return(SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1))
+        stop(paste0('mDataType ', mDataType, ' not found the object!'))
     }
-  } else {
-    stop(paste0('mDataType ', mDataType, ' not found the object!'))
-  }
 })
 
 #' @export
@@ -764,7 +765,7 @@ setGeneric("molecularProfiles<-", function(object, mDataType, assay, value)
     __molecularProfiles<-__: Update an assay in a `SummarizedExperiment` from
     the `molecularProfiles` slot of a {class_} object with the specified
     `mDataType`. Valid `mDataType` arguments can be found with
-    `mDataNames(object)`.
+    `mDataNames(object)`. Omit `mDataType` and `assay` to update the slot.
     - assay: Optional `character(1)` vector specifying an assay in the
     `SummarizedExperiment` of the `molecularProfiles` slot of the
     `{class_}` object for the specified `mDataType`. If excluded,
@@ -781,9 +782,14 @@ setGeneric("molecularProfiles<-", function(object, mDataType, assay, value)
     molecularProfiles({data_}, 'rna', 'exprs') <-
         molecularProfiles({data_}, 'rna', 'exprs')
 
+    # Replace the whole slot
+    molecularProfiles({data_}) <- molecularProfiles({data_})
+
     @md
     @aliases molecularProfiles<-,{class_},character,character,matrix-method
     molecularProfiles<-,{class_},character,missing,matrix-method
+    molecularProfiles<-,{class_},missing,missing,list-method
+    molecularProfiles<-,{class_},missing,missing,MutliAssayExperiment-method
     molecularProfiles<-
     @importFrom SummarizedExperiment assay
     @exportMethod molecularProfiles<-
@@ -797,19 +803,27 @@ setReplaceMethod("molecularProfiles", signature(object="CoreSet",
     mDataType ="character", assay="character", value="matrix"),
     function(object, mDataType, assay, value)
 {
-  if (mDataType %in% names(object@molecularProfiles)) {
-    SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], assay) <- value
-  }
-  object
+    if (mDataType %in% names(object@molecularProfiles)) {
+        assay(object@molecularProfiles[[mDataType]], assay) <- value
+    }
+    object
 })
+#' @rdname CoreSet-accessors
 setReplaceMethod("molecularProfiles",
     signature(object="CoreSet", mDataType ="character", assay="missing",
         value="matrix"), function(object, mDataType, assay, value)
 {
-  if (mDataType %in% names(object@molecularProfiles)) {
-    SummarizedExperiment::assay(object@molecularProfiles[[mDataType]], 1) <- value
-  }
-  object
+    if (mDataType %in% names(object@molecularProfiles)) {
+        assay(object@molecularProfiles[[mDataType]], 1) <- value
+    }
+    object
+})
+#' @rdname CoreSet-accessors
+setReplaceMethod("molecularProfiles", signature(object="CoreSet",
+        mDataType="missing", assay="missing", value="list_OR_MAE"),
+        function(object, mDataType, assay, value) {
+    object@molecularProfiles <- value
+    object
 })
 
 
@@ -846,11 +860,11 @@ setGeneric("featureInfo", function(object, mDataType, ...)
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_featureInfo(class_=.local_class, data_=.local_data)
 setMethod(featureInfo, "CoreSet", function(object, mDataType) {
-  if (mDataType %in% names(object@molecularProfiles)) {
-    return(rowData(object@molecularProfiles[[mDataType]]))
-  } else{
-    return(NULL)
-  }
+    if (mDataType %in% names(object@molecularProfiles)) {
+        return(rowData(object@molecularProfiles[[mDataType]]))
+    } else{
+        return(NULL)
+    }
 })
 
 #' @export
@@ -885,9 +899,9 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
     mDataType ="character",value="data.frame"),
     function(object, mDataType, value)
 {
-    if(mDataType %in% names(object@molecularProfiles)){
+    if (mDataType %in% names(object@molecularProfiles)) {
         rowData(object@molecularProfiles[[mDataType]]) <-
-            S4Vectors::DataFrame(value, rownames = rownames(value))
+            DataFrame(value, rownames = rownames(value))
     }
     object
 })
@@ -895,11 +909,11 @@ setReplaceMethod("featureInfo", signature(object="CoreSet",
     mDataType ="character",value="DataFrame"),
     function(object, mDataType, value)
 {
-  if(mDataType %in% names(object@molecularProfiles)){
-    rowData(object@molecularProfiles[[mDataType]]) <-
-        S4Vectors::DataFrame(value, rownames = rownames(value))
-  }
-  object
+    if (mDataType %in% names(object@molecularProfiles)) {
+        rowData(object@molecularProfiles[[mDataType]]) <-
+            DataFrame(value, rownames = rownames(value))
+    }
+    object
 })
 
 
@@ -1156,7 +1170,7 @@ setMethod("molecularProfilesSlot", signature("CoreSet"), function(object) {
 
 #' @export
 setGeneric("molecularProfilesSlot<-",
-           function(object, value) standardGeneric("molecularProfilesSlot<-"))
+    function(object, value) standardGeneric("molecularProfilesSlot<-"))
 
 #' @noRd
 .docs_CoreSet_set_molecularProfilesSlot <- function(...) .parseToRoxygen(
@@ -1183,8 +1197,7 @@ setGeneric("molecularProfilesSlot<-",
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_set_molecularProfilesSlot(class_=.local_class, data_=.local_data)
 setReplaceMethod("molecularProfilesSlot", signature("CoreSet", "list_OR_MAE"),
-                 function(object, value)
-{
+    function(object, value) {
     # funContext <- .S4MethodContext('molecularProfilesSlot<-', class(object),
     #     class(value))
     # if (!is(value, class(object@molecularProfiles)[1])) .error(funContext,
@@ -1243,16 +1256,16 @@ setMethod(sensitivityInfo, signature("CoreSet"),
         function(object, dimension, ...) {
     funContext <- .funContext('::sensitivityInfo')
     # case where sensitivity slot is a LongTable
-    if (is(sensitivitySlot(object), 'LongTable')) {
+    if (is(treatmentResponse(object), 'LongTable')) {
         if (!missing(dimension)) {
             switch(dimension,
-                sample={ return(colData(sensitivitySlot(object), ...)) },
-                treatment={ return(rowData(sensitivitySlot(object), ...)) },
-                assay={ return(assay(sensitivitySlot(object), 'assay_metadata')) },
+                sample={ return(colData(treatmentResponse(object), ...)) },
+                treatment={ return(rowData(treatmentResponse(object), ...)) },
+                assay={ return(assay(treatmentResponse(object), 'assay_metadata')) },
                 .error(funContext, 'Invalid value for the dimension argument.
                     Please select on of "sample", "treatment" or "assay'))
         } else {
-            return(.rebuildInfo(sensitivitySlot(object)))
+            return(.rebuildInfo(treatmentResponse(object)))
         }
     # sensitivity is a list
     } else {
@@ -1260,7 +1273,7 @@ setMethod(sensitivityInfo, signature("CoreSet"),
             .warning(funContext,' The dimension argument is only valid if the
                 sensitivity slot contains a LongTable object. Ignoring the
                 dimension and ... parameters.')
-        return(sensitivitySlot(object)$info)
+        return(treatmentResponse(object)$info)
     }
 })
 
@@ -1376,7 +1389,7 @@ setReplaceMethod("sensitivityInfo", signature(object="CoreSet", value="data.fram
                 function(object, dimension, ..., value) {
 
     funContext <- .funContext('::sensitivityInfo<-')
-    if (is(sensitivitySlot(object), 'LongTable')) {
+    if (is(treatmentResponse(object), 'LongTable')) {
         # coerce to data.table
         if (!is.data.table(value)) value <- data.table(value)
         if (missing(dimension)) {
@@ -1499,13 +1512,13 @@ setReplaceMethod('sensitivityMeasures',
 #' @eval .docs_CoreSet_get_sensitivityProfiles(class_=.local_class, data_=.local_data)
 setMethod(sensitivityProfiles, "CoreSet", function(object) {
     funContext <- .funContext('::sensitivityProfiles')
-    if (is(sensitivitySlot(object), 'LongTable')) {
-        if (!('profiles' %in% assayNames(sensitivitySlot(object)))) {
+    if (is(treatmentResponse(object), 'LongTable')) {
+        if (!('profiles' %in% assayNames(treatmentResponse(object)))) {
             .error(funContext, 'The LongTable onject in the sensivitiy slot
                 is not formatted correctly: it must contain an assay
                 named "profiles"!')
         } else {
-            .rebuildProfiles(sensitivitySlot(object))
+            .rebuildProfiles(treatmentResponse(object))
         }
     } else {
         return(object@treatmentResponse$profiles)
@@ -1515,16 +1528,21 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
 #' @keywords internal
 .rebuildProfiles <- function(object) {
     profDT <- object$profiles
-    rowCols <- rowIDs(object)[
-        !grepl("treatment[0-9]*dose|drug[0-9]*dose|replicate.*id", rowIDs(object))
-    ]
-    colCols <- colIDs(object)
-    profDT[, sample_uid := Reduce(.paste_colon, mget(colCols))]
-    profDT[, treatment_uid := Reduce(.paste_colon, mget(rowCols))]
-    profDT[, exp_id := .paste_(treatment_uid, sample_uid)]
+    rowCols <- lapply(rowIDs(object)[
+        !grepl("treatment[0-9]*dose|drug[0-9]*dose", rowIDs(object))
+    ], as.name)
+    colCols <- lapply(colIDs(object), as.name)
+    trt <- bquote(paste(..(rowCols), sep=":"), splice=TRUE)
+    smp <- bquote(paste(..(colCols), sep=":"), splice=TRUE)
+    profDT[, treatment_uid := eval(trt), by=.I]
+    profDT[, sample_uid := eval(smp), by=.I]
+    profDT[, exp_id := paste0(treatment_uid, "_", sample_uid), by=.I]
     assayCols <- setdiff(colnames(assay(object, "profiles", raw=TRUE)), "profiles")
-    sensProf <- as.data.frame(unique(profDT[, .SD, .SDcols=assayCols]))
-    rownames(sensProf) <- unique(profDT$exp_id)
+    sensProf <- unique(profDT[, .SD, .SDcols=c(assayCols, "exp_id")])
+    obsPerExpId <- sensProf[, .N, by="exp_id"][, max(N)]
+    if (obsPerExpId > 1) warning(.warnMsg("Multiple profile values per",
+        " experiment id, summarizing with mean!"), call.=FALSE)
+    sensProf <- sensProf[, lapply(.SD, mean, na.rm=TRUE), by="exp_id"]
     return(sensProf)
 }
 
@@ -1552,7 +1570,7 @@ setReplaceMethod("sensitivityProfiles",
     signature(object="CoreSet", value="data.frame"),
     function(object, value)
 {
-    if (is(sensitivitySlot(object), 'LongTable'))
+    if (is(treatmentResponse(object), 'LongTable'))
         warning(.warnMsg("The ", class(object)[1], " class structure has been",
             " updated! Assignment via sensitivityProfiles no long works, please",
             " see vignette('The LongTable Class', package='CoreGx') for more",
@@ -1587,8 +1605,8 @@ setReplaceMethod("sensitivityProfiles",
 #' @rdname CoreSet-accessors
 #' @eval .docs_CoreSet_get_sensitivityRaw(class_=.local_class, data_=.local_data)
 setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
-    if (is(sensitivitySlot(object), 'LongTable'))
-        return(.rebuildRaw(sensitivitySlot(object)))
+    if (is(treatmentResponse(object), 'LongTable'))
+        return(.rebuildRaw(treatmentResponse(object)))
     else
         return(object@treatmentResponse$raw)
 })
@@ -1701,24 +1719,22 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
     function(object, value)
 {
     funContext <- .funContext("::sensitivityRaw<-")
-    if (is(sensitivitySlot(object), 'LongTable')) {
+    if (is(treatmentResponse(object), 'LongTable')) {
 
         ## TODO:: validate value
-        longTable <- sensitivitySlot(object)
+        tre <- treatmentResponse(object)
 
-        viabilityCols <- setdiff(colnames(assay(longTable, 'sensitivity',
-            metadata=FALSE, key=FALSE)), "sensitivity")
+        viabilityCols <- assayCols(tre, "sensitivity")
         # Handle the non-treatment combo case
         if (length(viabilityCols) != ncol(value)) {
             valueDT <- as.data.table(value)
             valueDT <- dcast(valueDT, V1 + V2 ~ V3, value.var='value')
-            valueDT[, V2 := NULL] # drop the column names
             setnames(valueDT, old=c('Dose', 'Viability'),
                 new=c('treatment1dose', 'viability'))
-            valueDT[, c('treatment1id', 'sample_uid') := tstrsplit(V1, '_', type.convert=TRUE)]
-            valueDT[, (colIDs(longTable)) := tstrsplit(sample_uid, ':', type.convert=TRUE)]
-            valueDT[, c('V1', 'sample_uid') := NULL]
-            assay(longTable, i='sensitivity') <- valueDT
+            valueDT[, V2 := NULL]  # delete the array column names
+            valueDT[, (idCols(tre)) := tstrsplit(V1, ':|_', type.convert=TRUE)]
+            valueDT[, V1 := NULL]
+            assay(tre, i='sensitivity') <- valueDT
         } else {
             # Process into a the proper format for the sensitivity assay
             # NOTE: as.matrix deals with the case where there is only a single
@@ -1729,22 +1745,16 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
                 keep.rownames='rn', na.rm=FALSE)
             coerceCols <- colnames(raw)[-1]
             raw[, (coerceCols) := lapply(.SD, as.numeric), .SDcols=!'rn']
-            raw[, c('row_id', 'col_id') := tstrsplit(rn, '_')]
-            raw[, (rowIDs(longTable)) := tstrsplit(row_id, ':', type.convert=TRUE)]
-            raw[, (colIDs(longTable)) := tstrsplit(col_id, ':', type.convert=TRUE)]
-            raw[, c('row_id', 'col_id', 'rn') := NULL]
-            colnames(raw) <- gsub('^dose|^V', 'viability', colnames(raw))
-
+            raw[, (idCols(tre)) := tstrsplit(rn, ':|_', type.convert=TRUE)]
+            raw[, c('rn') := NULL]
+            colnames(raw) <- gsub('^dose\\d*|^V\\d*', 'viability', colnames(raw))
             # Update the assay
-            assay(longTable, i='sensitivity') <- raw
+            assay(tre, i='sensitivity') <- raw
         }
 
         # Update the object
-        sensitivitySlot(object) <- longTable
+        treatmentResponse(object) <- tre
     } else {
-        if (!is.array(value)) .error(funContext, "Values assigned to the
-            sensitivityRaw slot must be an array of experiment by dose by
-            values!")
         object@treatmentResponse$raw <- value
         object
     }
@@ -1757,42 +1767,45 @@ setReplaceMethod('sensitivityRaw', signature("CoreSet", "array"),
 
 
 #' @export
-setGeneric("sensitivitySlot", function(object, ...) standardGeneric("sensitivitySlot"))
+setGeneric("treatmentResponse", function(object, ...) standardGeneric("treatmentResponse"))
 
 #' @noRd
-.docs_CoreSet_get_sensitivitySlot <- function(...) .parseToRoxygen(
+.docs_CoreSet_get_treatmentResponse <- function(...) .parseToRoxygen(
     "
-    __sensitivitySlot__: Retrive the contents of `@treatmentResponse` from a `{class_}`
+    __treatmentResponse__: Retrive the contents of `@treatmentResponse` from a `{class_}`
     object.
 
     @examples
-    sensitivitySlot({data_})
+    treatmentResponse({data_})
 
     @md
-    @aliases sensitivitySlot,{class_}-method sensitivitySlot
-    @exportMethod sensitivitySlot
+    @aliases treatmentResponse,{class_}-method treatmentResponse
+    @aliases sensitivitySlot
+    @exportMethod treatmentResponse
     ",
     ...
 )
 
 #' @rdname CoreSet-accessors
-#' @eval .docs_CoreSet_get_sensitivitySlot(class_=.local_class,
+#' @eval .docs_CoreSet_get_treatmentResponse(class_=.local_class,
 #'   data_=.local_data)
-setMethod("sensitivitySlot", signature("CoreSet"), function(object) {
+setMethod("treatmentResponse", signature("CoreSet"), function(object) {
     object@treatmentResponse
 })
+#' @export
+sensitivitySlot <- function(...) treatmentResponse(...)
 
 
 #' @export
-setGeneric("sensitivitySlot<-", function(object, ..., value)
-    standardGeneric("sensitivitySlot<-"))
+setGeneric("treatmentResponse<-", function(object, ..., value)
+    standardGeneric("treatmentResponse<-"))
 
-.docs_CoreSet_set_sensitivitySlot <- function(...) .parseToRoxygen(
+.docs_CoreSet_set_treatmentResponse <- function(...) .parseToRoxygen(
     "
-    __sensitivitySlot<-__: Assign data to the `@treatmentResponse` slot of a
+    __treatmentResponse<-__: Assign data to the `@treatmentResponse` slot of a
     `{class_}` object.
-    - value: Either a `LongTable` class object, or a list with an 'info'
-    `data.frame` of experiment metadata, 'profiles' `data.frame` with
+    - value: Either a `TreatmentResponseExperiment` class object, or a list with
+    an 'info' `data.frame` of experiment metadata, 'profiles' `data.frame` with
     summary statistics from the sensitivity experiment and a 'raw' 3D array
     where rows are experiments, columns are replicates and pages are 'Dose'
     or 'Viability' containing their respective values for that treatment by sample
@@ -1800,12 +1813,13 @@ setGeneric("sensitivitySlot<-", function(object, ..., value)
     slot of the `{class_}` object.
 
     @examples
-    sensitivitySlot({data_}) <- sensitivitySlot({data_})
+    treatmentResponse({data_}) <- treatmentResponse({data_})
 
     @md
-    @aliases sensitivitySlot<- sensitivitySlot<-,{class_},list-method
-    sensitivitySlot<-,{class_},LongTable-method
-    @exportMethod sensitivitySlot<-
+    @aliases treatmentResponse<- treamentResponse<-,{class_},list-method
+    treatmentResponse<-,{class_},LongTable-method
+    @aliases sensitivitySlot<-
+    @exportMethod treatmentResponse<-
     ",
     ...
 )
@@ -1813,8 +1827,8 @@ setGeneric("sensitivitySlot<-", function(object, ..., value)
 
 #' @rdname CoreSet-accessors
 #' @include LongTable-class.R
-#' @eval .docs_CoreSet_set_sensitivitySlot(class_=.local_class, data_=.local_data)
-setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_OR_LongTable"),
+#' @eval .docs_CoreSet_set_treatmentResponse(class_=.local_class, data_=.local_data)
+setReplaceMethod("treatmentResponse", signature(object="CoreSet", value="list_OR_LongTable"),
     function(object, value)
 {
     # funContext <- .S4MethodContext('sensitivitySlot<-', class(object), class(value))
@@ -1825,6 +1839,8 @@ setReplaceMethod("sensitivitySlot", signature(object="CoreSet", value="list_OR_L
     object@treatmentResponse <- value
     return(object)
 })
+#' @export
+`sensitivitySlot<-` <- function(..., value) `treatmentResponse<-`(..., value=value)
 
 
 ##
@@ -1922,7 +1938,7 @@ setGeneric("sensNumber<-", function(object, value) standardGeneric("sensNumber<-
 setReplaceMethod('sensNumber', signature(object="CoreSet", value="matrix"),
     function(object, value)
 {
-    if (is(sensitivitySlot(object), 'LongTable')) {
+    if (is(treatmentResponse(object), 'LongTable')) {
         object
     } else {
         object@treatmentResponse$n <- value

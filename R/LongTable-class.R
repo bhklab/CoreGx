@@ -1,4 +1,5 @@
 #' @include immutable-class.R
+#' @include allGenerics.R
 NULL
 
 #' @title LongTable class definition
@@ -81,7 +82,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
 
     # handle missing parameters
     isMissing <- c(rowData=missing(rowData), rowIDs=missing(rowIDs),
-        colIDs=missing(colIDs), assays=missing(assays),
+        colIDs=missing(colIDs), colData=missing(colData), assays=missing(assays),
         assayIDs=missing(assayIDs))
 
     if (any(isMissing)) stop(.errorMsg('\nRequired parameter(s) missing: ',
@@ -125,6 +126,16 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     }
     assays <- copy(assays)
 
+    ## FIXME:: Move all validity checks to top of the function to prevent wasted
+    ## computation or into class validity method
+
+    # capture row internal metadata
+    if (is.numeric(rowIDs) || is.logical(rowIDs))
+        rowIDs <- colnames(rowData)[rowIDs]
+    if (!all(rowIDs %in% colnames(rowData)))
+        stop(.errorMsg('\nRow IDs not in rowData: ',
+            setdiff(rowIDs, colnames(rowData)), collapse=', '))
+
     # Create the row and column keys for LongTable internal mappings
     if (!('rowKey' %in% colnames(rowData)))
         rowData[, c('rowKey') := .GRP, keyby=c(rowIDs)]
@@ -135,16 +146,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     # NOTE: assign parent as emptyenv to prevent leaving parent.frame on the stack
     internals <- setNames(vector("list", length=6),
         c("rowIDs", "rowMeta", "colIDs", "colMeta", "assayKeys", "assayIndex"))
-
-    ## FIXME:: Move all validity checks to top of the function to prevent wasted
-    ## computation or into class validity method
-
-    # capture row internal metadata
-    if (is.numeric(rowIDs) || is.logical(rowIDs))
-        rowIDs <- colnames(rowData)[rowIDs]
-    if (!all(rowIDs %in% colnames(rowData)))
-        stop(.errorMsg('\nRow IDs not in rowData: ',
-            setdiff(rowIDs, colnames(rowData)), collapse=', '))
     internals$rowIDs <- rowIDs
     internals$rowMeta <- setdiff(colnames(rowData[, -'rowKey']), rowIDs)
 
@@ -474,45 +475,12 @@ setMethod('colMeta', signature(object='LongTable'),
     if (data) colData(object, key=TRUE)[, ..cols] else cols
 })
 
-#' Retrieve the value columns for the assays in a LongTable
-#'
-#' @examples
-#' assayCols(merckLongTable)
-#'
-#' @describeIn LongTable Get a list of column names for each assay in a
-#'   `LongTable`.
-#'
-#' @param object `LongTable`
-#' @param i Optional parameter specifying the `character` name or `integer`
-#' index of the assay to get the column names for. If missing, returns a
-#' list of value column names for all the assays.
-#'
-#' @return A `list` of `character` vectors containing the value column names for
-#' each assay if i is missing, otherwise a `character` vector of value column
-#' names for the selected assay.
-#'
-#' @import data.table
-#' @export
-setMethod('assayCols', signature(object='LongTable'),
-    function(object, i) {
 
-    colNameList <- lapply(assays(object, key=FALSE), names)
-    if (!missing(i)) {
-        if (length(i) > 1) stop(.errorMsg('The i parameter only accepts a ',
-            'single assay name or index'))
-
-        if ((is.numeric(i) && i < length(colNameList)) ||
-            (is.character(i) && i %in% names(colNameList)))
-            colNameList[[i]]
-        else
-            stop(.errorMsg("The specified index is invalid!"))
-    } else {
-        colNameList
-    }
-})
 
 #' Retrieve the unique identifier columns used for primary keys in rowData and
 #'    colData.
+#'
+#' @describeIn LongTable Get the names of all id columns.
 #'
 #' @examples
 #' idCols(merckLongTable)
@@ -526,4 +494,79 @@ setMethod('assayCols', signature(object='LongTable'),
 setMethod('idCols', signature('LongTable'),
     function(object) {
     return(unique(c(rowIDs(object), colIDs(object))))
+})
+
+#' Retrieve a copy of the assayIndex from the `@.intern` slot.
+#'
+#' @describeIn LongTable Get the assayIndex item from the objects internal metadata.
+#'
+#' @param `x` A `LongTable` or inheriting class.
+#'
+#' @return A `mutable` copy of the "assayIndex" for `x`
+#'
+#' @examples
+#' assayIndex(nci_TRE_small)
+#'
+#' @aliases assayIndex,LongTable-method
+#' @export
+setMethod("assayIndex", signature("LongTable"), function(x) {
+    mutable(getIntern(x, "assayIndex"))
+})
+
+#' Retrieve a copy of the assayKeys from the `@.intern` slot.
+#'
+#' @describeIn LongTable Get the assayKeys item from the objects internal metadata.
+#'
+#' @param `x` A `LongTable` or inheriting class.
+#' @param `i` An optional valid assay name or index in `x`.
+#'
+#' @return A `mutable` copy of the "assyKeys" for `x`
+#'
+#' @examples
+#' assayKeys(nci_TRE_small)
+#' assayKeys(nci_TRE_small, "sensitivity")
+#' assayKeys(nci_TRE_small, 1)
+#'
+#' @aliases assayKeys,LongTable-method
+#' @export
+setMethod("assayKeys", signature("LongTable"), function(x, i) {
+    keys <- mutable(getIntern(x, "assayKeys"))
+    # error handling occurs in `[[`
+    if (!missing(i)) keys[[i]] else keys
+})
+
+
+#' Retrieve the value columns for the assays in a LongTable
+#'
+#' @examples
+#' assayCols(merckLongTable)
+#'
+#' @describeIn LongTable Get a list of column names for each assay in the object.
+#'
+#' @param object `LongTable`
+#' @param i Optional parameter specifying the `character` name or `integer`
+#' index of the assay to get the column names for. If missing, returns a
+#' list of value column names for all the assays.
+#'
+#' @return A `list` of `character` vectors containing the value column names for
+#' each assay if i is missing, otherwise a `character` vector of value column
+#' names for the selected assay.
+#'
+#' @import data.table
+#' @export
+setMethod('assayCols', signature(object='LongTable'),
+        function(object, i) {
+    if (!missing(i)) {
+        stopifnot(is.numeric(i) || is.character(i))
+        stopifnot(length(i) == 1)
+        stopifnot(i %in% assayNames(object) ||
+            i %in% seq_along(assayNames(object)))
+    }
+    keys <- assayKeys(object)
+    assayColnames <- Map(setdiff,
+        x=lapply(assays(object, raw=TRUE), FUN=colnames),
+        y=as.list(assayNames(object))
+    )
+    assayCols <- Map(c, keys, assayColnames)
+    if (!missing(i)) assayCols[[i]] else assayCols
 })

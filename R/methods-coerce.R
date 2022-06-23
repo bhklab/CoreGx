@@ -337,6 +337,9 @@ setAs("LongTable", "SummarizedExperiment", def=function(from) {
     )
 }
 
+#' @name as
+#'
+#' @title
 #' Coerce a `LongTableDataMapper` to a `TREDataMapper`
 #'
 #' @param from A `LongTableDataMapper` to coerce.

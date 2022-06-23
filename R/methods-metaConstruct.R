@@ -42,6 +42,38 @@ setGeneric('metaConstruct', function(mapper, ...) standardGeneric('metaConstruct
 #' @export
 setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
         function(mapper) {
+    .metaConstruct(mapper)
+})
+
+#' @rdname metaConstruct
+#' @title metaConstruct
+#'
+#' @param mapper An `TREDataMapper` object abstracting arguments to an
+#'  the `TreatmentResponseExperiment` constructor.
+#'
+#' @return A `TreatmentResponseExperiment` object, as specified in the mapper.
+#'
+#' @examples
+#' data(exampleDataMapper)
+#' exampleDataMapper <- as(exampleDataMapper, "TREDataMapper")
+#' rowDataMap(exampleDataMapper) <- list(c('treatmentid'), c())
+#' colDataMap(exampleDataMapper) <- list(c('sampleid'), c())
+#' assayMap(exampleDataMapper) <- list(sensitivity=list(c("treatmentid", "sampleid"), c('viability')))
+#' metadataMap(exampleDataMapper) <- list(experiment_metadata=c('metadata'))
+#' tre <- metaConstruct(exampleDataMapper)
+#' tre
+#'
+#' @md
+#' @importFrom data.table key
+#' @export
+setMethod('metaConstruct', signature(mapper='TREDataMapper'),
+        function(mapper) {
+    .metaConstruct(mapper, constructor=CoreGx::TreatmentResponseExperiment)
+})
+
+#' @keywords internal
+#' @noRd
+.metaConstruct <- function(mapper, constructor=CoreGx::LongTable) {
     funContext <- paste0('[', .S4MethodContext('metaConstruct', class(mapper)[1]))
 
     # subset the rawdata slot to build out each component of LongTable
@@ -69,11 +101,11 @@ setMethod('metaConstruct', signature(mapper='LongTableDataMapper'),
     metadataL <- c(metadataL, metadata(mapper))
 
     ## FIXME:: Handle TREDataMapper class after updating constructor
-    object <- CoreGx::LongTable(
+    object <- constructor(
         rowData=rowDataDT, rowIDs=rowIDs,
         colData=colDataDT, colIDs=colIDs,
         assays=assayDtL, assayIDs=assayIDs,
         metadata=metadataL)
 
     return(object)
-})
+}

@@ -242,6 +242,50 @@ setGeneric('buildLongTable',
     function(from, ...) standardGeneric('buildLongTable'))
 
 
+#' Perform aggregation over an S4 object, but return an object of the same
+#' class.
+#'
+#' @examples
+#' print("Generics shouldn't need examples?")
+#'
+#' @param x An `S4` object to endomorphically aggregate over.
+#' @param ... `pairlist` Allow definition of new parameters for
+#'     implementations of this generic.
+#'
+#' @return An object with the same class as `x`.
+#'
+#' @export
+setGeneric("endoaggregate", function(x, ...) standardGeneric("endoaggregate"))
+
+#' Retrieve a set of assayKeys
+#'
+#' @examples
+#' print("Generics shouldn't need examples?")
+#'
+#' @param x An `S4` object.
+#' @param ... `pairlist` Allow definition of new parameters for
+#'     implementations of this generic.
+#'
+#' @return An object representing the "assayKeys" of an `S4` object.
+#'
+#' @export
+setGeneric("assayKeys", function(x, ...) standardGeneric("assayKeys"))
+
+
+#' Retrieve and assayIndex
+#'
+#' @examples
+#' print("Generics shouldn't need examples?")
+#'
+#' @param x An `S4` object.
+#' @param ... `pairlist` Allow definition of new parameters for
+#'     implementations of this generic.
+#'
+#' @return An object representing the "assayIndex" of an `S4` object.
+#'
+#' @export
+setGeneric("assayIndex", function(x, ...) standardGeneric("assayIndex"))
+
 # ===== Other Generics
 
 
