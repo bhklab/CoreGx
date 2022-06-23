@@ -388,7 +388,6 @@ setGeneric('assayMap', function(object, ...) standardGeneric('assayMap'))
 
     @md
     @aliases assayMap,{class_},list-method assayMap,{class_},List-method
-    assayMap
     @exportMethod assayMap
     ",
     ...
@@ -421,7 +420,6 @@ setGeneric('assayMap<-', function(object, ..., value) standardGeneric('assayMap<
 
     @md
     @aliases assayMap<-,{class_},list-method assayMap<-,{class_},List-methhod
-    assayMap<-
     @exportMethod assayMap<-
     ",
     ...
@@ -525,8 +523,7 @@ setGeneric('metadataMap', function(object, ...) standardGeneric('metadataMap'))
 )
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class_3,
-#' data_=.local_data_3)
+#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class_3, data_=.local_data_3)
 setMethod('metadataMap', signature(object='LongTableDataMapper'),
         function(object) {
     object@metadataMap
@@ -559,8 +556,7 @@ setGeneric('metadataMap<-', function(object, ..., value)
 )
 
 #' @rdname LongTableDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_3,
-#' data_=.local_data_3, col_='metadata')
+#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_3, data_=.local_data_3, col_='metadata')
 setReplaceMethod('metadataMap', signature(object='LongTableDataMapper',
     value='list_OR_List'), function(object, value) {
     funContext <- '[CoreGx::`metadataMap<-,LongTableDataMapper-method`]\n\t'

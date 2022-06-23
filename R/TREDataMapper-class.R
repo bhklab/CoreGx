@@ -219,6 +219,7 @@ setMethod("colData", signature(x="TREDataMapper"), function(x, key=TRUE) {
 
 #' @rdname TREDataMapper-accessors
 #' @eval .docs_LongTableDataMapper_get_assayMap(class_=.local_class_5, data_=.local_data_5)
+#' @aliases assayMap
 setMethod('assayMap', signature(object='TREDataMapper'),
         function(object) {
     callNextMethod()
@@ -227,6 +228,7 @@ setMethod('assayMap', signature(object='TREDataMapper'),
 
 #' @rdname TREDataMapper-accessors
 #' @eval .docs_LongTableDataMapper_set_assayMap(class_=.local_class_5, data_=.local_data_5)
+#' @aliases assayMap<-
 setReplaceMethod('assayMap', signature(object='TREDataMapper',
         value='list_OR_List'), function(object, value) {
     callNextMethod()
@@ -273,8 +275,8 @@ setMethod("assays", signature(x="TREDataMapper"),
 # -- metadataMap
 
 #' @rdname TREDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class_5,
-#' data_=.local_data_5)
+#' @eval .docs_LongTableDataMapper_get_metadataMap(class_=.local_class_5, data_=.local_data_5)
+#' @aliases metadataMap
 setMethod('metadataMap', signature(object='TREDataMapper'),
         function(object) {
     callNextMethod()
@@ -282,8 +284,8 @@ setMethod('metadataMap', signature(object='TREDataMapper'),
 
 
 #' @rdname TREDataMapper-accessors
-#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_5,
-#' data_=.local_data_5, col_='metadata')
+#' @eval .docs_LongTableDataMapper_set_metadataMap(class_=.local_class_5, data_=.local_data_5, col_='metadata')
+#' @aliases metadataMap<-
 setReplaceMethod('metadataMap', signature(object='TREDataMapper',
         value='list_OR_List'), function(object, value) {
     callNextMethod()

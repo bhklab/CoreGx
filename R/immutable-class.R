@@ -133,7 +133,7 @@ c.immutable <- function(x, ...) {
 #' immut_mat[1:5, 1:5]
 #'
 #' @md
-#' @aliases subset.immutable, [.immutable, [[.immutable, $.immutable
+#' @aliases subset, [.immutable, [[.immutable, $.immutable
 #' @export
 subset.immutable <- function(x, ...) {
     sub_obj <- NextMethod()

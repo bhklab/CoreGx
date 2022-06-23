@@ -3,7 +3,7 @@
 \name{setOps-immutable}
 \alias{setOps-immutable}
 \alias{subset.immutable}
-\alias{subset.immutable,}
+\alias{subset,}
 \alias{[.immutable,}
 \alias{[[.immutable,}
 \alias{$.immutable}

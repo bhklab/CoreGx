@@ -9,6 +9,9 @@
 \alias{rowMeta,LongTable-method}
 \alias{colIDs,LongTable-method}
 \alias{colMeta,LongTable-method}
+\alias{idCols,LongTable-method}
+\alias{assayIndex,LongTable-method}
+\alias{assayKeys,LongTable-method}
 \alias{assayCols,LongTable-method}
 \alias{getIntern,LongTable,character-method}
 \alias{getIntern,LongTable,missing-method}
@@ -35,6 +38,12 @@
 \S4method{colIDs}{LongTable}(object, data = FALSE, key = FALSE)
 
 \S4method{colMeta}{LongTable}(object, data = FALSE, key = FALSE)
+
+\S4method{idCols}{LongTable}(object)
+
+\S4method{assayIndex}{LongTable}(x)
+
+\S4method{assayKeys}{LongTable}(x, i)
 
 \S4method{assayCols}{LongTable}(object, i)
 
@@ -101,9 +110,9 @@ instead of the column names? Default is FALSE.}
 !withDimnames. This is incompatible with \code{summarize=TRUE}, which will
 drop the key columns regardless of the value of this argument.}
 
-\item{i}{\code{character(1)} name or \code{integer} index of the desired assay.}
-
 \item{x}{The \code{LongTable} object to retrieve the dimnames for.}
+
+\item{i}{\code{character(1)} name or \code{integer} index of the desired assay.}
 
 \item{use.names}{\code{logical} This parameter is just here to stop matching
 the positional argument to use.names from the rowData generic. It
@@ -134,6 +143,10 @@ were aggregated over be dropped?}
 
 \item{keys}{\code{logical} Should the row and column keys also be returned?
 Defaults to !withDimnames.}
+
+\item{`x`}{A \code{LongTable} or inheriting class.}
+
+\item{`i`}{An optional valid assay name or index in \code{x}.}
 }
 \value{
 \code{LongTable} object containing the assay data from a treatment
@@ -150,6 +163,13 @@ otherwise a \code{data.table} with the data from the colData id columns.
 
 A \code{character} vector of colData column names if data is FALSE,
 otherwise a \code{data.table} with the data from the colData metadta columns.
+
+\code{character} A character vector containing the unique rowIDs and
+colIDs in a LongTable object.
+
+A \code{mutable} copy of the "assayIndex" for \code{x}
+
+A \code{mutable} copy of the "assyKeys" for \code{x}
 
 A \code{list} of \code{character} vectors containing the value column names for
 each assay if i is missing, otherwise a \code{character} vector of value column
@@ -211,8 +231,13 @@ uniquely identify each row.
 \item \code{colMeta}: Get the names of the non-id columns in the colData
 \code{data.table}.
 
-\item \code{assayCols}: Get a list of column names for each assay in a
-\code{LongTable}.
+\item \code{idCols}: Get the names of all id columns.
+
+\item \code{assayIndex}: Get the assayIndex item from the objects internal metadata.
+
+\item \code{assayKeys}: Get the assayKeys item from the objects internal metadata.
+
+\item \code{assayCols}: Get a list of column names for each assay in the object.
 
 \item \code{getIntern}: Access structural metadata present within a
 LongTable object. This is mostly for developmer use.
@@ -308,6 +333,14 @@ rowMeta(merckLongTable)
 colIDs(merckLongTable)
 
 colMeta(merckLongTable)
+
+idCols(merckLongTable)
+
+assayIndex(nci_TRE_small)
+
+assayKeys(nci_TRE_small)
+assayKeys(nci_TRE_small, "sensitivity")
+assayKeys(nci_TRE_small, 1)
 
 assayCols(merckLongTable)
 

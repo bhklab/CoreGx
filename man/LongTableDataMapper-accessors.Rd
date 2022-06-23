@@ -15,11 +15,9 @@
 \alias{assayMap,LongTableDataMapper-method}
 \alias{assayMap,LongTableDataMapper,list-method}
 \alias{assayMap,LongTableDataMapper,List-method}
-\alias{assayMap}
 \alias{assayMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{assayMap<-,LongTableDataMapper,list-method}
 \alias{assayMap<-,LongTableDataMapper,List-methhod}
-\alias{assayMap<-}
 \alias{metadataMap,LongTableDataMapper-method}
 \alias{metadataMap<-,LongTableDataMapper,list_OR_List-method}
 \alias{metadataMap<-,LongTableDataMapper-method}

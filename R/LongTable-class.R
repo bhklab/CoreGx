@@ -480,6 +480,8 @@ setMethod('colMeta', signature(object='LongTable'),
 #' Retrieve the unique identifier columns used for primary keys in rowData and
 #'    colData.
 #'
+#' @describeIn LongTable Get the names of all id columns.
+#'
 #' @examples
 #' idCols(merckLongTable)
 #'
@@ -496,24 +498,38 @@ setMethod('idCols', signature('LongTable'),
 
 #' Retrieve a copy of the assayIndex from the `@.intern` slot.
 #'
+#' @describeIn LongTable Get the assayIndex item from the objects internal metadata.
+#'
 #' @param `x` A `LongTable` or inheriting class.
 #'
 #' @return A `mutable` copy of the "assayIndex" for `x`
 #'
+#' @examples
+#' assayIndex(nci_TRE_small)
+#'
+#' @aliases assayIndex,LongTable-method
 #' @export
-setMethod("assayIndex", signature(x="LongTable"), function(x) {
+setMethod("assayIndex", signature("LongTable"), function(x) {
     mutable(getIntern(x, "assayIndex"))
 })
 
-#' Retrieve a copy of the assayKey from the `@.intern` slot.
+#' Retrieve a copy of the assayKeys from the `@.intern` slot.
+#'
+#' @describeIn LongTable Get the assayKeys item from the objects internal metadata.
 #'
 #' @param `x` A `LongTable` or inheriting class.
 #' @param `i` An optional valid assay name or index in `x`.
 #'
-#' @return A `mutable` copy of the "assayIndex" for `x`
+#' @return A `mutable` copy of the "assyKeys" for `x`
 #'
+#' @examples
+#' assayKeys(nci_TRE_small)
+#' assayKeys(nci_TRE_small, "sensitivity")
+#' assayKeys(nci_TRE_small, 1)
+#'
+#' @aliases assayKeys,LongTable-method
 #' @export
-setMethod("assayKeys", signature(x="LongTable"), function(x, i) {
+setMethod("assayKeys", signature("LongTable"), function(x, i) {
     keys <- mutable(getIntern(x, "assayKeys"))
     # error handling occurs in `[[`
     if (!missing(i)) keys[[i]] else keys
@@ -525,8 +541,7 @@ setMethod("assayKeys", signature(x="LongTable"), function(x, i) {
 #' @examples
 #' assayCols(merckLongTable)
 #'
-#' @describeIn LongTable Get a list of column names for each assay in a
-#'   `LongTable`.
+#' @describeIn LongTable Get a list of column names for each assay in the object.
 #'
 #' @param object `LongTable`
 #' @param i Optional parameter specifying the `character` name or `integer`
