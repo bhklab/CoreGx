@@ -692,7 +692,9 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
 
     # -- update assayIndex with the new assay
     setkeyv(annotatedIndex, assayKey)
-    annotatedIndex[value, (i) := get(i), by=.EACHI]
+    if (i %in% colnames(annotatedIndex)) annotatedIndex[, (i) := NULL]
+    # FIXME:: This is really slow with by=.EACHI when the cardinality is high
+    annotatedIndex[value, (i) := get(i), on=assayKey, by=.EACHI]
     annotatedIndex[, (assayKey) := NULL]
     setkeyv(annotatedIndex, unique(c(assayNames(x), i)))
 

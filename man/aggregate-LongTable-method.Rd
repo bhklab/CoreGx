@@ -9,6 +9,7 @@
   assay,
   by,
   ...,
+  subset = TRUE,
   nthread = 1,
   progress = TRUE,
   BPPARAM = NULL,
@@ -28,6 +29,11 @@ If you name aggregation calls, that will be the column name of the value
 in the resulting \code{data.table} otherwise a default name will be parsed from
 the function name and its first argument, which is assumed to be the name
 of the column being aggregated over.}
+
+\item{subset}{\code{call} An R call to evaluate before perfoming an aggregate.
+This allows you to aggregate over a subset of columns in an assay but have
+it be assigned to the parent object. Default is TRUE, which includes all
+rows. Passed through as the \code{i} argument in \verb{[.data.table}.}
 
 \item{nthread}{\code{numeric(1)} Number of threads to use for split-apply-combine
 parallelization. Uses \code{BiocParllel::bplapply} if nthread > 1 or you pass in

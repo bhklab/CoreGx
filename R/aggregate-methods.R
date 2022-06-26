@@ -86,6 +86,10 @@ NULL
 #'
 #' @param x `LongTable` or inheriting class to compute aggregation on.
 #' @param assay `character(1)` The assay to aggregate over.
+#' @param subset `call` An R call to evaluate before perfoming an aggregate.
+#' This allows you to aggregate over a subset of columns in an assay but have
+#' it be assigned to the parent object. Default is TRUE, which includes all
+#' rows. Passed through as the `i` argument in `[.data.table`.
 #' @eval .docs_CoreGx_aggregate(curly="{")
 #'
 #' @return `data.table` of aggregation results.
@@ -94,10 +98,12 @@ NULL
 #'
 #' @export
 setMethod("aggregate", signature(x="LongTable"),
-        function(x, assay, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
-        enlist=TRUE) {
+        function(x, assay, by, ...,  subset=TRUE, nthread=1, progress=TRUE,
+        BPPARAM=NULL, enlist=TRUE) {
+    i <- substitute(subset)
+    assay_ <- x[[assay]][eval(i), ]
     aggregate2(
-        x[[assay]],
+        assay_,
         by=by,
         ...,
         nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist)
@@ -116,6 +122,10 @@ setMethod("aggregate", signature(x="LongTable"),
 #' original S3 method for a `data.table`.
 #'
 #' @param x `data.table` to compute aggregation over.
+#' @param subset `call` An R call to evaluate before perfoming an aggregate.
+#' This allows you to aggregate over a subset of columns in an assay but have
+#' it be assigned to the parent object. Default is TRUE, which includes all
+#' rows. Passed through as the `i` argument in `[.data.table`.
 #' @eval .docs_CoreGx_aggregate(curly="{")
 #'
 #' @return `data.table` of aggregated results with an `aggregations` attribute
@@ -123,7 +133,10 @@ setMethod("aggregate", signature(x="LongTable"),
 #'
 #' @export
 setMethod("aggregate", signature="data.table",
-        function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL, enlist=TRUE) {
+        function(x, by, ..., subset=TRUE, nthread=1, progress=TRUE,
+        BPPARAM=NULL, enlist=TRUE) {
+    i <- substitute(subset)
+    assay_ <- x[eval(i), ]
     aggregate2(
         x,
         by=by,

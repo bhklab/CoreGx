@@ -15,8 +15,7 @@ inheriting class}
   nthread = 1,
   progress = TRUE,
   BPPARAM = NULL,
-  enlist = TRUE,
-  strategy = c("merge", "rbind", "cbind")
+  enlist = TRUE
 )
 }
 \arguments{
@@ -58,11 +57,6 @@ settings from BPPARAM as long as \verb{bpworkers<-} is defined for that class.}
 \item{enlist}{\code{logical(1)} Default is \code{TRUE}. Set to \code{FALSE} to evaluate
 the first call in \code{...} within \code{data.table} groups. See details for more
 information.}
-
-\item{strategy}{\code{character(1)} Assuming \code{target} is an existing assay
-in the \code{LongTable}, how should the assays be merged? Options are \code{cbind},
-"rbind" or "merge". For strategy "merge", the join will be done using the
-\code{by} columns as the key. Defaults to "merge".}
 }
 \value{
 Object with the same class as \code{x}, with the aggregation results
