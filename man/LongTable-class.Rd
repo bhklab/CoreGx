@@ -73,8 +73,8 @@
   x,
   i,
   withDimnames = TRUE,
-  summarize = FALSE,
-  metadata = withDimnames,
+  summarize = withDimnames,
+  metadata = !summarize,
   key = !(summarize || withDimnames),
   ...
 )
@@ -88,7 +88,7 @@
   i,
   withDimnames = TRUE,
   summarize = withDimnames,
-  metadata = withDimnames,
+  metadata = !summarize,
   keys = !withDimnames
 )
 
@@ -136,13 +136,13 @@ the assay. Default is TRUE to allow easy use of group by arguments when
 performing data aggregation using the \code{data.table} API.}
 
 \item{metadata}{\code{logical} Should the row and column metadata also
-be joined to the to the returned assay. Default is withDimnames.}
+be joined to the to the returned assay. Default is \code{!summarize}.}
 
 \item{summarize}{\code{logical(1)} For summarized assays, should columns which
 were aggregated over be dropped?}
 
 \item{keys}{\code{logical} Should the row and column keys also be returned?
-Defaults to !withDimnames.}
+Defaults to \code{!withDimnames}.}
 
 \item{`x`}{A \code{LongTable} or inheriting class.}
 

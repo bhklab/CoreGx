@@ -503,7 +503,7 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'),
 #' @import data.table
 #' @export
 setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
-        summarize=FALSE, metadata=withDimnames,
+        summarize=withDimnames, metadata=!summarize,
         key=!(summarize || withDimnames), ...) {
     # secret arguments for internal use
     if (any(...names() == "raw") && isTRUE(...elt(which(...names() == "raw")))) {

@@ -412,15 +412,15 @@ setMethod('[', signature('LongTable'),
 #' @param summarize `logical(1)` For summarized assays, should columns which
 #' were aggregated over be dropped?
 #' @param metadata `logical` Should the row and column metadata also
-#'    be joined to the to the returned assay. Default is withDimnames.
+#'    be joined to the to the returned assay. Default is `!summarize`.
 #' @param keys `logical` Should the row and column keys also be returned?
-#'    Defaults to !withDimnames.
+#'    Defaults to `!withDimnames`.
 #'
 #' @importFrom crayon cyan magenta
 #' @import data.table
 #' @export
 setMethod('[[', signature('LongTable'), function(x, i, withDimnames=TRUE,
-        summarize=withDimnames, metadata=withDimnames, keys=!withDimnames) {
+        summarize=withDimnames, metadata=!summarize, keys=!withDimnames) {
     funContext <- .S4MethodContext('[[', class(x))
 
     if (metadata && !withDimnames) {
