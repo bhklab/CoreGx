@@ -83,14 +83,7 @@
 
 \S4method{assayNames}{LongTable}(x)
 
-\S4method{[[}{LongTable,ANY,ANY}(
-  x,
-  i,
-  withDimnames = TRUE,
-  summarize = withDimnames,
-  metadata = !summarize,
-  keys = !withDimnames
-)
+\S4method{[[}{LongTable,ANY,ANY}(x, i)
 
 \S4method{dim}{LongTable}(x)
 
@@ -131,18 +124,19 @@ assay has only some of the row or column indentifiers and an assay,
 \code{i}, already exists in \code{x}, then try join=TRUE to attempt to join with
 existing data.}
 
-\item{withDimnames}{\code{logical(1)} Should the row and column IDs be joined to
-the assay. Default is TRUE to allow easy use of group by arguments when
-performing data aggregation using the \code{data.table} API.}
+\item{withDimnames}{\code{logical(1)} Should the dimension names be returned
+joined to the assay. This retrieves both the row and column identifiers
+and returns them joined to the assay. For}
 
-\item{metadata}{\code{logical} Should the row and column metadata also
-be joined to the to the returned assay. Default is \code{!summarize}.}
+\item{metadata}{\code{logical(1)} Should all of the metadata also be joined to
+the assay. This is useful when modifying assays as the resulting list
+has all the information needed to recreated the LongTable object. Defaults
+to \code{withDimnames}.}
 
-\item{summarize}{\code{logical(1)} For summarized assays, should columns which
-were aggregated over be dropped?}
-
-\item{keys}{\code{logical} Should the row and column keys also be returned?
-Defaults to \code{!withDimnames}.}
+\item{summarize}{\code{logical(1)} If the assays is a summary where some of
+\code{idCols(x)} are not in \code{assayKeys(x, i)}, then those missing columns
+are dropped. Defaults to \code{FALSE}. When \code{metadata} is \code{TRUE}, only
+metadata columns with 1:1 cardinality with the assay keys for \code{i}.}
 
 \item{`x`}{A \code{LongTable} or inheriting class.}
 
