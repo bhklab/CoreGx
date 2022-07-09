@@ -314,11 +314,11 @@ testthat::test_that("`reindex,LongTable-method` removes gaps in keys in subset L
 #    )
 #})
 
-testthat::test_that("`[[,LongTable-method` allows only one assay selection at a time",{
-    testthat::expect_error({ tre[[1:2]] },
-        regexp = ".*Please specifying a single string assay name or integer index.*"
-    )
-    testthat::expect_error({ tre[[c("sensitivity", "profiles")]] },
-        regexp = ".*Please specifying a single string assay name or integer index.*"
-    )
-})
+#testthat::test_that("`[[,LongTable-method` allows only one assay selection at a time",{
+#    testthat::expect_error({ tre[[1:2]] },
+#        regexp = ".*Please specifying a single string assay name or integer index.*"
+#    )
+#    testthat::expect_error({ tre[[c("sensitivity", "profiles")]] },
+#        regexp = ".*Please specifying a single string assay name or integer index.*"
+#    )
+#})
