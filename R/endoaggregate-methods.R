@@ -28,14 +28,15 @@ NULL
 #' @export
 setMethod("endoaggregate", signature(x="LongTable"),
         function(x, ..., assay, target=assay, by, subset=TRUE, nthread=1,
-        progress=TRUE, BPPARAM=NULL, enlist=TRUE) {
+        progress=TRUE, BPPARAM=NULL, enlist=TRUE, moreArgs=list()) {
     i <- substitute(subset)
     assay_ <- x[[assay]][eval(i), ]
     res <- aggregate2(
         assay_,
         by=by,
         ...,
-        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist
+        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist,
+        moreArgs=moreArgs
     )
     if (target %in% assayNames(x)) {
         res <- merge.data.table(x[[assay]], res, by=by)

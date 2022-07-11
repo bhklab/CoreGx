@@ -13,7 +13,8 @@
   nthread = 1,
   progress = TRUE,
   BPPARAM = NULL,
-  enlist = TRUE
+  enlist = TRUE,
+  moreArgs = list()
 )
 }
 \arguments{
@@ -52,6 +53,10 @@ settings from BPPARAM as long as \verb{bpworkers<-} is defined for that class.}
 \item{enlist}{\code{logical(1)} Default is \code{TRUE}. Set to \code{FALSE} to evaluate
 the first call in \code{...} within \code{data.table} groups. See details for more
 information.}
+
+\item{moreArgs}{\code{list()} A named list where each item is an argument one of
+the calls in \code{...} which is not a column in the table being aggregated. Use
+to further parameterize you calls.}
 }
 \value{
 \code{data.table} of aggregation results.
