@@ -406,43 +406,12 @@ setMethod('[', signature('LongTable'),
 #'
 #' @param x `LongTable` object to retrieve assays from
 #' @param i `character(1)` name or `integer` index of the desired assay.
-#' @param withDimnames `logical(1)` Should the row and column IDs be joined to
-#'    the assay. Default is TRUE to allow easy use of group by arguments when
-#'    performing data aggregation using the `data.table` API.
-#' @param summarize `logical(1)` For summarized assays, should columns which
-#' were aggregated over be dropped?
-#' @param metadata `logical` Should the row and column metadata also
-#'    be joined to the to the returned assay. Default is withDimnames.
-#' @param keys `logical` Should the row and column keys also be returned?
-#'    Defaults to !withDimnames.
 #'
 #' @importFrom crayon cyan magenta
 #' @import data.table
 #' @export
-setMethod('[[', signature('LongTable'), function(x, i, withDimnames=TRUE,
-        summarize=withDimnames, metadata=withDimnames, keys=!withDimnames) {
-    funContext <- .S4MethodContext('[[', class(x))
-
-    if (metadata && !withDimnames) {
-        .warning('\nUnable to return metadata without dimnames, proceeding',
-            ' as if withDimnames=TRUE.')
-        withDimnames <- TRUE
-    }
-
-    if (length(i) > 1)
-        .error('\nPlease only select one assay! To subset on multiple',
-            'assays please see ?subset')
-
-    if (keys) {
-        .warning('\nIgnoring withDimnames and metadata arguments when',
-            ' keys=TRUE.')
-        return(assay(x, i))
-    } else {
-        if (withDimnames || metadata)
-            return(assay(x, i, withDimnames, metadata))
-        else
-            return(assay(x, i)[, -c('rowKey', 'colKey')])
-    }
+setMethod('[[', signature('LongTable'), function(x, i) {
+    assay(x, i)
 })
 
 
