@@ -522,7 +522,8 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
     if (length(keepAssay) < 1)
         stop(.errorMsg('\n[CoreGx::assay] There is no assay ', i,
             ' in this LongTable. Use assayNames(longTable) for a list',
-            'of valid assay names.'))
+            'of valid assay names.'),
+            call.=FALSE)
 
     if (!withDimnames && metadata)
         warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
@@ -531,7 +532,8 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 
     if (summarize && key)
         warning(.warnMsg('\n[CoreGx::assay] Cannot use key=TRUE when',
-            ' summarize=TRUE. Ignoring the key argument.'))
+            ' summarize=TRUE. Ignoring the key argument.'),
+            call.=FALSE)
 
     # extract the specified assay
     assayData <- copy(x@assays[[keepAssay]])
