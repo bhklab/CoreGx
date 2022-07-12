@@ -416,6 +416,12 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
 #' @md
 #' @export
 setMethod("show", signature=signature(object="CoreSet"), function(object) {
+
+    if (!.hasSlot(object, "sample") || !.hasSlot(object, "treatment"))
+        stop(.errorMsg("This ", class(object)[1], " object appears to be out",
+            "of date! Please run object <- updateObject(object) to update ",
+            "the object for compatibility with the current release."))
+
     cat(paste0("<", class(object)[1], ">\n"))
     space <- "  "
     cat("Name: ", name(object), "\n")
