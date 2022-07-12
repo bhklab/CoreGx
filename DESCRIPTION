@@ -2,7 +2,7 @@ Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
 Version: 2.1.5
-Date: 2022-06-22
+Date: 2022-07-12
 Authors@R: c(
     person(given="Petr", family="Smirnov", email = "petr.smirnov@uhnresearch.ca",
         role = c("aut")),
@@ -11,7 +11,7 @@ Authors@R: c(
     person(given="Christopher", family="Eeles", email = "christopher.eeles@uhnresearch.ca",
         role = c("aut")),
     person(given="Feifei", family="Li", email="ff.li@mail.utoronto.ca",
-        role=c("ctb")),
+        role=c("aut")),
     person("Benjamin", "Haibe-Kains",
         email = "benjamin.haibe.kains@utoronto.ca", role = c("aut", "cre"))
     )
@@ -95,6 +95,7 @@ Collate:
     'globals.R'
     'gwc.R'
     'matthewCor.R'
+    'mergeAssays-method.R'
     'methods-coerce.R'
     'methods-dim.R'
     'methods-dimnames.R'

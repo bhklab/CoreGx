@@ -17,11 +17,6 @@ NULL
 #' This allows you to aggregate over a subset of columns in an assay but have
 #' it be assigned to the parent object. Default is TRUE, which includes all
 #' rows. Passed through as the `i` argument in `[.data.table`.
-## TODO:: Do we need this parameter? Is there any case where a join wouldn't work?
-#' @param strategy `character(1)` Assuming `target` is an existing assay
-#' in the `LongTable`, how should the assays be merged? Options are `cbind`,
-#' "rbind" or "merge". For strategy "merge", the join will be done using the
-#' `by` columns as the key. Defaults to "merge".
 #' @eval .docs_CoreGx_aggregate(curly="{")
 #'
 #' @return Object with the same class as `x`, with the aggregation results
@@ -33,16 +28,16 @@ NULL
 #' @export
 setMethod("endoaggregate", signature(x="LongTable"),
         function(x, ..., assay, target=assay, by, subset=TRUE, nthread=1,
-        progress=TRUE, BPPARAM=NULL, enlist=TRUE,
-        strategy=c("merge", "rbind", "cbind")) {
+        progress=TRUE, BPPARAM=NULL, enlist=TRUE, moreArgs=list()) {
     i <- substitute(subset)
     assay_ <- x[[assay]][eval(i), ]
     res <- aggregate2(
         assay_,
         by=by,
         ...,
-        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist)
-    strategy <- match.arg(strategy)
+        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist,
+        moreArgs=moreArgs
+    )
     if (target %in% assayNames(x)) {
         res <- merge.data.table(x[[assay]], res, by=by)
     }

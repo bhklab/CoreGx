@@ -33,6 +33,9 @@ NULL
     @param enlist `logical(1)` Default is `TRUE`. Set to `FALSE` to evaluate
     the first call in `...` within `data.table` groups. See details for more
     information.
+    @param moreArgs `list()` A named list where each item is an argument one of
+    the calls in `...` which is not a column in the table being aggregated. Use
+    to further parameterize you calls.
 
     @details
     ## Use of Non-Standard Evaluation
@@ -86,6 +89,10 @@ NULL
 #'
 #' @param x `LongTable` or inheriting class to compute aggregation on.
 #' @param assay `character(1)` The assay to aggregate over.
+#' @param subset `call` An R call to evaluate before perfoming an aggregate.
+#' This allows you to aggregate over a subset of columns in an assay but have
+#' it be assigned to the parent object. Default is TRUE, which includes all
+#' rows. Passed through as the `i` argument in `[.data.table`.
 #' @eval .docs_CoreGx_aggregate(curly="{")
 #'
 #' @return `data.table` of aggregation results.
@@ -94,13 +101,16 @@ NULL
 #'
 #' @export
 setMethod("aggregate", signature(x="LongTable"),
-        function(x, assay, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
-        enlist=TRUE) {
+        function(x, assay, by, ...,  subset=TRUE, nthread=1, progress=TRUE,
+        BPPARAM=NULL, enlist=TRUE, moreArgs=list()) {
+    i <- substitute(subset)
+    assay_ <- x[[assay]][eval(i), ]
     aggregate2(
-        x[[assay]],
+        assay_,
         by=by,
         ...,
-        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist)
+        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist,
+            moreArgs=moreArgs)
 })
 
 
@@ -116,6 +126,10 @@ setMethod("aggregate", signature(x="LongTable"),
 #' original S3 method for a `data.table`.
 #'
 #' @param x `data.table` to compute aggregation over.
+#' @param subset `call` An R call to evaluate before perfoming an aggregate.
+#' This allows you to aggregate over a subset of columns in an assay but have
+#' it be assigned to the parent object. Default is TRUE, which includes all
+#' rows. Passed through as the `i` argument in `[.data.table`.
 #' @eval .docs_CoreGx_aggregate(curly="{")
 #'
 #' @return `data.table` of aggregated results with an `aggregations` attribute
@@ -123,12 +137,16 @@ setMethod("aggregate", signature(x="LongTable"),
 #'
 #' @export
 setMethod("aggregate", signature="data.table",
-        function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL, enlist=TRUE) {
+        function(x, by, ..., subset=TRUE, nthread=1, progress=TRUE,
+        BPPARAM=NULL, enlist=TRUE, moreArgs=list()) {
+    i <- substitute(subset)
+    assay_ <- x[eval(i), ]
     aggregate2(
         x,
         by=by,
         ...,
-        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist)
+        nthread=nthread, progress=progress, BPPARAM=BPPARAM, enlist=enlist,
+            moreArgs=moreArgs)
 })
 
 #' Functional API for data.table aggregation which allows capture of associated
@@ -143,11 +161,17 @@ setMethod("aggregate", signature="data.table",
 #'
 #' @export
 aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
-        enlist=TRUE) {
+        enlist=TRUE, moreArgs=list()) {
+    ## TODO:: refator to checkmate
     stopifnot(is.data.table(x))
     stopifnot(is.character(by) && all(by %in% colnames(x)))
     stopifnot(is.logical(progress) && length(progress) == 1)
     stopifnot(is.logical(enlist) && length(enlist) == 1)
+    stopifnot(is.list(moreArgs))
+    stopifnot(length(moreArgs) == 0 || all(names(moreArgs) != ""))
+
+    # -- assign moreArgs to the function scope, it is able to find the values
+    for (nm in names(moreArgs)) assign(nm, moreArgs[[nm]])
 
     # -- capture dots as a call and parse dot names, adding default names if
     # --   they are missing

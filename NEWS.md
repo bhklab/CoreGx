@@ -1,5 +1,12 @@
 # CoreGx News File
 
+# v 2.1.5
+* Add error message to CoreSet,show-method which lets users know to use updateObject if the slot names are not valid
+
+# v 2.1.4
+* Add `endoaggregate` method to compute `TreatmentResponseExperiment` assay aggregations within the object
+* Add `mergeAssays` method to allow joining assaying within a `TreatmentResponseExperiment`
+
 ## v 2.1.3
 * Updated `CoreSet` vignette to reflect recent changes to the object structure
 * Renamed the `LongTable` vignette to `TreatmentResponseExperiment` and updated

@@ -1280,77 +1280,145 @@ is.items <- function(list, ..., FUN=is)
     return(context)
 }
 
-#' Grouping monotherapy responses with dual-therapy responses
-#'   within an assay.
+# Let it live here for now...
+
+#' Build an assay table with an `S4` object.
+#'
+#' @param object `S4` An S4 object a list-like slot containing assays for the
+#'   object.
+#' @param ... Allow new arguments to be defined for this generic.
+#'
+#' @return `data.table`.
+#'
+#' @examples
+#' "This is a generic method!"
+#'
+#' @exportMethod buildComboProfiles
+setGeneric("buildComboProfiles", function(object, ...) standardGeneric("buildComboProfiles"))
+
+#' Build an assay table with selected assay profiles for drug combinations
 #' 
-#' For preparing an input to synergy score method.
+#' @examples
+#' \dontrun{
+#' combo_profile_1 <- buildComboProfiles(tre, c("auc", "SCORE"))
+#' combo_profile_2 <- buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP"))
+#' }
 #' 
-#' @param assay_dt A `data.table` that must contain fields `drug1id`, `drug2id`,
-#'   `drug1dose`, `drug2dose`, `cellid`, and `viability`.
-#'   The input assay data table contains both monotherapeutic observations
-#'   and dual-therapeutic observations.
-#'   Monotherapeutic observations have `NA` for either `drug1id` and `drug1dose`,
-#'   or `drug2id` and `drug2dose`. 
-#' 
+#' @param object `LongTable` or inheriting class containing curated drug combination data. 
+#' @param profiles `character` a vector of profile names, i.e., column names of assays.
 #' 
 #' @return A `data.table` containing fields
-#'   `drug1id`, `drug1dose`, `drug2id`, `drug2dose`, `cellid`,
-#'   `viability`, `avg_viability_1`, and `avg_viability_2`.
-#'   Each `avg_viability_*` is the response of a single-agent in the combination
-#'   averaged over its monotherapeutic replicates.
+#'   `treatment1id`, `treatment1dose`, `treatment2id`, `treatment2dose`, `sampleid`,
+#'   along with columns of selected profiles from their assays.
+#'   Each `*_1` is the monothearpy profile of treatment 1 in the combination,
+#'   and the same rule applies to treatment 2.
 #' 
 #' @import data.table
+#' @importFrom methods is
 #' @export
-comboResponse <- function(assay_dt) {
-    ## TODO:: Need a better name for this method
-    ## TODO:: Add input validaty check
-    comb_keys <- key(assay_dt)[!key(assay_dt) %in% "replicate_id"]
-    ## Extract drug1 observations from assay table
-    drug1_response <- assay_dt[is.na(drug2id),
-                               c("drug1id", "drug1dose", "cellid", "viability")
-                               ][,
-                                 .(avg_viability = mean(viability)),
-                                 by = c("drug1id", "drug1dose", "cellid")
-                               ][,
-                                 `:=`(drugid = drug1id,
-                                      dose = drug1dose,
-                                      drug1id = NULL,
-                                      drug1dose = NULL)
-                                ]
-    ## Extract drug2 observations from assay table
-    drug2_response <- assay_dt[is.na(drug1id),
-                               c("drug2id", "drug2dose", "cellid", "viability")
-                               ][,
-                                 .(avg_viability = mean(viability)),
-                                 by = c("drug2id", "drug2dose", "cellid")
-                               ][,
-                                 `:=`(drugid = drug2id,
-                                      dose = drug2dose,
-                                      drug2id = NULL,
-                                      drug2dose = NULL)
-                                ]
-    ## Group monotherapy observations of drug1 and drug2 into a table
-    mono_keys <- c("drugid", "dose", "cellid")
-    mono_response <- rbind(drug1_response, drug2_response)
-    ## Extract dual-therapy observations from input assay data table
-    comb_response <- assay_dt[!is.na(drug1id) & !is.na(drug2id),
-                              c(comb_keys, "viability"),
-                              with = FALSE
-                             ]
-    setkeyv(mono_response, mono_keys)
-    setkeyv(comb_response, comb_keys)
-    ## Merge monotherapy table with combination table for drug1
-    comb_response[mono_response,
-                  avg_viability_1 := avg_viability,
-                  on = c(drug1id = "drugid",
-                         drug1dose = "dose",
-                         cellid = "cellid")
-                    ]
-    ## Merge monotherapy table with combination table for drug2
-    comb_response[mono_response,
-                  avg_viability_2 := avg_viability,
-                  on = c(drug2id = "drugid",
-                         drug2dose = "dose",
-                         cellid = "cellid")]
-    return(comb_response[!is.na(avg_viability_1) & !is.na(avg_viability_2)])
-}
+setMethod("buildComboProfiles", signature(object = "LongTable"),
+          function(object, profiles) {
+    ## TODO: provide options to exclude dose and viability columns
+    ## TODO: Reorder key columns in the returned table
+    if (!is.character(profiles)) {
+        stop("argument `profiles` must be `character`")
+    } else if (length(profiles) == 0) {
+        stop("argument `profiles` must not be empty")
+    }
+
+    if (is.null(object[["sensitivity"]])) {
+        stop("Assay sensitivity is missing", call. = FALSE)
+    } else if (!"treatment2id" %in% idCols(object)) {
+        stop("This `TreatmentResponseExperiment` does not contain drug combination data.",
+             call. = FALSE)
+    }
+
+    if ("viability" %in% profiles) {
+        profiles <- profiles[!profiles %in% "viability"]
+        # and enable option for including viability here?
+    }
+
+    combo_keys <- c("treatment1id", "treatment2id",
+                    "treatment1dose", "treatment2dose", "sampleid")
+    if (any(combo_keys %in% profiles)) {
+        profiles <- profiles[!profiles %in% combo_keys]
+        # and enable option for including dose here?
+    }
+
+    ## stop if none of the assays contain user selected profiles
+    which_profiles <- lapply(assayCols(object), function(x) {
+        if (any(x %in% profiles))
+            return(x %in% profiles)
+    })
+    which_profiles[sapply(which_profiles, is.null)] <- NULL
+    if (length(which_profiles) == 0)
+        stop("No profiles found in any assay!")
+
+    ## check whether there are profiles not present in assays
+    profiles_exist <- vapply(profiles, function(x){
+        any(sapply(assayCols(object), function(y) x %in% y))
+    }, logical(1))
+    profiles_not_exist <- names(profiles_exist)[which(profiles_exist == FALSE)]
+    if (length(profiles_not_exist) > 0)
+        warning(
+            'No profiles named ',
+            paste(profiles_not_exist, collapse = ", "),
+            ' in any of the assays, thus will not be included in the returned table.',
+            call. = FALSE
+        )
+    ## TODO: Should we recalculate viability from sensitivity?
+
+    if (!is.null(object[["combo_viability"]])) {
+        combo_profiles <- object[["combo_viability"]][,
+            c(combo_keys, "viability"), with = FALSE
+        ]
+    } else {
+        object |>
+            subset(!is.na(treatment2dose)) |>
+            aggregate(
+                assay = "sensitivity",
+                viability = (mean(viability) / 100),
+                by = combo_keys
+            ) -> combo_profiles
+    }
+    setkeyv(combo_profiles, combo_keys)
+
+    assay_to_query <- names(which_profiles)
+
+    ## how do we handle replicate rows?
+    for (i in seq_along(which_profiles)) {
+        assay_cols <- assayCols(object)[[assay_to_query[i]]]
+        query_profiles <- assay_cols[which_profiles[[i]]]
+        assay_ <- object[[assay_to_query[i]]]
+        if (!("treatment2id" %in% assay_cols)) {
+            ## assays for monotherapy data
+            monotherapy_keys <- c("treatment1id", "sampleid")
+            if ("treatment1dose" %in% assay_cols)
+                monotherapy_keys <- c(monotherapy_keys, "treatment1dose")
+            assay_ <- assay_[, c(monotherapy_keys, query_profiles), with = FALSE]
+            combo_profiles <- combo_profiles[assay_, ,
+                on = c(treatment1id = "treatment1id", sampleid = "sampleid")
+            ]
+            combo_profiles <- merge(
+                combo_profiles,
+                assay_,
+                by.x = c("treatment2id", "sampleid"),
+                by.y = c("treatment1id", "sampleid"),
+                suffixes = c("_1", "_2")
+            )
+        } else {
+            ## How should we handle summery assays here?
+            assay_ <- assay_[, c(combo_keys, query_profiles), with = FALSE]
+            combo_profiles <- combo_profiles[assay_, ,
+                on = c(treatment1id = "treatment1id",
+                       treatment2id = "treatment2id",
+                       treatment1dose = "treatment1dose",
+                       treatment2dose = "treatment2dose",
+                       sampleid = "sampleid")
+            ]
+        }
+    }
+
+    return(combo_profiles)
+})
+
