@@ -228,20 +228,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         metadata=metadata, .intern=internals))
 }
 
-# NOT RUN: testing code for construtor method
-if (sys.nframe() == 0) {
-    bench::system_time(rowData <- rowData(dataMapperLT))
-    bench::system_time(rowIDs <- rowDataMap(dataMapperLT)[[1]])
-    bench::system_time(colData <- colData(dataMapperLT))
-    bench::system_time(colIDs <- colDataMap(dataMapperLT)[[1]])
-    bench::system_time(assays <- assays(dataMapperLT))
-    bench::system_time(assayIDs <- lapply(assayMap(dataMapperLT), `[[`, i=1))
-
-    bench::system_time(
-        lt <- LongTable(rowData, rowIDs, colData, colIDs, assays, assayIDs)
-    )
-}
-
 # ---- Class unions for CoreSet slots
 #' A class union to allow multiple types in a CoreSet slot
 #'
