@@ -530,7 +530,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
             call.=FALSE)
 
     if (summarize && key)
-        warning(.warnMSg('\n[CoreGx::assay] Cannot use key=TRUE when',
+        warning(.warnMsg('\n[CoreGx::assay] Cannot use key=TRUE when',
             ' summarize=TRUE. Ignoring the key argument.'))
 
     # extract the specified assay
