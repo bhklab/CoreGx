@@ -13,9 +13,9 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
         cellid %in% unique(cellid)[1:5]
     )
     testthat::expect_s4_class(ntre, "LongTable")
-    ## These tests need to be updated to use expect_true with .table_is_subset 
+    ## These tests need to be updated to use expect_true with .table_is_subset
     ## instead of expect_equal due the fact that the subset,LongTable-method
-    ## will drop additional rowKey or colKey values than those in the initial 
+    ## will drop additional rowKey or colKey values than those in the initial
     ## subset statement if there are no assay observations using those keys.
     ## This change fixed #148, but now makes it impossible to store metadata
     ## when there are no observations, which may not be ideal?
@@ -293,7 +293,7 @@ testthat::test_that("`reindex,LongTable-method` removes gaps in keys in subset L
     ## check if assays' keys have gaps
     for (i in seq_along(assayNames(stre))) {
         assay_name <- assayNames(stre)[i]
-        assay_keys <- assay(stre, i, key = FALSE, withDimnames = FALSE)[[assay_name]]
+        assay_keys <- assay(stre, i, key = FALSE, withDimnames = FALSE, metadata=FALSE)[[assay_name]]
         has_no_gaps_in_assay <- rle(diff(assay_keys))$value == 1
         if (length(has_no_gaps_in_assay) > 1) print(i)
         testthat::expect_true(has_no_gaps_in_assay)
