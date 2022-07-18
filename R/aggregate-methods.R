@@ -192,7 +192,14 @@ aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
     if (nthread == 1 && is.null(BPPARAM)) {
         res <- x[, eval(agg_call), by=c(by)]
     } else {
-        x_split <- split(x, by=by)
+        x <- copy(x) # prevent modifying the source by reference
+        # compute groups such that there is one table per thread
+        x[, group_id := .GRP, by=by]
+        ngrp <- x[, max(group_id)]
+        grp_size <- ceiling(ngrp / nthread)
+        x[, split_id := floor(group_id / grp_size)]
+        x_split <- split(x, by="split_id")
+        stopifnot(length(x_split) == nthread)
         if (is.null(BPPARAM)) {
             BPPARAM <- BiocParallel::bpparam()
         }
@@ -202,14 +209,14 @@ aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
         } else if (isTRUE(progress)) {
             warning(.warnMsg(
                 "Unable to set progressbar for BiocParallel backend: ",
-                class(BPPARAM)), .call=FALSE)
+                class(BPPARAM)[1]), .call=FALSE)
         }
         # optionally set nthread
         if (hasMethod("bpworkers<-", signature=c(class(BPPARAM), "integer"))) {
             BiocParallel::bpworkers(BPPARAM) <- nthread
         } else if (nthread > 1) {
             warning(.warnMsg("Unable to set nthread for BiocParallel backend: ",
-                class(BPPARAM)), .call=FALSE)
+                class(BPPARAM)[1]), .call=FALSE)
         }
         res <- BiocParallel::bplapply(
             x_split,
