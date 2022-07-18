@@ -35,7 +35,8 @@ NULL
     information.
     @param moreArgs `list()` A named list where each item is an argument one of
     the calls in `...` which is not a column in the table being aggregated. Use
-    to further parameterize you calls.
+    to further parameterize you calls. Please note that these are not added
+    to your aggregate calls unless you specify the names in the call.
 
     @details
     ## Use of Non-Standard Evaluation
@@ -46,19 +47,6 @@ NULL
     which is assumed to be the column name being aggregated over. If an argument
     to `...` is named, that will be the column name of its value in the resulting
     `data.table`.
-
-
-    ## Parallelization Strategies
-    While your first instinct may be to make use of all available cores, because
-    this method uses `data.table` internally for aggregation the optimal way
-    to compute a set of aggregate functions is dependent on the functions being
-    called. For functions which `data.table` optimizes intenally, such as `mean`,
-    `sd` and others (see `?gforce` for full list of optimized functons) it is
-    almost always better to run this function with `nthread=1` and let
-    `data.table` handle parallelization.
-    However, for functions not internally optimized by `data.table`, such as
-    fitting statistical models, compute time can be reduced by adding
-    more cores at the cost of additional memory usage.
 
     ## Enlisting
     The primary use case for `enlist=FALSE` is to allow computation of dependent
