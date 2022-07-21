@@ -282,12 +282,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
     assayLength <- length(assayNames(object))
     assaysString <- paste0('assays(', assayLength, '): ')
     assayNames <- assayNames(object)
-    assayNamesString <-
-        if (length(assayNames(object)) > 6) {
-            paste0(.collapse(head(assayNames, 3), ' ... ', .collapse(tail(assayNames, 3))))
-        } else {
-            .collapse(assayNames(object))
-        }
+    assayNamesString <- .collapse(assayNames(object))
+    if (nchar(assayNamesString) > options("width")) {
+        assayNamesString <- paste0(strwrap(assayNamesString), collapse="\n  ")
+    }
     cat(yellow$bold(assaysString) %+% red(assayNamesString), '\n')
 
     # --- rownames
