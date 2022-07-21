@@ -20,7 +20,7 @@ NULL
 #' @eval .docs_CoreGx_aggregate(curly="{")
 #'
 #' @return Object with the same class as `x`, with the aggregation results
-#' assinged to `target`, using `strategy` if `target` is an existing assay in
+#' assigned to `target`, using `strategy` if `target` is an existing assay in
 #' `x`.
 #'
 #' @seealso `data.table::[.data.table`, `BiocParallel::bplapply`
