@@ -214,6 +214,14 @@ aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
         )
         res <- rbindlist(res)
     }
-    attributes(res)$aggregations <- list(agg_call=agg_call, by=by, enlist=enlist)
+    attributes(res)$aggregations <- c(
+        attributes(res)$aggregations,
+        list(
+            agg_call=agg_call,
+            by=by,
+            enlist=enlist,
+            moreArgs=moreArgs
+        )
+    )
     return(res)
 }

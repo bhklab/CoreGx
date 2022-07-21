@@ -629,10 +629,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 #'   columns to allow correctly mapping the assay keys. We recommend modifying
 #'   the results returned by assay(longTable, 'assayName', withDimnames=TRUE).
 #'   For convenience, both the `[[` and `$` LongTable accessors return an assay
-#'   with the dimnames and metadata already attached. In the case where your
-#'   assay has only some of the row or column indentifiers and an assay,
-#'   `i`, already exists in `x`, then try join=TRUE to attempt to join with
-#'   existing data.
+#'   with the dimnames.
 #'
 #' @return `LongTable` With updated assays slot.
 #'
@@ -645,12 +642,17 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 setReplaceMethod('assay', signature(x='LongTable', i='character'),
         function(x, i, value) {
     funContext <- CoreGx:::.S4MethodContext('assay', class(x), class(i))
-    if (!is.data.frame(value)) .error(funContext, 'Only a data.frame or',
-        ' data.table can be assiged to the assay slot!')
 
     if (length(i) > 1) .error(funContext, ' Only a single assay ',
         'name can be assiged with assay(x, i) <- value.')
 
+    if (is.null(value)) {
+        x@assays[[i]] <- NULL
+        return(x)
+    }
+
+    if (!is.data.frame(value)) .error(funContext, ' Only a data.frame or',
+        ' data.table can be assiged to the assay slot!')
     value <- copy(value)  # prevent modify by reference
     if (!is.data.table(value)) setDT(value)
 
@@ -664,8 +666,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
 
     # -- determine the id columns if the assay doesn't already exits
     if (!any(assayExists)) {
-        assayKey <- key(value)
-        if (is.null(assayKey)) assayKey <- intersect(idCols(x), colnames(value))
+        assayKey <- intersect(idCols(x), colnames(value))
     } else {
         if (sum(assayExists) > 1)
             .error(funContext, "Only one assay can be modified at a time.",

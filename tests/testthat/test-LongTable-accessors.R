@@ -73,16 +73,18 @@ testthat::test_that("`assay` invalid assay name and index", {
     )
 })
 
-testthat::test_that("`assay<-,LongTable-meothd` prevents invalid assay slot assignment", {
+testthat::test_that("`assay<-,LongTable-method` prevents invalid assay slot assignment", {
     ntre <- copy(tre)
-    testthat::expect_error({ assay(ntre, i = "sensitivity", withDimnames = FALSE) <- NULL },
-        regexp = ".*Only a\ndata.frame or data.table can be assiged to the assay slot!.*"
-    ) ## FIXME:: If an integer assay slot index is used for i instead, it can bypass this check
+    testthat::expect_error({
+        assay(ntre, i = "sensitivity", withDimnames = FALSE) <- c(1, 2, 3)
+    },
+    regexp = ".*Only a\ndata.frame or data.table can be assiged to the assay slot!.*"
+    )
 })
 
 testthat::test_that("`assay,LongTable-method` and `assays,LongTable-method` return equivalent data", {
     assay_list <- lapply(seq_along(assayNames(tre)), FUN=assay,
-        x=tre, withDimnames=TRUE)
+        x=tre, withDimnames=TRUE, summarize=FALSE)
     assays_ <- assays(tre)
     for (i in seq_along(assay_list)) {
         testthat::expect_true(all.equal(assay_list[[i]], assays_[[i]]))

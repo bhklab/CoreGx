@@ -383,7 +383,7 @@
         if (y_to_frac) {
             y <- y/100
         }
-        
+
         if (trunc) {
             y = pmin(as.numeric(y), 1)
             y = pmax(as.numeric(y), 0)
@@ -1271,7 +1271,7 @@ is.items <- function(list, ..., FUN=is)
 #' @md
 #' @export
 .S4MethodContext <- function(generic, ...) {
-    dots <- as.list(...)
+    dots <- list(...)
     formals <- selectMethod(generic, signature=dots)
     context <- paste0(
         formals@target@package[1], '::`', # what package is the method from
@@ -1297,23 +1297,23 @@ is.items <- function(list, ..., FUN=is)
 setGeneric("buildComboProfiles", function(object, ...) standardGeneric("buildComboProfiles"))
 
 #' Build an assay table with selected assay profiles for drug combinations
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' combo_profile_1 <- buildComboProfiles(tre, c("auc", "SCORE"))
 #' combo_profile_2 <- buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP"))
 #' }
-#' 
-#' @param object `LongTable` or inheriting class containing curated drug combination data. 
+#'
+#' @param object `LongTable` or inheriting class containing curated drug combination data.
 #' @param profiles `character` a vector of profile names, i.e., column names of assays.
-#' 
+#'
 #' @return A `data.table` containing fields
 #'   `treatment1id`, `treatment1dose`, `treatment2id`, `treatment2dose`, `sampleid`,
 #'   which are used as keys to keep track of profiles,
 #'   along with columns of selected profiles from their assays.
 #'   Each `*_1` is the monothearpy profile of treatment 1 in the combination,
 #'   and the same rule applies to treatment 2.
-#' 
+#'
 #' @import data.table
 #' @importFrom methods is
 #' @export
@@ -1466,4 +1466,3 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
     }
     return(combo_profiles)
 })
-
