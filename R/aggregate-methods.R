@@ -185,7 +185,7 @@ aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
         x[, group_id := .GRP, by=by]
         ngrp <- x[, max(group_id)]
         grp_size <- ceiling(ngrp / nthread)
-        x[, split_id := floor(group_id / grp_size)]
+        x[, split_id := ceiling(group_id / grp_size)]
         x_split <- split(x, by="split_id")
         stopifnot(length(x_split) == nthread)
         if (is.null(BPPARAM)) {
