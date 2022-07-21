@@ -191,7 +191,7 @@ aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
         if (is.null(BPPARAM)) {
             BPPARAM <- BiocParallel::bpparam()
         }
-        # optionally add progresbar
+        # optionally add progressbar
         if (hasMethod("bpprogressbar<-", signature=c(class(BPPARAM), "logical"))) {
             BiocParallel::bpprogressbar(BPPARAM) <- progress
         } else if (isTRUE(progress)) {
