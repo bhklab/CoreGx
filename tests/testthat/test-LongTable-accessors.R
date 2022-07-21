@@ -73,16 +73,18 @@ testthat::test_that("`assay` invalid assay name and index", {
     )
 })
 
-testthat::test_that("`assay<-,LongTable-meothd` prevents invalid assay slot assignment", {
+testthat::test_that("`assay<-,LongTable-method` prevents invalid assay slot assignment", {
     ntre <- copy(tre)
-    testthat::expect_error({ assay(ntre, i = "sensitivity", withDimnames = FALSE) <- NULL },
-        regexp = ".*Only a\ndata.frame or data.table can be assiged to the assay slot!.*"
-    ) ## FIXME:: If an integer assay slot index is used for i instead, it can bypass this check
+    testthat::expect_error({
+        assay(ntre, i = "sensitivity", withDimnames = FALSE) <- c(1, 2, 3)
+    },
+    regexp = ".*Only a\ndata.frame or data.table can be assiged to the assay slot!.*"
+    )
 })
 
 testthat::test_that("`assay,LongTable-method` and `assays,LongTable-method` return equivalent data", {
     assay_list <- lapply(seq_along(assayNames(tre)), FUN=assay,
-        x=tre, withDimnames=TRUE)
+        x=tre, withDimnames=TRUE, summarize=FALSE)
     assays_ <- assays(tre)
     for (i in seq_along(assay_list)) {
         testthat::expect_true(all.equal(assay_list[[i]], assays_[[i]]))
@@ -123,8 +125,8 @@ testthat::test_that("`assay<-LongTable-method` allows simple summary assignments
     sens <- ntre$sensitivity
     sens_sum <- sens[,
         .(
-            mean_drug1dose=mean(drug1dose, na.rm=TRUE),
-            mean_drug2dose=mean(drug2dose, na.rm=TRUE),
+            drug1dose=unique(drug1dose),
+            drug2dose=unique(drug2dose),
             mean_viability=mean(viability, na.rm=TRUE)
         ),
         by=.(drug1id, drug2id, cellid)
@@ -132,10 +134,11 @@ testthat::test_that("`assay<-LongTable-method` allows simple summary assignments
     testthat::expect_silent(ntre$sens_sum <- sens_sum)
     # ensure that the returned assay matches the assigned assay when
     #   summarize=TRUE (the default)
+    sens_sum_accessed <- ntre$sens_sum[, colnames(sens_sum), with=FALSE]
+    setkeyv(sens_sum, key(sens_sum_accessed))
     testthat::expect_true(all.equal(
         sens_sum,
-        ntre$sens_sum[, colnames(sens_sum), with=FALSE],
-        check.attributes=FALSE
+        sens_sum_accessed,
     ))
     # test that summarzie=FALSE attaches all original data
     testthat::expect_true(all.equal(

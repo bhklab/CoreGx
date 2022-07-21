@@ -21,7 +21,7 @@ setGeneric("mergeAssays", function(object, ...) standardGeneric("mergeAssays"))
 
 #' Endomorphically merge assays within a `LongTable` or inheriting class
 #'
-#' @param object A `LongTable` or inheriting clas.
+#' @param object A `LongTable` or inheriting class.
 #' @param x `character(1)` A valid assay name in `object`.
 #' @param y `character(1)` A valid assay name in `object`.
 #' @param target `character(1)` Name of the assay to assign the result to.
@@ -52,8 +52,7 @@ setMethod("mergeAssays", signature("LongTable"),
 })
 
 #' @noRd
-.merge_longtable_assays <- function(object, x, y, ..., i_x, i_y, j_x, j_y,
-        metadata=FALSE) {
+.merge_longtable_assays <- function(object, x, y, ..., metadata=FALSE) {
     # -- input validation
     checkmate::qassert(x, "S1")
     checkmate::qassert(y, "S1")

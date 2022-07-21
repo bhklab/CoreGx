@@ -522,7 +522,8 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
     if (length(keepAssay) < 1)
         stop(.errorMsg('\n[CoreGx::assay] There is no assay ', i,
             ' in this LongTable. Use assayNames(longTable) for a list',
-            'of valid assay names.'))
+            'of valid assay names.'),
+            call.=FALSE)
 
     if (!withDimnames && metadata)
         warning(.warnMsg('\n[CoreGx::assay] Cannot use metadata=TRUE when',
@@ -531,7 +532,8 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 
     if (summarize && key)
         warning(.warnMsg('\n[CoreGx::assay] Cannot use key=TRUE when',
-            ' summarize=TRUE. Ignoring the key argument.'))
+            ' summarize=TRUE. Ignoring the key argument.'),
+            call.=FALSE)
 
     # extract the specified assay
     assayData <- copy(x@assays[[keepAssay]])
@@ -627,10 +629,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 #'   columns to allow correctly mapping the assay keys. We recommend modifying
 #'   the results returned by assay(longTable, 'assayName', withDimnames=TRUE).
 #'   For convenience, both the `[[` and `$` LongTable accessors return an assay
-#'   with the dimnames and metadata already attached. In the case where your
-#'   assay has only some of the row or column indentifiers and an assay,
-#'   `i`, already exists in `x`, then try join=TRUE to attempt to join with
-#'   existing data.
+#'   with the dimnames.
 #'
 #' @return `LongTable` With updated assays slot.
 #'
@@ -640,15 +639,20 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 #' @importMethodsFrom SummarizedExperiment assay<-
 #' @importFrom data.table data.table fsetdiff setcolorder set setDT
 #' @export
-setReplaceMethod('assay', signature(x='LongTable', i='character'),
-        function(x, i, value) {
-    funContext <- CoreGx:::.S4MethodContext('assay', class(x), class(i))
-    if (!is.data.frame(value)) .error(funContext, 'Only a data.frame or',
-        ' data.table can be assiged to the assay slot!')
+setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
+    stopifnot(is.character(i) || is.numeric(i))
 
+    funContext <- CoreGx:::.S4MethodContext('assay', class(x))
     if (length(i) > 1) .error(funContext, ' Only a single assay ',
         'name can be assiged with assay(x, i) <- value.')
 
+    if (is.null(value)) {
+        x@assays[[i]] <- NULL
+        return(x)
+    }
+
+    if (!is.data.frame(value)) .error(funContext, ' Only a data.frame or',
+        ' data.table can be assiged to the assay slot!')
     value <- copy(value)  # prevent modify by reference
     if (!is.data.table(value)) setDT(value)
 
@@ -658,12 +662,12 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     aKeys <- mutable_intern$assayKeys
 
     # -- determine if the assay already exists
+    if (is.numeric(i)) i <- assayNames(x)[i]
     assayExists <- i %in% assayNames(x)
 
     # -- determine the id columns if the assay doesn't already exits
     if (!any(assayExists)) {
-        assayKey <- key(value)
-        if (is.null(assayKey)) assayKey <- intersect(idCols(x), colnames(value))
+        assayKey <- intersect(idCols(x), colnames(value))
     } else {
         if (sum(assayExists) > 1)
             .error(funContext, "Only one assay can be modified at a time.",

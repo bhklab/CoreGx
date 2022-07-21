@@ -53,7 +53,8 @@ information.}
 
 \item{moreArgs}{\code{list()} A named list where each item is an argument one of
 the calls in \code{...} which is not a column in the table being aggregated. Use
-to further parameterize you calls.}
+to further parameterize you calls. Please note that these are not added
+to your aggregate calls unless you specify the names in the call.}
 }
 \value{
 \code{data.table} of aggregated results with an \code{aggregations} attribute
@@ -77,20 +78,6 @@ appending the name of each function call with the name of its first argument,
 which is assumed to be the column name being aggregated over. If an argument
 to \code{...} is named, that will be the column name of its value in the resulting
 \code{data.table}.
-}
-
-\subsection{Parallelization Strategies}{
-
-While your first instinct may be to make use of all available cores, because
-this method uses \code{data.table} internally for aggregation the optimal way
-to compute a set of aggregate functions is dependent on the functions being
-called. For functions which \code{data.table} optimizes intenally, such as \code{mean},
-\code{sd} and others (see \code{?gforce} for full list of optimized functons) it is
-almost always better to run this function with \code{nthread=1} and let
-\code{data.table} handle parallelization.
-However, for functions not internally optimized by \code{data.table}, such as
-fitting statistical models, compute time can be reduced by adding
-more cores at the cost of additional memory usage.
 }
 
 \subsection{Enlisting}{

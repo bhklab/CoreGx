@@ -383,7 +383,7 @@
         if (y_to_frac) {
             y <- y/100
         }
-        
+
         if (trunc) {
             y = pmin(as.numeric(y), 1)
             y = pmax(as.numeric(y), 0)
@@ -1271,7 +1271,7 @@ is.items <- function(list, ..., FUN=is)
 #' @md
 #' @export
 .S4MethodContext <- function(generic, ...) {
-    dots <- as.list(...)
+    dots <- list(...)
     formals <- selectMethod(generic, signature=dots)
     context <- paste0(
         formals@target@package[1], '::`', # what package is the method from
@@ -1297,29 +1297,29 @@ is.items <- function(list, ..., FUN=is)
 setGeneric("buildComboProfiles", function(object, ...) standardGeneric("buildComboProfiles"))
 
 #' Build an assay table with selected assay profiles for drug combinations
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' combo_profile_1 <- buildComboProfiles(tre, c("auc", "SCORE"))
 #' combo_profile_2 <- buildComboProfiles(tre, c("HS", "EC50", "E_inf", "ZIP"))
 #' }
-#' 
-#' @param object `LongTable` or inheriting class containing curated drug combination data. 
+#'
+#' @param object `LongTable` or inheriting class containing curated drug combination data.
 #' @param profiles `character` a vector of profile names, i.e., column names of assays.
-#' 
+#'
 #' @return A `data.table` containing fields
 #'   `treatment1id`, `treatment1dose`, `treatment2id`, `treatment2dose`, `sampleid`,
+#'   which are used as keys to keep track of profiles,
 #'   along with columns of selected profiles from their assays.
 #'   Each `*_1` is the monothearpy profile of treatment 1 in the combination,
 #'   and the same rule applies to treatment 2.
-#' 
+#'
 #' @import data.table
 #' @importFrom methods is
 #' @export
+#' @docType methods
 setMethod("buildComboProfiles", signature(object = "LongTable"),
           function(object, profiles) {
-    ## TODO: provide options to exclude dose and viability columns
-    ## TODO: Reorder key columns in the returned table
     if (!is.character(profiles)) {
         stop("argument `profiles` must be `character`")
     } else if (length(profiles) == 0) {
@@ -1333,9 +1333,10 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
              call. = FALSE)
     }
 
-    if ("viability" %in% profiles) {
+    get_viability <- ("viability" %in% profiles)
+    if (get_viability) {
         profiles <- profiles[!profiles %in% "viability"]
-        # and enable option for including viability here?
+        # and enable option for including combo viability
     }
 
     combo_keys <- c("treatment1id", "treatment2id",
@@ -1366,20 +1367,37 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
             ' in any of the assays, thus will not be included in the returned table.',
             call. = FALSE
         )
-    ## TODO: Should we recalculate viability from sensitivity?
 
     if (!is.null(object[["combo_viability"]])) {
-        combo_profiles <- object[["combo_viability"]][,
-            c(combo_keys, "viability"), with = FALSE
-        ]
+        if (get_viability) {
+            combo_profiles <- object[["combo_viability"]][,
+                c(combo_keys, "viability"), with = FALSE
+            ]
+        } else {
+            combo_profiles <- object[["combo_viability"]][,
+                combo_keys, with = FALSE
+            ]
+        }
+        ## we know replicates have been averaged in combo_viability
     } else {
-        object |>
-            subset(!is.na(treatment2dose)) |>
-            aggregate(
-                assay = "sensitivity",
-                viability = (mean(viability) / 100),
+        if (get_viability) {
+            object |>
+                subset(!is.na(treatment2dose)) |>
+                aggregate(
+                    assay = "sensitivity",
+                    viability = (mean(viability) / 100),
+                    by = combo_keys
+                ) -> combo_profiles
+        } else {
+            combo_profiles <- unique(
+                object$sensitivity[
+                    !is.na(treatment2dose),
+                    combo_keys,
+                    with = FALSE
+                ],
                 by = combo_keys
-            ) -> combo_profiles
+            )
+        }
     }
     setkeyv(combo_profiles, combo_keys)
 
@@ -1391,7 +1409,10 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
         query_profiles <- assay_cols[which_profiles[[i]]]
         assay_ <- object[[assay_to_query[i]]]
         if (!("treatment2id" %in% assay_cols)) {
-            ## assays for monotherapy data
+            ## Assays for monotherapy data
+            ## Here I assume monotherapy assay tables have fewer keys
+            ## and less cardinality than treatment combo tables
+            ## might need extra condition check?
             monotherapy_keys <- c("treatment1id", "sampleid")
             if ("treatment1dose" %in% assay_cols)
                 monotherapy_keys <- c(monotherapy_keys, "treatment1dose")
@@ -1399,6 +1420,8 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
             combo_profiles <- combo_profiles[assay_, ,
                 on = c(treatment1id = "treatment1id", sampleid = "sampleid")
             ]
+            ## remove single agents not tested in drug combination screening
+            combo_profiles <- combo_profiles[!is.na(treatment2dose)]
             combo_profiles <- merge(
                 combo_profiles,
                 assay_,
@@ -1406,19 +1429,40 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
                 by.y = c("treatment1id", "sampleid"),
                 suffixes = c("_1", "_2")
             )
+            ## remove single agents not tested in drug combination screening
+            combo_profiles <- combo_profiles[!is.na(treatment1dose)]
+            ## Edge case: adding profiles in sensitivity first
+            ## then add monotherapy profiles
+            if ("replicate" %in% colnames(combo_profiles)) {
+                setkeyv(combo_profiles, c(combo_keys, "replicate"))
+            } else {
+                setkeyv(combo_profiles, combo_keys)
+            }
         } else {
-            ## How should we handle summery assays here?
-            assay_ <- assay_[, c(combo_keys, query_profiles), with = FALSE]
-            combo_profiles <- combo_profiles[assay_, ,
-                on = c(treatment1id = "treatment1id",
-                       treatment2id = "treatment2id",
-                       treatment1dose = "treatment1dose",
-                       treatment2dose = "treatment2dose",
-                       sampleid = "sampleid")
-            ]
+            assay_keys <- key(assay_)
+            common_keys <- intersect(key(combo_profiles), assay_keys)
+            if (dim(combo_profiles)[1] >= dim(assay_)[1]) {
+                ## Here assume less cardinality implies no replicates
+                assay_ <- assay_[, c(common_keys, query_profiles), with = FALSE]
+                setkeyv(assay_, common_keys)
+                ## Left-join on combo_profiles
+                combo_profiles <- combo_profiles[assay_, ,
+                    on = common_keys
+                ]
+            } else { ## might have replicates
+                ## likely to happen for profiles in sensitivity assay
+                if (!("replicate" %in% common_keys) & ("replicate" %in% assay_keys)) {
+                    ## treat it as a profile to add first
+                    query_profiles <- c(query_profiles, "replicate")
+                    setkeyv(assay_, c(common_keys, "replicate"))
+                }
+                assay_ <- assay_[, c(common_keys, query_profiles), with = FALSE]
+                ## Left-join on assay_, replicate has become a key if present in assay_
+                combo_profiles <- assay_[combo_profiles, ,
+                    on = common_keys
+                ]
+            }
         }
     }
-
     return(combo_profiles)
 })
-

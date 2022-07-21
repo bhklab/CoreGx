@@ -22,7 +22,7 @@
 \alias{assays,LongTable-method}
 \alias{assays<-,LongTable,list-method}
 \alias{assay,LongTable,ANY-method}
-\alias{assay<-,LongTable,character-method}
+\alias{assay<-,LongTable,ANY-method}
 \alias{assayNames,LongTable-method}
 \alias{[[,LongTable,ANY,ANY-method}
 \alias{dim,LongTable-method}
@@ -79,7 +79,7 @@
   ...
 )
 
-\S4method{assay}{LongTable,character}(x, i) <- value
+\S4method{assay}{LongTable,ANY}(x, i) <- value
 
 \S4method{assayNames}{LongTable}(x)
 
@@ -119,10 +119,7 @@ with. This must at minumum contain the row and column data identifier
 columns to allow correctly mapping the assay keys. We recommend modifying
 the results returned by assay(longTable, 'assayName', withDimnames=TRUE).
 For convenience, both the \code{[[} and \code{$} LongTable accessors return an assay
-with the dimnames and metadata already attached. In the case where your
-assay has only some of the row or column indentifiers and an assay,
-\code{i}, already exists in \code{x}, then try join=TRUE to attempt to join with
-existing data.}
+with the dimnames.}
 
 \item{withDimnames}{\code{logical(1)} Should the dimension names be returned
 joined to the assay. This retrieves both the row and column identifiers

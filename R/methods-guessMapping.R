@@ -144,7 +144,7 @@ checkColumnCardinality <- function(df, group, cardinality=1, ...) {
             uniquely identifies each row, so the cardinality is 1:1!'))
         columnsHaveCardinality <- setdiff(colnames(df), group)
     } else {
-        dimDT <- df[, lapply(.SD, FUN=.length_unique), by=group, ...]
+        dimDT <- df[, lapply(.SD, FUN=uniqueN), by=group, ...]
         columnsHaveCardinality <- colnames(dimDT)[colAlls(dimDT == cardinality)]
     }
 

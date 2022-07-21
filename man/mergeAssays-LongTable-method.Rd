@@ -7,7 +7,7 @@
 \S4method{mergeAssays}{LongTable}(object, x, y, target = x, ..., metadata = FALSE)
 }
 \arguments{
-\item{object}{A \code{LongTable} or inheriting clas.}
+\item{object}{A \code{LongTable} or inheriting class.}
 
 \item{x}{\code{character(1)} A valid assay name in \code{object}.}
 
