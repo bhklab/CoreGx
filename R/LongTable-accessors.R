@@ -639,10 +639,10 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 #' @importMethodsFrom SummarizedExperiment assay<-
 #' @importFrom data.table data.table fsetdiff setcolorder set setDT
 #' @export
-setReplaceMethod('assay', signature(x='LongTable', i='character'),
-        function(x, i, value) {
-    funContext <- CoreGx:::.S4MethodContext('assay', class(x), class(i))
+setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
+    stopifnot(is.character(i) || is.numeric(i))
 
+    funContext <- CoreGx:::.S4MethodContext('assay', class(x))
     if (length(i) > 1) .error(funContext, ' Only a single assay ',
         'name can be assiged with assay(x, i) <- value.')
 
@@ -662,6 +662,7 @@ setReplaceMethod('assay', signature(x='LongTable', i='character'),
     aKeys <- mutable_intern$assayKeys
 
     # -- determine if the assay already exists
+    if (is.numeric(i)) i <- assayNames(x)[i]
     assayExists <- i %in% assayNames(x)
 
     # -- determine the id columns if the assay doesn't already exits
