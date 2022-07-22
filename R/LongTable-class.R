@@ -199,6 +199,14 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         assayIndex[assays[[nm]], (nm) := get(nm)]
     }
     assayIndex[, (c(rowIDs, colIDs)) := NULL]
+    validKeys <- assayIndex[
+        which(rowAnys(!is.na(idx[, names(assays), with=FALSE]))),
+        .(rowKey, colKey)
+    ]
+    assayIndex <- assayIndex[
+        rowKey %in% unique(validKeys$rowKey) &
+            colKey %in% unique(validKeys$colKey),
+    ]
     setkeyv(assayIndex, names(assays))
     internals$assayIndex <- assayIndex
 
