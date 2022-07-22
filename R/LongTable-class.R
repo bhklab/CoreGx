@@ -200,7 +200,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     }
     assayIndex[, (c(rowIDs, colIDs)) := NULL]
     validKeys <- assayIndex[
-        which(rowAnys(!is.na(idx[, names(assays), with=FALSE]))),
+        which(rowAnys(!is.na(assayIndex[, names(assays), with=FALSE]))),
         .(rowKey, colKey)
     ]
     assayIndex <- assayIndex[
