@@ -9,8 +9,8 @@ tre <- nci_TRE_small
 
 testthat::test_that("`subset,LongTable-method` works with call queries", {
     ntre <- subset(tre,
-        drug1id %in% unique(drug1id)[1:5],
-        cellid %in% unique(cellid)[1:5]
+        treatment1id %in% unique(treatment1id)[1:5],
+        sampleid %in% unique(sampleid)[1:5]
     )
     testthat::expect_s4_class(ntre, "LongTable")
     ## These tests need to be updated to use expect_true with .table_is_subset
@@ -23,13 +23,13 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
     testthat::expect_true(
         CoreGx:::.table_is_subset(
             rowData(ntre),
-            rowData(tre)[drug1id %in% unique(drug1id)[1:5]]
+            rowData(tre)[treatment1id %in% unique(treatment1id)[1:5]]
         )
     )
     testthat::expect_true(
         CoreGx:::.table_is_subset(
             colData(ntre),
-            colData(tre)[cellid %in% unique(cellid)[1:5]]
+            colData(tre)[sampleid %in% unique(sampleid)[1:5]]
         )
     )
     # check for NA values in the key column of the assay
@@ -37,20 +37,20 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
         !anyNA(assays(ntre, raw=TRUE)[["sensitivity"]]$sensitivity)
     )
     ntre2 <- tre[
-        .(drug1id %in% unique(drug1id)[1:5]),
-        .(cellid %in% unique(cellid)[1:5])
+        .(treatment1id %in% unique(treatment1id)[1:5]),
+        .(sampleid %in% unique(sampleid)[1:5])
     ]
     testthat::expect_s4_class(ntre2, "LongTable")
     testthat::expect_true(
         CoreGx:::.table_is_subset(
             rowData(ntre2),
-            rowData(tre)[drug1id %in% unique(drug1id)[1:5]]
+            rowData(tre)[treatment1id %in% unique(treatment1id)[1:5]]
         )
     )
     testthat::expect_true(
         CoreGx:::.table_is_subset(
             colData(ntre2),
-            colData(tre)[cellid %in% unique(cellid)[1:5]]
+            colData(tre)[sampleid %in% unique(sampleid)[1:5]]
         )
     )
     # check for NA values in the key column of the assay
@@ -61,48 +61,29 @@ testthat::test_that("`subset,LongTable-method` works with call queries", {
 })
 
 testthat::test_that("`subset,LongTable-method` works with regex queries", {
-    ## TODO:: Why are we testing subset twice with the same statement?
     ntre <- subset(tre,
-        c("vemurafenib", "Vismodegib"),
-        c("UACC*", "SK-MEL-*")
+        c("Vinblastine", "Temozolomide"),
+        c("HT*", "MOLT*")
     )
     testthat::expect_s4_class(ntre, "LongTable")
     testthat::expect_true(
         CoreGx:::.table_is_subset(
             rowData(ntre),
-            rowData(tre)[grepl("vemurafenib|Vismodegib", rownames(tre)), ]
+            rowData(tre)[grepl("Vinblastine|Temozolomide", rownames(tre)), ]
         )
     )
     testthat::expect_true(
         CoreGx:::.table_is_subset(
             colData(ntre),
-            colData(tre)[grepl("UACC*|SK-MEL-*", colnames(tre)), ]
+            colData(tre)[grepl("HT*|MOLT-*", colnames(tre)), ]
         )
     )
-    ntre2 <- tre[
-        c("vemurafenib", "Vismodegib"),
-        c("UACC*", "SK-MEL-*")
-    ]
-    testthat::expect_s4_class(ntre2, "LongTable")
-    testthat::expect_true(
-        CoreGx:::.table_is_subset(
-            rowData(ntre2),
-            rowData(tre)[grepl("vemurafenib|Vismodegib", rownames(tre)), ]
-        )
-    )
-    testthat::expect_true(
-        CoreGx:::.table_is_subset(
-            colData(ntre2),
-            colData(tre)[grepl("UACC*|SK-MEL-*", colnames(tre)), ]
-        )
-    )
-    testthat::expect_equal(ntre, ntre2)
 })
 
 testthat::test_that("`CoreGx:::.subsetByIndex` is equivalent to subsetting the raw data", {
-    keepRows <- rowData(tre, key=TRUE)[drug1id %in% drug1id[1:5], ]
+    keepRows <- rowData(tre, key=TRUE)[treatment1id %in% treatment1id[1:5], ]
     fullAssay <- tre$sensitivity
-    rawSubset <- fullAssay[drug1id %in% keepRows$drug1id, ]
+    rawSubset <- fullAssay[treatment1id %in% keepRows$treatment1id, ]
     aindex <- mutable(getIntern(tre, "assayIndex"))
     subindex <- aindex[rowKey %in% keepRows$rowKey, ]
     ntre <- CoreGx:::.subsetByIndex(tre, subindex)
@@ -151,7 +132,7 @@ testthat::test_that("`subset,LongTable-method` doesn't miss assay observations f
     assay_names <- assayNames(sub_tre)
     for (a in seq_along(assay_names)) {
         assay_sub1 <- assay(sub_tre, a, key = FALSE, withDimnames = TRUE)
-        assay_sub2 <- all_assays[[a]][cellid == select_col, ]
+        assay_sub2 <- all_assays[[a]][sampleid == select_col, ]
         testthat::expect_equal(assay_sub1, assay_sub2)
     }
     sub_tre <- tre[select_row_idx, select_col_idx]
@@ -175,7 +156,7 @@ testthat::test_that("`subset,LongTable-method` subset indexing behaves the same 
     testthat::expect_equal(sub_tre, tre)
     sub_tre <- subset(tre, i = "", j = "") ## subset by empty row+column names
     testthat::expect_equal(sub_tre, tre)
-    ## Get a subset with 2-Fluoro Ara-A of dose 6e-06 as second drug in combination therapies
+    ## Get a subset with 2-Fluoro Ara-A of dose 6e-06 as second treatment in combination therapies
     sub_tre <- subset(tre, i = "*:2-Fluoro Ara-A:*:6e-06")
     regex <- "(?=.*\\:2-Fluoro Ara-A)(?=.*6e-06\\:*)^" ## rowData regex
     testthat::expect_equal(
@@ -291,7 +272,7 @@ testthat::test_that("`reindex,LongTable-method` removes gaps in keys in subset L
     ## check if assays' keys have gaps
     for (i in seq_along(assayNames(stre))) {
         assay_name <- assayNames(stre)[i]
-        assay_keys <- assay(stre, i, key = FALSE, withDimnames = FALSE, metadata=FALSE)[[assay_name]]
+        assay_keys <- assay(stre, i, key = FALSE, withDimnames = FALSE, metadata=FALSE)[[paste0(".", assay_name)]]
         has_no_gaps_in_assay <- rle(diff(assay_keys))$value == 1
         if (length(has_no_gaps_in_assay) > 1) print(i)
         testthat::expect_true(has_no_gaps_in_assay)
