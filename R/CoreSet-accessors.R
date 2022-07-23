@@ -1514,7 +1514,7 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
     funContext <- .funContext('::sensitivityProfiles')
     if (is(treatmentResponse(object), 'LongTable')) {
         if (!('profiles' %in% assayNames(treatmentResponse(object)))) {
-            .error(funContext, 'The LongTable onject in the sensivitiy slot
+            .error(funContext, 'The LongTable object in the sensivitiy slot
                 is not formatted correctly: it must contain an assay
                 named "profiles"!')
         } else {
@@ -1537,7 +1537,7 @@ setMethod(sensitivityProfiles, "CoreSet", function(object) {
     profDT[, treatment_uid := eval(trt), by=.I]
     profDT[, sample_uid := eval(smp), by=.I]
     profDT[, exp_id := paste0(treatment_uid, "_", sample_uid), by=.I]
-    assayCols <- setdiff(colnames(assay(object, "profiles", raw=TRUE)), "profiles")
+    assayCols <- setdiff(colnames(assay(object, "profiles", raw=TRUE)), ".profiles")
     sensProf <- unique(profDT[, .SD, .SDcols=c(assayCols, "exp_id")])
     obsPerExpId <- sensProf[, .N, by="exp_id"][, max(N)]
     if (obsPerExpId > 1) warning(.warnMsg("Multiple profile values per",

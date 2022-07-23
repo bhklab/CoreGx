@@ -71,14 +71,16 @@ setAs('LongTable', 'data.table', def=function(from) {
         y=c(idCols(from), rowMeta(from), colMeta(from)))
     aMap <- Map(list, mutable(getIntern(from, "assayKeys")), aMap)
 
+    DT <- cbind(DT, metadata(from)$experiment_metadata)
+
+    metaCols <- names(metadata(from)$experiment_metadata)
     longTableMapper <- LongTableDataMapper(
         rowDataMap=list(rowIDs(from), rowMeta(from)),
         colDataMap=list(colIDs(from), colMeta(from)),
         assayMap=aMap,
-        metadataMap=tryCatch({ lapply(metadata(from), names) },
-            error=function(e) list())
+        metadataMap=if (is.character(metaCols)) list(metaCols) else list()
     )
-    metadata(longTableMapper) <- metadata(from)
+    metadata(longTableMapper) <- metadata(from)[names(metadata(from) != "experiment_metadata")]
     attr(DT, 'longTableDataMapper') <- longTableMapper
 
     # return the data.table

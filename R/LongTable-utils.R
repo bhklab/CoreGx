@@ -55,7 +55,7 @@ NULL
     setkeyv(index, metaKeys)
     for (i in seq_along(assays)) {
         setkeyv(assays[[i]], metaKeys)
-        aname <- names(assays)[i]
+        aname <- paste0(".", names(assays)[i])
         # join based subsets use binary-search, O(log(n)) vs O(n) for vector-scan
         # see https://rdatatable.gitlab.io/data.table/articles/datatable-keys-fast-subset.html
         assays[[i]] <- assays[[i]][
@@ -75,7 +75,7 @@ NULL
     colData(x, raw=TRUE) <- cData
     assays(x, raw=TRUE) <- assays
     mutableIntern <- mutable(getIntern(x))
-    setkeyv(index, names(assays))
+    setkeyv(index, paste0(".", names(assays)))
     mutableIntern$assayIndex <- index
     x@.intern <- immutable(mutableIntern)
 
@@ -219,15 +219,16 @@ setMethod('subset', signature('LongTable'),
     keepAssays <- assayNames(x) %in% assays
 
     # -- subset index, then use index to subset x
+    assayKeys <- paste0(".", assayNames(x)[keepAssays])
     idx <- mutable(getIntern(x, "assayIndex"))[
         rowKey %in% rows & colKey %in% cols,
         .SD,
-        .SDcols=c("rowKey", "colKey", assayNames(x)[keepAssays])
+        .SDcols=c("rowKey", "colKey", assayKeys)
     ]
     # -- drop rowKeys or colKeys which no longer have any assay observation
     #   after the initial subset, fixes #148
     validKeys <- idx[
-        which(rowAnys(!is.na(idx[, assayNames(x)[keepAssays], with=FALSE]))),
+        which(rowAnys(!is.na(idx[, assayKeys, with=FALSE]))),
         .(rowKey, colKey)
     ]
     idx <- idx[
@@ -511,7 +512,7 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     rData[, .rowKey := .I, by=c(rowIDs(object))]
     cData[, .colKey := .I, by=c(colIDs(object))]
 
-    # -- update rowKey and colKey in the asssayIndex, if they have changed
+    # -- update rowKey and colKey in the assayIndex, if they have changed
     if (rData[, any(rowKey != .rowKey)]) {
         index[rData, rowKey := .rowKey, on="rowKey"]
         rData[, rowKey := .rowKey]
@@ -537,14 +538,15 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     }
 
     # -- check equality and update assayKeys in assays if they have changed
-    for (nm in names(which(!assayEqualKeys))) {
-        setkeyv(index, nm)
-        aList[[nm]][index, (nm) := get(paste0(".", nm))]
-        setkeyv(aList[[nm]], nm)
-        index[, (nm) := get(paste0(".", nm))]
+    for (.nm in names(which(!assayEqualKeys))) {
+        nm <- gsub("\\.", "", .nm)
+        setkeyv(index, .nm)
+        aList[[nm]][index, (.nm) := get(paste0(".", .nm))]
+        setkeyv(aList[[nm]], .nm)
+        index[, (.nm) := get(paste0(".", .nm))]
     }
     index[, paste0(".", assays_) := NULL]
-    setkeyv(index, assayNames(object))
+    setkeyv(index, paste0(".", assayNames(object)))
 
     # -- update the object with the reindexed tables and return
     rowData(object, raw=TRUE) <- rData

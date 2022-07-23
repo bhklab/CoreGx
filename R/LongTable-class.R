@@ -143,7 +143,6 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         colData[, c('colKey') := .GRP, keyby=c(colIDs)]
 
     # initialize the internals object to store private metadata for a LongTable
-    # NOTE: assign parent as emptyenv to prevent leaving parent.frame on the stack
     internals <- setNames(vector("list", length=6),
         c("rowIDs", "rowMeta", "colIDs", "colMeta", "assayKeys", "assayIndex"))
     internals$rowIDs <- rowIDs
@@ -154,7 +153,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         colIDs <- colnames(colData)[colIDs]
     if (!all(colIDs %in% colnames(colData)))
         stop(.errorMsg('\nColumn IDs not in colData: ',
-            setdiff(colIDs, colnames(colData)), collapse=', '))
+            setdiff(colIDs, colnames(colData)), collapse=', '),
+            call.=FALSE)
     internals$colIDs <- colIDs
     internals$colMeta <- setdiff(colnames(colData[, -'colKey']), colIDs)
 
@@ -177,7 +177,8 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     # set keys for join with metadata
     for (nm in names(assays)) {
         setkeyv(assays[[nm]], assayIDs[[nm]])
-        assays[[nm]][, (nm) := .I]
+        .nm <- paste0(".", nm)
+        assays[[nm]][, (.nm) := .I]
     }
 
     # build the index mapping assay rows to rowKey and colKey
@@ -196,13 +197,14 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     ]
     setkeyv(assayIndex, c(rowIDs, colIDs))
     for (nm in names(assays)) {
-        assayIndex[assays[[nm]], (nm) := get(nm)]
+        .nm <- paste0(".", nm)
+        assayIndex[assays[[nm]], (.nm) := get(.nm)]
     }
     assayIndex[, (c(rowIDs, colIDs)) := NULL]
     assayIndex <- assayIndex[
-        which(rowAnys(!is.na(assayIndex[, names(assays), with=FALSE]))),
+        which(rowAnys(!is.na(assayIndex[, paste0(".", names(assays)), with=FALSE]))),
     ]
-    setkeyv(assayIndex, names(assays))
+    setkeyv(assayIndex, paste0(".", names(assays)))
     internals$assayIndex <- assayIndex
 
     # make internals immutable to prevent users from modifying structural metadata
@@ -211,7 +213,7 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     # Drop extra assay columns and key by the assay key in the assay index
     for (i in seq_along(assays)) {
         assays[[i]][, (assayIDs[[i]]) := NULL]
-        setkeyv(assays[[i]], names(assays)[i])
+        setkeyv(assays[[i]], paste0(".", names(assays)[i]))
     }
 
     # Reorder columns to match the keys, this prevents issues in unit tests
@@ -552,7 +554,7 @@ setMethod('assayCols', signature(object='LongTable'),
     keys <- assayKeys(object)
     assayColnames <- Map(setdiff,
         x=lapply(assays(object, raw=TRUE), FUN=colnames),
-        y=as.list(assayNames(object))
+        y=as.list(paste0(".", assayNames(object)))
     )
     assayCols <- Map(c, keys, assayColnames)
     if (!missing(i)) assayCols[[i]] else assayCols

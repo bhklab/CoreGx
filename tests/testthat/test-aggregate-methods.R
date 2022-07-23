@@ -5,7 +5,7 @@ library(data.table)
 
 data(nci_TRE_small)
 tre <- copy(nci_TRE_small)
-by <- c("drug1id", "drug2id", "cellid")
+by <- c("treatment1id", "treatment2id", "sampleid")
 sens <- tre$sensitivity
 
 
@@ -15,25 +15,25 @@ sens <- tre$sensitivity
 testthat::test_that("`aggregate2` is equivalent to raw data.table aggregation", {
     ## Single threaded case
     agg_res <- sens |>
-        subset(drug1id %in% unique(drug1id)[1:3]) |>
+        subset(treatment1id %in% unique(treatment1id)[1:3]) |>
         aggregate2(
-            mean(drug1dose), mean(drug2dose), mean(viability),
+            mean(treatment1dose), mean(treatment2dose), mean(viability),
             by=by
         )
     ## Mutlithreaded case (via bplapply)
     agg_res_parallel <- sens |>
-        subset(drug1id %in% unique(drug1id)[1:3]) |>
+        subset(treatment1id %in% unique(treatment1id)[1:3]) |>
         aggregate2(
-            mean(drug1dose), mean(drug2dose), mean(viability),
+            mean(treatment1dose), mean(treatment2dose), mean(viability),
             by=by,
             nthread=2
         )
     ## data.table default
     dt_res <- sens[
-        drug1id %in% unique(drug1id)[1:3],
+        treatment1id %in% unique(treatment1id)[1:3],
         .(
-            mean_drug1dose=mean(drug1dose),
-            mean_drug2dose=mean(drug2dose),
+            mean_treatment1dose=mean(treatment1dose),
+            mean_treatment2dose=mean(treatment2dose),
             mean_viability=mean(viability)
         ),
         by=by
@@ -58,7 +58,7 @@ testthat::test_that("`aggregate,LongTable-method` is equivalent to aggregating t
             by=by
         )
     agg_tre_parallel <- tre |>
-        subset(drug1id %in% unique(drug1id)[1:3]) |>
+        subset(treatment1id %in% unique(treatment1id)[1:3]) |>
         aggregate(
             assay="sensitivity",
             mean_viability=mean(viability),
@@ -70,16 +70,16 @@ testthat::test_that("`aggregate,LongTable-method` is equivalent to aggregating t
         by=by
     ]
     agg_dt_small <- tre$sensitivity[
-        drug1id %in% unique(drug1id)[1:3],
+        treatment1id %in% unique(treatment1id)[1:3],
         .(mean_viability=mean(viability)),
         by=by
     ]
     expect_true(all.equal(
-        agg_tre, agg_dt, 
+        agg_tre, agg_dt,
         check.attributes=FALSE
     ))
     expect_true(all.equal(
-        agg_tre_parallel, agg_dt_small, 
+        agg_tre_parallel, agg_dt_small,
         check.attributes=FALSE
     ))
 })
@@ -88,13 +88,13 @@ testthat::test_that("`aggregate2` and `aggregate,LongTable-method` automatic nam
     ## aggregate2
     agg2_named <- sens |>
         aggregate2(
-            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
-                mean_drug2dose=mean(drug2dose),
+            mean_viability=mean(viability), mean_treatment1dose=mean(treatment1dose),
+                mean_treatment2dose=mean(treatment2dose),
             by=by
         )
     agg2_unnamed <- sens |>
         aggregate2(
-            mean(viability), mean(drug1dose), mean(drug2dose),
+            mean(viability), mean(treatment1dose), mean(treatment2dose),
             by=by
         )
     testthat::expect_true(all.equal(
@@ -105,14 +105,14 @@ testthat::test_that("`aggregate2` and `aggregate,LongTable-method` automatic nam
     agg_named <- tre |>
         aggregate(
             "sensitivity",
-            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
-                mean_drug2dose=mean(drug2dose),
+            mean_viability=mean(viability), mean_treatment1dose=mean(treatment1dose),
+                mean_treatment2dose=mean(treatment2dose),
             by=by
         )
     agg_unnamed <- tre |>
         aggregate(
             "sensitivity",
-            mean(viability), mean(drug1dose), mean(drug2dose),
+            mean(viability), mean(treatment1dose), mean(treatment2dose),
             by=by
         )
     testthat::expect_true(all.equal(
@@ -129,16 +129,19 @@ testthat::test_that("`Assignment doesn't modify summarized assay data", {
     sens_summary <- tre |>
         aggregate(
             "sensitivity",
-            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
-                mean_drug2dose=mean(drug2dose),
+            mean_viability=mean(viability, na.rm=TRUE),
+            mean_treatment1dose=mean(treatment1dose, na.rm=TRUE),
+            mean_treatment2dose=mean(treatment2dose, na.rm=TRUE),
             by=by
         )
     ntre$sens_summary <- sens_summary
     sens_summary2 <- unique(ntre$sens_summary[, .SD, .SDcols=colnames(sens_summary)])
+    setkeyv(sens_summary, by)
+    setkeyv(sens_summary2, by)
     testthat::expect_true(all.equal(
         sens_summary,
         sens_summary2,
-        check.attributes=FALSE  # Should we fix this so they also have the same key?
+        check.attributes=FALSE
     ))
 })
 
@@ -147,8 +150,8 @@ testthat::test_that("`reindex,LongTable-method` doesn't corrupt referrential int
     sens_summary <- tre |>
         aggregate(
             "sensitivity",
-            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
-                mean_drug2dose=mean(drug2dose),
+            mean_viability=mean(viability), mean_treatment1dose=mean(treatment1dose),
+                mean_treatment2dose=mean(treatment2dose),
             by=by
         )
     ntre$sens_summary <- sens_summary
@@ -164,14 +167,14 @@ testthat::test_that("`subset,LongTable-method` works correctly with summary assa
     sens_summary <- tre |>
         aggregate(
             "sensitivity",
-            mean_viability=mean(viability), mean_drug1dose=mean(drug1dose),
-                mean_drug2dose=mean(drug2dose),
+            mean_viability=mean(viability), mean_treatment1dose=mean(treatment1dose),
+                mean_treatment2dose=mean(treatment2dose),
             by=by
         )
     ntre$sens_summary <- sens_summary
-    stre <- subset(ntre, drug1id %in% drug1id[1:5])
+    stre <- subset(ntre, treatment1id %in% treatment1id[1:5])
     testthat::expect_true(CoreGx:::.table_is_subset(
         stre$sens_summary,
-        ntre$sens_summary[drug1id %in% drug1id[1:5]]
+        ntre$sens_summary[treatment1id %in% treatment1id[1:5]]
     ))
 })
