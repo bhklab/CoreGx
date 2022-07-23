@@ -66,7 +66,7 @@ to your aggregate calls unless you specify the names in the call.}
 }
 \value{
 Object with the same class as \code{x}, with the aggregation results
-assinged to \code{target}, using \code{strategy} if \code{target} is an existing assay in
+assigned to \code{target}, using \code{strategy} if \code{target} is an existing assay in
 \code{x}.
 }
 \description{
