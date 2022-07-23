@@ -397,6 +397,9 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
 
     # honor row and column ordering guarantees from CoreGx design documentation
     aList <- copy(x@assays)
+    aNames <- names(aList)
+    # prepend with . to match assay index naming convention
+    names(aList) <- paste0(".", aNames)
     corder <- c(
         if (withDimnames) idCols(x),
         if (key) c("rowKey", "colKey"),
@@ -416,6 +419,8 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
         if (!is.null(corder)) setcolorder(aList[[i]], corder) else
             setcolorder(aList[[i]])
     }
+    # reset names to no dot version
+    names(aList) <- aNames
     return(aList)
 })
 
@@ -519,6 +524,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 
     keepAssay <- if (is.character(i)) which(assayNames(x) == i) else i
     assayName <- assayNames(x)[keepAssay]
+    .assayName <- paste0(".", assayName)
     if (length(keepAssay) < 1)
         stop(.errorMsg('\n[CoreGx::assay] There is no assay ', i,
             ' in this LongTable. Use assayNames(longTable) for a list',
@@ -540,7 +546,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 
     # optionally join to rowData and colData
     assayIndex <- na.omit(unique(assayIndex(x)[,
-        c("rowKey", "colKey", assayName),
+        c("rowKey", "colKey", .assayName),
         with=FALSE
     ]))
 
@@ -549,11 +555,11 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
     # only compute summaries for assays that are summarized actually summarized
     summarize <- summarize && !all(idCols(x) %in% aKeys)
     if (summarize) {
-        assayIndex <- assayIndex[, first(.SD), by=assayName]
+        assayIndex <- assayIndex[, first(.SD), by=.assayName]
     }
 
-    setkeyv(assayIndex, assayName)
-    assayData <- assayData[assayIndex, on=assayName]
+    setkeyv(assayIndex, .assayName)
+    assayData <- assayData[assayIndex, on=.assayName]
     setkeyv(assayData, "rowKey")
     if (withDimnames && !metadata) {
         assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, ]
@@ -567,11 +573,11 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
     # honour row and column ordering guarantees
     ## See: https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation
     if (withDimnames || key) {
-        assayData[, (assayName) := NULL]
+        assayData[, (.assayName) := NULL]
         if (withDimnames) setkeyv(assayData, idCols(x)) else
             setkeyv(assayData, c("rowKey", "colKey"))
     } else {
-        setkeyv(assayData, assayName)
+        setkeyv(assayData, .assayName)
     }
     if (!key) assayData[, c("rowKey", "colKey") := NULL]
     corder <- c(
@@ -663,6 +669,7 @@ setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
 
     # -- determine if the assay already exists
     if (is.numeric(i)) i <- assayNames(x)[i]
+    .i <- paste0(".", i)
     assayExists <- i %in% assayNames(x)
 
     # -- determine the id columns if the assay doesn't already exits
@@ -676,7 +683,7 @@ setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
     }
     # -- add assayKey column to the value
     setkeyv(value, assayKey)
-    value[, (i) := .I]
+    value[, (.i) := .I]
 
     # -- join assay with existing metadata
     rKeys <- intersect(rowIDs(x), assayKey)
@@ -696,11 +703,11 @@ setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
 
     # -- update assayIndex with the new assay
     setkeyv(annotatedIndex, assayKey)
-    if (i %in% colnames(annotatedIndex)) annotatedIndex[, (i) := NULL]
+    if (.i %in% colnames(annotatedIndex)) annotatedIndex[, (.i) := NULL]
     # FIXME:: This is really slow with by=.EACHI when the cardinality is high
-    annotatedIndex[value, (i) := get(i), on=assayKey, by=.EACHI]
+    annotatedIndex[value, (.i) := get(.i), on=assayKey, by=.EACHI]
     annotatedIndex[, (assayKey) := NULL]
-    setkeyv(annotatedIndex, unique(c(assayNames(x), i)))
+    setkeyv(annotatedIndex, unique(c(paste0(".", assayNames(x)), .i)))
 
     # -- detect and warn users if they have modified id columns
     # rowIDs
@@ -734,11 +741,10 @@ setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
         )
 
     # -- remove metadata columns for the assay
-    ## TODO:: Do we want to allow mutating rowData and colData via assay method?
     throwAwayCols <- c(idCols(x), rowMeta(x), colMeta(x))
     keepCols <- setdiff(colnames(value), throwAwayCols)
     assayValue <- unique(value[, keepCols, with=FALSE])
-    setkeyv(assayValue, i)
+    setkeyv(assayValue, .i)
 
     # -- update the object
     setcolorder(annotatedIndex, c("rowKey", "colKey"))
