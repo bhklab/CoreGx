@@ -89,8 +89,8 @@ NULL
 #' Subset method for a LongTable object.
 #'
 #' Allows use of the colData and rowData `data.table` objects to query based on
-#'  rowID and colID, which is then used to subset all value data.tables stored
-#'  in the dataList slot.
+#'  rowID and colID, which is then used to subset all assay `data.table`s stored
+#'  in the `assays` slot.
 #' This function is endomorphic, it always returns a LongTable object.
 #'
 #' @examples
@@ -105,19 +105,19 @@ NULL
 #'     sampleid == 'A2058')
 #'
 #' @param x `LongTable` The object to subset.
-#' @param i `character`, `numeric`, `logical` or `expression`
-#'  Character: pass in a character vector of drug names, which will subset the
-#'    object on all row id columns matching the vector.
-#'  Numeric or Logical: these select based on the rowKey from the `rowData`
-#'    method for the `LongTable`.
+#' @param i `character`, `numeric`, `logical` or `call`
+#'  Character: pass in a character vector of rownames for the `LongTable` object
+#'    or a valid regex query which will be evaluated against the rownames.
+#'  Numeric or Logical: vector of indices or a logical vector to subset
+#'    the rows of a `LongTable`.
 #'  Call: Accepts valid query statements to the `data.table` i parameter,
 #'    this can be used to make complex queries using the `data.table` API
 #'    for the `rowData` data.table.
-#' @param j `character`, `numeric`, `logical` or `expression`
-#'  Character: pass in a character vector of drug names, which will subset the
-#'    object on all drug id columns matching the vector.
-#'  Numeric or Logical: these select based on the rowID from the `rowData`
-#'    method for the `LongTable`.
+#' @param j `character`, `numeric`, `logical` or `call`
+#'  Character: pass in a character vector of colnames for the `LongTable` object
+#'    or a valid regex query which will be evaluated against the colnames.
+#'  Numeric or Logical: vector of indices or a logical vector to subset
+#'    the columns of a `LongTable`.
 #'  Call: Accepts valid query statements to the `data.table` i parameter,
 #'    this can be used to make complex queries using the `data.table` API
 #'    for the `colData` data.table.
@@ -128,7 +128,7 @@ NULL
 #'   are the smallest possible set of consecutive integers. Modifies the
 #'   "rowKey", "colKey", and all assayKey columns. Initial benchmarks indicate
 #'   `reindex=FALSE` saves ~20% of both execution time and memory allocation. The
-#'   cost of reindexing decreases the smaller your subet gets.
+#'   cost of reindexing decreases the smaller your subset gets.
 #'
 #' @return `LongTable` A new `LongTable` object subset based on the specified
 #'      parameters.
