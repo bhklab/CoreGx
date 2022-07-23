@@ -104,7 +104,7 @@ testthat::test_that("`assay<-,LongTable-method` assignment does not corrupt data
     testthat::expect_true(all.equal(getIntern(ntre)$assayIndex, getIntern(tre)$assayIndex))
 })
 
-testthat::test_that("`assay<-LongTable-method` allows non-id column updates", {
+testthat::test_that("`assay<-,LongTable-method` allows non-id column updates", {
     ntre <- copy(tre)
     assay_ <- ntre[["sensitivity"]]
     assay_[, viability := rnorm(.N)]
@@ -156,7 +156,7 @@ testthat::test_that("`assay<-LongTable-method` allows simple summary assignments
     ))
 })
 
-testthat::test_that("`assay<-LongTable-method` summary assignment doesn't break referential integrity", {
+testthat::test_that("`assay<-,LongTable-method` summary assignment doesn't break referential integrity", {
     ntre <- copy(tre)
     sens <- ntre$sensitivity
     sens_sum <- sens[,
