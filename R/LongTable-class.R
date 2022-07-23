@@ -554,7 +554,7 @@ setMethod('assayCols', signature(object='LongTable'),
     keys <- assayKeys(object)
     assayColnames <- Map(setdiff,
         x=lapply(assays(object, raw=TRUE), FUN=colnames),
-        y=as.list(assayNames(object))
+        y=as.list(paste0(".", assayNames(object)))
     )
     assayCols <- Map(c, keys, assayColnames)
     if (!missing(i)) assayCols[[i]] else assayCols
