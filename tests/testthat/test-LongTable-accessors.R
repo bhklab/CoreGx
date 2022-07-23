@@ -5,8 +5,8 @@ library(data.table)
 data(nci_TRE_small)
 tre <- nci_TRE_small
 
-## tre = TreatmentResponseExperiment
-## ntre = New TreatmentResponseExperiment
+## tre = drugResponseExperiment
+## ntre = New drugResponseExperiment
 
 # see https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation for
 # explanation
@@ -45,7 +45,7 @@ testthat::test_that("`colData<-` prevents intentionally breaking referential int
 # This warning doesn't trigger if we remove another ID column.
 # Instead, an error like in the NCI-ALMANAC script will occur. (Too many duplicate rows)
 
-## FIXME:: We should probably just throw an error for these cases! This test 
+## FIXME:: We should probably just throw an error for these cases! This test
 ##   doesn't work for the full NCI_TRE object due to cartesian join
 # testthat::test_that("`rowData<-` ensures necessary row ID columns present in the replacement rowData", {
 #     ntre <- copy(tre)
@@ -116,7 +116,7 @@ testthat::test_that("`assay<-LongTable-method` allows non-id column updates", {
 testthat::test_that("`assay<-LongTable-method` prevents id column updates", {
     ntre <- copy(tre)
     assay_ <- ntre[["sensitivity"]]
-#    assay_[, treatment1dose := rnorm(.N)]
+#    assay_[, drug1dose := rnorm(.N)]
 #    testthat::expect_error({ ntre[["sensitivity"]] <- assay_ },
 #        regexp=".*Identifier columns cannot be modified via assay assignment!.*"
 #    )
@@ -128,11 +128,11 @@ testthat::test_that("`assay<-LongTable-method` allows simple summary assignments
     sens <- ntre$sensitivity
     sens_sum <- sens[,
         .(
-            mean_treatment1dose=mean(treatment1dose, na.rm=TRUE),
-            mean_treatment2dose=mean(treatment2dose, na.rm=TRUE),
+            mean_drug1dose=mean(drug1dose, na.rm=TRUE),
+            mean_drug2dose=mean(drug2dose, na.rm=TRUE),
             mean_viability=mean(viability, na.rm=TRUE)
         ),
-        by=.(treatment1id, treatment2id, sampleid)
+        by=.(drug1id, drug2id, cellid)
     ]
     testthat::expect_silent(ntre$sens_sum <- sens_sum)
     # ensure that the returned assay matches the assigned assay when
@@ -161,11 +161,11 @@ testthat::test_that("`assay<-LongTable-method` summary assignment doesn't break 
     sens <- ntre$sensitivity
     sens_sum <- sens[,
         .(
-            mean_treatment1dose=mean(treatment1dose, na.rm=TRUE),
-            mean_treatment2dose=mean(treatment2dose, na.rm=TRUE),
+            mean_drug1dose=mean(drug1dose, na.rm=TRUE),
+            mean_drug2dose=mean(drug2dose, na.rm=TRUE),
             mean_viability=mean(viability, na.rm=TRUE)
         ),
-        by=.(treatment1id, treatment2id, sampleid)
+        by=.(drug1id, drug2id, cellid)
     ]
     testthat::expect_silent(ntre$sens_sum <- sens_sum)
     testthat::expect_true(all.equal(rowData(tre), rowData(ntre)))
@@ -184,16 +184,16 @@ testthat::test_that("`assay<-,LongTable-method` prevents modified row ID in new 
     sens <- ntre$sensitivity
     sens_sum <- sens[,
         .(
-            mean_treatment1dose=mean(treatment1dose, na.rm=TRUE),
-            mean_treatment2dose=mean(treatment2dose, na.rm=TRUE),
+            mean_drug1dose=mean(drug1dose, na.rm=TRUE),
+            mean_drug2dose=mean(drug2dose, na.rm=TRUE),
             mean_viability=mean(viability, na.rm=TRUE)
         ),
-        by=.(treatment1id, treatment2id, sampleid)
+        by=.(drug1id, drug2id, cellid)
     ]
     set(sens_sum,
-        i     = which(sens_sum[["treatment1id"]] == sens_sum[1, treatment1id]),
-        j     = "treatment1id",           # rowID to modify
-        value = sens_sum[1, sampleid]) # Replace a treatment id with a sample id
+        i     = which(sens_sum[["drug1id"]] == sens_sum[1, drug1id]),
+        j     = "drug1id",           # rowID to modify
+        value = sens_sum[1, cellid]) # Replace a drug id with a cell id
     testthat::expect_error({ ntre$sens_sum <- sens_sum },
         regexp = paste(
             ".*One or more rowIDs\\(x\\) columns have been modified.",
@@ -207,16 +207,16 @@ testthat::test_that("`assay<-,LongTable-method` prevents modified column ID in n
     sens <- ntre$sensitivity
     sens_sum <- sens[,
         .(
-            mean_treatment1dose=mean(treatment1dose, na.rm=TRUE),
-            mean_treatment2dose=mean(treatment2dose, na.rm=TRUE),
+            mean_drug1dose=mean(drug1dose, na.rm=TRUE),
+            mean_drug2dose=mean(drug2dose, na.rm=TRUE),
             mean_viability=mean(viability, na.rm=TRUE)
         ),
-        by=.(treatment1id, treatment2id, sampleid)
+        by=.(drug1id, drug2id, cellid)
     ]
     set(sens_sum,
-        i = which(sens_sum[["sampleid"]] == sens_sum[1, sampleid]),
-        j = "sampleid",             # column ID to modify
-        value = sens_sum[1, treatment2id]) # Replace a sample ID with a treatment ID
+        i = which(sens_sum[["cellid"]] == sens_sum[1, cellid]),
+        j = "cellid",             # column ID to modify
+        value = sens_sum[1, drug2id]) # Replace a cell ID with a drug ID
     testthat::expect_error({ ntre$sens_sum <- sens_sum },
         regexp = paste(
             ".*One or more colIDs\\(x\\) column have been modified.",
