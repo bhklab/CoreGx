@@ -9,20 +9,20 @@
 \arguments{
 \item{x}{\code{LongTable} The object to subset.}
 
-\item{i}{\code{character}, \code{numeric}, \code{logical} or \code{expression}
-Character: pass in a character vector of drug names, which will subset the
-object on all row id columns matching the vector.
-Numeric or Logical: these select based on the rowKey from the \code{rowData}
-method for the \code{LongTable}.
+\item{i}{\code{character}, \code{numeric}, \code{logical} or \code{call}
+Character: pass in a character vector of rownames for the \code{LongTable} object
+or a valid regex query which will be evaluated against the rownames.
+Numeric or Logical: vector of indices or a logical vector to subset
+the rows of a \code{LongTable}.
 Call: Accepts valid query statements to the \code{data.table} i parameter,
 this can be used to make complex queries using the \code{data.table} API
 for the \code{rowData} data.table.}
 
-\item{j}{\code{character}, \code{numeric}, \code{logical} or \code{expression}
-Character: pass in a character vector of drug names, which will subset the
-object on all drug id columns matching the vector.
-Numeric or Logical: these select based on the rowID from the \code{rowData}
-method for the \code{LongTable}.
+\item{j}{\code{character}, \code{numeric}, \code{logical} or \code{call}
+Character: pass in a character vector of colnames for the \code{LongTable} object
+or a valid regex query which will be evaluated against the colnames.
+Numeric or Logical: vector of indices or a logical vector to subset
+the columns of a \code{LongTable}.
 Call: Accepts valid query statements to the \code{data.table} i parameter,
 this can be used to make complex queries using the \code{data.table} API
 for the \code{colData} data.table.}
@@ -35,7 +35,7 @@ returning only the selected items in the new LongTable.}
 are the smallest possible set of consecutive integers. Modifies the
 "rowKey", "colKey", and all assayKey columns. Initial benchmarks indicate
 \code{reindex=FALSE} saves ~20\% of both execution time and memory allocation. The
-cost of reindexing decreases the smaller your subet gets.}
+cost of reindexing decreases the smaller your subset gets.}
 }
 \value{
 \code{LongTable} A new \code{LongTable} object subset based on the specified
@@ -43,8 +43,8 @@ parameters.
 }
 \description{
 Allows use of the colData and rowData \code{data.table} objects to query based on
-rowID and colID, which is then used to subset all value data.tables stored
-in the dataList slot.
+rowID and colID, which is then used to subset all assay \code{data.table}s stored
+in the \code{assays} slot.
 This function is endomorphic, it always returns a LongTable object.
 }
 \examples{

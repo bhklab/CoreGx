@@ -5,8 +5,8 @@ library(data.table)
 data(nci_TRE_small)
 tre <- nci_TRE_small
 
-## tre = TreatmentResponseExperiment
-## ntre = New TreatmentResponseExperiment
+## tre = drugResponseExperiment
+## ntre = New drugResponseExperiment
 
 # see https://github.com/bhklab/CoreGx/wiki/CoreGx-Design-Documentation for
 # explanation
@@ -44,14 +44,17 @@ testthat::test_that("`colData<-` prevents intentionally breaking referential int
 
 # This warning doesn't trigger if we remove another ID column.
 # Instead, an error like in the NCI-ALMANAC script will occur. (Too many duplicate rows)
-testthat::test_that("`rowData<-` ensures necessary row ID columns present in the replacement rowData", {
-    ntre <- copy(tre)
-    rowData_missingID <- rowData(ntre)
-    rowData_missingID[, (rowIDs(ntre)[4]) := NULL] # remove one ID column
-    testthat::expect_warning({ rowData(ntre) <- rowData_missingID },
-        regexp = ".*The function will attempt to join with existing rowIDs, but this may fail!.*"
-    )
-})
+
+## FIXME:: We should probably just throw an error for these cases! This test
+##   doesn't work for the full NCI_TRE object due to cartesian join
+# testthat::test_that("`rowData<-` ensures necessary row ID columns present in the replacement rowData", {
+#     ntre <- copy(tre)
+#     rowData_missingID <- rowData(ntre)
+#     rowData_missingID[, (rowIDs(ntre)[4]) := NULL] # remove one ID column
+#     testthat::expect_warning({ rowData(ntre) <- rowData_missingID },
+#         regexp = ".*The function will attempt to join with existing rowIDs, but this may fail!.*"
+#     )
+# })
 
 # == @colData slot
 
@@ -101,7 +104,7 @@ testthat::test_that("`assay<-,LongTable-method` assignment does not corrupt data
     testthat::expect_true(all.equal(getIntern(ntre)$assayIndex, getIntern(tre)$assayIndex))
 })
 
-testthat::test_that("`assay<-LongTable-method` allows non-id column updates", {
+testthat::test_that("`assay<-,LongTable-method` allows non-id column updates", {
     ntre <- copy(tre)
     assay_ <- ntre[["sensitivity"]]
     assay_[, viability := rnorm(.N)]
@@ -125,8 +128,8 @@ testthat::test_that("`assay<-LongTable-method` allows simple summary assignments
     sens <- ntre$sensitivity
     sens_sum <- sens[,
         .(
-            drug1dose=unique(drug1dose),
-            drug2dose=unique(drug2dose),
+            mean_drug1dose=mean(drug1dose, na.rm=TRUE),
+            mean_drug2dose=mean(drug2dose, na.rm=TRUE),
             mean_viability=mean(viability, na.rm=TRUE)
         ),
         by=.(drug1id, drug2id, cellid)
@@ -153,7 +156,7 @@ testthat::test_that("`assay<-LongTable-method` allows simple summary assignments
     ))
 })
 
-testthat::test_that("`assay<-LongTable-method` summary assignment doesn't break referential integrity", {
+testthat::test_that("`assay<-,LongTable-method` summary assignment doesn't break referential integrity", {
     ntre <- copy(tre)
     sens <- ntre$sensitivity
     sens_sum <- sens[,

@@ -85,7 +85,7 @@ testthat::test_that("`subset,LongTable-method` works with regex queries", {
     ]
     testthat::expect_s4_class(ntre2, "LongTable")
     testthat::expect_true(
-        .table_is_subset(
+        CoreGx:::.table_is_subset(
             rowData(ntre2),
             rowData(tre)[grepl("vemurafenib|Vismodegib", rownames(tre)), ]
         )
@@ -264,7 +264,6 @@ testthat::test_that("`reindex,LongTable-method` has same index as LongTable cons
 testthat::test_that("`reindex,LongTable-method` does not corrupt data relationships", {
     ntre <- reindex(tre)
     for (i in seq_along(assayNames(tre))) {
-        print(i)
         assay1 <- assay(tre, i, withDimnames=TRUE)
         setkeyv(assay1, idCols(tre))
         assay2 <- assay(ntre, i, withDimnames=TRUE)
@@ -274,7 +273,6 @@ testthat::test_that("`reindex,LongTable-method` does not corrupt data relationsh
     assayL1 <- assays(tre)
     assayL2 <- assays(ntre)
     for (i in seq_along(assayL1)) {
-        print(i)
         testthat::expect_true(all.equal(assayL1[[i]], assayL2[[i]]))
     }
 })
