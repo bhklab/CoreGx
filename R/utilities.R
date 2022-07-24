@@ -1333,9 +1333,9 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
              call. = FALSE)
     }
 
-    get_viability <- ("viability" %in% profiles)
-    if (get_viability) {
-        profiles <- profiles[!profiles %in% "viability"]
+    get_combo_viability <- ("combo_viability" %in% profiles)
+    if (get_combo_viability) {
+        profiles <- profiles[!profiles %in% "combo_viability"]
         # and enable option for including combo viability
     }
 
@@ -1369,9 +1369,9 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
         )
 
     if (!is.null(object[["combo_viability"]])) {
-        if (get_viability) {
+        if (get_combo_viability) {
             combo_profiles <- object[["combo_viability"]][,
-                c(combo_keys, "viability"), with = FALSE
+                c(combo_keys, "combo_viability"), with = FALSE
             ]
         } else {
             combo_profiles <- object[["combo_viability"]][,
@@ -1380,12 +1380,12 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
         }
         ## we know replicates have been averaged in combo_viability
     } else {
-        if (get_viability) {
+        if (get_combo_viability) {
             object |>
                 subset(!is.na(treatment2dose)) |>
                 aggregate(
                     assay = "sensitivity",
-                    viability = (mean(viability) / 100),
+                    combo_viability = (mean(viability) / 100),
                     by = combo_keys
                 ) -> combo_profiles
         } else {
@@ -1433,8 +1433,10 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
             combo_profiles <- combo_profiles[!is.na(treatment1dose)]
             ## Edge case: adding profiles in sensitivity first
             ## then add monotherapy profiles
-            if ("replicate" %in% colnames(combo_profiles)) {
-                setkeyv(combo_profiles, c(combo_keys, "replicate"))
+            replicates <- c("tech_rep", "bio_rep")
+            has_reps <- replicates %in% colnames(combo_profiles)
+            if (any(has_reps)) {
+                setkeyv(combo_profiles, c(combo_keys, replicates[has_reps]))
             } else {
                 setkeyv(combo_profiles, combo_keys)
             }
@@ -1451,10 +1453,16 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
                 ]
             } else { ## might have replicates
                 ## likely to happen for profiles in sensitivity assay
-                if (!("replicate" %in% common_keys) & ("replicate" %in% assay_keys)) {
+                replicates <- c("tech_rep", "bio_rep")
+                reps_in_common_keys <- replicates %in% common_keys
+                reps_in_assay_keys <- replicates %in% assay_keys
+                if (!all(reps_in_common_keys) & any(reps_in_assay_keys))
+                    miss_rep_key <- xor(reps_in_common_keys, reps_in_assay_keys)
+                if (any(miss_rep_key)) {
                     ## treat it as a profile to add first
-                    query_profiles <- c(query_profiles, "replicate")
-                    setkeyv(assay_, c(common_keys, "replicate"))
+                    add_rep_key <- replicates[which(reps_in_assay_keys)]
+                    query_profiles <- c(query_profiles, add_rep_key)
+                    setkeyv(assay_, c(common_keys, add_rep_key))
                 }
                 assay_ <- assay_[, c(common_keys, query_profiles), with = FALSE]
                 ## Left-join on assay_, replicate has become a key if present in assay_
