@@ -24,6 +24,8 @@
 \alias{assay,LongTable,ANY-method}
 \alias{assay<-,LongTable,ANY-method}
 \alias{assayNames,LongTable-method}
+\alias{names,LongTable-method}
+\alias{names}
 \alias{[[,LongTable,ANY,ANY-method}
 \alias{dim,LongTable-method}
 \alias{colnames,LongTable-method}
@@ -370,6 +372,7 @@ assay(merckLongTable, 'sensitivity') <-
 assay(merckLongTable, 'sensitivity') <- merckLongTable$sensitivity
 
 assayNames(merckLongTable)
+names(merckLongTable)
 
 merckLongTable[['sensitivity']]
 
