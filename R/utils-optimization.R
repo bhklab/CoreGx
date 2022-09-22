@@ -1,5 +1,5 @@
-#' Curve fitting via `base::optim` with fall-back grid/pattern search if
-#'   convergence is not achieved.
+#' Curve fitting via `base::optim` L-BFGS-B with fall-back grid/pattern search
+#'   if convergence is not achieved.
 #'
 #' @param par `numeric` Vector of intial guesses for the parameters. Must be
 #'   within the range (`lower`, `upper`).
@@ -29,6 +29,8 @@
         control=list(factr=1e-08, ndeps=rep(1e-4, times=length(par)), trace = 0)
         ) {
     stop("Function not fully implemented yet!")
+    stopifnot(is.function(fn))
+    stopifnot(is.function(loss) || is.character(loss))
     stopifnot(c("par", "x", "y", "fn") %in% formalArgs(loss))
     stopifnot(
         is.null(names(loss_args)) || all(names(loss_args) %in% formalArgs(loss))
@@ -40,7 +42,8 @@
                 do.call(loss, c(list(par=par, x=x, y=y, fn=fn), loss_args))
             upper=upper,
             lower=lower,
-            control=control
+            control=control,
+            method="L-BFGS-B"
         )
     },
     error=function(x) {
@@ -71,8 +74,6 @@
     attr(guess, "Rsquare") <- Rsqr
 
     return(guess)
-
-
 
 }
 
