@@ -28,3 +28,6 @@ local_data
 .VSCodeCounter
 .local_data
 .scripts
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

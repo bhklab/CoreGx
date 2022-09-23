@@ -1,5 +1,20 @@
 # CoreGx News File
 
+# v 2.1.7
+* Fixed a bug when deleting a `TreatmentResponseExperiment` assay via `NULL` assignment
+* Added a names S4 method fo `TreatmentResponseExperiment` to enable tab autocomplete with `$` access in interative sessions
+* Added additional methods for drug combination modelling; these changes will be documented in a new vignette once we have thoroughly tested the new functions
+  * For now these are experimental and should not be considered a stable API
+
+# v 2.1.6
+* Changed default parallelization strategy inside `aggregate2` (and therefore inside `aggregate,TreatmentResponseExperiment-method` and `endoaggregate`) to split the table into nthread tables instead of using by
+  * Result should be (1) parallelization is now always faster than serial computations, which was not true previously
+  * Memory usage of parallelization should be much smaller, since we aren't splitting into a very long list of tables
+* Optimized the internal representation of the `TreatmentResponseExperiment` assay index to remove storage of `NA` for `rowKey`-`colKey` combinations with no observations in any assay
+  * This was causing memory usage to baloon if both `rowKey` and `colKey` were a large sequence
+* Prepended a "." to the internal assay index column names for each assay
+  * This should reduce name clashes between internal `TRE` metadata and the column names of an assay (specifically, you can now have a column with the same name as the assay)  
+
 # v 2.1.5
 * Add error message to CoreSet,show-method which lets users know to use updateObject if the slot names are not valid
 

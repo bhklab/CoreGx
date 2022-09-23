@@ -652,9 +652,14 @@ setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
     if (length(i) > 1) .error(funContext, ' Only a single assay ',
         'name can be assiged with assay(x, i) <- value.')
 
+    # -- determine if the assay already exists
+    if (is.numeric(i)) i <- assayNames(x)[i]
+    .i <- paste0(".", i)
+    assayExists <- i %in% assayNames(x)
+
     if (is.null(value)) {
-        x@assays[[i]] <- NULL
-        return(x)
+        keepAssays <- setdiff(assayNames(x), i)
+        return(x[, , keepAssays])
     }
 
     if (!is.data.frame(value)) .error(funContext, ' Only a data.frame or',
@@ -667,10 +672,7 @@ setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
     aIndex <- mutable_intern$assayIndex
     aKeys <- mutable_intern$assayKeys
 
-    # -- determine if the assay already exists
-    if (is.numeric(i)) i <- assayNames(x)[i]
-    .i <- paste0(".", i)
-    assayExists <- i %in% assayNames(x)
+
 
     # -- determine the id columns if the assay doesn't already exits
     if (!any(assayExists)) {
@@ -764,6 +766,7 @@ setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
 #'
 #' @examples
 #' assayNames(merckLongTable)
+#' names(merckLongTable)
 #'
 #' @describeIn LongTable Return the names of the assays contained in a
 #'   `LongTable`
@@ -773,9 +776,14 @@ setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
 #' @return `character` Names of the assays contained in the `LongTable`.
 #'
 #' @importMethodsFrom SummarizedExperiment assayNames
+#' @aliases names,LongTable-method names
 #' @export
 setMethod('assayNames', signature(x='LongTable'), function(x) {
     return(names(x@assays))
+})
+#' @export
+setMethod("names", signature(x="LongTable"), function(x) {
+    return(assayNames(x))
 })
 
 
