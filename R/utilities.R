@@ -1334,10 +1334,10 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
     }
 
     get_combo_viability <- ("combo_viability" %in% profiles)
-    if (get_combo_viability) {
-        profiles <- profiles[!profiles %in% "combo_viability"]
-        # and enable option for including combo viability
-    }
+    #if (get_combo_viability) {
+    #    profiles <- profiles[!profiles %in% "combo_viability"]
+    #    # and enable option for including combo viability
+    #}
 
     combo_keys <- c("treatment1id", "treatment2id",
                     "treatment1dose", "treatment2dose", "sampleid")
@@ -1369,35 +1369,46 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
         )
 
     if (!is.null(object[["combo_viability"]])) {
-        if (get_combo_viability) {
-            combo_profiles <- object[["combo_viability"]][,
-                c(combo_keys, "combo_viability"), with = FALSE
-            ]
-        } else {
-            combo_profiles <- object[["combo_viability"]][,
-                combo_keys, with = FALSE
-            ]
-        }
+        #if (get_combo_viability) {
+        #    combo_profiles <- object[["combo_viability"]][,
+        #        c(combo_keys, "combo_viability"), with = FALSE
+        #    ]
+        #} else {
+        #    combo_profiles <- object[["combo_viability"]][,
+        #        combo_keys, with = FALSE
+        #    ]
+        #}
+        combo_profiles <- object[["combo_viability"]][,
+            combo_keys, with = FALSE
+        ]
         ## we know replicates have been averaged in combo_viability
     } else {
-        if (get_combo_viability) {
-            object |>
-                subset(!is.na(treatment2dose)) |>
-                aggregate(
-                    assay = "sensitivity",
-                    combo_viability = (mean(viability) / 100),
-                    by = combo_keys
-                ) -> combo_profiles
-        } else {
-            combo_profiles <- unique(
-                object$sensitivity[
-                    !is.na(treatment2dose),
-                    combo_keys,
-                    with = FALSE
-                ],
-                by = combo_keys
-            )
-        }
+        #if (get_combo_viability) {
+        #    object |>
+        #        subset(!is.na(treatment2dose)) |>
+        #        aggregate(
+        #            assay = "sensitivity",
+        #            combo_viability = (mean(viability) / 100),
+        #            by = combo_keys
+        #        ) -> combo_profiles
+        #} else {
+        #    combo_profiles <- unique(
+        #        object$sensitivity[
+        #            !is.na(treatment2dose),
+        #            combo_keys,
+        #            with = FALSE
+        #        ],
+        #        by = combo_keys
+        #    )
+        #}
+        combo_profiles <- unique(
+            object$sensitivity[
+                !is.na(treatment2dose),
+                combo_keys,
+                with = FALSE
+            ],
+            by = combo_keys
+        )
     }
     setkeyv(combo_profiles, combo_keys)
 
