@@ -35,11 +35,18 @@
     stopifnot(
         is.null(names(loss_args)) || all(names(loss_args) %in% formalArgs(loss))
     )
+    .none_of <- function(...) !any(...)
+    stopifnot(.none_of(names(loss_args) %in% ...names())
     guess <- tryCatch({
         optim(
             par=par,
             fn=function(x)
-                do.call(loss, c(list(par=par, x=x, y=y, fn=fn), loss_args))
+                do.call(loss,
+                    args=c(
+                        list(par=par, x=x, y=y, fn=fn),  # mandatory loss args
+                        list(...),  # args to fn
+                        loss_args)  # additional args to loss
+                )
             upper=upper,
             lower=lower,
             control=control,
@@ -54,21 +61,24 @@
     guess <- guess[["par"]]
 
     guess_residual <- do.call(loss,
-        args=c(list(par=guess, x=x, y=y, fn=fn), loss_args))
+        args=c(list(par=guess, x=x, y=y, fn=fn), ..., loss_args))
     gritty_guess_residual <- do.call(loss,
-        args=c(list(par=guess, x=x, y=y, fn=fn), loss_args))
+        args=c(list(par=par, x=x, y=y, fn=fn), ..., loss_args))
 
     if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
-        ## TODO:: Update .meshEval and .patternSearch to paramterize the loss function
-        guess <- .meshEval(x = x, y = y, f = f, guess = gritty_guess, lower_bounds = lower_bounds, upper_bounds = upper_bounds, density = density,
-            n = median_n, scale = scale, family = family, trunc = trunc)
-        guess_residual <- .residual(x = x, y = y, n = median_n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
+        guess <- do.call(.meshEval,
+            c(list(par=guess, x=x, y=y, fn=fn, loss=loss, loss_args=loss_args),
+            list(...))
+        )
+        guess_residual <- do.call(loss,
+            args=c(list(par=guess, x=x, y=y, fn=fn), ..., loss_args))
 
         guess <- .patternSearch(x = x, y = y, f = f, guess = guess, n = median_n, guess_residual = guess_residual, lower_bounds = lower_bounds,
             upper_bounds = upper_bounds, span = span, precision = precision, step = step, scale = scale, family = family, trunc = trunc)
     }
 
-    y_hat <- do.call(fn, list(x, guess))
+    y_hat <- do.call(loss,
+        args=c(list(par=guess, x=x, y=y, fn=fn), loss_args))
 
     Rsqr <- 1 - var(y - y_hat) / var(y)
     attr(guess, "Rsquare") <- Rsqr
@@ -82,20 +92,20 @@
 #'   for N samples from a probability function.
 #'
 #' @param .pdf `function` Probability density function to use for computing loss.
-#' @param .edf `function` Expected liklihood of the median of `n` random
-#'   samples from `.pdf`.
+#' @param .edf `function` Expected liklihood function for the median of `n`
+#'   random samples from `.pdf`.
 #' @inheritParams .fitCurve2
 #' @param n `numeric(1)`
-#' @param scale ``
+#' @param scale `numeric(1)`
 #' @param trunc `logical(1)`
 #'
 #' @return `numeric(1)` Loss of `fn` on `x` relative to `y`.
 #'
 #' @keywords interal
 #' @noRd
-.sampling_loss <- function(.pdf, .edf, par, x, y, fn, n, scale=0.07,
+.sampling_loss <- function(.pdf, .edf, par, x, y, fn, ..., n, scale=0.07,
         trunc=FALSE) {
-    diffs <- do.call(f, list(x, pars)) - y
+    diffs <- fn(par=par, x=x, ...) - y
     if (trunc == FALSE) {
         return(sum(-log(.pdf(diffs, n, scale))))
     } else {
@@ -200,10 +210,16 @@
     return(guess)
 }
 
+.meshEval2 <- function(density, par, x, y, fn, loss=.normal_loss, ...,
+        loss_args=list()) {
+    pars <- NULL
+    guess_loss <- do.call()
+}
+
 # meshEval ----------------------------------------------------------------
 #' meshEval
 #'
-#' generate an initial guess for dose-response curve parameters by evaluating
+#' Generate an initial guess for dose-response curve parameters by evaluating
 #' the residuals at different lattice points of the search space
 #'
 #' @export
@@ -212,7 +228,8 @@
 # ##FIXME:: Why is this different in PharmacoGx?
 .meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
     pars <- NULL
-    guess_residual <- .residual(x = x, y = y, n = n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
+    guess_residual <- .residual(x = x, y = y, n = n, pars = guess, f = f,
+        scale = scale, family = family, trunc = trunc)
 
     periods <- matrix(NA, nrow = length(guess), ncol = 1)
     names(periods) <- names(guess)
