@@ -353,3 +353,62 @@
         }
     }
 }
+
+#' Drop parameters from a function and replace them with constants
+#'   inside the function body.
+#'
+#' @param fn `function` A non-primitive function to remove parameters from
+#'   (via `formals(fn)`).
+#' @param args `list` A list where names are the function arguments (parameters)
+#'   to remove and the values are the appopriate value to replace the paramter
+#'   with in the function body.
+#'
+#' @return `function` A new non-primitize function with the parameters in `args`
+#'   deleted and their values fixed with the values from `args` in the function
+#'   body.
+#'
+#' @export
+fix_params <- function(fn, args) {
+    stopifnot(is.function(fn) && !is.primitive(fn))
+    stopifnot(all(names(args) %in% formalArgs(fn)))
+    stopifnot(is.list(args))
+    # Delete the arguments we are deparamterizing
+    formals(fn)[formalArgs(fn) %in% names(args)] <- NULL
+    # Replace the symbols with the new fixed value inside the fuction body
+    deparse_body <- deparse(body(fn))
+    for (i in seq_along(args)) {
+        deparse_body <- gsub(names(args)[i], args[[i]], deparse_body)
+    }
+    # Parse the new function body back to a call
+    body(fn) <- str2lang(deparse_body)
+    # TODO:: Do I need to update the environment as well?
+    return(fn)
+}
+
+#' Collects all function arguments other than the first into a single list
+#'   parameter.
+#'
+#' @description
+#' Useful for converting a regular function into a function amenable to optimization
+#' via `base::optim`, which requires all free parameters be passed as a single
+#' vector `par`.
+#'
+#' @param fn `function`
+#'
+#' @return
+#'
+#'
+#' @export
+unify_params <- function(fn) {
+    stopifnot(is.function(fn) && !is.primitive(fn))
+    # Capture the current formal args
+    formal_args <- formalArgs(fn)
+    # Replace args other than the first with a list
+    args <- paste0("par[[", seq_along(formal_args[-1]), "]]") |>
+        as.list() |>
+        setNames(formal_args[-1])
+    fn <- fix_params(fn, args=args)
+    # Add the `par` list to the formal args of the function
+    formals(fn) <- c(alist(par=), formals(fn))
+    return(fn)
+}
