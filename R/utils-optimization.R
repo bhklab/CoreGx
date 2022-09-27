@@ -354,22 +354,24 @@
     }
 }
 
+
 #' Drop parameters from a function and replace them with constants
 #'   inside the function body.
 #'
 #' @param fn `function` A non-primitive function to remove parameters from
-#'   (via `formals(fn)`).
+#'   (via `base::formals(fn)`).
 #' @param args `list` A list where names are the function arguments (parameters)
-#'   to remove and the values are the appopriate value to replace the paramter
+#'   to remove and the values are the appopriate value to replace the parameter
 #'   with in the function body.
 #'
-#' @return `function` A new non-primitize function with the parameters in `args`
-#'   deleted and their values fixed with the values from `args` in the function
-#'   body.
+#' @return `function` A new non-primitize function with the parameters named in
+#'   `args` deleted and their values fixed with the values from `args` in the
+#'   function body.
 #'
 #' @export
-fix_params <- function(fn, args) {
+drop_fn_params <- function(fn, args) {
     stopifnot(is.function(fn) && !is.primitive(fn))
+    if (length(args) == 0) return(fn)
     stopifnot(all(names(args) %in% formalArgs(fn)))
     stopifnot(is.list(args))
     # Delete the arguments we are deparamterizing
@@ -380,10 +382,11 @@ fix_params <- function(fn, args) {
         deparse_body <- gsub(names(args)[i], args[[i]], deparse_body)
     }
     # Parse the new function body back to a call
-    body(fn) <- str2lang(deparse_body)
-    # TODO:: Do I need to update the environment as well?
+    body(fn) <- str2lang(paste0(deparse_body, collapse="\n"))
+    # TODO:: Do I need to update the closure environment as well?
     return(fn)
 }
+
 
 #' Collects all function arguments other than the first into a single list
 #'   parameter.
@@ -393,16 +396,29 @@ fix_params <- function(fn, args) {
 #' via `base::optim`, which requires all free parameters be passed as a single
 #' vector `par`.
 #'
-#' @param fn `function`
+#' @details
+#' Takes a function of the form f(x, ...), where ... is any number of additional
+#'   function parameters (bot not literal `...`!) and parses it to a function of
+#'   the form f(par, x) where `par` is a vector of values for ... in
+#'   the same order as the arguments appear in `fn`.
 #'
-#' @return
+#' @param fn `function` A non-primitive function to refactor such that the first
+#'   argument becomes the second argument and all other parameters must be
+#'   passed as a vector to the first argument of the new function via the `par`
+#'   parameter.
 #'
+#' @return `function` A new non-primitive function where the first argument is
+#'   `par`, which takes a vector of parameters being optimized, and the
+#'   second argument is the old first argument to `fn` (usually `x` since this
+#'   is the independent variable to optimize the function over).
 #'
 #' @export
-unify_params <- function(fn) {
+collect_fn_params <- function(fn) {
     stopifnot(is.function(fn) && !is.primitive(fn))
     # Capture the current formal args
     formal_args <- formalArgs(fn)
+    if ("..." %in% formalArgs(fn))
+        stop("No support for fn with ... in signature!")
     # Replace args other than the first with a list
     args <- paste0("par[[", seq_along(formal_args[-1]), "]]") |>
         as.list() |>
@@ -411,4 +427,58 @@ unify_params <- function(fn) {
     # Add the `par` list to the formal args of the function
     formals(fn) <- c(alist(par=), formals(fn))
     return(fn)
+}
+
+
+#' Takes a non-primitive R function and refactors it to be compatible with
+#'   optimization via `stats::optim`.
+#'
+#' @description
+#'
+#'
+#' @param fn `function` A non-primitive function
+#' @param ... Arguments to `fn` to fix for before building the
+#'   function to be optimized. Useful for reducing the number of free parameters
+#'   in an optimization if there are insufficient degrees of freedom.
+#'
+#' @seealso [`drop_fn_params`], [`collect_fn_params`]
+#'
+#' @export
+make_optim_function <- function(fn, ...) {
+    # NOTE: error handling done inside helper methods!
+    fn1 <- drop_fn_params(fn, args=list(...))
+    fn2 <- collect_fn_params(fn1)
+    return(fn2)
+}
+
+
+#' Check whether a function signature is amenable to optimization via `stats::optim`.
+#'
+#' @description
+#' Functions compatible with `optim` have the parameter named `par` as their
+#' first formal argument where each value is a respective free parameter to
+#' be optimized.
+#'
+#' @param fn `function` A non-primitive function.
+#'
+#' @return `logical(1)` `TRUE` if the first value of `formalArg(fn)` is "par",
+#'   otherwise `FALSE`.
+#'
+#' @export
+is_optim_compatible <- function(fn) formalArgs(fn)[1] == "par"
+
+
+if (sys.nframe() == 0) {
+    # A full function we want to optimize
+    hillEqn <- function(x, Emin, Emax, EC50, lambda) {
+        (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
+    }
+    # We don't want to optimize all the parameters, so lets fix some
+    hillEqn2 <- fix_params(hillEqn, args=list(lambda=1, Emin=1))
+    # Now we want to make the function amendable to being called by optim
+    hillEqn2Optim <- collect_fn_params(hillEqn2)
+
+
+    # Helper to combine
+    fx <- if (is_optim_compatible(hillEqn)) hillEqn else make_optim_function(hillEqn, lambda=1)
 }
