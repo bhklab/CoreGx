@@ -1,13 +1,16 @@
-#' Curve fitting via `base::optim` L-BFGS-B with fall-back grid/pattern search
+#' Curve fitting via `stats::optim` L-BFGS-B with fall-back grid/pattern search
 #'   if convergence is not achieved.
 #'
 #' @param par `numeric` Vector of intial guesses for the parameters. Must be
 #'   within the range (`lower`, `upper`).
 #' @param x `numeric` Values to evaluate `fn` for.
 #' @param y `numeric` Target output values to optimze `fn` against.
-#' @param fn `function` A function to optimize, where the values in `par` are
-#'   in the same order as they appear in `fn`. This is passed to the `loss`
-#'   function inside the call to `base::optim`.
+#' @param fn `function` A function to optimize. Any `fn` arguments passed via
+#'   `...` will be treated as constant and removed from the optimization. It
+#'   is assumed that the first argument is the x value to optimize over and
+#'   any subsequent arguments are free parameters to be optimized. Transformed
+#'   to be optim compatible via `make_optim_function` is the first arguement
+#'   isn't already `par`.
 #' @param loss `character(1)` or `function` Either the name of one of the bundled
 #'   loss functions (see details) or a custom loss function to compute for
 #'   the output of `fn` over `x`.
@@ -24,57 +27,56 @@
 #'
 #' @importFrom stats optim
 #' @export
-.fitCurve2 <- function(par, x, y, fn, loss, lower, upper, ...,
+.fitCurve2 <- function(par, x, y, fn, loss, lower=-Inf, upper=Inf, ...,
         loss_args=list(),
         control=list(factr=1e-08, ndeps=rep(1e-4, times=length(par)), trace = 0)
         ) {
-    stop("Function not fully implemented yet!")
+    #stop("Function not fully implemented yet!")
     stopifnot(is.function(fn))
     stopifnot(is.function(loss) || is.character(loss))
     stopifnot(c("par", "x", "y", "fn") %in% formalArgs(loss))
     stopifnot(
         is.null(names(loss_args)) || all(names(loss_args) %in% formalArgs(loss))
     )
-    .none_of <- function(...) !any(...)
-    stopifnot(.none_of(names(loss_args) %in% ...names())
-    guess <- tryCatch({
-        optim(
-            par=par,
-            fn=function(x)
-                do.call(loss,
-                    args=c(
-                        list(par=par, x=x, y=y, fn=fn),  # mandatory loss args
-                        list(...),  # args to fn
-                        loss_args)  # additional args to loss
+    optim_fun <- if (is_optim_compatible(fn)) {
+        fn
+    } else {
+        make_optim_function(fn, ...)
+    }
+    guess <- optim(
+        par=par,
+        fn=function(x)
+            do.call(loss,
+                args=c(
+                    list(par=par, x=x, y=y, fn=optim_fun), # mandatory loss args
+                    loss_args # additional args to loss
                 )
-            upper=upper,
-            lower=lower,
-            control=control,
-            method="L-BFGS-B"
-        )
-    },
-    error=function(x) {
-        list(par=par, convergence=(-1))
-    })
+            ),
+        upper=upper,
+        lower=lower,
+        control=control,
+        method="L-BFGS-B"
+    )
 
     failed <- guess[["convergence"]] != 0
+    if (failed) guess <- list(par=par, convergence=-1)
     guess <- guess[["par"]]
 
     guess_residual <- do.call(loss,
-        args=c(list(par=guess, x=x, y=y, fn=fn), ..., loss_args))
+        args=c(list(par=guess, x=x, y=y, fn=optim_fun), loss_args))
     gritty_guess_residual <- do.call(loss,
-        args=c(list(par=par, x=x, y=y, fn=fn), ..., loss_args))
+        args=c(list(par=par, x=x, y=y, fn=optim_fun), loss_args))
 
+    stop("You shall not pass!")
     if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
-        guess <- do.call(.meshEval,
-            c(list(par=guess, x=x, y=y, fn=fn, loss=loss, loss_args=loss_args),
-            list(...))
+        guess <- do.call(.meshEval2,
+            c(list(par=guess, x=x, y=y, fn=fn, loss=loss, loss_args=loss_args))
         )
         guess_residual <- do.call(loss,
-            args=c(list(par=guess, x=x, y=y, fn=fn), ..., loss_args))
+            args=c(list(par=guess, x=x, y=y, fn=fn), loss_args))
 
-        guess <- .patternSearch(x = x, y = y, f = f, guess = guess, n = median_n, guess_residual = guess_residual, lower_bounds = lower_bounds,
-            upper_bounds = upper_bounds, span = span, precision = precision, step = step, scale = scale, family = family, trunc = trunc)
+        guess <- do.call(.patternSearch2,
+            c(list(par=guess, x=x, y=y, fn=fn, loss=loss, loss_args=loss_args))
     }
 
     y_hat <- do.call(loss,
@@ -84,15 +86,14 @@
     attr(guess, "Rsquare") <- Rsqr
 
     return(guess)
-
 }
 
 
 #' Compute the loss using the expectation of the likelihood of the median
-#'   for N samples from a probability function.
+#'   for N samples from a probability density function.
 #'
 #' @param .pdf `function` Probability density function to use for computing loss.
-#' @param .edf `function` Expected liklihood function for the median of `n`
+#' @param .edf `function` Expected likelihood function for the median of `n`
 #'   random samples from `.pdf`.
 #' @inheritParams .fitCurve2
 #' @param n `numeric(1)`
@@ -103,7 +104,7 @@
 #'
 #' @keywords interal
 #' @noRd
-.sampling_loss <- function(.pdf, .edf, par, x, y, fn, ..., n, scale=0.07,
+.sampling_loss <- function(.pdf, .edf, par, x, y, fn, ..., n=1, scale=0.07,
         trunc=FALSE) {
     diffs <- fn(par=par, x=x, ...) - y
     if (trunc == FALSE) {
@@ -122,15 +123,22 @@
 #' See docs for `.sampling_loss`
 #' @keywords interal
 #' @noRd
-.normal_loss <- function(...)
-    .sampling_loss(.pdf=.dmednnormals, .edf=.edmednormal, ...)
+.normal_loss <- function(par, x, y, fn, ..., n=1, scale=0.07,
+        trunc=FALSE) {
+    .sampling_loss(.pdf=.dmednnormals, .edf=.edmednormal, par=par, x=x, y=y,
+        fn=fn, ..., n=n, scale=scale)
+}
+
 
 
 #' See docs for `.sampling_loss`
 #' @keywords interal
 #' @noRd
-.cauchy_loss <- function(...) {
-    .sampling_loss(.pdf=.dmedncauchys, .edf=.edmedncauchys, ...)
+.cauchy_loss <- function(par, x, y, fn, ..., n=1, scale=0.07,
+        trunc=FALSE) {
+    .sampling_loss(.pdf=.dmedncauchys, .edf=.edmedncauchys, par=par, x=x, y=y,
+        fn=fn, ..., n=n, scale=scale)
+}
 
 
 # ==== Deprecating =====
@@ -186,7 +194,6 @@
         list(par = gritty_guess, convergence = -1)
     })
 
-
     failed <- guess[["convergence"]] != 0
     guess <- guess[["par"]]
 
@@ -210,10 +217,74 @@
     return(guess)
 }
 
-.meshEval2 <- function(density, par, x, y, fn, loss=.normal_loss, ...,
-        loss_args=list()) {
-    pars <- NULL
-    guess_loss <- do.call()
+.meshEval2 <- function(density, par, x, y, fn,
+        loss=.normal_loss, lower, upper, ..., loss_args=list()) {
+    # input validation
+    stopifnot(is.function(fn))
+    stopifnot(is.function(loss) || is.character(loss))
+    stopifnot(c("par", "x", "y", "fn") %in% formalArgs(loss))
+    stopifnot(
+        is.null(names(loss_args)) || all(names(loss_args) %in% formalArgs(loss))
+    )
+    # make function amenable to use via optim
+    optim_fun <- if (is_optim_compatible(fn)) {
+        fn
+    } else {
+        make_optim_function(fn, ...)
+    }
+    guess_loss <- do.call(loss,
+        args=c(list(par=par, x=x, y=y, fn=optim_fun), loss_args))
+
+    periods <- matrix(NA, nrow = length(par), ncol = 1)
+    names(periods) <- names(par)
+    periods[1] <- 1
+
+    if (length(guess) > 1) {
+        for (p in seq(2, length(par))) {
+            ## the par-1 is because we want 1 increment of par variable once
+            ##   all previous variables have their values tested once.
+            periods[p] <- periods[p - 1] * (density[p - 1] *
+                (upper[p - 1] - lower[p - 1]) + 1)
+        }
+    }
+
+    currentPars <- lower
+
+    ## The plus one is because we include endpoints.
+    for (point in seq_len(prod((upper - lower) * density + 1))) {
+
+        test_guess_loss <- do.call(loss,
+            c(list(par=currentPars, x=x, y=y, fn=optim_fun), loss_args))
+
+        ## Check for something catastrophic going wrong
+        if (
+            !length(test_guess_loss) ||
+            (!is.finite(test_guess_loss) && test_guess_loss != Inf)
+        ) {
+            stop(paste0(" Test Guess Loss is: ", test_guess_loss, "\n",
+                "Other Pars:\n", "x: ", paste(x, collapse = ", "), "\n",
+                "y: ", paste(y, collapse = ", "), "\n", "n: ", n, "\n",
+                "pars: ", pars, "\n", "scale: ", scale, "\n",
+                "family : ", family, "\n", "Trunc ", trunc))
+        }
+        ## save the guess if its an improvement
+        if (test_guess_loss < guess_loss) {
+            par <- currentPars
+            guess_loss <- test_guess_loss
+        }
+        ## increment the variable(s) that should be incremented this loop
+        for (p in seq_along(par)) {
+            if (point %% periods[p] == 0) {
+                currentPars[p] <- currentPars[p] + 1 / density[p]
+
+                if (currentPars[p] > upper[p]) {
+                    currentPars[p] <- lower[p]
+                }
+            }
+        }
+    }
+
+    return(guess)
 }
 
 # meshEval ----------------------------------------------------------------
@@ -226,7 +297,8 @@
 #' @keywords internal
 #' @noRd
 # ##FIXME:: Why is this different in PharmacoGx?
-.meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
+.meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n,
+        scale, family, trunc) {
     pars <- NULL
     guess_residual <- .residual(x = x, y = y, n = n, pars = guess, f = f,
         scale = scale, family = family, trunc = trunc)
@@ -423,7 +495,7 @@ collect_fn_params <- function(fn) {
     args <- paste0("par[[", seq_along(formal_args[-1]), "]]") |>
         as.list() |>
         setNames(formal_args[-1])
-    fn <- fix_params(fn, args=args)
+    fn <- drop_fn_params(fn, args=args)
     # Add the `par` list to the formal args of the function
     formals(fn) <- c(alist(par=), formals(fn))
     return(fn)
@@ -478,7 +550,36 @@ if (sys.nframe() == 0) {
     # Now we want to make the function amendable to being called by optim
     hillEqn2Optim <- collect_fn_params(hillEqn2)
 
-
     # Helper to combine
-    fx <- if (is_optim_compatible(hillEqn)) hillEqn else make_optim_function(hillEqn, lambda=1)
+    fx <- if (is_optim_compatible(hillEqn)) hillEqn else
+        make_optim_function(hillEqn, lambda=0.6, Emin=1)
+
+    debug(.fitCurve2)
+    doses <- 10^(-6:5)
+    opt_pars <- .fitCurve2(
+        par=c(Emax=0.5, EC50=0.501),
+        x=doses,
+        y=hillEqn(doses, Emin=1, lambda=1, Emax=0, EC50=median(doses)),
+        fn=hillEqn,
+        loss=.cauchy_loss,
+        loss_args=list(trunc=TRUE),
+        Emin=1,
+        lambda=1,
+        upper=c(1, max(doses)),
+        lower=c(0, min(doses))
+    )
+
+    opt_pars <- .fitCurve(
+        gritty_guess=c(Emax=0.01, EC50=0.51),
+        x=doses,
+        y=hillEqn(doses, Emin=1, lambda=1, Emax=0, EC50=median(doses)),
+        f=fx,
+        family="normal",
+        trunc=FALSE,
+        density = c(2, 10, 5),
+        median_n=1,
+        scale=0.07,
+        upper_bound=c(1, 100),
+        lower_bound=c(0, 0.0001)
+    )
 }
