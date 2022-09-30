@@ -52,6 +52,10 @@
     stopifnot(
         is.null(names(loss_args)) || all(names(loss_args) %in% formalArgs(loss))
     )
+    stopifnot(
+        (length(par) == length(upper) && length(par) == length(lower)) ||
+        (length(upper) == 1 && length(lower) == 1)
+    )
     optim_fn <- if (is_optim_compatible(fn)) {
         fn
     } else {
@@ -59,13 +63,13 @@
     }
     guess <- optim(
         par=par,
-        fn=function(x)
-            abs(do.call(loss,
+        fn=function(p)
+            do.call(loss,
                 args=c(
-                    list(par=par, x=x, y=y, fn=optim_fn), # mandatory loss args
+                    list(par=p, x=x, y=y, fn=optim_fn), # mandatory loss args
                     loss_args # additional args to loss
                 )
-            )),
+            ),
         upper=upper,
         lower=lower,
         control=control,
@@ -94,7 +98,7 @@
 
     y_hat <- optim_fn(par=guess, x=x)
 
-    Rsqr <- 1 - var(y - y_hat) / var(y)
+    Rsqr <- 1 - (var(y - y_hat) / var(y))
     attr(guess, "Rsquare") <- Rsqr
 
     return(guess)
@@ -351,9 +355,9 @@
             upper_bounds = upper_bounds, span = span, precision = precision, step = step, scale = scale, family = family, trunc = trunc)
     }
 
-    y_hat <- do.call(f, list(x, guess))
+    y_hat <- do.call(f, list(x=x, par=guess))
 
-    Rsqr <- 1 - var(y - y_hat) / var(y)
+    Rsqr <- 1 - (var(y - y_hat) / var(y))
     attr(guess, "Rsquare") <- Rsqr
 
     return(guess)
