@@ -1,8 +1,12 @@
 #' Curve fitting via `stats::optim` L-BFGS-B with fall-back grid/pattern search
 #'   if convergence is not achieved.
 #'
-#' @param par `numeric` Vector of intial guesses for the parameters. Must be
-#'   within the range (`lower`, `upper`).
+#' @description
+#'
+#' @param par `numeric` Vector of intial guesses for the parameters. For each
+#'    index `i` of `par`, par[i] must be within the range (`lower[i]`, `upper[i]`).
+#'    If only a single `upper` or `lower` value is present, that range is used
+#'    for all parameters in `par`.
 #' @param x `numeric` Values to evaluate `fn` for.
 #' @param y `numeric` Target output values to optimze `fn` against.
 #' @param fn `function` A function to optimize. Any `fn` arguments passed via
@@ -16,29 +20,39 @@
 #'   the output of `fn` over `x`.
 #' @param lower `numeric(1)`
 #' @param upper `numeric(1)`
+#' @param density `numeric` how many points in the dimension of each parameter
+#'   should be evaluated (density of the grid)
+#' @param step initial step size for pattern search.
+#' @param precision `numeric` smallest step size used in pattern search, once
+#'   step size drops below this value, the search terminates.
 #' @param ... `pairlist` Fall through arguments to `fn`.
 #' @param loss_args `list` Additional argument to the `loss` function.
 #'   These get passed to losss via `do.call` analagously to using `...`.
 #' @param control `list` List of control parameters to pass to `optim`. See
 #'   `?optim` for details.
 #'
+#' @details
+#' TODO::
+#'
+#' @seealso [`CoreGx:::.meshEval2`], [`CoreGx:::.patternSearch2`]
+#'
 #' @return `numeric` Vector of optimal parameters for `fn` fit against `y`
 #'   on the values of `x`.
 #'
 #' @importFrom stats optim
 #' @export
-.fitCurve2 <- function(par, x, y, fn, loss, lower=-Inf, upper=Inf, ...,
-        loss_args=list(),
+.fitCurve2 <- function(par, x, y, fn, loss, lower=-Inf, upper=Inf,
+        precision=1e-4, density=c(2, 10, 5), step= 0.5 / density, ...,
+        loss_args=list(), span=1,
         control=list(factr=1e-08, ndeps=rep(1e-4, times=length(par)), trace = 0)
         ) {
-    #stop("Function not fully implemented yet!")
     stopifnot(is.function(fn))
     stopifnot(is.function(loss) || is.character(loss))
     stopifnot(c("par", "x", "y", "fn") %in% formalArgs(loss))
     stopifnot(
         is.null(names(loss_args)) || all(names(loss_args) %in% formalArgs(loss))
     )
-    optim_fun <- if (is_optim_compatible(fn)) {
+    optim_fn <- if (is_optim_compatible(fn)) {
         fn
     } else {
         make_optim_function(fn, ...)
@@ -48,7 +62,7 @@
         fn=function(x)
             do.call(loss,
                 args=c(
-                    list(par=par, x=x, y=y, fn=optim_fun), # mandatory loss args
+                    list(par=par, x=x, y=y, fn=optim_fn), # mandatory loss args
                     loss_args # additional args to loss
                 )
             ),
@@ -59,30 +73,29 @@
     )
 
     failed <- guess[["convergence"]] != 0
-    if (failed) guess <- list(par=par, convergence=-1)
+    if (failed) guess <- list(par=par, convergence=(-1))
     guess <- guess[["par"]]
 
     guess_residual <- do.call(loss,
-        args=c(list(par=guess, x=x, y=y, fn=optim_fun), loss_args))
+        args=c(list(par=guess, x=x, y=y, fn=optim_fn), loss_args))
     gritty_guess_residual <- do.call(loss,
-        args=c(list(par=par, x=x, y=y, fn=optim_fun), loss_args))
+        args=c(list(par=par, x=x, y=y, fn=optim_fn), loss_args))
 
-    stop("You shall not pass!")
     if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
-        guess <- do.call(.meshEval2,
-            c(list(par=guess, x=x, y=y, fn=fn, loss=loss, loss_args=loss_args))
-        )
+        guess <- .meshEval2(density=density, par=guess, x=x, y=y, fn=optim_fn,
+            ..., loss=loss,loss_args=loss_args)
         guess_residual <- do.call(loss,
             args=c(list(par=guess, x=x, y=y, fn=fn), loss_args))
 
-        guess <- do.call(.patternSearch2,
-            c(list(par=guess, x=x, y=y, fn=fn, loss=loss, loss_args=loss_args))
+        guess <- .patternSearch2(span=span, precision=precision, step=step,
+            par=guess, par_residual=guess_residual, x=x, y=y, fn=optim_fn,
+            loss=loss, ..., loss_args=loss_args)
     }
 
     y_hat <- do.call(loss,
-        args=c(list(par=guess, x=x, y=y, fn=fn), loss_args))
+        args=c(list(par=guess, x=x, y=y, fn=optim_fn), loss_args))
 
-    Rsqr <- 1 - var(y - y_hat) / var(y)
+    Rsqr <- abs(1 - var(y - y_hat) / var(y))
     attr(guess, "Rsquare") <- Rsqr
 
     return(guess)
@@ -108,6 +121,8 @@
         trunc=FALSE) {
     diffs <- fn(par=par, x=x, ...) - y
     if (trunc == FALSE) {
+        if (n == 1 && grepl("normals", deparse(substitute(.pdf))))
+            return(sum(diffs^2))
         return(sum(-log(.pdf(diffs, n, scale))))
     } else {
         down_truncated <- abs(y) >= 1
@@ -132,7 +147,7 @@
 
 
 #' See docs for `.sampling_loss`
-#' @keywords interal
+#' @keywords internal
 #' @noRd
 .cauchy_loss <- function(par, x, y, fn, ..., n=1, scale=0.07,
         trunc=FALSE) {
@@ -140,7 +155,135 @@
         fn=fn, ..., n=n, scale=scale)
 }
 
+#' @keywords internal
+#' @noRd
+.meshEval2 <- function(density, par, x, y, fn,
+        loss=.normal_loss, lower, upper, ..., loss_args=list()) {
+    # input validation
+    stopifnot(is.function(fn))
+    stopifnot(is.function(loss) || is.character(loss))
+    stopifnot(c("par", "x", "y", "fn") %in% formalArgs(loss))
+    stopifnot(
+        is.null(names(loss_args)) || all(names(loss_args) %in% formalArgs(loss))
+    )
+    # make function amenable to use via optim
+    optim_fn <- if (is_optim_compatible(fn)) {
+        fn
+    } else {
+        make_optim_function(fn, ...)
+    }
+    par_loss <- do.call(loss,
+        args=c(list(par=par, x=x, y=y, fn=optim_fun), loss_args))
 
+    periods <- matrix(NA, nrow = length(par), ncol = 1)
+    names(periods) <- names(par)
+    periods[1] <- 1
+
+    if (length(par) > 1) {
+        for (p in seq(2, length(par))) {
+            ## the par-1 is because we want 1 increment of par variable once
+            ##   all previous variables have their values tested once.
+            periods[p] <- periods[p - 1] * (density[p - 1] *
+                (upper[p - 1] - lower[p - 1]) + 1)
+        }
+    }
+
+    currentPars <- lower
+
+    ## The plus one is because we include endpoints.
+    for (point in seq_len(prod((upper - lower) * density + 1))) {
+
+        test_par_loss <- do.call(loss,
+            c(list(par=currentPars, x=x, y=y, fn=optim_fn), loss_args))
+
+        ## Check for something catastrophic going wrong
+        if (
+            !length(test_par_loss) ||
+            (!is.finite(test_par_loss) && test_par_loss != Inf)
+        ) {
+            stop(paste0(" Test Guess Loss is: ", test_par_loss, "\n",
+                "Other Pars:\n", "x: ", paste(x, collapse = ", "), "\n",
+                "y: ", paste(y, collapse = ", "), "\n", "n: ", n, "\n",
+                "pars: ", pars, "\n", "scale: ", scale, "\n",
+                "family : ", family, "\n", "Trunc ", trunc))
+        }
+        ## save the guess if its an improvement
+        if (test_par_loss < par_loss) {
+            par <- currentPars
+            par_loss <- test_par_loss
+        }
+        ## increment the variable(s) that should be incremented this loop
+        for (p in seq_along(par)) {
+            if (point %% periods[p] == 0) {
+                currentPars[p] <- currentPars[p] + 1 / density[p]
+
+                if (currentPars[p] > upper[p]) {
+                    currentPars[p] <- lower[p]
+                }
+            }
+        }
+    }
+
+    return(par)
+}
+
+
+
+#' @export
+#' @keywords internal
+#' @noRd
+.patternSearch2 <- function(span, precision, step, par, par_residual, x, y,
+        lower, upper, fn, loss, ..., loss_args=list()) {
+    # input validation
+    stopifnot(is.function(fn))
+    stopifnot(is.function(loss) || is.character(loss))
+    stopifnot(c("par", "x", "y", "fn") %in% formalArgs(loss))
+    stopifnot(
+        is.null(names(loss_args)) || all(names(loss_args) %in% formalArgs(loss))
+    )
+    # make function amenable to use via optim
+    optim_fn <- if (is_optim_compatible(fn)) {
+        fn
+    } else {
+        make_optim_function(fn, ...)
+    }
+    # setup matrix for searching the parameter space
+    neighbours <- matrix(nrow = 2 * length(par), ncol = length(par))
+    neighbour_loss <- matrix(NA, nrow = 1, ncol = nrow(neighbours))
+
+    while (span > precision) {
+        for (neighbour in seq_len(nrow(neighbours))) {
+            neighbours[neighbour, ] <- par
+            dimension <- ceiling(neighbour / 2)
+            if (neighbour %% 2 == 1) {
+                neighbours[neighbour, dimension] <- pmin(
+                    par[dimension] + span * step[dimension],
+                    upper_bounds[dimension]
+                )
+            } else {
+                neighbours[neighbour, dimension] <- pmax(
+                    par[dimension] - span * step[dimension],
+                    lower_bounds[dimension]
+                )
+            }
+
+            neighbour_loss[neighbour] <- do.call(loss, args=c(
+                list(par=neighbours[neighbour, ], x=x, y=y, fn=optim_fn),
+                    loss_args))
+        }
+
+        if (min(neighbour_loss) < par_residual) {
+            par <- neighbours[which.min(neighbour_loss)[1], ]
+            par_residual <- min(neighbour_loss)
+        } else {
+            span <- span / 2
+        }
+    }
+    return(par)
+}
+
+
+# ======================
 # ==== Deprecating =====
 
 #' .fitCurve
@@ -211,81 +354,13 @@
 
     y_hat <- do.call(f, list(x, guess))
 
-    Rsqr <- 1 - var(y - y_hat) / var(y)
+    Rsqr <- abs(1 - var(y - y_hat) / var(y))
     attr(guess, "Rsquare") <- Rsqr
 
     return(guess)
 }
 
-.meshEval2 <- function(density, par, x, y, fn,
-        loss=.normal_loss, lower, upper, ..., loss_args=list()) {
-    # input validation
-    stopifnot(is.function(fn))
-    stopifnot(is.function(loss) || is.character(loss))
-    stopifnot(c("par", "x", "y", "fn") %in% formalArgs(loss))
-    stopifnot(
-        is.null(names(loss_args)) || all(names(loss_args) %in% formalArgs(loss))
-    )
-    # make function amenable to use via optim
-    optim_fun <- if (is_optim_compatible(fn)) {
-        fn
-    } else {
-        make_optim_function(fn, ...)
-    }
-    guess_loss <- do.call(loss,
-        args=c(list(par=par, x=x, y=y, fn=optim_fun), loss_args))
 
-    periods <- matrix(NA, nrow = length(par), ncol = 1)
-    names(periods) <- names(par)
-    periods[1] <- 1
-
-    if (length(guess) > 1) {
-        for (p in seq(2, length(par))) {
-            ## the par-1 is because we want 1 increment of par variable once
-            ##   all previous variables have their values tested once.
-            periods[p] <- periods[p - 1] * (density[p - 1] *
-                (upper[p - 1] - lower[p - 1]) + 1)
-        }
-    }
-
-    currentPars <- lower
-
-    ## The plus one is because we include endpoints.
-    for (point in seq_len(prod((upper - lower) * density + 1))) {
-
-        test_guess_loss <- do.call(loss,
-            c(list(par=currentPars, x=x, y=y, fn=optim_fun), loss_args))
-
-        ## Check for something catastrophic going wrong
-        if (
-            !length(test_guess_loss) ||
-            (!is.finite(test_guess_loss) && test_guess_loss != Inf)
-        ) {
-            stop(paste0(" Test Guess Loss is: ", test_guess_loss, "\n",
-                "Other Pars:\n", "x: ", paste(x, collapse = ", "), "\n",
-                "y: ", paste(y, collapse = ", "), "\n", "n: ", n, "\n",
-                "pars: ", pars, "\n", "scale: ", scale, "\n",
-                "family : ", family, "\n", "Trunc ", trunc))
-        }
-        ## save the guess if its an improvement
-        if (test_guess_loss < guess_loss) {
-            par <- currentPars
-            guess_loss <- test_guess_loss
-        }
-        ## increment the variable(s) that should be incremented this loop
-        for (p in seq_along(par)) {
-            if (point %% periods[p] == 0) {
-                currentPars[p] <- currentPars[p] + 1 / density[p]
-
-                if (currentPars[p] > upper[p]) {
-                    currentPars[p] <- lower[p]
-                }
-            }
-        }
-    }
-
-    return(guess)
-}
 
 # meshEval ----------------------------------------------------------------
 #' meshEval
@@ -346,7 +421,6 @@
 
     return(guess)
 }
-
 
 #' @export
 #' @keywords internal
@@ -541,20 +615,21 @@ is_optim_compatible <- function(fn) formalArgs(fn)[1] == "par"
 
 
 if (sys.nframe() == 0) {
+    source("R/utilities.R")
+    source("R/utils-optimization.R")
     # A full function we want to optimize
     hillEqn <- function(x, Emin, Emax, EC50, lambda) {
         (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
     }
     # We don't want to optimize all the parameters, so lets fix some
-    hillEqn2 <- fix_params(hillEqn, args=list(lambda=1, Emin=1))
+    hillEqn2 <- drop_fn_params(hillEqn, args=list(lambda=1, Emin=1))
     # Now we want to make the function amendable to being called by optim
     hillEqn2Optim <- collect_fn_params(hillEqn2)
 
     # Helper to combine
     fx <- if (is_optim_compatible(hillEqn)) hillEqn else
-        make_optim_function(hillEqn, lambda=0.6, Emin=1)
+        make_optim_function(hillEqn, lambda=1, Emin=1)
 
-    debug(.fitCurve2)
     doses <- 10^(-6:5)
     opt_pars <- .fitCurve2(
         par=c(Emax=0.5, EC50=0.501),
@@ -566,20 +641,23 @@ if (sys.nframe() == 0) {
         Emin=1,
         lambda=1,
         upper=c(1, max(doses)),
-        lower=c(0, min(doses))
+        lower=c(0, min(doses)),
+        density=c(2, 10)
     )
 
-    opt_pars <- .fitCurve(
+    opt_pars2 <- .fitCurve(
         gritty_guess=c(Emax=0.01, EC50=0.51),
         x=doses,
         y=hillEqn(doses, Emin=1, lambda=1, Emax=0, EC50=median(doses)),
         f=fx,
-        family="normal",
+        family="Cauchy",
         trunc=FALSE,
-        density = c(2, 10, 5),
         median_n=1,
         scale=0.07,
-        upper_bound=c(1, 100),
-        lower_bound=c(0, 0.0001)
+        upper_bound=c(1, max(doses)),
+        lower_bound=c(0, min(doses)),
+        density=c(2, 10)
     )
+
+    stopifnot(all.equal())
 }
