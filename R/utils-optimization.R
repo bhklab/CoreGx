@@ -28,11 +28,55 @@
 #' @param ... `pairlist` Fall through arguments to `fn`.
 #' @param loss_args `list` Additional argument to the `loss` function.
 #'   These get passed to losss via `do.call` analagously to using `...`.
+#' @param optim_only `logical(1)` Should the fall back methods when optim fails
+#'   be skipped? Default is `FALSE`.
 #' @param control `list` List of control parameters to pass to `optim`. See
 #'   `?optim` for details.
 #'
+#' @examples
+#' \dontest{
+#' # Four parameter hill curve equation
+#' hillEqn <- function(x, Emin, Emax, EC50, lambda) {
+#'     (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
+#' }
+#' # Make some dummy data
+#' doses <- rev(1000 / (2^(1:20)))
+#' response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
+#' nresponse <- response + rnorm(length(response), sd=sd(response)*0.1) # add noise
+#' # Set parameters for function testing
+#' lambda <- 1
+#' Emin <- 1
+#' Emax <- 0.1
+#' EC50 <- median(doses)
+#' # 3-parameter optimization
+#' 3par <- .fitCurve2(
+#'     par=c(Emax, EC50, lambda),
+#'     x=doses,
+#'     y=nresponse,
+#'     fn=hillEqn,
+#'     Emin=Emin, # set this as constant in the function being optimized (via ...)
+#'     loss=.normal_loss,
+#'     loss_args=list(trunc=FALSE, n=1, scale=0.07),
+#'     upper=c(1, max(doses), 6),
+#'     lower=c(0, min(doses), 0)
+#' )
+#' # 2-parameter optimization
+#' 2par <- .fitCurve2(
+#'     par=c(Emax, EC50),
+#'     x=doses,
+#'     y=nresponse,
+#'     fn=hillEqn,
+#'     Emin=Emin, # set this as constant in the function being optimized (via ...)
+#'     lambda=1,
+#'     loss=.normal_loss,
+#'     loss_args=list(trunc=FALSE, n=1, scale=0.07),
+#'     upper=c(1, max(doses)),
+#'     lower=c(0, min(doses))
+#' )
+#' }
+#'
 #' @details
-#' TODO::
+#'
 #'
 #' @seealso [`CoreGx:::.meshEval2`], [`CoreGx:::.patternSearch2`]
 #'
@@ -43,7 +87,7 @@
 #' @export
 .fitCurve2 <- function(par, x, y, fn, loss, lower=-Inf, upper=Inf,
         precision=1e-4, density=c(2, 10, 5), step= 0.5 / density, ...,
-        loss_args=list(), span=1,
+        loss_args=list(), span=1, optim_only=FALSE,
         control=list(factr=1e-08, ndeps=rep(1e-4, times=length(par)), trace = 0)
         ) {
     stopifnot(is.function(fn))
@@ -83,7 +127,7 @@
     guess_residual <- do.call(loss,
         args=c(list(par=guess, x=x, y=y, fn=optim_fn), loss_args))
     gritty_guess_residual <- do.call(loss,
-        args=c(list(par=par, x=x, y=y, fn=optim_fn), loss_args))
+        args=c(list(par=par, x=x, /y=y, fn=optim_fn), loss_args))
 
     if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
         guess <- .meshEval2(density=density, par=guess, x=x, y=y, fn=optim_fn,
