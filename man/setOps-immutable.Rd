@@ -14,7 +14,7 @@
 \alias{$}
 \title{Subset an immutable object, returning another immutable object.}
 \usage{
-\method{subset}{immutable}(x, ...)
+subset.immutable(x, ...)
 
 \method{[}{immutable}(x, ...)
 

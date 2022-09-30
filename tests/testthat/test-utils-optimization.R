@@ -6,7 +6,7 @@ hillEqn <- function(x, Emin, Emax, EC50, lambda) {
     (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
 }
 # Set parameters for function testing
-doses <- rev(1000 / (2^(1:20)))
+doses <- rev(1000 / (5^(1:10)))
 lambda <- 0.6
 Emin <- 1
 Emax <- 0.5
@@ -25,7 +25,7 @@ testthat::test_that(paste0(lmsg, ".residual and .normal_loss produce equal resul
     for (i in seq_along(trunc_vals)) {
         n1 <- .residual(par=c(Emax=0.2, EC50=10), x=doses, y=nresponse, f=fx,
             family="normal", n=nvals[i], trunc=trunc_vals[i], scale=0.07)
-        n2 <- .normal_loss(par=c(Emax=0.2, EC50=10), x=doses, y=nresponse, fn=fx,
+        n2 <- CoreGx:::.normal_loss(par=c(Emax=0.2, EC50=10), x=doses, y=nresponse, fn=fx,
             n=nvals[i], trunc=trunc_vals[i], scale=0.07)
         testthat::expect_equal(n1, n2,
             info=paste0("trunc: ", trunc_vals[i], ", n: ", nvals[i])
@@ -39,7 +39,7 @@ testthat::test_that(paste0(lmsg, ".residual and .cauchy_loss produce equal resul
     for (i in seq_along(trunc_vals)) {
         c1 <- .residual(par=c(Emax=0.2, EC50=10), x=doses, y=nresponse, f=fx,
             family="Cauchy", n=nvals[i], trunc=trunc_vals[i], scale=0.07)
-        c2 <- .cauchy_loss(par=c(Emax=0.2, EC50=10), x=doses, y=nresponse, fn=fx,
+        c2 <- CoreGx:::.cauchy_loss(par=c(Emax=0.2, EC50=10), x=doses, y=nresponse, fn=fx,
             n=nvals[i], trunc=trunc_vals[i], scale=0.07)
         testthat::expect_equal(c1, c2,
             info=paste0("trunc: ", trunc_vals[i], ", n: ", nvals[i])
@@ -73,7 +73,7 @@ testthat::test_that(paste0(cmsg, ".fitCurve and .fitCurve2 produce equal results
             x=doses,
             y=nresponse,
             fn=hillEqn,
-            loss=.normal_loss,
+            loss=CoreGx:::.normal_loss,
             loss_args=list(trunc=FALSE, n=1, scale=0.07),
             Emin=Emin,
             lambda=lambda,
@@ -105,7 +105,7 @@ testthat::test_that(paste0(cmsg, ".fitCurve and .fitCurve2 produce equal results
             x=doses,
             y=nresponse,
             fn=hillEqn,
-            loss=.cauchy_loss,
+            loss=CoreGx:::.cauchy_loss,
             loss_args=list(trunc=FALSE, n=1, scale=0.07),
             Emin=Emin,
             lambda=lambda,
@@ -131,7 +131,6 @@ testthat::test_that(
     fx <- make_optim_function(hillEqn, Emin=Emin)
     for (i in seq_along(par_list)) {
         pars <- par_list[[i]]
-        print(pars)
         normal_par1 <- .fitCurve(
             gritty_guess=pars,
             x=doses,
@@ -152,7 +151,7 @@ testthat::test_that(
             x=doses,
             y=nresponse,
             fn=hillEqn,
-            loss=.normal_loss,
+            loss=CoreGx:::.normal_loss,
             loss_args=list(trunc=FALSE, n=1, scale=0.07),
             Emin=Emin,
             upper=c(2, max(doses), 6),
@@ -183,7 +182,7 @@ testthat::test_that(
             x=doses,
             y=nresponse,
             fn=hillEqn,
-            loss=.cauchy_loss,
+            loss=CoreGx:::.cauchy_loss,
             loss_args=list(trunc=FALSE, n=1, scale=0.07),
             Emin=Emin,
             upper=c(2, max(doses), 6),

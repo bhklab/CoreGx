@@ -127,7 +127,7 @@
     guess_residual <- do.call(loss,
         args=c(list(par=guess, x=x, y=y, fn=optim_fn), loss_args))
     gritty_guess_residual <- do.call(loss,
-        args=c(list(par=par, x=x, /y=y, fn=optim_fn), loss_args))
+        args=c(list(par=par, x=x, y=y, fn=optim_fn), loss_args))
 
     if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
         guess <- .meshEval2(density=density, par=guess, x=x, y=y, fn=optim_fn,
