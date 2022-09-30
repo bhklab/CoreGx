@@ -60,12 +60,12 @@
     guess <- optim(
         par=par,
         fn=function(x)
-            do.call(loss,
+            abs(do.call(loss,
                 args=c(
                     list(par=par, x=x, y=y, fn=optim_fn), # mandatory loss args
                     loss_args # additional args to loss
                 )
-            ),
+            )),
         upper=upper,
         lower=lower,
         control=control,
@@ -83,19 +83,18 @@
 
     if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
         guess <- .meshEval2(density=density, par=guess, x=x, y=y, fn=optim_fn,
-            ..., loss=loss,loss_args=loss_args)
+            lower=lower, upper=upper, ..., loss=loss,loss_args=loss_args)
         guess_residual <- do.call(loss,
-            args=c(list(par=guess, x=x, y=y, fn=fn), loss_args))
+            args=c(list(par=guess, x=x, y=y, fn=optim_fn), loss_args))
 
         guess <- .patternSearch2(span=span, precision=precision, step=step,
             par=guess, par_residual=guess_residual, x=x, y=y, fn=optim_fn,
-            loss=loss, ..., loss_args=loss_args)
+            loss=loss, lower=lower, upper=upper, ..., loss_args=loss_args)
     }
 
-    y_hat <- do.call(loss,
-        args=c(list(par=guess, x=x, y=y, fn=optim_fn), loss_args))
+    y_hat <- optim_fn(par=guess, x=x)
 
-    Rsqr <- abs(1 - var(y - y_hat) / var(y))
+    Rsqr <- 1 - var(y - y_hat) / var(y)
     attr(guess, "Rsquare") <- Rsqr
 
     return(guess)
@@ -140,8 +139,8 @@
 #' @noRd
 .normal_loss <- function(par, x, y, fn, ..., n=1, scale=0.07,
         trunc=FALSE) {
-    .sampling_loss(.pdf=.dmednnormals, .edf=.edmednormal, par=par, x=x, y=y,
-        fn=fn, ..., n=n, scale=scale)
+    .sampling_loss(.pdf=.dmednnormals, .edf=.edmednnormals, par=par, x=x, y=y,
+        fn=fn, ..., n=n, scale=scale, trunc=trunc)
 }
 
 
@@ -152,7 +151,7 @@
 .cauchy_loss <- function(par, x, y, fn, ..., n=1, scale=0.07,
         trunc=FALSE) {
     .sampling_loss(.pdf=.dmedncauchys, .edf=.edmedncauchys, par=par, x=x, y=y,
-        fn=fn, ..., n=n, scale=scale)
+        fn=fn, ..., n=n, scale=scale, trunc=trunc)
 }
 
 #' @keywords internal
@@ -173,7 +172,7 @@
         make_optim_function(fn, ...)
     }
     par_loss <- do.call(loss,
-        args=c(list(par=par, x=x, y=y, fn=optim_fun), loss_args))
+        args=c(list(par=par, x=x, y=y, fn=optim_fn), loss_args))
 
     periods <- matrix(NA, nrow = length(par), ncol = 1)
     names(periods) <- names(par)
@@ -204,7 +203,7 @@
             stop(paste0(" Test Guess Loss is: ", test_par_loss, "\n",
                 "Other Pars:\n", "x: ", paste(x, collapse = ", "), "\n",
                 "y: ", paste(y, collapse = ", "), "\n", "n: ", n, "\n",
-                "pars: ", pars, "\n", "scale: ", scale, "\n",
+                "pars: ", currentPars, "\n", "scale: ", scale, "\n",
                 "family : ", family, "\n", "Trunc ", trunc))
         }
         ## save the guess if its an improvement
@@ -258,12 +257,12 @@
             if (neighbour %% 2 == 1) {
                 neighbours[neighbour, dimension] <- pmin(
                     par[dimension] + span * step[dimension],
-                    upper_bounds[dimension]
+                    upper[dimension]
                 )
             } else {
                 neighbours[neighbour, dimension] <- pmax(
                     par[dimension] - span * step[dimension],
-                    lower_bounds[dimension]
+                    lower[dimension]
                 )
             }
 
@@ -354,7 +353,7 @@
 
     y_hat <- do.call(f, list(x, guess))
 
-    Rsqr <- abs(1 - var(y - y_hat) / var(y))
+    Rsqr <- 1 - var(y - y_hat) / var(y)
     attr(guess, "Rsquare") <- Rsqr
 
     return(guess)
@@ -474,7 +473,7 @@
 #' @noRd
 .residual <- function(x, y, n, pars, f, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
     family <- match.arg(family)
-    diffs <- do.call(f, list(x, pars)) - y
+    diffs <- f(x=x, par=pars) - y
 
     if (family != "Cauchy") {
         if (trunc == FALSE) {
@@ -539,7 +538,7 @@ drop_fn_params <- function(fn, args) {
 #'
 #' @description
 #' Useful for converting a regular function into a function amenable to optimization
-#' via `base::optim`, which requires all free parameters be passed as a single
+#' via `stats::optim`, which requires all free parameters be passed as a single
 #' vector `par`.
 #'
 #' @details
@@ -621,43 +620,68 @@ if (sys.nframe() == 0) {
     hillEqn <- function(x, Emin, Emax, EC50, lambda) {
         (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
     }
+    # Set parameters for function testing
+    doses <- rev(1000 / (2^(1:20)))
+    lambda <- 1
+    Emin <- 1
+    Emax <- 0.1
+    EC50 <- median(doses)
+
     # We don't want to optimize all the parameters, so lets fix some
-    hillEqn2 <- drop_fn_params(hillEqn, args=list(lambda=1, Emin=1))
+    hillEqn2 <- drop_fn_params(hillEqn, args=list(lambda=lambda, Emin=Emin))
     # Now we want to make the function amendable to being called by optim
     hillEqn2Optim <- collect_fn_params(hillEqn2)
 
     # Helper to combine
     fx <- if (is_optim_compatible(hillEqn)) hillEqn else
-        make_optim_function(hillEqn, lambda=1, Emin=1)
+        make_optim_function(hillEqn, lambda=lambda, Emin=Emin)
 
-    doses <- 10^(-6:5)
+    response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
+
+    # Check equivalence of loss functions
+    c1 <- .residual(par=c(0.5, 10), x=doses, y=response, f=fx, family="Cauchy",
+        n=1, scale=0.07, trunc=FALSE)
+    c2 <- .cauchy_loss(par=c(0.5, 10), x=doses, y=response, f=fx,
+        n=1, scale=0.07, trunc=FALSE)
+    stopifnot(c1 == c2)
+    n1 <-.residual(par=c(0.5, 10), x=doses, y=response, f=fx, family="normal",
+        n=1, scale=0.07, trunc=FALSE)
+    n2 <- .normal_loss(par=c(0.5, 10), x=doses, y=response, f=fx,
+        n=1, scale=0.07, trunc=FALSE)
+    stopifnot(n1 == n2)
+
+
     opt_pars <- .fitCurve2(
-        par=c(Emax=0.5, EC50=0.501),
+        par=c(Emax=0.5, EC50=10),
         x=doses,
-        y=hillEqn(doses, Emin=1, lambda=1, Emax=0, EC50=median(doses)),
+        y=response,
         fn=hillEqn,
         loss=.cauchy_loss,
-        loss_args=list(trunc=TRUE),
-        Emin=1,
-        lambda=1,
-        upper=c(1, max(doses)),
+        loss_args=list(trunc=FALSE, n=1, scale=0.07),
+        Emin=Emin,
+        lambda=lambda,
+        upper=c(2, max(doses)),
         lower=c(0, min(doses)),
-        density=c(2, 10)
+        density=c(2, 10),
+        precision=1e-4,
+        step=0.5 / c(2, 10)
     )
 
     opt_pars2 <- .fitCurve(
-        gritty_guess=c(Emax=0.01, EC50=0.51),
+        gritty_guess=c(Emax=0.5, EC50=100),
         x=doses,
-        y=hillEqn(doses, Emin=1, lambda=1, Emax=0, EC50=median(doses)),
+        y=response,
         f=fx,
         family="Cauchy",
         trunc=FALSE,
         median_n=1,
         scale=0.07,
-        upper_bound=c(1, max(doses)),
+        upper_bound=c(2, max(doses)),
         lower_bound=c(0, min(doses)),
-        density=c(2, 10)
+        density=c(2, 10),
+        precision=1e-4,
+        step=0.5 / c(2, 10)
     )
 
-    stopifnot(all.equal())
+    all.equal(opt_pars, opt_pars2)
 }
