@@ -34,20 +34,19 @@
 #'   `?optim` for details.
 #'
 #' @examples
-#' \dontest{
+#' \donttest{
 #' # Four parameter hill curve equation
 #' hillEqn <- function(x, Emin, Emax, EC50, lambda) {
 #'     (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
 #' }
 #' # Make some dummy data
 #' doses <- rev(1000 / (2^(1:20)))
-#' response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
-#' nresponse <- response + rnorm(length(response), sd=sd(response)*0.1) # add noise
-#' # Set parameters for function testing
 #' lambda <- 1
 #' Emin <- 1
 #' Emax <- 0.1
 #' EC50 <- median(doses)
+#' response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
+#' nresponse <- response + rnorm(length(response), sd=sd(response)*0.1) # add noise
 #' # 3-parameter optimization
 #' 3par <- .fitCurve2(
 #'     par=c(Emax, EC50, lambda),
@@ -129,7 +128,10 @@
     gritty_guess_residual <- do.call(loss,
         args=c(list(par=par, x=x, y=y, fn=optim_fn), loss_args))
 
-    if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
+    if (
+        (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual)
+        && !optim_only
+    ) {
         guess <- .meshEval2(density=density, par=guess, x=x, y=y, fn=optim_fn,
             lower=lower, upper=upper, ..., loss=loss,loss_args=loss_args)
         guess_residual <- do.call(loss,
@@ -202,6 +204,7 @@
         fn=fn, ..., n=n, scale=scale, trunc=trunc)
 }
 
+#' @export
 #' @keywords internal
 #' @noRd
 .meshEval2 <- function(density, par, x, y, fn,
@@ -273,7 +276,6 @@
 
     return(par)
 }
-
 
 
 #' @export
@@ -620,6 +622,30 @@ collect_fn_params <- function(fn) {
     # Add the `par` list to the formal args of the function
     formals(fn) <- c(alist(par=), formals(fn))
     return(fn)
+}
+
+#' Takes in a loss function and a prediction function to return the loss
+#'   of the prediction function.
+#'
+#' @param loss `function` A numeric loss function. This should take in a numeric
+#'   vector of differences and return a single numeric value: the loss for `fn`
+#'   on `x` relative to `y`.
+#' @param fn `function` A prediction function. Must take in a parameter `x`,
+#'   which is a numeric vector to call the function on. Additional args may
+#'   by passed via `...`.
+#' @param x `numeric()` Independent variable to call `fn` on.
+#' @param `y` `numeric()` True values for the dependent variable.
+#' @param ... `pairlist` Fallthrough arguments to `fn`.
+#'
+#' @export
+make_loss_fn <- function(loss, fn, x, y, ..., loss_args=list()) {
+    stopifnot(is.function(loss) && is.function(fn))
+    stopifnot("x" %in% formalArgs(fn))
+
+    loss_fn <- function() {
+        diff <- fn(x) - y
+        do.call(loss, list(
+    }
 }
 
 

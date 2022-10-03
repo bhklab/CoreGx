@@ -76,20 +76,19 @@ Curve fitting via \code{stats::optim} L-BFGS-B with fall-back grid/pattern searc
 if convergence is not achieved.
 }
 \examples{
-\dontest{
+\donttest{
 # Four parameter hill curve equation
 hillEqn <- function(x, Emin, Emax, EC50, lambda) {
     (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
 }
 # Make some dummy data
 doses <- rev(1000 / (2^(1:20)))
-response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
-nresponse <- response + rnorm(length(response), sd=sd(response)*0.1) # add noise
-# Set parameters for function testing
 lambda <- 1
 Emin <- 1
 Emax <- 0.1
 EC50 <- median(doses)
+response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
+nresponse <- response + rnorm(length(response), sd=sd(response)*0.1) # add noise
 # 3-parameter optimization
 3par <- .fitCurve2(
     par=c(Emax, EC50, lambda),
