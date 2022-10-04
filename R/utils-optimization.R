@@ -21,7 +21,7 @@
 #' @param lower `numeric(1)` Lower bound for parameters. Parallel to `par`.
 #' @param upper `numeric(1)` Upper bound for paramteres. Parallel to `par`.
 #' @param density `numeric` how many points in the dimension of each parameter
-#'   should be evaluated (density of the grid).
+#'   should be evaluated (density of the grid)
 #' @param step initial step size for pattern search.
 #' @param precision `numeric` smallest step size used in pattern search, once
 #'   step size drops below this value, the search terminates.
