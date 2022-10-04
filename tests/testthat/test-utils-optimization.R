@@ -1,4 +1,4 @@
-library(test_that)
+library(testthat)
 testthat::local_edition(3)
 
 # Create some dummy data
