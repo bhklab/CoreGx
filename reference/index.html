@@ -167,7 +167,7 @@ aggregate calls so they can be recomputed later.</dd>
         <dd>Calculate an Adaptive Matthews Correlation Coefficient</dd>
       </dl><dl><dt>
           
-          <code><a href="as.html">as.data.table.long.table()</a></code> <code><a href="as.html">as.data.frame(<i>&lt;long.table&gt;</i>)</a></code> 
+          <code><a href="as.html">as.data.table(<i>&lt;long.table&gt;</i>)</a></code> <code><a href="as.html">as.data.frame(<i>&lt;long.table&gt;</i>)</a></code> 
         </dt>
         <dd>Coerce a <code>LongTable</code> to a <code>TreatmentResponseExperiment</code></dd>
       </dl><dl><dt>
@@ -280,6 +280,12 @@ the assigned <code>colDataMap</code> metadata.</dd>
         <dd>Generic to access the column identifiers for a rectangular object.</dd>
       </dl><dl><dt>
           
+          <code><a href="collect_fn_params.html">collect_fn_params()</a></code> 
+        </dt>
+        <dd>Collects all function arguments other than the first into a single list
+parameter.</dd>
+      </dl><dl><dt>
+          
           <code><a href="connectivityScore.html">connectivityScore()</a></code> 
         </dt>
         <dd>Function computing connectivity scores between two signatures</dd>
@@ -300,9 +306,21 @@ the assigned <code>colDataMap</code> metadata.</dd>
         <dd>Convert a LongTable assay into a BumpyMatrix object</dd>
       </dl><dl><dt>
           
+          <code><a href="dot-fitCurve2.html">.fitCurve2()</a></code> 
+        </dt>
+        <dd>Curve fitting via <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim</a></code> L-BFGS-B with fall-back grid/pattern search
+if convergence is not achieved.</dd>
+      </dl><dl><dt>
+          
           <code><a href="dot-longTableToSummarizedExperiment.html">.longTableToSummarizedExperiment()</a></code> 
         </dt>
         <dd>Convert LongTable to gDR Style SummarizedExperiment</dd>
+      </dl><dl><dt>
+          
+          <code><a href="drop_fn_params.html">drop_fn_params()</a></code> 
+        </dt>
+        <dd>Drop parameters from a function and replace them with constants
+inside the function body.</dd>
       </dl><dl><dt>
           
           <code><a href="endoaggregate-LongTable-method.html">endoaggregate(<i>&lt;LongTable&gt;</i>)</a></code> 
@@ -357,6 +375,11 @@ class.</dd>
         <dd>Get the types of all items in a list</dd>
       </dl><dl><dt>
           
+          <code><a href="is_optim_compatible.html">is_optim_compatible()</a></code> 
+        </dt>
+        <dd>Check whether a function signature is amenable to optimization via <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim</a></code>.</dd>
+      </dl><dl><dt>
+          
           <code><a href="lapply-MultiAssayExperiment-method.html">lapply(<i>&lt;MultiAssayExperiment&gt;</i>)</a></code> 
         </dt>
         <dd>lapply
@@ -366,6 +389,12 @@ lapply method for <code>MultiAssayExperiment</code></dd>
           <code><a href="list_OR_LongTable-class.html">list_OR_LongTable-class</a></code> 
         </dt>
         <dd>A class union to allow multiple types in a CoreSet slot</dd>
+      </dl><dl><dt>
+          
+          <code><a href="make_optim_function.html">make_optim_function()</a></code> 
+        </dt>
+        <dd>Takes a non-primitive R function and refactors it to be compatible with
+optimization via <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim</a></code>.</dd>
       </dl><dl><dt>
           
           <code><a href="mcc.html">mcc()</a></code> 
@@ -499,7 +528,7 @@ from an S4 class</dd>
         <dd>sensitivitySlotToLongTable Generic</dd>
       </dl><dl><dt>
           
-          <code><a href="setOps-immutable.html">subset(<i>&lt;immutable&gt;</i>)</a></code> <code><a href="setOps-immutable.html">`[`(<i>&lt;immutable&gt;</i>)</a></code> <code><a href="setOps-immutable.html">`[[`(<i>&lt;immutable&gt;</i>)</a></code> <code><a href="setOps-immutable.html">`$`(<i>&lt;immutable&gt;</i>)</a></code> 
+          <code><a href="setOps-immutable.html">subset.immutable()</a></code> <code><a href="setOps-immutable.html">`[`(<i>&lt;immutable&gt;</i>)</a></code> <code><a href="setOps-immutable.html">`[[`(<i>&lt;immutable&gt;</i>)</a></code> <code><a href="setOps-immutable.html">`$`(<i>&lt;immutable&gt;</i>)</a></code> 
         </dt>
         <dd>Subset an immutable object, returning another immutable object.</dd>
       </dl><dl><dt>

@@ -178,6 +178,9 @@
     <loc>/reference/colMeta.html</loc>
   </url>
   <url>
+    <loc>/reference/collect_fn_params.html</loc>
+  </url>
+  <url>
     <loc>/reference/connectivityScore.html</loc>
   </url>
   <url>
@@ -199,6 +202,9 @@
     <loc>/reference/dot-distancePointSegment.html</loc>
   </url>
   <url>
+    <loc>/reference/dot-fitCurve2.html</loc>
+  </url>
+  <url>
     <loc>/reference/dot-intersectList.html</loc>
   </url>
   <url>
@@ -209,6 +215,9 @@
   </url>
   <url>
     <loc>/reference/dot-unionList.html</loc>
+  </url>
+  <url>
+    <loc>/reference/drop_fn_params.html</loc>
   </url>
   <url>
     <loc>/reference/drugSensitivitySig.html</loc>
@@ -253,10 +262,16 @@
     <loc>/reference/is.items.html</loc>
   </url>
   <url>
+    <loc>/reference/is_optim_compatible.html</loc>
+  </url>
+  <url>
     <loc>/reference/lapply-MultiAssayExperiment-method.html</loc>
   </url>
   <url>
     <loc>/reference/list_OR_LongTable-class.html</loc>
+  </url>
+  <url>
+    <loc>/reference/make_optim_function.html</loc>
   </url>
   <url>
     <loc>/reference/mcc.html</loc>
