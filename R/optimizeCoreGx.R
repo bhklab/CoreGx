@@ -19,8 +19,10 @@
 #' If `report=TRUE`, also returns a `data.frame` of the benchmark results.
 #'
 #' @examples
-#' data(merckLongTable)
-#' optimizeCoreGx(merckLongTable)
+#' \donttest{
+#'   data(merckLongTable)
+#'   optimizeCoreGx(merckLongTable)
+#' }
 #'
 #' @md
 #' @export

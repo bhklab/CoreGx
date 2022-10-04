@@ -533,7 +533,7 @@
     scale <- rep(scale, times = length(x)/length(scale))
     y <- integer(length(x))
     for (g in seq_along(x)) {
-        if (n[g]%%2 == 0) {
+        if (n[g] %% 2 == 0) {
             y[g] <- tryCatch(integrate(f = function(k) {
                 .dmedncauchys(k, n[g], scale[g])
             }, lower = -Inf, upper = x[g], subdivisions = divisions)[[1]], error = function(e) {
@@ -553,11 +553,20 @@
     return(y)
 }
 
-#' Expectation of the likelihood of the median of N Cauchy distributions for truncated data
+#' Expectation of the likelihood of the median of N Cauchy distributions for
+#' truncated data
 #'
-#' This function calculates the expected value of the PDF of a median of N Cauchy with given scale parameter, calculated over the region from x to infinity if x>0, and -infinity to x otherwise.
-#' This is used in curve fitting when data has been truncated. Since for truncated data, we don't know what the "real" value was, the reasoning is we take the expected value.
-#' This increases robustness to extreme outliers while not completely ignoring the fact that points are truncated, and seems to work well in practice. The name of the function follows:
+#' This function calculates the expected value of the PDF of a median of N
+#' Cauchy with given scale parameter, calculated over the region from x to
+#' infinity if x>0, and -infinity to x otherwise.
+#'
+#' This is used in curve fitting when data has been truncated. Since for
+#' truncated data, we don't know what the "real" value was, the reasoning is
+#' we take the expected value.
+#'
+#' This increases robustness to extreme outliers while not completely ignoring
+#' the fact that points are truncated, and seems to work well in practice. The
+#' name of the function follows:
 #' e(xpectation)d(istribution)med(ian)ncauchys - following R conventions.
 #'
 #' @param x Where the truncation occurred
@@ -747,135 +756,6 @@
 }
 
 
-# fitCurve ----------------------------------------------------------------
-
-## TODO:: Add function documentation
-#' .fitCurve
-#'
-#' Curve optimization from 1 variable to 1 variable, using L-BFSG-B from optim,
-#' with fallback to pattern search if optimization fails to converge.
-#'
-#' @param x `numeric` input/x values for function
-#' @param y `numeric` output/y values for function
-#' @param f `function` function f, parameterized by parameters to optimize
-#' @param density `numeric` how many points in the dimension of each parameter should
-#'   be evaluated (density of the grid)
-#' @param step initial step size for pattern search.
-#' @param precision `numeric` smallest step size used in pattern search, once step size drops below this value,
-#'   the search terminates.
-#' @param lower_bounds `numeric` lower bounds for the paramater search space
-#' @param upper_bounds `numeric` upper bounds for the parameter search space
-#' @param median_n `integer` number of technical replicates per measured point in x. Used to
-#'   evaluate the proper median distribution for the normal and cauchy error models
-#' @param scale `numeric` scale on which to measure probability for the error model (roughly SD of error)
-#' @param family `character` which error family to use. Currently, `normal` and `cauchy` are implemented
-#' @param trunc `logical` Whether or not to truncate the values at 100% (1.0)
-#' @param verbose `logical` should diagnostic messages be printed?
-#' @param gritty_guess `numeric` intitial, uninformed guess on parameter values (usually heuristic)
-#' @param span ['numeric'] can be safely kept at 1, multiplicative ratio for initial step size in pattern search.
-#'   Must be larger than precision.
-#' @importFrom stats optim var
-#' @export
-#' @keywords internal
-#' @noRd
-.fitCurve <- function(x, y, f, density, step, precision, lower_bounds, upper_bounds, scale, family, median_n, trunc, verbose, gritty_guess,
-    span = 1) {
-
-    guess <- tryCatch(optim(par = gritty_guess, fn = function(t) {
-        .residual(
-            x = x, y = y, n = median_n, pars = t, f = f,
-            scale = scale, family = family, trunc = trunc
-        )
-    }, lower = lower_bounds, upper = upper_bounds, control = list(
-        factr = 1e-08,
-        ndeps = rep(1e-4, times = length(gritty_guess)),
-        trace = 0
-    ), method = "L-BFGS-B"), error = function(e) {
-        list(par = gritty_guess, convergence = -1)
-    })
-
-
-    failed <- guess[["convergence"]] != 0
-    guess <- guess[["par"]]
-
-    guess_residual <- .residual(x = x, y = y, n = median_n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
-    gritty_guess_residual <- .residual(x = x, y = y, n = median_n, pars = gritty_guess, f = f, scale = scale, family = family, trunc = trunc)
-
-    if (failed || any(is.na(guess)) || guess_residual >= gritty_guess_residual) {
-        guess <- .meshEval(x = x, y = y, f = f, guess = gritty_guess, lower_bounds = lower_bounds, upper_bounds = upper_bounds, density = density,
-            n = median_n, scale = scale, family = family, trunc = trunc)
-        guess_residual <- .residual(x = x, y = y, n = median_n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
-
-        guess <- .patternSearch(x = x, y = y, f = f, guess = guess, n = median_n, guess_residual = guess_residual, lower_bounds = lower_bounds,
-            upper_bounds = upper_bounds, span = span, precision = precision, step = step, scale = scale, family = family, trunc = trunc)
-    }
-
-    y_hat <- do.call(f, list(x, guess))
-
-    Rsqr <- 1 - var(y - y_hat)/var(y)
-    attr(guess, "Rsquare") <- Rsqr
-
-    return(guess)
-}
-
-# meshEval ----------------------------------------------------------------
-#' meshEval
-#'
-#' generate an initial guess for dose-response curve parameters by evaluating
-#' the residuals at different lattice points of the search space
-#'
-#' @export
-#' @keywords internal
-#' @noRd
-# ##FIXME:: Why is this different in PharmacoGx?
-.meshEval <- function(x, y, f, guess, lower_bounds, upper_bounds, density, n, scale, family, trunc) {
-    pars <- NULL
-    guess_residual <- .residual(x = x, y = y, n = n, pars = guess, f = f, scale = scale, family = family, trunc = trunc)
-
-    periods <- matrix(NA, nrow = length(guess), ncol = 1)
-    names(periods) <- names(guess)
-    periods[1] <- 1
-
-    if (length(guess) > 1) {
-        for (par in 2:length(guess)) {
-            ## the par-1 is because we want 1 increment of par variable once all previous variables have their values tested once.
-            periods[par] <- periods[par - 1] * (density[par - 1] * (upper_bounds[par - 1] - lower_bounds[par - 1]) + 1)
-        }
-    }
-
-    currentPars <- lower_bounds
-
-    ## The plus one is because we include endpoints.
-
-    for (point in seq_len(prod((upper_bounds - lower_bounds) * density+1))) {
-
-        test_guess_residual <- .residual(x = x, y = y, n = n, pars = currentPars, f = f, scale = scale, family = family, trunc = trunc)
-
-        ## Check for something catastrophic going wrong
-        if (!length(test_guess_residual) || (!is.finite(test_guess_residual) && test_guess_residual != Inf)) {
-            stop(paste0(" Test Guess Residual is: ", test_guess_residual, "\n", "Other Pars:\n", "x: ", paste(x, collapse = ", "), "\n",
-                "y: ", paste(y, collapse = ", "), "\n", "n: ", n, "\n", "pars: ", pars, "\n", "scale: ", scale, "\n", "family : ", family,
-                "\n", "Trunc ", trunc))
-        }
-        ## save the guess if its an improvement
-        if (test_guess_residual < guess_residual) {
-            guess <- currentPars
-            guess_residual <- test_guess_residual
-        }
-        ## increment the variable(s) that should be incremented this loop
-        for (par in seq_along(guess)) {
-            if (point%%periods[par] == 0) {
-                currentPars[par] <- currentPars[par] + 1/density[par]
-
-                if (currentPars[par] > upper_bounds[par]) {
-                    currentPars[par] <- lower_bounds[par]
-                }
-            }
-        }
-    }
-
-    return(guess)
-}
 
 
 # Set Operations ----------------------------------------------------------
@@ -976,10 +856,13 @@
     return(unique(unlist(do.call(c, args))))
 }
 
+
+#' @param matInd array indices
+#' @param dimsizes array containing size of array of interest in each dimension
+#'
 #' @export
 #' @keywords internal
 #' @noRd
-# @param matInd array indices @param dimsizes array containing size of array of interest in each dimension
 .linInd <- function(matInd, dimsizes) {
     y <- matInd[1]
     if (length(dimsizes) > 1) {
@@ -1006,39 +889,6 @@
     return(y)
 }
 
-#' @export
-#' @keywords internal
-#' @noRd
-.patternSearch <- function(x, y, f, guess, n, guess_residual, lower_bounds, upper_bounds, span, precision, step, scale, family, trunc) {
-    neighbours <- matrix(nrow = 2 * length(guess), ncol = length(guess))
-    neighbour_residuals <- matrix(NA, nrow = 1, ncol = nrow(neighbours))
-
-    while (span > precision) {
-        for (neighbour in seq_len(nrow(neighbours))) {
-            neighbours[neighbour, ] <- guess
-            dimension <- ceiling(neighbour/2)
-            if (neighbour%%2 == 1) {
-                neighbours[neighbour, dimension] <- pmin(guess[dimension] + span * step[dimension], upper_bounds[dimension])
-            } else {
-                neighbours[neighbour, dimension] <- pmax(guess[dimension] - span * step[dimension], lower_bounds[dimension])
-            }
-
-            neighbour_residuals[neighbour] <- .residual(x = x, y = y, f = f, pars = neighbours[neighbour, ], n = n, scale = scale, family = family,
-                trunc = trunc)
-        }
-
-        if (min(neighbour_residuals) < guess_residual) {
-            guess <- neighbours[which.min(neighbour_residuals)[1], ]
-            guess_residual <- min(neighbour_residuals)
-        } else {
-            span <- span/2
-        }
-    }
-
-    return(guess)
-}
-
-
 
 # Not Used? ------------------------------------------------------------------
 
@@ -1057,45 +907,6 @@
 
 # Different in PharmacoGx? ------------------------------------------------
 
-## TODO:: Write documentation
-## FIXME:: Why is this different from PharmacoGx?
-#' @title Residual calculation
-#'
-#' @return A \code{numeric} containing the estimated residuals for the model
-#'   fit
-#'
-#' @export
-#' @keywords internal
-#' @noRd
-.residual <- function(x, y, n, pars, f, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
-    family <- match.arg(family)
-    diffs <- do.call(f, list(x, pars)) - y
-
-    if (family != "Cauchy") {
-        if (trunc == FALSE) {
-
-            if (n == 1) {
-                return(sum(diffs^2))
-            }
-
-            return(sum(-log(.dmednnormals(diffs, n, scale))))
-        } else {
-            down_truncated <- abs(y) >= 1
-            up_truncated <- abs(y) <= 0
-            return(sum(-log(.dmednnormals(diffs[!(down_truncated | up_truncated)], n, scale))) + sum(-log(.edmednnormals(-diffs[up_truncated |
-                down_truncated], n, scale))))
-        }
-    } else {
-        if (trunc == FALSE) {
-            return(sum(-log(.dmedncauchys(diffs, n, scale))))
-        } else {
-            down_truncated <- abs(y) >= 1
-            up_truncated <- abs(y) <= 0
-            return(sum(-log(.dmedncauchys(diffs[!(down_truncated | up_truncated)], n, scale))) + sum(-log(.edmedncauchys(-diffs[up_truncated |
-                down_truncated], n, scale))))
-        }
-    }
-}
 
 ## FIXME:: This function already exists as base::trimws? Is there any reason we need to reimplement it?
 #' @export
@@ -1334,10 +1145,10 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
     }
 
     get_combo_viability <- ("combo_viability" %in% profiles)
-    if (get_combo_viability) {
-        profiles <- profiles[!profiles %in% "combo_viability"]
-        # and enable option for including combo viability
-    }
+    #if (get_combo_viability) {
+    #    profiles <- profiles[!profiles %in% "combo_viability"]
+    #    # and enable option for including combo viability
+    #}
 
     combo_keys <- c("treatment1id", "treatment2id",
                     "treatment1dose", "treatment2dose", "sampleid")
@@ -1369,35 +1180,46 @@ setMethod("buildComboProfiles", signature(object = "LongTable"),
         )
 
     if (!is.null(object[["combo_viability"]])) {
-        if (get_combo_viability) {
-            combo_profiles <- object[["combo_viability"]][,
-                c(combo_keys, "combo_viability"), with = FALSE
-            ]
-        } else {
-            combo_profiles <- object[["combo_viability"]][,
-                combo_keys, with = FALSE
-            ]
-        }
+        #if (get_combo_viability) {
+        #    combo_profiles <- object[["combo_viability"]][,
+        #        c(combo_keys, "combo_viability"), with = FALSE
+        #    ]
+        #} else {
+        #    combo_profiles <- object[["combo_viability"]][,
+        #        combo_keys, with = FALSE
+        #    ]
+        #}
+        combo_profiles <- object[["combo_viability"]][,
+            combo_keys, with = FALSE
+        ]
         ## we know replicates have been averaged in combo_viability
     } else {
-        if (get_combo_viability) {
-            object |>
-                subset(!is.na(treatment2dose)) |>
-                aggregate(
-                    assay = "sensitivity",
-                    combo_viability = (mean(viability) / 100),
-                    by = combo_keys
-                ) -> combo_profiles
-        } else {
-            combo_profiles <- unique(
-                object$sensitivity[
-                    !is.na(treatment2dose),
-                    combo_keys,
-                    with = FALSE
-                ],
-                by = combo_keys
-            )
-        }
+        #if (get_combo_viability) {
+        #    object |>
+        #        subset(!is.na(treatment2dose)) |>
+        #        aggregate(
+        #            assay = "sensitivity",
+        #            combo_viability = (mean(viability) / 100),
+        #            by = combo_keys
+        #        ) -> combo_profiles
+        #} else {
+        #    combo_profiles <- unique(
+        #        object$sensitivity[
+        #            !is.na(treatment2dose),
+        #            combo_keys,
+        #            with = FALSE
+        #        ],
+        #        by = combo_keys
+        #    )
+        #}
+        combo_profiles <- unique(
+            object$sensitivity[
+                !is.na(treatment2dose),
+                combo_keys,
+                with = FALSE
+            ],
+            by = combo_keys
+        )
     }
     setkeyv(combo_profiles, combo_keys)
 
