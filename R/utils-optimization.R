@@ -224,9 +224,11 @@
     }
     par_loss <- do.call(loss,
         args=c(list(par=par, x=x, y=y, fn=optim_fn), loss_args))
+
     periods <- matrix(NA, nrow = length(par), ncol = 1)
     names(periods) <- names(par)
     periods[1] <- 1
+
     if (length(par) > 1) {
         for (p in seq(2, length(par))) {
             ## the par-1 is because we want 1 increment of par variable once
@@ -235,11 +237,15 @@
                 (upper[p - 1] - lower[p - 1]) + 1)
         }
     }
+
     currentPars <- lower
+
     ## The plus one is because we include endpoints.
     for (point in seq_len(prod((upper - lower) * density + 1))) {
+
         test_par_loss <- do.call(loss,
             c(list(par=currentPars, x=x, y=y, fn=optim_fn), loss_args))
+
         ## Check for something catastrophic going wrong
         if (
             !length(test_par_loss) ||
@@ -266,6 +272,7 @@
             }
         }
     }
+
     return(par)
 }
 
@@ -322,6 +329,200 @@
     }
     return(par)
 }
+
+
+
+#' Drop parameters from a function and replace them with constants
+#'   inside the function body.
+#'
+#' @param fn `function` A non-primitive function to remove parameters from
+#'   (via `base::formals(fn)`).
+#' @param args `list` A list where names are the function arguments (parameters)
+#'   to remove and the values are the appopriate value to replace the parameter
+#'   with in the function body.
+#'
+#' @return `function` A new non-primitize function with the parameters named in
+#'   `args` deleted and their values fixed with the values from `args` in the
+#'   function body.
+#'
+#' @export
+drop_fn_params <- function(fn, args) {
+    stopifnot(is.function(fn) && !is.primitive(fn))
+    if (length(args) == 0) return(fn)
+    stopifnot(all(names(args) %in% formalArgs(fn)))
+    stopifnot(is.list(args))
+    # Delete the arguments we are deparamterizing
+    formals(fn)[formalArgs(fn) %in% names(args)] <- NULL
+    # Replace the symbols with the new fixed value inside the fuction body
+    deparse_body <- deparse(body(fn))
+    for (i in seq_along(args)) {
+        deparse_body <- gsub(names(args)[i], args[[i]], deparse_body)
+    }
+    # Parse the new function body back to a call
+    body(fn) <- str2lang(paste0(deparse_body, collapse="\n"))
+    # TODO:: Do I need to update the closure environment as well?
+    return(fn)
+}
+
+
+#' Collects all function arguments other than the first into a single list
+#'   parameter.
+#'
+#' @description
+#' Useful for converting a regular function into a function amenable to
+#' optimization via `stats::optim`, which requires all free parameters be
+#' passed as a single vector `par`.
+#'
+#' @details
+#' Takes a function of the form f(x, ...), where ... is any number of additional
+#'   function parameters (bot not literal `...`!) and parses it to a function of
+#'   the form f(par, x) where `par` is a vector of values for ... in
+#'   the same order as the arguments appear in `fn`.
+#'
+#' @param fn `function` A non-primitive function to refactor such that the first
+#'   argument becomes the second argument and all other parameters must be
+#'   passed as a vector to the first argument of the new function via the `par`
+#'   parameter.
+#'
+#' @return `function` A new non-primitive function where the first argument is
+#'   `par`, which takes a vector of parameters being optimized, and the
+#'   second argument is the old first argument to `fn` (usually `x` since this
+#'   is the independent variable to optimize the function over).
+#'
+#' @export
+collect_fn_params <- function(fn) {
+    stopifnot(is.function(fn) && !is.primitive(fn))
+    # Capture the current formal args
+    formal_args <- formalArgs(fn)
+    if ("..." %in% formalArgs(fn))
+        stop("No support for fn with ... in signature!")
+    # Replace args other than the first with a list
+    args <- paste0("par[[", seq_along(formal_args[-1]), "]]") |>
+        as.list() |>
+        setNames(formal_args[-1])
+    fn <- drop_fn_params(fn, args=args)
+    # Add the `par` list to the formal args of the function
+    formals(fn) <- c(alist(par=), formals(fn))
+    return(fn)
+}
+
+
+#' Takes a non-primitive R function and refactors it to be compatible with
+#'   optimization via `stats::optim`.
+#'
+#' @description
+#'
+#'
+#' @param fn `function` A non-primitive function
+#' @param ... Arguments to `fn` to fix for before building the
+#'   function to be optimized. Useful for reducing the number of free parameters
+#'   in an optimization if there are insufficient degrees of freedom.
+#'
+#' @seealso [`drop_fn_params`], [`collect_fn_params`]
+#'
+#' @export
+make_optim_function <- function(fn, ...) {
+    # NOTE: error handling done inside helper methods!
+    fn1 <- drop_fn_params(fn, args=list(...))
+    fn2 <- collect_fn_params(fn1)
+    return(fn2)
+}
+
+
+#' Check whether a function signature is amenable to optimization via `stats::optim`.
+#'
+#' @description
+#' Functions compatible with `optim` have the parameter named `par` as their
+#' first formal argument where each value is a respective free parameter to
+#' be optimized.
+#'
+#' @param fn `function` A non-primitive function.
+#'
+#' @return `logical(1)` `TRUE` if the first value of `formalArg(fn)` is "par",
+#'   otherwise `FALSE`.
+#'
+#' @export
+is_optim_compatible <- function(fn) formalArgs(fn)[1] == "par"
+
+
+
+
+if (sys.nframe() == 0) {
+    source("R/utilities.R")
+    source("R/utils-optimization.R")
+    # A full function we want to optimize
+    hillEqn <- function(x, Emin, Emax, EC50, lambda) {
+        (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
+    }
+    # Set parameters for function testing
+    doses <- rev(1000 / (2^(1:20)))
+    lambda <- 1
+    Emin <- 1
+    Emax <- 0.1
+    EC50 <- median(doses)
+
+    # We don't want to optimize all the parameters, so lets fix some
+    hillEqn2 <- drop_fn_params(hillEqn, args=list(lambda=lambda, Emin=Emin))
+    # Now we want to make the function amendable to being called by optim
+    hillEqn2Optim <- collect_fn_params(hillEqn2)
+
+    # Helper to combine
+    fx <- if (is_optim_compatible(hillEqn)) hillEqn else
+        make_optim_function(hillEqn, lambda=lambda, Emin=Emin)
+
+    response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
+
+    # Check equivalence of loss functions
+    c1 <- .residual(par=c(0.5, 10), x=doses, y=response, f=fx, family="Cauchy",
+        n=1, scale=0.07, trunc=FALSE)
+    c2 <- .cauchy_loss(par=c(0.5, 10), x=doses, y=response, f=fx,
+        n=1, scale=0.07, trunc=FALSE)
+    stopifnot(c1 == c2)
+    n1 <-.residual(par=c(0.5, 10), x=doses, y=response, f=fx, family="normal",
+        n=1, scale=0.07, trunc=FALSE)
+    n2 <- .normal_loss(par=c(0.5, 10), x=doses, y=response, f=fx,
+        n=1, scale=0.07, trunc=FALSE)
+    stopifnot(n1 == n2)
+
+
+    opt_pars <- .fitCurve2(
+        par=c(Emax=0.5, EC50=10),
+        x=doses,
+        y=response,
+        fn=hillEqn,
+        loss=.cauchy_loss,
+        loss_args=list(trunc=FALSE, n=1, scale=0.07),
+        Emin=Emin,
+        lambda=lambda,
+        upper=c(2, max(doses)),
+        lower=c(0, min(doses)),
+        density=c(2, 10),
+        precision=1e-4,
+        step=0.5 / c(2, 10)
+    )
+
+    opt_pars2 <- .fitCurve(
+        gritty_guess=c(Emax=0.5, EC50=100),
+        x=doses,
+        y=response,
+        f=fx,
+        family="Cauchy",
+        trunc=FALSE,
+        median_n=1,
+        scale=0.07,
+        upper_bound=c(2, max(doses)),
+        lower_bound=c(0, min(doses)),
+        density=c(2, 10),
+        precision=1e-4,
+        step=0.5 / c(2, 10)
+    )
+
+    all.equal(opt_pars, opt_pars2)
+}
+
+
+
+
 
 
 # ======================
@@ -539,215 +740,4 @@
                 down_truncated], n, scale))))
         }
     }
-}
-
-
-#' Drop parameters from a function and replace them with constants
-#'   inside the function body.
-#'
-#' @param fn `function` A non-primitive function to remove parameters from
-#'   (via `base::formals(fn)`).
-#' @param args `list` A list where names are the function arguments (parameters)
-#'   to remove and the values are the appopriate value to replace the parameter
-#'   with in the function body.
-#'
-#' @return `function` A new non-primitize function with the parameters named in
-#'   `args` deleted and their values fixed with the values from `args` in the
-#'   function body.
-#'
-#' @export
-drop_fn_params <- function(fn, args) {
-    stopifnot(is.function(fn) && !is.primitive(fn))
-    if (length(args) == 0) return(fn)
-    stopifnot(all(names(args) %in% formalArgs(fn)))
-    stopifnot(is.list(args))
-    # Delete the arguments we are deparamterizing
-    formals(fn)[formalArgs(fn) %in% names(args)] <- NULL
-    # Replace the symbols with the new fixed value inside the fuction body
-    deparse_body <- deparse(body(fn))
-    for (i in seq_along(args)) {
-        deparse_body <- gsub(names(args)[i], args[[i]], deparse_body)
-    }
-    # Parse the new function body back to a call
-    body(fn) <- str2lang(paste0(deparse_body, collapse="\n"))
-    # TODO:: Do I need to update the closure environment as well?
-    return(fn)
-}
-
-
-#' Collects all function arguments other than the first into a single list
-#'   parameter.
-#'
-#' @description
-#' Useful for converting a regular function into a function amenable to optimization
-#' via `stats::optim`, which requires all free parameters be passed as a single
-#' vector `par`.
-#'
-#' @details
-#' Takes a function of the form f(x, ...), where ... is any number of additional
-#'   function parameters (bot not literal `...`!) and parses it to a function of
-#'   the form f(par, x) where `par` is a vector of values for ... in
-#'   the same order as the arguments appear in `fn`.
-#'
-#' @param fn `function` A non-primitive function to refactor such that the first
-#'   argument becomes the second argument and all other parameters must be
-#'   passed as a vector to the first argument of the new function via the `par`
-#'   parameter.
-#'
-#' @return `function` A new non-primitive function where the first argument is
-#'   `par`, which takes a vector of parameters being optimized, and the
-#'   second argument is the old first argument to `fn` (usually `x` since this
-#'   is the independent variable to optimize the function over).
-#'
-#' @export
-collect_fn_params <- function(fn) {
-    stopifnot(is.function(fn) && !is.primitive(fn))
-    # Capture the current formal args
-    formal_args <- formalArgs(fn)
-    if ("..." %in% formalArgs(fn))
-        stop("No support for fn with ... in signature!")
-    # Replace args other than the first with a list
-    args <- paste0("par[[", seq_along(formal_args[-1]), "]]") |>
-        as.list() |>
-        setNames(formal_args[-1])
-    fn <- drop_fn_params(fn, args=args)
-    # Add the `par` list to the formal args of the function
-    formals(fn) <- c(alist(par=), formals(fn))
-    return(fn)
-}
-
-#' Takes in a loss function and a prediction function to return the loss
-#'   of the prediction function.
-#'
-#' @param loss `function` A numeric loss function. This should take in a numeric
-#'   vector of differences and return a single numeric value: the loss for `fn`
-#'   on `x` relative to `y`.
-#' @param fn `function` A prediction function. Must take in a parameter `x`,
-#'   which is a numeric vector to call the function on. Additional args may
-#'   by passed via `...`.
-#' @param x `numeric()` Independent variable to call `fn` on.
-#' @param `y` `numeric()` True values for the dependent variable.
-#' @param ... `pairlist` Fallthrough arguments to `fn`.
-#'
-#' @export
-make_loss_fn <- function(loss, fn, x, y, ..., loss_args=list()) {
-    stopifnot(is.function(loss) && is.function(fn))
-    stopifnot("x" %in% formalArgs(fn))
-
-    loss_fn <- function() {
-        diff <- fn(x) - y
-        do.call(loss, list(
-    }
-}
-
-
-#' Takes a non-primitive R function and refactors it to be compatible with
-#'   optimization via `stats::optim`.
-#'
-#' @description
-#'
-#'
-#' @param fn `function` A non-primitive function
-#' @param ... Arguments to `fn` to fix for before building the
-#'   function to be optimized. Useful for reducing the number of free parameters
-#'   in an optimization if there are insufficient degrees of freedom.
-#'
-#' @seealso [`drop_fn_params`], [`collect_fn_params`]
-#'
-#' @export
-make_optim_function <- function(fn, ...) {
-    # NOTE: error handling done inside helper methods!
-    fn1 <- drop_fn_params(fn, args=list(...))
-    fn2 <- collect_fn_params(fn1)
-    return(fn2)
-}
-
-
-#' Check whether a function signature is amenable to optimization via `stats::optim`.
-#'
-#' @description
-#' Functions compatible with `optim` have the parameter named `par` as their
-#' first formal argument where each value is a respective free parameter to
-#' be optimized.
-#'
-#' @param fn `function` A non-primitive function.
-#'
-#' @return `logical(1)` `TRUE` if the first value of `formalArg(fn)` is "par",
-#'   otherwise `FALSE`.
-#'
-#' @export
-is_optim_compatible <- function(fn) formalArgs(fn)[1] == "par"
-
-
-if (sys.nframe() == 0) {
-    source("R/utilities.R")
-    source("R/utils-optimization.R")
-    # A full function we want to optimize
-    hillEqn <- function(x, Emin, Emax, EC50, lambda) {
-        (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
-    }
-    # Set parameters for function testing
-    doses <- rev(1000 / (2^(1:20)))
-    lambda <- 1
-    Emin <- 1
-    Emax <- 0.1
-    EC50 <- median(doses)
-
-    # We don't want to optimize all the parameters, so lets fix some
-    hillEqn2 <- drop_fn_params(hillEqn, args=list(lambda=lambda, Emin=Emin))
-    # Now we want to make the function amendable to being called by optim
-    hillEqn2Optim <- collect_fn_params(hillEqn2)
-
-    # Helper to combine
-    fx <- if (is_optim_compatible(hillEqn)) hillEqn else
-        make_optim_function(hillEqn, lambda=lambda, Emin=Emin)
-
-    response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
-
-    # Check equivalence of loss functions
-    c1 <- .residual(par=c(0.5, 10), x=doses, y=response, f=fx, family="Cauchy",
-        n=1, scale=0.07, trunc=FALSE)
-    c2 <- .cauchy_loss(par=c(0.5, 10), x=doses, y=response, f=fx,
-        n=1, scale=0.07, trunc=FALSE)
-    stopifnot(c1 == c2)
-    n1 <-.residual(par=c(0.5, 10), x=doses, y=response, f=fx, family="normal",
-        n=1, scale=0.07, trunc=FALSE)
-    n2 <- .normal_loss(par=c(0.5, 10), x=doses, y=response, f=fx,
-        n=1, scale=0.07, trunc=FALSE)
-    stopifnot(n1 == n2)
-
-
-    opt_pars <- .fitCurve2(
-        par=c(Emax=0.5, EC50=10),
-        x=doses,
-        y=response,
-        fn=hillEqn,
-        loss=.cauchy_loss,
-        loss_args=list(trunc=FALSE, n=1, scale=0.07),
-        Emin=Emin,
-        lambda=lambda,
-        upper=c(2, max(doses)),
-        lower=c(0, min(doses)),
-        density=c(2, 10),
-        precision=1e-4,
-        step=0.5 / c(2, 10)
-    )
-
-    opt_pars2 <- .fitCurve(
-        gritty_guess=c(Emax=0.5, EC50=100),
-        x=doses,
-        y=response,
-        f=fx,
-        family="Cauchy",
-        trunc=FALSE,
-        median_n=1,
-        scale=0.07,
-        upper_bound=c(2, max(doses)),
-        lower_bound=c(0, min(doses)),
-        density=c(2, 10),
-        precision=1e-4,
-        step=0.5 / c(2, 10)
-    )
-
-    all.equal(opt_pars, opt_pars2)
 }
