@@ -20,9 +20,9 @@ second argument is the old first argument to \code{fn} (usually \code{x} since t
 is the independent variable to optimize the function over).
 }
 \description{
-Useful for converting a regular function into a function amenable to optimization
-via \code{stats::optim}, which requires all free parameters be passed as a single
-vector \code{par}.
+Useful for converting a regular function into a function amenable to
+optimization via \code{stats::optim}, which requires all free parameters be
+passed as a single vector \code{par}.
 }
 \details{
 Takes a function of the form f(x, ...), where ... is any number of additional
