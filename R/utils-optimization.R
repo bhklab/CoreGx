@@ -224,11 +224,9 @@
     }
     par_loss <- do.call(loss,
         args=c(list(par=par, x=x, y=y, fn=optim_fn), loss_args))
-
     periods <- matrix(NA, nrow = length(par), ncol = 1)
     names(periods) <- names(par)
     periods[1] <- 1
-
     if (length(par) > 1) {
         for (p in seq(2, length(par))) {
             ## the par-1 is because we want 1 increment of par variable once
@@ -237,15 +235,11 @@
                 (upper[p - 1] - lower[p - 1]) + 1)
         }
     }
-
     currentPars <- lower
-
     ## The plus one is because we include endpoints.
     for (point in seq_len(prod((upper - lower) * density + 1))) {
-
         test_par_loss <- do.call(loss,
             c(list(par=currentPars, x=x, y=y, fn=optim_fn), loss_args))
-
         ## Check for something catastrophic going wrong
         if (
             !length(test_par_loss) ||
@@ -266,14 +260,12 @@
         for (p in seq_along(par)) {
             if (point %% periods[p] == 0) {
                 currentPars[p] <- currentPars[p] + 1 / density[p]
-
                 if (currentPars[p] > upper[p]) {
                     currentPars[p] <- lower[p]
                 }
             }
         }
     }
-
     return(par)
 }
 
