@@ -27,7 +27,9 @@ A helper method to find the best multithreading configuration for your
 computer
 }
 \examples{
-data(merckLongTable)
-optimizeCoreGx(merckLongTable)
+\donttest{
+  data(merckLongTable)
+  optimizeCoreGx(merckLongTable)
+}
 
 }

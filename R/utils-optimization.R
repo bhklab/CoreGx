@@ -4,9 +4,9 @@
 #' @description
 #'
 #' @param par `numeric` Vector of intial guesses for the parameters. For each
-#'    index `i` of `par`, par[i] must be within the range (`lower[i]`, `upper[i]`).
-#'    If only a single `upper` or `lower` value is present, that range is used
-#'    for all parameters in `par`.
+#'    index `i` of `par`, par\[i\] must be within the range (`lower\[i\]`,
+#'   `upper\[i\]`). If only a single `upper` or `lower` value is present,
+#'   that range is used for all parameters in `par`.
 #' @param x `numeric` Values to evaluate `fn` for.
 #' @param y `numeric` Target output values to optimze `fn` against.
 #' @param fn `function` A function to optimize. Any `fn` arguments passed via
@@ -18,13 +18,15 @@
 #' @param loss `character(1)` or `function` Either the name of one of the bundled
 #'   loss functions (see details) or a custom loss function to compute for
 #'   the output of `fn` over `x`.
-#' @param lower `numeric(1)`
-#' @param upper `numeric(1)`
+#' @param lower `numeric(1)` Lower bound for parameters. Parallel to `par`.
+#' @param upper `numeric(1)` Upper bound for paramteres. Parallel to `par`.
 #' @param density `numeric` how many points in the dimension of each parameter
-#'   should be evaluated (density of the grid)
+#'   should be evaluated (density of the grid).
 #' @param step initial step size for pattern search.
 #' @param precision `numeric` smallest step size used in pattern search, once
 #'   step size drops below this value, the search terminates.
+#' @param span `numeric` Can be safely kept at 1, multiplicative ratio for
+#'   initial step size in pattern search. Must be larger than precision.
 #' @param ... `pairlist` Fall through arguments to `fn`.
 #' @param loss_args `list` Additional argument to the `loss` function.
 #'   These get passed to losss via `do.call` analagously to using `...`.
@@ -34,50 +36,48 @@
 #'   `?optim` for details.
 #'
 #' @examples
-#' \donttest{
-#' # Four parameter hill curve equation
-#' hillEqn <- function(x, Emin, Emax, EC50, lambda) {
-#'     (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
-#' }
-#' # Make some dummy data
-#' doses <- rev(1000 / (2^(1:20)))
-#' lambda <- 1
-#' Emin <- 1
-#' Emax <- 0.1
-#' EC50 <- median(doses)
-#' response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
-#' nresponse <- response + rnorm(length(response), sd=sd(response)*0.1) # add noise
-#' # 3-parameter optimization
-#' 3par <- .fitCurve2(
-#'     par=c(Emax, EC50, lambda),
-#'     x=doses,
-#'     y=nresponse,
-#'     fn=hillEqn,
-#'     Emin=Emin, # set this as constant in the function being optimized (via ...)
-#'     loss=.normal_loss,
-#'     loss_args=list(trunc=FALSE, n=1, scale=0.07),
-#'     upper=c(1, max(doses), 6),
-#'     lower=c(0, min(doses), 0)
-#' )
-#' # 2-parameter optimization
-#' 2par <- .fitCurve2(
-#'     par=c(Emax, EC50),
-#'     x=doses,
-#'     y=nresponse,
-#'     fn=hillEqn,
-#'     Emin=Emin, # set this as constant in the function being optimized (via ...)
-#'     lambda=1,
-#'     loss=.normal_loss,
-#'     loss_args=list(trunc=FALSE, n=1, scale=0.07),
-#'     upper=c(1, max(doses)),
-#'     lower=c(0, min(doses))
-#' )
+#' \dontrun{
+#'   # Four parameter hill curve equation
+#'   hillEqn <- function(x, Emin, Emax, EC50, lambda) {
+#'       (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
+#'   }
+#'   # Make some dummy data
+#'   doses <- rev(1000 / (2^(1:20)))
+#'   lambda <- 1
+#'   Emin <- 1
+#'   Emax <- 0.1
+#'   EC50 <- median(doses)
+#'   response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
+#'   nresponse <- response + rnorm(length(response), sd=sd(response)*0.1) # add noise
+#'   # 3-parameter optimization
+#'   3par <- .fitCurve2(
+#'       par=c(Emax, EC50, lambda),
+#'       x=doses,
+#'       y=nresponse,
+#'       fn=hillEqn,
+#'       Emin=Emin, # set this as constant in the function being optimized (via ...)
+#'       loss=.normal_loss,
+#'       loss_args=list(trunc=FALSE, n=1, scale=0.07),
+#'       upper=c(1, max(doses), 6),
+#'       lower=c(0, min(doses), 0)
+#'   )
+#'   # 2-parameter optimization
+#'   2par <- .fitCurve2(
+#'       par=c(Emax, EC50),
+#'       x=doses,
+#'       y=nresponse,
+#'       fn=hillEqn,
+#'       Emin=Emin, # set this as constant in the function being optimized (via ...)
+#'       lambda=1,
+#'       loss=.normal_loss,
+#'       loss_args=list(trunc=FALSE, n=1, scale=0.07),
+#'       upper=c(1, max(doses)),
+#'       lower=c(0, min(doses))
+#'   )
 #' }
 #'
 #' @details
-#'
-#'
-#' @seealso [`CoreGx:::.meshEval2`], [`CoreGx:::.patternSearch2`]
+#' TODO
 #'
 #' @return `numeric` Vector of optimal parameters for `fn` fit against `y`
 #'   on the values of `x`.
@@ -99,6 +99,7 @@
         (length(par) == length(upper) && length(par) == length(lower)) ||
         (length(upper) == 1 && length(lower) == 1)
     )
+    stopifnot(span > precision)
     optim_fn <- if (is_optim_compatible(fn)) {
         fn
     } else {

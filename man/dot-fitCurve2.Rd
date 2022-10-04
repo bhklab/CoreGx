@@ -25,9 +25,9 @@ if convergence is not achieved.}
 }
 \arguments{
 \item{par}{\code{numeric} Vector of intial guesses for the parameters. For each
-index \code{i} of \code{par}, par\link{i} must be within the range (\code{lower[i]}, \code{upper[i]}).
-If only a single \code{upper} or \code{lower} value is present, that range is used
-for all parameters in \code{par}.}
+index \code{i} of \code{par}, par[i] must be within the range (\verb{lower\[i\]},
+\verb{upper\[i\]}). If only a single \code{upper} or \code{lower} value is present,
+that range is used for all parameters in \code{par}.}
 
 \item{x}{\code{numeric} Values to evaluate \code{fn} for.}
 
@@ -44,15 +44,15 @@ isn't already \code{par}.}
 loss functions (see details) or a custom loss function to compute for
 the output of \code{fn} over \code{x}.}
 
-\item{lower}{\code{numeric(1)}}
+\item{lower}{\code{numeric(1)} Lower bound for parameters. Parallel to \code{par}.}
 
-\item{upper}{\code{numeric(1)}}
+\item{upper}{\code{numeric(1)} Upper bound for paramteres. Parallel to \code{par}.}
 
 \item{precision}{\code{numeric} smallest step size used in pattern search, once
 step size drops below this value, the search terminates.}
 
 \item{density}{\code{numeric} how many points in the dimension of each parameter
-should be evaluated (density of the grid)}
+should be evaluated (density of the grid).}
 
 \item{step}{initial step size for pattern search.}
 
@@ -60,6 +60,9 @@ should be evaluated (density of the grid)}
 
 \item{loss_args}{\code{list} Additional argument to the \code{loss} function.
 These get passed to losss via \code{do.call} analagously to using \code{...}.}
+
+\item{span}{\code{numeric} Can be safely kept at 1, multiplicative ratio for
+initial step size in pattern search. Must be larger than precision.}
 
 \item{optim_only}{\code{logical(1)} Should the fall back methods when optim fails
 be skipped? Default is \code{FALSE}.}
@@ -75,48 +78,48 @@ on the values of \code{x}.
 Curve fitting via \code{stats::optim} L-BFGS-B with fall-back grid/pattern search
 if convergence is not achieved.
 }
-\examples{
-\donttest{
-# Four parameter hill curve equation
-hillEqn <- function(x, Emin, Emax, EC50, lambda) {
-    (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
+\details{
+TODO
 }
-# Make some dummy data
-doses <- rev(1000 / (2^(1:20)))
-lambda <- 1
-Emin <- 1
-Emax <- 0.1
-EC50 <- median(doses)
-response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
-nresponse <- response + rnorm(length(response), sd=sd(response)*0.1) # add noise
-# 3-parameter optimization
-3par <- .fitCurve2(
-    par=c(Emax, EC50, lambda),
-    x=doses,
-    y=nresponse,
-    fn=hillEqn,
-    Emin=Emin, # set this as constant in the function being optimized (via ...)
-    loss=.normal_loss,
-    loss_args=list(trunc=FALSE, n=1, scale=0.07),
-    upper=c(1, max(doses), 6),
-    lower=c(0, min(doses), 0)
-)
-# 2-parameter optimization
-2par <- .fitCurve2(
-    par=c(Emax, EC50),
-    x=doses,
-    y=nresponse,
-    fn=hillEqn,
-    Emin=Emin, # set this as constant in the function being optimized (via ...)
-    lambda=1,
-    loss=.normal_loss,
-    loss_args=list(trunc=FALSE, n=1, scale=0.07),
-    upper=c(1, max(doses)),
-    lower=c(0, min(doses))
-)
+\examples{
+\dontrun{
+  # Four parameter hill curve equation
+  hillEqn <- function(x, Emin, Emax, EC50, lambda) {
+      (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
+  }
+  # Make some dummy data
+  doses <- rev(1000 / (2^(1:20)))
+  lambda <- 1
+  Emin <- 1
+  Emax <- 0.1
+  EC50 <- median(doses)
+  response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
+  nresponse <- response + rnorm(length(response), sd=sd(response)*0.1) # add noise
+  # 3-parameter optimization
+  3par <- .fitCurve2(
+      par=c(Emax, EC50, lambda),
+      x=doses,
+      y=nresponse,
+      fn=hillEqn,
+      Emin=Emin, # set this as constant in the function being optimized (via ...)
+      loss=.normal_loss,
+      loss_args=list(trunc=FALSE, n=1, scale=0.07),
+      upper=c(1, max(doses), 6),
+      lower=c(0, min(doses), 0)
+  )
+  # 2-parameter optimization
+  2par <- .fitCurve2(
+      par=c(Emax, EC50),
+      x=doses,
+      y=nresponse,
+      fn=hillEqn,
+      Emin=Emin, # set this as constant in the function being optimized (via ...)
+      lambda=1,
+      loss=.normal_loss,
+      loss_args=list(trunc=FALSE, n=1, scale=0.07),
+      upper=c(1, max(doses)),
+      lower=c(0, min(doses))
+  )
 }
 
-}
-\seealso{
-\code{\link[CoreGx:::.meshEval2]{CoreGx::::.meshEval2}}, \code{\link[CoreGx:::.patternSearch2]{CoreGx::::.patternSearch2}}
 }
