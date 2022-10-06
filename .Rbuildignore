@@ -31,3 +31,4 @@ local_data
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^LICENSE\.md$
