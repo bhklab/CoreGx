@@ -52,7 +52,7 @@ the output of \code{fn} over \code{x}.}
 step size drops below this value, the search terminates.}
 
 \item{density}{\code{numeric} how many points in the dimension of each parameter
-should be evaluated (density of the grid).}
+should be evaluated (density of the grid)}
 
 \item{step}{initial step size for pattern search.}
 
