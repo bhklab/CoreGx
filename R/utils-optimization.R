@@ -448,82 +448,6 @@ is_optim_compatible <- function(fn) formalArgs(fn)[1] == "par"
 
 
 
-if (sys.nframe() == 0) {
-    source("R/utilities.R")
-    source("R/utils-optimization.R")
-    # A full function we want to optimize
-    hillEqn <- function(x, Emin, Emax, EC50, lambda) {
-        (Emin + Emax * (x / EC50)^lambda) / (1 + (x / EC50)^lambda)
-    }
-    # Set parameters for function testing
-    doses <- rev(1000 / (2^(1:20)))
-    lambda <- 1
-    Emin <- 1
-    Emax <- 0.1
-    EC50 <- median(doses)
-
-    # We don't want to optimize all the parameters, so lets fix some
-    hillEqn2 <- drop_fn_params(hillEqn, args=list(lambda=lambda, Emin=Emin))
-    # Now we want to make the function amendable to being called by optim
-    hillEqn2Optim <- collect_fn_params(hillEqn2)
-
-    # Helper to combine
-    fx <- if (is_optim_compatible(hillEqn)) hillEqn else
-        make_optim_function(hillEqn, lambda=lambda, Emin=Emin)
-
-    response <- hillEqn(doses, Emin=Emin, lambda=lambda, Emax=Emax, EC50=EC50)
-
-    # Check equivalence of loss functions
-    c1 <- .residual(par=c(0.5, 10), x=doses, y=response, f=fx, family="Cauchy",
-        n=1, scale=0.07, trunc=FALSE)
-    c2 <- .cauchy_loss(par=c(0.5, 10), x=doses, y=response, f=fx,
-        n=1, scale=0.07, trunc=FALSE)
-    stopifnot(c1 == c2)
-    n1 <-.residual(par=c(0.5, 10), x=doses, y=response, f=fx, family="normal",
-        n=1, scale=0.07, trunc=FALSE)
-    n2 <- .normal_loss(par=c(0.5, 10), x=doses, y=response, f=fx,
-        n=1, scale=0.07, trunc=FALSE)
-    stopifnot(n1 == n2)
-
-
-    opt_pars <- .fitCurve2(
-        par=c(Emax=0.5, EC50=10),
-        x=doses,
-        y=response,
-        fn=hillEqn,
-        loss=.cauchy_loss,
-        loss_args=list(trunc=FALSE, n=1, scale=0.07),
-        Emin=Emin,
-        lambda=lambda,
-        upper=c(2, max(doses)),
-        lower=c(0, min(doses)),
-        density=c(2, 10),
-        precision=1e-4,
-        step=0.5 / c(2, 10)
-    )
-
-    opt_pars2 <- .fitCurve(
-        gritty_guess=c(Emax=0.5, EC50=100),
-        x=doses,
-        y=response,
-        f=fx,
-        family="Cauchy",
-        trunc=FALSE,
-        median_n=1,
-        scale=0.07,
-        upper_bound=c(2, max(doses)),
-        lower_bound=c(0, min(doses)),
-        density=c(2, 10),
-        precision=1e-4,
-        step=0.5 / c(2, 10)
-    )
-
-    all.equal(opt_pars, opt_pars2)
-}
-
-
-
-
 
 
 # ======================
@@ -595,7 +519,7 @@ if (sys.nframe() == 0) {
             upper_bounds = upper_bounds, span = span, precision = precision, step = step, scale = scale, family = family, trunc = trunc)
     }
 
-    y_hat <- do.call(f, list(x=x, par=guess))
+    y_hat <- do.call(f, list(x, par=guess))
 
     Rsqr <- 1 - (var(y - y_hat) / var(y))
     attr(guess, "Rsquare") <- Rsqr
@@ -717,7 +641,7 @@ if (sys.nframe() == 0) {
 #' @noRd
 .residual <- function(x, y, n, pars, f, scale = 0.07, family = c("normal", "Cauchy"), trunc = FALSE) {
     family <- match.arg(family)
-    diffs <- f(x=x, par=pars) - y
+    diffs <- f(x, par=pars) - y
 
     if (family != "Cauchy") {
         if (trunc == FALSE) {
