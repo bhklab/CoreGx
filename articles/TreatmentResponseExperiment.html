@@ -66,13 +66,17 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>The TreatmentResponseExperiment Class</h1>
-                        <h4 data-toc-skip class="author">Petr Smirnov</h4>
+                        <h4 data-toc-skip class="author">Petr
+Smirnov</h4>
             <address class="author_afil">
-      Princess Margaret Cancer Centre, University Health Network, Toronto Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:petr.smirnov@uhnresearch.ca" class="email">petr.smirnov@uhnresearch.ca</a>
+      Princess Margaret Cancer Centre, University Health Network,
+Toronto Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:petr.smirnov@uhnresearch.ca" class="email">petr.smirnov@uhnresearch.ca</a>
       </address>
-                              <h4 data-toc-skip class="author">Christopher Eeles</h4>
+                              <h4 data-toc-skip class="author">Christopher
+Eeles</h4>
             <address class="author_afil">
-      Princess Margaret Cancer Centre, University Health Network, Toronto Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:christopher.eeles@uhnresearch.ca" class="email">christopher.eeles@uhnresearch.ca</a>
+      Princess Margaret Cancer Centre, University Health Network,
+Toronto Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:christopher.eeles@uhnresearch.ca" class="email">christopher.eeles@uhnresearch.ca</a>
       </address>
                   
       
@@ -85,16 +89,41 @@
 <div class="section level2">
 <h2 id="why-do-we-need-a-new-class">Why Do We Need A New Class?<a class="anchor" aria-label="anchor" href="#why-do-we-need-a-new-class"></a>
 </h2>
-<p>The current implementation for the <code>@treatmentResponse</code> slot in a <code>PharmacoSet</code> has some limitations.</p>
-<p>Firstly, it does not natively support dose-response experiments with multiple drugs and/or cancer cell lines. As a result we have not been able to include this data into a <code>PharmacoSet</code> thus far.</p>
-<p>Secondly, drug combination data has the potential to scale to high dimensionality. As a result we need an object that is highly performant to ensure computations on such data can be completed in a timely manner.</p>
-<p>To resolve these issues, we designed and implement the <code>TreamtentResponseExperiment</code> (or <code>TRE</code> for short)!</p>
+<p>The current implementation for the <code>@treatmentResponse</code>
+slot in a <code>PharmacoSet</code> has some limitations.</p>
+<p>Firstly, it does not natively support dose-response experiments with
+multiple drugs and/or cancer cell lines. As a result we have not been
+able to include this data into a <code>PharmacoSet</code> thus far.</p>
+<p>Secondly, drug combination data has the potential to scale to high
+dimensionality. As a result we need an object that is highly performant
+to ensure computations on such data can be completed in a timely
+manner.</p>
+<p>To resolve these issues, we designed and implement the
+<code>TreamtentResponseExperiment</code> (or <code>TRE</code> for
+short)!</p>
 </div>
 <div class="section level2">
 <h2 id="design-philosophy">Design Philosophy<a class="anchor" aria-label="anchor" href="#design-philosophy"></a>
 </h2>
-<p>The current use case is supporting drug combinations experiments in <em><a href="https://bioconductor.org/packages/3.15/PharmacoGx" class="external-link">PharmacoGx</a></em>, but we wanted to create something flexible enough to fit other use cases. As such, we have used the generic term ‘treatment’ to refer to any experimental intervention one can conduct on a set of samples. In context of <em><a href="https://bioconductor.org/packages/3.15/PharmacoGx" class="external-link">PharmacoGx</a></em>, a treatment represents application of one or more anti-cancer compounds to a cancer cell-line. The resulting viability for this cell-line after treatment is the response metric. We hope that the implementation of our class is general enough to support other use cases. For example, the <code>TreatmentResponseExperiment</code> class is also being adopted for radiation dose-response experiments in cancer cell-lines in <em><a href="https://bioconductor.org/packages/3.15/RadioGx" class="external-link">RadioGx</a></em> as well as for investigating compound toxicity in healthy human and rat cell-lines in <em><a href="https://bioconductor.org/packages/3.15/ToxicoGx" class="external-link">ToxicoGx</a></em>.</p>
-<p>Our design takes the aspects of the <code>SummarizedExperiment</code> and <code>MultiAssayExperiment</code> classes and implements them using the <code>data.table</code> package, which provides an R API to a rich set of tools for scalable, high performance data processing implemented in C.</p>
+<p>The current use case is supporting drug combinations experiments in
+<em><a href="https://bioconductor.org/packages/3.15/PharmacoGx" class="external-link">PharmacoGx</a></em>,
+but we wanted to create something flexible enough to fit other use
+cases. As such, we have used the generic term ‘treatment’ to refer to
+any experimental intervention one can conduct on a set of samples. In
+context of <em><a href="https://bioconductor.org/packages/3.15/PharmacoGx" class="external-link">PharmacoGx</a></em>,
+a treatment represents application of one or more anti-cancer compounds
+to a cancer cell-line. The resulting viability for this cell-line after
+treatment is the response metric. We hope that the implementation of our
+class is general enough to support other use cases. For example, the
+<code>TreatmentResponseExperiment</code> class is also being adopted for
+radiation dose-response experiments in cancer cell-lines in <em><a href="https://bioconductor.org/packages/3.15/RadioGx" class="external-link">RadioGx</a></em>
+as well as for investigating compound toxicity in healthy human and rat
+cell-lines in <em><a href="https://bioconductor.org/packages/3.15/ToxicoGx" class="external-link">ToxicoGx</a></em>.</p>
+<p>Our design takes the aspects of the <code>SummarizedExperiment</code>
+and <code>MultiAssayExperiment</code> classes and implements them using
+the <code>data.table</code> package, which provides an R API to a rich
+set of tools for scalable, high performance data processing implemented
+in C.</p>
 </div>
 <div class="section level2">
 <h2 id="anatomy-of-a-treatmentresponseexperiment">Anatomy of a TreatmentResponseExperiment<a class="anchor" aria-label="anchor" href="#anatomy-of-a-treatmentresponseexperiment"></a>
@@ -103,36 +132,110 @@
 <h3 id="class-diagram">Class Diagram<a class="anchor" aria-label="anchor" href="#class-diagram"></a>
 </h3>
 <p><img src="TreatmentResponseExperimentClassDiagram.drawio.png"><!-- --></p>
-<p>We have borrowed directly from the <code>SummarizedExperiment</code> class for the <code>rowData</code>, <code>colData</code>, <code>metadata</code> and <code>assays</code> slot names. We also implemented the <code>SummarizedExperiment</code> accessor methods for the <code>TreatmentResponseExperiment</code>. Therefore the interface should be familiar to users of common Bioconductor packages.</p>
+<p>We have borrowed directly from the <code>SummarizedExperiment</code>
+class for the <code>rowData</code>, <code>colData</code>,
+<code>metadata</code> and <code>assays</code> slot names. We also
+implemented the <code>SummarizedExperiment</code> accessor methods for
+the <code>TreatmentResponseExperiment</code>. Therefore the interface
+should be familiar to users of common Bioconductor packages.</p>
 </div>
 <div class="section level3">
 <h3 id="object-structure-and-cardinality">Object Structure and Cardinality<a class="anchor" aria-label="anchor" href="#object-structure-and-cardinality"></a>
 </h3>
-<p>There are, however, some important differences which make this object more flexible when dealing with high dimensional data.</p>
+<p>There are, however, some important differences which make this object
+more flexible when dealing with high dimensional data.</p>
 <p><img src="TreatmentResponseExperimentStructure.drawio.png"><!-- --></p>
-<p>Unlike a <code>SummarizedExperiment</code>, there are three distinct subgroups of columns in <code>rowData</code> and <code>colData</code>.</p>
-<p>The first are the <code>rowKey</code> and <code>colKey</code> which are implemented internally to map between each assay observation and its associated treatments or samples (rows or columns); these will not be returned by the accessors by default. The second are the <code>rowIDs</code> and <code>colIDs</code>, these hold all of the information necessary to uniquely identify a row or column and are used to generate the <code>rowKey</code> and <code>colKey</code>. Finally, there are the <code>rowMeta</code> and <code>colMeta</code> columns, which store any additional data about treatments or samples not required to uniquely identify a row in either table.</p>
-<p>Within the <code>TreatmentResponseExperiment</code>, an <code>assayIndex</code> is stored in the <code>@.intern</code> slot which maps between unique combinations of <code>rowKey</code> and <code>colKey</code> and the experimental observations in each assay. This relationship is maintained using a separate primary key for each assay, which can map to one or more <code>rowKey</code> and <code>colKey</code> combination. For assays containing raw experimental observations, generally each assay row will map to one and only one combination of <code>rowKey</code> and <code>colKey</code>. However, for metrics computed over experimental observations, It may be desirable to summarized over some of the <code>rowID</code> and/or <code>colID</code> columns. In this case, the relationship between the summarized rows and the metadata stored in the <code>rowData</code> and <code>colData</code> slots are retained in the <code>assayIndex</code>, allowing</p>
-<p>Also worth noting is the cardinality between <code>rowData</code> and <code>colData</code> for a given assay within the assays list. As indicated by the lower connection between these tables and an assay, for each row or column key there may be zero or more rows in the assay table. Conversely for each row in the assay there may be zero or one key in <code>colData</code> or <code>rowData</code>. When combined, the <code>rowKey</code> and <code>colKey</code> for a given row in an assay become a composite key which uniquely identify an observation.</p>
+<p>Unlike a <code>SummarizedExperiment</code>, there are three distinct
+subgroups of columns in <code>rowData</code> and
+<code>colData</code>.</p>
+<p>The first are the <code>rowKey</code> and <code>colKey</code> which
+are implemented internally to map between each assay observation and its
+associated treatments or samples (rows or columns); these will not be
+returned by the accessors by default. The second are the
+<code>rowIDs</code> and <code>colIDs</code>, these hold all of the
+information necessary to uniquely identify a row or column and are used
+to generate the <code>rowKey</code> and <code>colKey</code>. Finally,
+there are the <code>rowMeta</code> and <code>colMeta</code> columns,
+which store any additional data about treatments or samples not required
+to uniquely identify a row in either table.</p>
+<p>Within the <code>TreatmentResponseExperiment</code>, an
+<code>assayIndex</code> is stored in the <code>@.intern</code> slot
+which maps between unique combinations of <code>rowKey</code> and
+<code>colKey</code> and the experimental observations in each assay.
+This relationship is maintained using a separate primary key for each
+assay, which can map to one or more <code>rowKey</code> and
+<code>colKey</code> combination. For assays containing raw experimental
+observations, generally each assay row will map to one and only one
+combination of <code>rowKey</code> and <code>colKey</code>. However, for
+metrics computed over experimental observations, It may be desirable to
+summarized over some of the <code>rowID</code> and/or <code>colID</code>
+columns. In this case, the relationship between the summarized rows and
+the metadata stored in the <code>rowData</code> and <code>colData</code>
+slots are retained in the <code>assayIndex</code>, allowing</p>
+<p>Also worth noting is the cardinality between <code>rowData</code> and
+<code>colData</code> for a given assay within the assays list. As
+indicated by the lower connection between these tables and an assay, for
+each row or column key there may be zero or more rows in the assay
+table. Conversely for each row in the assay there may be zero or one key
+in <code>colData</code> or <code>rowData</code>. When combined, the
+<code>rowKey</code> and <code>colKey</code> for a given row in an assay
+become a composite key which uniquely identify an observation.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="constructing-a-treatmentresponseexperiment">Constructing a TreatmentResponseExperiment<a class="anchor" aria-label="anchor" href="#constructing-a-treatmentresponseexperiment"></a>
 </h2>
-<p>To deal with the complex kinds of experimental designs which can be stored in a <code>LongTable</code>, we have engineered a new object to help document and validate the way data is mapped from raw data files, as a single large <code>data.frame</code> or <code>data.table</code>, to the various slots of a <code>TreatmentResponseExperiment</code> object.</p>
+<p>To deal with the complex kinds of experimental designs which can be
+stored in a <code>LongTable</code>, we have engineered a new object to
+help document and validate the way data is mapped from raw data files,
+as a single large <code>data.frame</code> or <code>data.table</code>, to
+the various slots of a <code>TreatmentResponseExperiment</code>
+object.</p>
 <div class="section level3">
 <h3 id="the-datamapper-class">The DataMapper Class<a class="anchor" aria-label="anchor" href="#the-datamapper-class"></a>
 </h3>
-<p>The <code>DataMapper</code> is an abstract class, which means in cannot be instatiated. Its purpose is to provide a description of the concept of a DataMapper and define a basic interface for any classes inheriting from it. A DataMapper is simply a way to map columns from some raw data file to the slots of an S4 class. It is similar to a schema in SQL in that it defines the valid parts of an object (analogously a SQL table), but differs in that no types are specified or enforced at this time.</p>
-<p>This object is not important for general users, but may be useful for other developers who want to map from some raw data to some <code>S4</code> class. In this case, any derived data mapper should inherit from the <code>DataMapper</code> abstract class. Only one slot is defined by default, a <code>list</code> or <code>List</code> in the <code>@rawdata</code> slot. An accessor method, <code>rawdata(DataMapper)</code>, is defined to assign and retrieve the raw data from your mapper object.</p>
+<p>The <code>DataMapper</code> is an abstract class, which means in
+cannot be instatiated. Its purpose is to provide a description of the
+concept of a DataMapper and define a basic interface for any classes
+inheriting from it. A DataMapper is simply a way to map columns from
+some raw data file to the slots of an S4 class. It is similar to a
+schema in SQL in that it defines the valid parts of an object
+(analogously a SQL table), but differs in that no types are specified or
+enforced at this time.</p>
+<p>This object is not important for general users, but may be useful for
+other developers who want to map from some raw data to some
+<code>S4</code> class. In this case, any derived data mapper should
+inherit from the <code>DataMapper</code> abstract class. Only one slot
+is defined by default, a <code>list</code> or <code>List</code> in the
+<code>@rawdata</code> slot. An accessor method,
+<code>rawdata(DataMapper)</code>, is defined to assign and retrieve the
+raw data from your mapper object.</p>
 </div>
 <div class="section level3">
 <h3 id="the-tredatamapper-class">The TREDataMapper Class<a class="anchor" aria-label="anchor" href="#the-tredatamapper-class"></a>
 </h3>
-<p>The <code>TREDataMapper</code> class is the first concrete sub-class of a <code>DataMapper</code>. It is the object which defines how to go from a single <code>data.frame</code> or <code>data.table</code> of raw experimental data to a properly formatted and valid <code>TreatmentResponseExperiment</code> object. This is accomplished by defining various mappings, which let the the user decide which columns from <code>rawdata</code> should go into which slots of the object. Each slot mapping is implemented as a list of character vectors specifying the column names from <code>rawdata</code> to assign to each slot.</p>
-<p>Additionally, a helper method has been included, <code>guessMapping</code>, that will try to determine which columns of a <code>TreatmentResponseExperiment</code>s <code>rawdata</code> should be assigned to which slots, and therefore which maps.</p>
-<p>To get started making a <code>TreatmentResponseExperiment</code> lets have a look at some rawdata which is a subset of the data from Oneil <em>et al.</em>, 2016. The full set of rawdata is available for exploration and download from <a href="https://www.synergxdb.ca/" class="external-link">SynergxDB.ca</a>, a free and open source web-app and database of publicly available drug combination sensitivity experiments which we created and released (Seo <em>et al.</em>, 2019).</p>
-<p>The data was generated as part of the commercial activities of the pharmaceutical company Merck, and is thus named according.</p>
+<p>The <code>TREDataMapper</code> class is the first concrete sub-class
+of a <code>DataMapper</code>. It is the object which defines how to go
+from a single <code>data.frame</code> or <code>data.table</code> of raw
+experimental data to a properly formatted and valid
+<code>TreatmentResponseExperiment</code> object. This is accomplished by
+defining various mappings, which let the the user decide which columns
+from <code>rawdata</code> should go into which slots of the object. Each
+slot mapping is implemented as a list of character vectors specifying
+the column names from <code>rawdata</code> to assign to each slot.</p>
+<p>Additionally, a helper method has been included,
+<code>guessMapping</code>, that will try to determine which columns of a
+<code>TreatmentResponseExperiment</code>s <code>rawdata</code> should be
+assigned to which slots, and therefore which maps.</p>
+<p>To get started making a <code>TreatmentResponseExperiment</code> lets
+have a look at some rawdata which is a subset of the data from Oneil
+<em>et al.</em>, 2016. The full set of rawdata is available for
+exploration and download from <a href="https://www.synergxdb.ca/" class="external-link">SynergxDB.ca</a>, a free and open
+source web-app and database of publicly available drug combination
+sensitivity experiments which we created and released (Seo <em>et
+al.</em>, 2019).</p>
+<p>The data was generated as part of the commercial activities of the
+pharmaceutical company Merck, and is thus named according.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">filePath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata'</span>, <span class="st">'merckLongTable.csv'</span>, package<span class="op">=</span><span class="st">'CoreGx'</span>,</span>
 <span>  mustWork<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
@@ -288,8 +391,10 @@
 </tr>
 </tbody>
 </table>
-<p>We can see that all the data related to the treatment response experiment is contained within this table.</p>
-<p>To get an idea of where in a <code>TreatmentResponseExperiment</code> this data should go, lets come up with some guesses for mappings.</p>
+<p>We can see that all the data related to the treatment response
+experiment is contained within this table.</p>
+<p>To get an idea of where in a <code>TreatmentResponseExperiment</code>
+this data should go, lets come up with some guesses for mappings.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Our guesses of how we may identify rows, columns and assays</span></span>
 <span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -383,12 +488,30 @@
 <span><span class="co">## </span></span>
 <span><span class="co">## $unmapped</span></span>
 <span><span class="co">## character(0)</span></span></code></pre>
-<p>Since we want our <code>TreatmentResponseExperiment</code> to have drugs as rows and samples as columns, we see that both <code>justDrug</code> and <code>drugsAndDoses</code> yield the same result. So we do not yet prefer one over the other. Looking at <code>justCells</code> and <code>cellsAndBatches</code>, we see one column maps to each of them and therefore still have no preference. For <code>assay1</code> however, we see that no columns mapped, while <code>assay2</code> maps many of raw data columns.</p>
-<p>Since assays will be subset based on the <code>rowKey</code> and <code>colKey</code>, we know that the rowIDs must be <code>drugsAndDose</code> and the the colIDs must be <code>cellsAndBatches</code>. Therefore, to uniquely identify an observation in any given assay we need all of these columns. We can use this information to assign maps to our <code>TREDataMapper</code>.</p>
+<p>Since we want our <code>TreatmentResponseExperiment</code> to have
+drugs as rows and samples as columns, we see that both
+<code>justDrug</code> and <code>drugsAndDoses</code> yield the same
+result. So we do not yet prefer one over the other. Looking at
+<code>justCells</code> and <code>cellsAndBatches</code>, we see one
+column maps to each of them and therefore still have no preference. For
+<code>assay1</code> however, we see that no columns mapped, while
+<code>assay2</code> maps many of raw data columns.</p>
+<p>Since assays will be subset based on the <code>rowKey</code> and
+<code>colKey</code>, we know that the rowIDs must be
+<code>drugsAndDose</code> and the the colIDs must be
+<code>cellsAndBatches</code>. Therefore, to uniquely identify an
+observation in any given assay we need all of these columns. We can use
+this information to assign maps to our <code>TREDataMapper</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/TREDataMapper-accessors.html">rowDataMap</a></span><span class="op">(</span><span class="va">TREdataMapper</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">guess</span><span class="op">$</span><span class="va">drugsAndDose</span></span>
 <span><span class="fu"><a href="../reference/TREDataMapper-accessors.html">colDataMap</a></span><span class="op">(</span><span class="va">TREdataMapper</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">guess</span><span class="op">$</span><span class="va">cellsAndBatches</span></span></code></pre></div>
-<p>Looking at our mapped columns for <code>assay2</code>, we must decide if we want these to go into more than one assay. If we do, we should name each item of our <code>assayMap</code> for the <code>TREDataMapper</code> and specify it in a list of <code>character</code> vectors, one for each assay. Since viability is the raw experimental measurement and the final two columns are summaries of it, we will assign them to two assays:sensitivity and profiles.</p>
+<p>Looking at our mapped columns for <code>assay2</code>, we must decide
+if we want these to go into more than one assay. If we do, we should
+name each item of our <code>assayMap</code> for the
+<code>TREDataMapper</code> and specify it in a list of
+<code>character</code> vectors, one for each assay. Since viability is
+the raw experimental measurement and the final two columns are summaries
+of it, we will assign them to two assays:sensitivity and profiles.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">assays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  sensitivity<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -421,9 +544,19 @@
 <div class="section level3">
 <h3 id="metaconstruct-method">metaConstruct Method<a class="anchor" aria-label="anchor" href="#metaconstruct-method"></a>
 </h3>
-<p>The metaConstruct method accepts a <code>DataMapper</code> object as its only argument, and uses the information in that <code>DataMapper</code> to preprocess all <code>rawdata</code> and map them to the appropriate slots of an <code>S4</code> object. In our case, we are mapping from the merckDT <code>data.table</code> to a <code>TreatmentResponseExperiment</code>.</p>
-<p>At minimum, a <code>TREDataMapper</code> must specify the <code>rowDataMap</code>, <code>colDataMap</code>, and <code>assayMap</code>. Additional maps are available, see <code>?TREDataMapper-class</code> and <code>?TREDataMapper-accessors</code> for more details.</p>
-<p>After configuration, creating the object is very straight forward.</p>
+<p>The metaConstruct method accepts a <code>DataMapper</code> object as
+its only argument, and uses the information in that
+<code>DataMapper</code> to preprocess all <code>rawdata</code> and map
+them to the appropriate slots of an <code>S4</code> object. In our case,
+we are mapping from the merckDT <code>data.table</code> to a
+<code>TreatmentResponseExperiment</code>.</p>
+<p>At minimum, a <code>TREDataMapper</code> must specify the
+<code>rowDataMap</code>, <code>colDataMap</code>, and
+<code>assayMap</code>. Additional maps are available, see
+<code>?TREDataMapper-class</code> and
+<code>?TREDataMapper-accessors</code> for more details.</p>
+<p>After configuration, creating the object is very straight
+forward.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/metaConstruct.html">metaConstruct</a></span><span class="op">(</span><span class="va">TREdataMapper</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -431,8 +564,16 @@
 <div class="section level2">
 <h2 id="treatmentresponseexperiment-object">TreatmentResponseExperiment Object<a class="anchor" aria-label="anchor" href="#treatmentresponseexperiment-object"></a>
 </h2>
-<p>As mentioned previously, a <code>TreatmentResponseExperiment</code> has both list and table like behaviours. For table like operations, a given <code>TreatmentResponseExperiment</code> can be thought of as a <code>rowKey</code> by <code>colKey</code> rectangular object.</p>
-<p>To support <code>data.frame</code> like sub-setting for this object, the constructor makes pseudo row and column names, which are the ID columns for each row of <code>rowData</code> or <code>colData</code> pasted together with a ‘:’. The ordering of these columns is preserved in the pseudo-dim names, so be sure to arrange them as desirged before creating the <code>TreatmentResponseExperiment</code>.</p>
+<p>As mentioned previously, a <code>TreatmentResponseExperiment</code>
+has both list and table like behaviours. For table like operations, a
+given <code>TreatmentResponseExperiment</code> can be thought of as a
+<code>rowKey</code> by <code>colKey</code> rectangular object.</p>
+<p>To support <code>data.frame</code> like sub-setting for this object,
+the constructor makes pseudo row and column names, which are the ID
+columns for each row of <code>rowData</code> or <code>colData</code>
+pasted together with a ‘:’. The ordering of these columns is preserved
+in the pseudo-dim names, so be sure to arrange them as desirged before
+creating the <code>TreatmentResponseExperiment</code>.</p>
 <div class="section level3">
 <h3 id="row-and-column-names">Row and Column Names<a class="anchor" aria-label="anchor" href="#row-and-column-names"></a>
 </h3>
@@ -441,17 +582,22 @@
 <pre><code><span><span class="co">## [1] "5-FU:Bortezomib:0.35:0.00045" "5-FU:Bortezomib:0.35:0.002"  </span></span>
 <span><span class="co">## [3] "5-FU:Bortezomib:0.35:0.009"   "5-FU:Bortezomib:0.35:0.04"   </span></span>
 <span><span class="co">## [5] "5-FU:L778123:0.35:0.325"      "5-FU:L778123:0.35:0.8"</span></span></code></pre>
-<p>We see that the rownames for the Merck <code>TreatmentResponseExperiment</code> are the cell-line name pasted to the batch id.</p>
+<p>We see that the rownames for the Merck
+<code>TreatmentResponseExperiment</code> are the cell-line name pasted
+to the batch id.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">tre</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "A2058:1" "A2058:3" "A2780:1" "A2780:2" "A375:1"  "A375:2"</span></span></code></pre>
-<p>For the column names, a similar pattern is followed by combining the colID columns in the form ‘drug1:drug2:drug1dose:drug2dose’.</p>
+<p>For the column names, a similar pattern is followed by combining the
+colID columns in the form ‘drug1:drug2:drug1dose:drug2dose’.</p>
 </div>
 <div class="section level3">
 <h3 id="data-frame-subsetting">
 <code>data.frame</code> Subsetting<a class="anchor" aria-label="anchor" href="#data-frame-subsetting"></a>
 </h3>
-<p>We can subset a <code>TreatmentResponseExperiment</code> using the same row and column name syntax as with a <code>data.frame</code> or <code>matrix</code>.</p>
+<p>We can subset a <code>TreatmentResponseExperiment</code> using the
+same row and column name syntax as with a <code>data.frame</code> or
+<code>matrix</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">row</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tre</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">columns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">tre</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span>
@@ -467,7 +613,9 @@
 <div class="section level4">
 <h4 id="regex-queries">Regex Queries<a class="anchor" aria-label="anchor" href="#regex-queries"></a>
 </h4>
-<p>However, unlike a <code>data.frame</code> or <code>matrix</code> this subsetting also accepts partial row and column names as well as regex queries.</p>
+<p>However, unlike a <code>data.frame</code> or <code>matrix</code> this
+subsetting also accepts partial row and column names as well as regex
+queries.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">tre</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    drug1id    drug2id drug1dose drug2dose  combination_name</span></span>
@@ -480,7 +628,8 @@
 <span><span class="co">## 1:  A2058       1</span></span>
 <span><span class="co">## 2:  A2058       3</span></span>
 <span><span class="co">## 3:  A2780       1</span></span></code></pre>
-<p>For example, if we want to get all instance where ‘5-FU’ is the drug:</p>
+<p>For example, if we want to get all instance where ‘5-FU’ is the
+drug:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre</span><span class="op">[</span><span class="st">'5-FU'</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #BBBB00; font-weight: bold; font-style: italic;">&lt;TreatmentResponseExperiment&gt; </span></span></span>
@@ -491,19 +640,29 @@
 <span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">colnames(5): </span><span style="color: #00BB00;">A2058:1 A2780:1 A375:1 A427:1 CAOV3:1</span> </span></span>
 <span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">colData(2): </span><span style="color: #00BB00;">cellid batchid</span> </span></span>
 <span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">metadata(0): </span><span style="color: #00BB00;">none</span></span></span></code></pre>
-<p>This has matched all colnames where 5-FU was in either drug1 or drug2. If we only want to match drug1, we have several options:</p>
+<p>This has matched all colnames where 5-FU was in either drug1 or
+drug2. If we only want to match drug1, we have several options:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">tre</span><span class="op">[</span><span class="st">'5-FU:*:*:*'</span>, <span class="op">]</span>, <span class="va">tre</span><span class="op">[</span><span class="st">'^5-FU'</span>,  <span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
-<p>As a technicaly note, ‘*’ is replaced with ‘.*’ internally for regex queries. This was implemented to mimic the linux shell style patten matching that most command-line users are familiar with.</p>
+<p>As a technicaly note, ‘*’ is replaced with ‘.*’ internally for regex
+queries. This was implemented to mimic the linux shell style patten
+matching that most command-line users are familiar with.</p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="data-table-subsetting">
 <code>data.table</code> Subsetting<a class="anchor" aria-label="anchor" href="#data-table-subsetting"></a>
 </h3>
-<p>In addition to regex queries, a <code>TreatmentResponseExperiment</code> object supports arbitrarily complex subset queries using the <code>data.table</code> API. To access this API, you will need to use the <code>.</code> function, which allows you to pass raw R expressions to be evaluated inside the <code>i</code> and <code>j</code> arguments for <code>dataTable[i, j]</code>.</p>
-<p>For example if we want to subset to rows where the cell line is VCAP and columns where drug1 is Temozolomide and drug2 is either Lapatinib or Bortezomib:</p>
+<p>In addition to regex queries, a
+<code>TreatmentResponseExperiment</code> object supports arbitrarily
+complex subset queries using the <code>data.table</code> API. To access
+this API, you will need to use the <code>.</code> function, which allows
+you to pass raw R expressions to be evaluated inside the <code>i</code>
+and <code>j</code> arguments for <code>dataTable[i, j]</code>.</p>
+<p>For example if we want to subset to rows where the cell line is VCAP
+and columns where drug1 is Temozolomide and drug2 is either Lapatinib or
+Bortezomib:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tre</span><span class="op">[</span></span>
 <span>    <span class="co"># row query</span></span>
@@ -518,7 +677,8 @@
 <span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">colnames(1): </span><span style="color: #00BB00;">CAOV3:1</span> </span></span>
 <span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">colData(2): </span><span style="color: #00BB00;">cellid batchid</span> </span></span>
 <span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">metadata(0): </span><span style="color: #00BB00;">none</span></span></span></code></pre>
-<p>We can also invert matches or subset on other columns in <code>rowData</code> or <code>colData</code>:</p>
+<p>We can also invert matches or subset on other columns in
+<code>rowData</code> or <code>colData</code>:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">subTRE</span> <span class="op">&lt;-</span> <span class="va">tre</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="../reference/dot-.html">.</a></span><span class="op">(</span><span class="va">drug1id</span> <span class="op">==</span> <span class="st">'Temozolomide'</span> <span class="op">&amp;</span> <span class="va">drug2id</span> <span class="op">!=</span> <span class="st">'Lapatinib'</span><span class="op">)</span>,</span>
@@ -641,7 +801,8 @@
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">assayNames</span><span class="op">(</span><span class="va">tre</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "sensitivity" "profiles"</span></span></code></pre>
-<p>Using these names we can access specific assays within a <code>TreatmentResponseExperiment</code>.</p>
+<p>Using these names we can access specific assays within a
+<code>TreatmentResponseExperiment</code>.</p>
 </div>
 <div class="section level3">
 <h3 id="assay">assay<a class="anchor" aria-label="anchor" href="#assay"></a>
@@ -714,8 +875,17 @@
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li><p>O’Neil J, Benita Y, Feldman I, Chenard M, Roberts B, Liu Y, Li J, Kral A, Lejnine S, Loboda A, Arthur W, Cristescu R, Haines BB, Winter C, Zhang T, Bloecher A, Shumway SD. An Unbiased Oncology Compound Screen to Identify Novel Combination Strategies. Mol Cancer Ther. 2016 Jun;15(6):1155-62. doi: 10.1158/1535-7163.MCT-15-0843. Epub 2016 Mar 16. PMID: 26983881.</p></li>
-<li><p>Heewon Seo, Denis Tkachuk, Chantal Ho, Anthony Mammoliti, Aria Rezaie, Seyed Ali Madani Tonekaboni, Benjamin Haibe-Kains, SYNERGxDB: an integrative pharmacogenomic portal to identify synergistic drug combinations for precision oncology, Nucleic Acids Research, Volume 48, Issue W1, 02 July 2020, Pages W494–W501, <a href="https://doi.org/10.1093/nar/gkaa421" class="external-link uri">https://doi.org/10.1093/nar/gkaa421</a></p></li>
+<li><p>O’Neil J, Benita Y, Feldman I, Chenard M, Roberts B, Liu Y, Li J,
+Kral A, Lejnine S, Loboda A, Arthur W, Cristescu R, Haines BB, Winter C,
+Zhang T, Bloecher A, Shumway SD. An Unbiased Oncology Compound Screen to
+Identify Novel Combination Strategies. Mol Cancer Ther. 2016
+Jun;15(6):1155-62. doi: 10.1158/1535-7163.MCT-15-0843. Epub 2016 Mar 16.
+PMID: 26983881.</p></li>
+<li><p>Heewon Seo, Denis Tkachuk, Chantal Ho, Anthony Mammoliti, Aria
+Rezaie, Seyed Ali Madani Tonekaboni, Benjamin Haibe-Kains, SYNERGxDB: an
+integrative pharmacogenomic portal to identify synergistic drug
+combinations for precision oncology, Nucleic Acids Research, Volume 48,
+Issue W1, 02 July 2020, Pages W494–W501, <a href="https://doi.org/10.1093/nar/gkaa421" class="external-link uri">https://doi.org/10.1093/nar/gkaa421</a></p></li>
 </ol>
 </div>
 <div class="section level2">
@@ -740,7 +910,7 @@
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] data.table_1.14.2           CoreGx_2.1.8               </span></span>
+<span><span class="co">##  [1] data.table_1.14.4           CoreGx_2.1.8               </span></span>
 <span><span class="co">##  [3] SummarizedExperiment_1.26.1 Biobase_2.56.0             </span></span>
 <span><span class="co">##  [5] GenomicRanges_1.48.0        GenomeInfoDb_1.32.4        </span></span>
 <span><span class="co">##  [7] IRanges_2.30.1              S4Vectors_0.34.0           </span></span>
@@ -753,7 +923,7 @@
 <span><span class="co">##  [3] fs_1.5.2                    rprojroot_2.0.3            </span></span>
 <span><span class="co">##  [5] BumpyMatrix_1.4.0           SnowballC_0.7.0            </span></span>
 <span><span class="co">##  [7] tools_4.2.1                 backports_1.4.1            </span></span>
-<span><span class="co">##  [9] bslib_0.4.0                 DT_0.25                    </span></span>
+<span><span class="co">##  [9] bslib_0.4.0                 DT_0.26                    </span></span>
 <span><span class="co">## [11] utf8_1.2.2                  R6_2.5.1                   </span></span>
 <span><span class="co">## [13] KernSmooth_2.23-20          colorspace_2.0-3           </span></span>
 <span><span class="co">## [15] gridExtra_2.3               tidyselect_1.2.0           </span></span>
@@ -765,21 +935,21 @@
 <span><span class="co">## [27] caTools_1.18.2              bench_1.1.2                </span></span>
 <span><span class="co">## [29] checkmate_2.1.0             relations_0.6-12           </span></span>
 <span><span class="co">## [31] pkgdown_2.0.6               systemfonts_1.0.4          </span></span>
-<span><span class="co">## [33] stringr_1.4.1               digest_0.6.29              </span></span>
+<span><span class="co">## [33] stringr_1.4.1               digest_0.6.30              </span></span>
 <span><span class="co">## [35] rmarkdown_2.17              XVector_0.36.0             </span></span>
 <span><span class="co">## [37] pkgconfig_2.0.3             htmltools_0.5.3            </span></span>
 <span><span class="co">## [39] highr_0.9                   fastmap_1.1.0              </span></span>
 <span><span class="co">## [41] limma_3.52.4                htmlwidgets_1.5.4          </span></span>
-<span><span class="co">## [43] rlang_1.0.6                 shiny_1.7.2                </span></span>
+<span><span class="co">## [43] rlang_1.0.6                 shiny_1.7.3                </span></span>
 <span><span class="co">## [45] visNetwork_2.1.2            generics_0.1.3             </span></span>
-<span><span class="co">## [47] jquerylib_0.1.4             jsonlite_1.8.2             </span></span>
+<span><span class="co">## [47] jquerylib_0.1.4             jsonlite_1.8.3             </span></span>
 <span><span class="co">## [49] BiocParallel_1.30.4         gtools_3.9.3               </span></span>
 <span><span class="co">## [51] dplyr_1.0.10                RCurl_1.98-1.9             </span></span>
 <span><span class="co">## [53] magrittr_2.0.3              GenomeInfoDbData_1.2.8     </span></span>
 <span><span class="co">## [55] Matrix_1.4-1                fansi_1.0.3                </span></span>
 <span><span class="co">## [57] munsell_0.5.0               Rcpp_1.0.9                 </span></span>
 <span><span class="co">## [59] lifecycle_1.0.3             piano_2.12.1               </span></span>
-<span><span class="co">## [61] stringi_1.7.8               yaml_2.3.5                 </span></span>
+<span><span class="co">## [61] stringi_1.7.8               yaml_2.3.6                 </span></span>
 <span><span class="co">## [63] zlibbioc_1.42.0             gplots_3.1.3               </span></span>
 <span><span class="co">## [65] grid_4.2.1                  parallel_4.2.1             </span></span>
 <span><span class="co">## [67] promises_1.2.0.1            shinydashboard_0.7.2       </span></span>
@@ -788,13 +958,13 @@
 <span><span class="co">## [73] fgsea_1.22.0                igraph_1.3.5               </span></span>
 <span><span class="co">## [75] codetools_0.2-18            marray_1.74.0              </span></span>
 <span><span class="co">## [77] fastmatch_1.1-3             glue_1.6.2                 </span></span>
-<span><span class="co">## [79] evaluate_0.17               BiocManager_1.30.18        </span></span>
-<span><span class="co">## [81] MultiAssayExperiment_1.22.0 vctrs_0.4.2                </span></span>
+<span><span class="co">## [79] evaluate_0.17               BiocManager_1.30.19        </span></span>
+<span><span class="co">## [81] MultiAssayExperiment_1.22.0 vctrs_0.5.0                </span></span>
 <span><span class="co">## [83] httpuv_1.6.6                gtable_0.3.1               </span></span>
 <span><span class="co">## [85] purrr_0.3.5                 ggplot2_3.3.6              </span></span>
-<span><span class="co">## [87] cachem_1.0.6                xfun_0.33                  </span></span>
+<span><span class="co">## [87] cachem_1.0.6                xfun_0.34                  </span></span>
 <span><span class="co">## [89] mime_0.12                   xtable_1.8-4               </span></span>
-<span><span class="co">## [91] later_1.3.0                 ragg_1.2.3                 </span></span>
+<span><span class="co">## [91] later_1.3.0                 ragg_1.2.4                 </span></span>
 <span><span class="co">## [93] tibble_3.1.8                memoise_2.0.1              </span></span>
 <span><span class="co">## [95] sets_1.0-21                 cluster_2.1.3              </span></span>
 <span><span class="co">## [97] ellipsis_0.3.2</span></span></code></pre>

@@ -66,10 +66,14 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>CoreGx: Class and Function Abstractions for PharmacoGx, RadioGx and ToxicoGx</h1>
-                        <h4 data-toc-skip class="author">Petr Smirnov</h4>
-                                    <h4 data-toc-skip class="author">Ian Smith</h4>
-                                    <h4 data-toc-skip class="author">Christopher Eeles</h4>
-                                    <h4 data-toc-skip class="author">Benjamin Haibe-Kains</h4>
+                        <h4 data-toc-skip class="author">Petr
+Smirnov</h4>
+                                    <h4 data-toc-skip class="author">Ian
+Smith</h4>
+                                    <h4 data-toc-skip class="author">Christopher
+Eeles</h4>
+                                    <h4 data-toc-skip class="author">Benjamin
+Haibe-Kains</h4>
                         
       
       
@@ -81,7 +85,11 @@
 <div class="section level2">
 <h2 id="coregx">CoreGx<a class="anchor" aria-label="anchor" href="#coregx"></a>
 </h2>
-<p>This package provides a foundation for the PharmacoGx, RadioGx and ToxicoGx packages. It is not intended for standalone use, only as a dependency for the aforementioned software. Its existence allows abstracting generic definitions, method definitions and class structures common to all three of the Gx suite packages.</p>
+<p>This package provides a foundation for the PharmacoGx, RadioGx and
+ToxicoGx packages. It is not intended for standalone use, only as a
+dependency for the aforementioned software. Its existence allows
+abstracting generic definitions, method definitions and class structures
+common to all three of the Gx suite packages.</p>
 <div class="section level3">
 <h3 id="importing-and-using-coregx">Importing and Using CoreGx<a class="anchor" aria-label="anchor" href="#importing-and-using-coregx"></a>
 </h3>
@@ -94,7 +102,17 @@
 <div class="section level3">
 <h3 id="the-coreset-class">The CoreSet Class<a class="anchor" aria-label="anchor" href="#the-coreset-class"></a>
 </h3>
-<p>The <code>CoreSet</code> class is intended as a general purpose data structure for storing multiomic treatment response data. Extensions of this class have been customized for their respective fields of study. For example, the <code>PharmacoSet</code> class inherits from the <code>CoreSet</code> and is specialized for storing and analyzing drug sensitivity and perturbation experiments on cancer cell lines together with associated multiomic data for each treated sample. The RadioSet class serves a role similar to the PharmacoSet with radiation instead of drug treatments. Finally, the ToxicoSet class is used to store toxicity data for healthy human and rat hepatocytes along with the associated multiomic profile for each treatment.</p>
+<p>The <code>CoreSet</code> class is intended as a general purpose data
+structure for storing multiomic treatment response data. Extensions of
+this class have been customized for their respective fields of study.
+For example, the <code>PharmacoSet</code> class inherits from the
+<code>CoreSet</code> and is specialized for storing and analyzing drug
+sensitivity and perturbation experiments on cancer cell lines together
+with associated multiomic data for each treated sample. The RadioSet
+class serves a role similar to the PharmacoSet with radiation instead of
+drug treatments. Finally, the ToxicoSet class is used to store toxicity
+data for healthy human and rat hepatocytes along with the associated
+multiomic profile for each treatment.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/methods/getClass.html" class="external-link">getClass</a></span><span class="op">(</span><span class="st">"CoreSet"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Class "CoreSet" [package "CoreGx"]</span></span>
@@ -106,15 +124,63 @@
 <span><span class="co">##                                                                               </span></span>
 <span><span class="co">## Name:          treatment       datasetType      perturbation          curation</span></span>
 <span><span class="co">## Class:        data.frame         character              list              list</span></span></code></pre>
-<p>The <code>annotation</code> slot holds the CoreSet name, the original constructor call, and a range of metadata about the R session in which the constructor was called. This allows easy comparison of <code>CoreSet</code> versions across time and ensures the code used to generate a <code>CoreSet</code> is well-documented and reproducible.</p>
-<p>The <code>molecularProfiles</code> slot contains a list of <code>SummarizedExperiment</code> objects for each multi-omic molecular datatype available for a given experiment. Within the <code>SummarizedExperiments</code> are feature and sample annotations for each data type. We are currently in the process of adopting the <code>MultiAssayExperiment</code> class instead of a <code>list</code> for storing molecular profile <code>SummarizedExperiment</code>s. However, the <code>list</code> version of the <code>molecularProfiles</code> slot is still supported for backwards compatability.</p>
-<p>The <code>sample</code> slot contains a <code>data.frame</code> with annotations for samples used in the molecularProfiles or sensitivity slot. It should at minimum have the standardized column ‘sampleid’, with a unique identifier for each sample in the <code>CoreSet</code>.</p>
-<p>The <code>treatment</code> slot contains a <code>data.frame</code> of metadata for treatments applied to samples in the <code>molecularProfiles</code> or <code>treatmentResponse</code> slot. It should at minimum have the standarized column ‘treatmentid’, containing a unique identifier for each treatment in the <code>CoreSet</code>.</p>
-<p>The <code>datasetType</code> slot contains a character vector indicating the experiment type the <code>CoreSet</code> contains. This slot is soft deprecated and may be removed in future updates.</p>
-<p>The <code>treatmentResponse</code> slot contains a list of raw, curated and meta data for treatment-response experiments. We are currently in the process of adopting our new S4-class, the <code>TreamtentResponseExperiment</code> to store treatment-response data within a <code>CoreSet</code> and inheriting classes. However, the old <code>list</code> format for sensitivity experiments will continue to be support for backwards compatability.</p>
-<p>The <code>perturbation</code> slot contains a list of raw, curated and meta data for perturbation experiments. This slot is soft-deprecated and may be removed in the future. The reason is that treatment perturbation experiments can be efficiently stored in the <code>colData</code> slot of their respective <code>SummarizedExperiment</code> objects and thus no longer require their own space within a <code>CoreSet</code>.</p>
-<p>The <code>curation</code> slot contains a list of manually curated identifiers such as standardized cell-line, tissue and treatment names. Inclusion of such identifiers ensures a consistent nomenclature is used across all datasets curated into the classes inheriting from the <code>CoreSet</code>, enabling results from such datasets to be easily compared to validate results from published studies or combine them for use in larger meta-analyses. The slot contains a list of <code>data.frame</code>s, one for each entity, and should at minimum include a mapping from curated identifiers used throughout the object to those used in the original dataset publication.</p>
-<p>The <code>CoreSet</code> class provides a set of standardized accessor methods which simplify curation, annotation, and retrieval of data associated with a specfic treatment response experiment. All accessors are implemented as generics to allow new methods to be defined on classes inheriting from the <code>CoreSet</code>.</p>
+<p>The <code>annotation</code> slot holds the CoreSet name, the original
+constructor call, and a range of metadata about the R session in which
+the constructor was called. This allows easy comparison of
+<code>CoreSet</code> versions across time and ensures the code used to
+generate a <code>CoreSet</code> is well-documented and reproducible.</p>
+<p>The <code>molecularProfiles</code> slot contains a list of
+<code>SummarizedExperiment</code> objects for each multi-omic molecular
+datatype available for a given experiment. Within the
+<code>SummarizedExperiments</code> are feature and sample annotations
+for each data type. We are currently in the process of adopting the
+<code>MultiAssayExperiment</code> class instead of a <code>list</code>
+for storing molecular profile <code>SummarizedExperiment</code>s.
+However, the <code>list</code> version of the
+<code>molecularProfiles</code> slot is still supported for backwards
+compatability.</p>
+<p>The <code>sample</code> slot contains a <code>data.frame</code> with
+annotations for samples used in the molecularProfiles or sensitivity
+slot. It should at minimum have the standardized column ‘sampleid’, with
+a unique identifier for each sample in the <code>CoreSet</code>.</p>
+<p>The <code>treatment</code> slot contains a <code>data.frame</code> of
+metadata for treatments applied to samples in the
+<code>molecularProfiles</code> or <code>treatmentResponse</code> slot.
+It should at minimum have the standarized column ‘treatmentid’,
+containing a unique identifier for each treatment in the
+<code>CoreSet</code>.</p>
+<p>The <code>datasetType</code> slot contains a character vector
+indicating the experiment type the <code>CoreSet</code> contains. This
+slot is soft deprecated and may be removed in future updates.</p>
+<p>The <code>treatmentResponse</code> slot contains a list of raw,
+curated and meta data for treatment-response experiments. We are
+currently in the process of adopting our new S4-class, the
+<code>TreamtentResponseExperiment</code> to store treatment-response
+data within a <code>CoreSet</code> and inheriting classes. However, the
+old <code>list</code> format for sensitivity experiments will continue
+to be support for backwards compatability.</p>
+<p>The <code>perturbation</code> slot contains a list of raw, curated
+and meta data for perturbation experiments. This slot is soft-deprecated
+and may be removed in the future. The reason is that treatment
+perturbation experiments can be efficiently stored in the
+<code>colData</code> slot of their respective
+<code>SummarizedExperiment</code> objects and thus no longer require
+their own space within a <code>CoreSet</code>.</p>
+<p>The <code>curation</code> slot contains a list of manually curated
+identifiers such as standardized cell-line, tissue and treatment names.
+Inclusion of such identifiers ensures a consistent nomenclature is used
+across all datasets curated into the classes inheriting from the
+<code>CoreSet</code>, enabling results from such datasets to be easily
+compared to validate results from published studies or combine them for
+use in larger meta-analyses. The slot contains a list of
+<code>data.frame</code>s, one for each entity, and should at minimum
+include a mapping from curated identifiers used throughout the object to
+those used in the original dataset publication.</p>
+<p>The <code>CoreSet</code> class provides a set of standardized
+accessor methods which simplify curation, annotation, and retrieval of
+data associated with a specfic treatment response experiment. All
+accessors are implemented as generics to allow new methods to be defined
+on classes inheriting from the <code>CoreSet</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/methods.html" class="external-link">methods</a></span><span class="op">(</span>class<span class="op">=</span><span class="st">"CoreSet"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] annotation              annotation&lt;-            curation               </span></span>
@@ -135,7 +201,9 @@
 <span><span class="co">## [46] treatmentNames&lt;-        treatmentResponse       treatmentResponse&lt;-    </span></span>
 <span><span class="co">## [49] updateObject           </span></span>
 <span><span class="co">## see '?methods' for accessing help and source code</span></span></code></pre>
-<p>We have provided a sample <code>CoreSet</code> (cSet) in this package. In the below code we load the example cSet and demonstrate a few of the accessor methods.</p>
+<p>We have provided a sample <code>CoreSet</code> (cSet) in this
+package. In the below code we load the example cSet and demonstrate a
+few of the accessor methods.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clevelandSmall_cSet</span><span class="op">)</span></span>
 <span><span class="va">clevelandSmall_cSet</span></span></code></pre></div>
@@ -207,13 +275,20 @@
 <code class="sourceCode R"><span><span class="va">sensProf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sensitivityProfiles.html">sensitivityProfiles</a></span><span class="op">(</span><span class="va">clevelandSmall_cSet</span><span class="op">)</span></span>
 <span><span class="va">sensProf</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 1 2 3 4 5</span></span></code></pre>
-<p>For more information about the accessor methods available for the <code>CoreSet</code> class please see the <code><a href="../reference/CoreSet-class.html">class?CoreSet</a></code> help page.</p>
+<p>For more information about the accessor methods available for the
+<code>CoreSet</code> class please see the <code><a href="../reference/CoreSet-class.html">class?CoreSet</a></code>
+help page.</p>
 </div>
 <div class="section level3">
 <h3 id="extending-the-coreset-class">Extending the CoreSet Class<a class="anchor" aria-label="anchor" href="#extending-the-coreset-class"></a>
 </h3>
-<p>Given that the CoreSet class is intended for extension, we will show some examples of how to define a new class based on it and implement new methods for the generics provided for the CoreSet class.</p>
-<p>Here we will define a new class, the <code>DemoSet</code>, with an additional slot, the <code>demoSlot</code>. We will then view the available methods for this class as well as define new S4 methods on it.</p>
+<p>Given that the CoreSet class is intended for extension, we will show
+some examples of how to define a new class based on it and implement new
+methods for the generics provided for the CoreSet class.</p>
+<p>Here we will define a new class, the <code>DemoSet</code>, with an
+additional slot, the <code>demoSlot</code>. We will then view the
+available methods for this class as well as define new S4 methods on
+it.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DemoSet</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/methods/setClass.html" class="external-link">setClass</a></span><span class="op">(</span><span class="st">"DemoSet"</span>,</span>
 <span>                    <span class="fu"><a href="https://rdrr.io/r/methods/representation.html" class="external-link">representation</a></span><span class="op">(</span>demoSlot<span class="op">=</span><span class="st">"character"</span><span class="op">)</span>,</span>
@@ -233,7 +308,9 @@
 <span><span class="co">## Class:              list</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Extends: "CoreSet"</span></span></code></pre>
-<p>Here we can see the class extending <code>CoreSet</code> has all of the same slots as the original <code>CoreSet</code>, plus the new slot we defined: <code>demoSlot</code>.</p>
+<p>Here we can see the class extending <code>CoreSet</code> has all of
+the same slots as the original <code>CoreSet</code>, plus the new slot
+we defined: <code>demoSlot</code>.</p>
 <p>We can see which methods are available for this new class.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/methods.html" class="external-link">methods</a></span><span class="op">(</span>class<span class="op">=</span><span class="st">"DemoSet"</span><span class="op">)</span></span></code></pre></div>
@@ -255,7 +332,13 @@
 <span><span class="co">## [46] treatmentNames&lt;-        treatmentResponse       treatmentResponse&lt;-    </span></span>
 <span><span class="co">## [49] updateObject           </span></span>
 <span><span class="co">## see '?methods' for accessing help and source code</span></span></code></pre>
-<p>We see that all the accessors defined for the <code>CoreSet</code> are also defined for the inheriting <code>DemoSet</code>. These methods all assume the inherit slots have the same structure as the <code>CoreSet</code>. If this is not true, for example, if molecularProfiles holds <code>ExpressionSet</code>s instead of <code>SummarizedExperiment</code>s, we can redefine existing methods as follows:</p>
+<p>We see that all the accessors defined for the <code>CoreSet</code>
+are also defined for the inheriting <code>DemoSet</code>. These methods
+all assume the inherit slots have the same structure as the
+<code>CoreSet</code>. If this is not true, for example, if
+molecularProfiles holds <code>ExpressionSet</code>s instead of
+<code>SummarizedExperiment</code>s, we can redefine existing methods as
+follows:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">clevelandSmall_dSet</span> <span class="op">&lt;-</span> <span class="fu">DemoSet</span><span class="op">(</span><span class="va">clevelandSmall_cSet</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">clevelandSmall_dSet</span><span class="op">@</span><span class="va">molecularProfiles</span><span class="op">[[</span><span class="st">'rna'</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
@@ -272,14 +355,23 @@
 <span>         error<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span></span>
 <span>             <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Error: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Error:  unable to find an inherited method for function 'assay' for signature '\"ExpressionSet\", \"numeric\"'"</span></span></code></pre>
-<p>Since we changed the data in the <code>molecularProfiles</code> slot of the <code>DemoSet</code>, the original method from <code>CoreGx</code> no longer works. Thus we get an error when trying to access that slot. To fix this we will need to set a new S4 method for the molecularProfiles generic function defined in <code>CoreGx</code>.</p>
+<p>Since we changed the data in the <code>molecularProfiles</code> slot
+of the <code>DemoSet</code>, the original method from
+<code>CoreGx</code> no longer works. Thus we get an error when trying to
+access that slot. To fix this we will need to set a new S4 method for
+the molecularProfiles generic function defined in
+<code>CoreGx</code>.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/methods/setMethod.html" class="external-link">setMethod</a></span><span class="op">(</span><span class="va">molecularProfiles</span>,</span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/methods/GenericFunctions.html" class="external-link">signature</a></span><span class="op">(</span><span class="st">"DemoSet"</span><span class="op">)</span>,</span>
 <span>          <span class="kw">function</span><span class="op">(</span><span class="va">object</span>, <span class="va">mDataType</span><span class="op">)</span> <span class="op">{</span></span>
 <span>            <span class="fu"><a href="https://rdrr.io/pkg/Biobase/man/phenoData.html" class="external-link">pData</a></span><span class="op">(</span><span class="va">object</span><span class="op">@</span><span class="va">molecularProfiles</span><span class="op">[[</span><span class="va">mDataType</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span>          <span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>This new method is now called whenever we use the <code>molecularProfiles</code> method on a <code>DemoSet</code>. Since the new method uses <code>ExpressionSet</code> accessor methods instead of <code>SummarizedExperiment</code> accessor methods, we now expect to be able to access the data in our modified slot.</p>
+<p>This new method is now called whenever we use the
+<code>molecularProfiles</code> method on a <code>DemoSet</code>. Since
+the new method uses <code>ExpressionSet</code> accessor methods instead
+of <code>SummarizedExperiment</code> accessor methods, we now expect to
+be able to access the data in our modified slot.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Now we test our new method</span></span>
 <span><span class="va">mProf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CoreSet-accessors.html">molecularProfiles</a></span><span class="op">(</span><span class="va">clevelandSmall_dSet</span>, <span class="st">'rna'</span><span class="op">)</span></span>
@@ -314,8 +406,14 @@
 <span><span class="co">## BUNDS_P_NCLE_RNA5_HG-U133_PLUS_2_B11_419860                 11:43:19</span></span>
 <span><span class="co">## SILOS_P_NCLE_RNA9_HG-U133_PLUS_2_A04_523474                20:44:59Z</span></span>
 <span><span class="co">## WATCH_P_NCLE_RNA8_HG-U133_PLUS_2_B04_474582                17:15:45Z</span></span></code></pre>
-<p>We can see our new method works! In order to finish updating the methods for our new class, we would have to redefine all the methods which access the modified slot.</p>
-<p>However, additional work needs to be done to define accessors for the new <code>demoSlot</code>. Since no generics are available in CoreGx to access this slot, we need to first define a generic, then implement methods which dispatch on the ‘DemoSet’ class to retrieve data in the slot.</p>
+<p>We can see our new method works! In order to finish updating the
+methods for our new class, we would have to redefine all the methods
+which access the modified slot.</p>
+<p>However, additional work needs to be done to define accessors for the
+new <code>demoSlot</code>. Since no generics are available in CoreGx to
+access this slot, we need to first define a generic, then implement
+methods which dispatch on the ‘DemoSet’ class to retrieve data in the
+slot.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define generic for setter method</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/methods/setGeneric.html" class="external-link">setGeneric</a></span><span class="op">(</span><span class="st">'demoSlot&lt;-'</span>, <span class="kw">function</span><span class="op">(</span><span class="va">object</span>, <span class="va">value</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/standardGeneric.html" class="external-link">standardGeneric</a></span><span class="op">(</span><span class="st">'demoSlot&lt;-'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -346,8 +444,10 @@
 <span><span class="co"># Test our getter method</span></span>
 <span><span class="fu">demoSlot</span><span class="op">(</span><span class="va">clevelandSmall_dSet</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "This is the demoSlot"</span></span></code></pre>
-<p>Now you should have all the knowledge you need to extend the CoreSet class for use in other treatment-response experiments!</p>
-<p>For more information about this package and the possibility of collaborating on its extension please contact <a href="mailto:benjamin.haibe.kains@utoronto.ca" class="email">benjamin.haibe.kains@utoronto.ca</a>.</p>
+<p>Now you should have all the knowledge you need to extend the CoreSet
+class for use in other treatment-response experiments!</p>
+<p>For more information about this package and the possibility of
+collaborating on its extension please contact <a href="mailto:benjamin.haibe.kains@utoronto.ca" class="email">benjamin.haibe.kains@utoronto.ca</a>.</p>
 </div>
 </div>
 <div class="section level2">
@@ -386,7 +486,7 @@
 <span><span class="co">##  [3] fs_1.5.2                    rprojroot_2.0.3            </span></span>
 <span><span class="co">##  [5] BumpyMatrix_1.4.0           SnowballC_0.7.0            </span></span>
 <span><span class="co">##  [7] tools_4.2.1                 backports_1.4.1            </span></span>
-<span><span class="co">##  [9] bslib_0.4.0                 DT_0.25                    </span></span>
+<span><span class="co">##  [9] bslib_0.4.0                 DT_0.26                    </span></span>
 <span><span class="co">## [11] utf8_1.2.2                  R6_2.5.1                   </span></span>
 <span><span class="co">## [13] KernSmooth_2.23-20          colorspace_2.0-3           </span></span>
 <span><span class="co">## [15] gridExtra_2.3               tidyselect_1.2.0           </span></span>
@@ -398,21 +498,21 @@
 <span><span class="co">## [27] caTools_1.18.2              bench_1.1.2                </span></span>
 <span><span class="co">## [29] checkmate_2.1.0             relations_0.6-12           </span></span>
 <span><span class="co">## [31] pkgdown_2.0.6               systemfonts_1.0.4          </span></span>
-<span><span class="co">## [33] stringr_1.4.1               digest_0.6.29              </span></span>
+<span><span class="co">## [33] stringr_1.4.1               digest_0.6.30              </span></span>
 <span><span class="co">## [35] rmarkdown_2.17              XVector_0.36.0             </span></span>
 <span><span class="co">## [37] pkgconfig_2.0.3             htmltools_0.5.3            </span></span>
 <span><span class="co">## [39] fastmap_1.1.0               limma_3.52.4               </span></span>
 <span><span class="co">## [41] htmlwidgets_1.5.4           rlang_1.0.6                </span></span>
-<span><span class="co">## [43] shiny_1.7.2                 visNetwork_2.1.2           </span></span>
+<span><span class="co">## [43] shiny_1.7.3                 visNetwork_2.1.2           </span></span>
 <span><span class="co">## [45] generics_0.1.3              jquerylib_0.1.4            </span></span>
-<span><span class="co">## [47] jsonlite_1.8.2              BiocParallel_1.30.4        </span></span>
+<span><span class="co">## [47] jsonlite_1.8.3              BiocParallel_1.30.4        </span></span>
 <span><span class="co">## [49] gtools_3.9.3                dplyr_1.0.10               </span></span>
 <span><span class="co">## [51] RCurl_1.98-1.9              magrittr_2.0.3             </span></span>
 <span><span class="co">## [53] GenomeInfoDbData_1.2.8      Matrix_1.4-1               </span></span>
 <span><span class="co">## [55] fansi_1.0.3                 munsell_0.5.0              </span></span>
 <span><span class="co">## [57] Rcpp_1.0.9                  lifecycle_1.0.3            </span></span>
 <span><span class="co">## [59] piano_2.12.1                stringi_1.7.8              </span></span>
-<span><span class="co">## [61] yaml_2.3.5                  zlibbioc_1.42.0            </span></span>
+<span><span class="co">## [61] yaml_2.3.6                  zlibbioc_1.42.0            </span></span>
 <span><span class="co">## [63] gplots_3.1.3                grid_4.2.1                 </span></span>
 <span><span class="co">## [65] parallel_4.2.1              promises_1.2.0.1           </span></span>
 <span><span class="co">## [67] shinydashboard_0.7.2        crayon_1.5.2               </span></span>
@@ -420,14 +520,14 @@
 <span><span class="co">## [71] fgsea_1.22.0                igraph_1.3.5               </span></span>
 <span><span class="co">## [73] codetools_0.2-18            marray_1.74.0              </span></span>
 <span><span class="co">## [75] fastmatch_1.1-3             glue_1.6.2                 </span></span>
-<span><span class="co">## [77] evaluate_0.17               data.table_1.14.2          </span></span>
-<span><span class="co">## [79] BiocManager_1.30.18         MultiAssayExperiment_1.22.0</span></span>
-<span><span class="co">## [81] vctrs_0.4.2                 httpuv_1.6.6               </span></span>
+<span><span class="co">## [77] evaluate_0.17               data.table_1.14.4          </span></span>
+<span><span class="co">## [79] BiocManager_1.30.19         MultiAssayExperiment_1.22.0</span></span>
+<span><span class="co">## [81] vctrs_0.5.0                 httpuv_1.6.6               </span></span>
 <span><span class="co">## [83] gtable_0.3.1                purrr_0.3.5                </span></span>
 <span><span class="co">## [85] cachem_1.0.6                ggplot2_3.3.6              </span></span>
-<span><span class="co">## [87] xfun_0.33                   mime_0.12                  </span></span>
+<span><span class="co">## [87] xfun_0.34                   mime_0.12                  </span></span>
 <span><span class="co">## [89] xtable_1.8-4                later_1.3.0                </span></span>
-<span><span class="co">## [91] ragg_1.2.3                  tibble_3.1.8               </span></span>
+<span><span class="co">## [91] ragg_1.2.4                  tibble_3.1.8               </span></span>
 <span><span class="co">## [93] memoise_2.0.1               sets_1.0-21                </span></span>
 <span><span class="co">## [95] cluster_2.1.3               ellipsis_0.3.2</span></span></code></pre>
 </div>
