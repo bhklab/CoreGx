@@ -346,6 +346,7 @@
 #'   `args` deleted and their values fixed with the values from `args` in the
 #'   function body.
 #'
+#' @importFrom compiler cmpfun
 #' @export
 drop_fn_params <- function(fn, args) {
     stopifnot(is.function(fn) && !is.primitive(fn))
@@ -360,8 +361,8 @@ drop_fn_params <- function(fn, args) {
         deparse_body <- gsub(names(args)[i], args[[i]], deparse_body)
     }
     # Parse the new function body back to a call
-    body(fn) <- str2lang(paste0(deparse_body, collapse="\n"))
-    # TODO:: Do I need to update the closure environment as well?
+    body(fn, envir=parent.frame()) <- str2lang(paste0(deparse_body, collapse="\n"))
+    fn <- compiler::cmpfun(fn)
     return(fn)
 }
 
