@@ -20,10 +20,10 @@ A Class for Mapping Between Raw Data and an \code{LongTable} Object
 }
 \section{Functions}{
 \itemize{
-\item \code{show,LongTableDataMapper-method}: Show method for LongTableDataMapper.
+\item \code{show(LongTableDataMapper)}: Show method for LongTableDataMapper.
 Determines how the object is displayed in the console.
-}}
 
+}}
 \section{Slots}{
 
 \describe{

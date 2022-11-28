@@ -10,7 +10,7 @@ aggregate2(
   by,
   ...,
   nthread = 1,
-  progress = TRUE,
+  progress = interactive(),
   BPPARAM = NULL,
   enlist = TRUE,
   moreArgs = list()

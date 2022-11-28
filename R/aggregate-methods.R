@@ -148,7 +148,7 @@ setMethod("aggregate", signature="data.table",
 #' @seealso `data.table::[.data.table`, `BiocParallel::bplapply`
 #'
 #' @export
-aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
+aggregate2 <- function(x, by, ..., nthread=1, progress=interactive(), BPPARAM=NULL,
         enlist=TRUE, moreArgs=list()) {
     ## TODO:: refator to checkmate
     stopifnot(is.data.table(x))
@@ -158,7 +158,7 @@ aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
     stopifnot(is.list(moreArgs))
     stopifnot(length(moreArgs) == 0 || all(names(moreArgs) != ""))
 
-    # -- assign moreArgs to the function scope, it is able to find the values
+    # -- assign moreArgs to the function scope, if it is able to find the values
     for (nm in names(moreArgs)) assign(nm, moreArgs[[nm]])
 
     # -- capture dots as a call and parse dot names, adding default names if
@@ -214,8 +214,8 @@ aggregate2 <- function(x, by, ..., nthread=1, progress=TRUE, BPPARAM=NULL,
         )
         res <- rbindlist(res)
     }
-    attributes(res)$aggregations <- c(
-        attributes(res)$aggregations,
+    attributes(res)[["aggregations"]] <- c(
+        attributes(res)[["aggregations"]],
         list(
             agg_call=agg_call,
             by=by,
