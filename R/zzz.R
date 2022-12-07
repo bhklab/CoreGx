@@ -1,8 +1,9 @@
 .onLoad <- function(libname, pkgname) {
     # CoreGx nomenclature options
     cgx_opts <- list(
-        CoreGx.treatmentid="treatment\\d+id",
-        CoreGx.sampleid="sampleid",
+        CoreGx.treatmentid="treatment<n>id",
+        CoreGx.treatmentdose="treatment<n>dose",
+        CoreGx.sampleid="sample<n>id",
         CoreGx.tissueid="tissueid",
         CoreGx.rawdata_assay="raw",
         CoreGx.monotherapy_assay_prefix="mono",
@@ -12,6 +13,6 @@
     )
     opts <- options()
     # Allow users to override defaults in their .Rprofile
-    unset_cgx_options=which(is.null(opts[names(cgx_opts)]))
+    unset_cgx_options=!(names(cgx_opts) %in% names(opts))
     do.call(options, args=cgx_opts[unset_cgx_options])
 }

@@ -70,7 +70,7 @@ License: GPL (>= 3)
 Config/testthat/edition: 3
 Roxygen: list(markdown=TRUE, r6=FALSE)
 RoxygenNote: 7.2.1
-Collate:
+Collate: 
     'allGenerics.R'
     'immutable-class.R'
     'LongTable-class.R'
@@ -108,6 +108,7 @@ Collate:
     'utils-iteration.R'
     'utils-messages.R'
     'utils-optimization.R'
+    'utils-options.R'
     'utils-testing.R'
     'utils-updateS4.R'
     'utils.R'
