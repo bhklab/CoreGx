@@ -197,7 +197,7 @@ setMethod('rowData', signature(x='LongTable'),
     dimIDCols <- dimIDs(x)
     sharedDimIDCols <- intersect(dimIDCols, colnames(value))
 
-    # error if all the rowID columns are not present in the new rowData
+    # error if all the row/colID columns are not present in the new row/colData
     equalDimIDs <- dimIDCols %in% sharedDimIDCols
     if (!all(equalDimIDs)) warning(.warnMsg('\n[CoreGx::', dim,
         'Data<-] The ID columns ', dimIDCols[!equalDimIDs],
@@ -305,7 +305,7 @@ setMethod('colData', signature(x='LongTable'),
 #' @examples
 #' colData(merckLongTable) <- colData(merckLongTable)
 #'
-#' @describeIn LongTable Upadte the colData of a LongTable object. Currently
+#' @describeIn LongTable Update the colData of a LongTable object. Currently
 #'   requires that all of the colIDs(longTable) be in the value object.
 #'
 #' @param x A `LongTable` object to modify.
@@ -408,7 +408,10 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
     for (i in seq_along(aList)) {
         setkeyv(assayIndex, names(aList)[i])
         aList[[i]] <- assayIndex[aList[[i]], ]
-        aList[[i]][, (setdiff(names(aList), names(aList)[i])) := NULL]
+        deleteCols <- setdiff(names(aList), names(aList)[i])
+        if (length(deleteCols) > 0) {
+            aList[[i]][, (deleteCols) := NULL]
+        }
         if (withDimnames || key) aList[[i]][, (names(aList)[i]) := NULL]
         if (!key) {
             aList[[i]][, c("rowKey", "colKey") := NULL]
@@ -419,7 +422,7 @@ setMethod('assays', signature(x='LongTable'), function(x, withDimnames=TRUE,
         if (!is.null(corder)) setcolorder(aList[[i]], corder) else
             setcolorder(aList[[i]])
     }
-    # reset names to no dot version
+    # reset names to non dot version
     names(aList) <- aNames
     return(aList)
 })
@@ -499,7 +502,6 @@ setReplaceMethod('assays', signature(x='LongTable', value='list'),
 #' @param key `logical` Should the key columns also be returned? Defaults to
 #'   !withDimnames. This is incompatible with `summarize=TRUE`, which will
 #'   drop the key columns regardless of the value of this argument.
-#'
 #' @param ... For developer use only! Pass raw=TRUE to return the slot for
 #'   modification by reference.
 #'
@@ -544,7 +546,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
     # extract the specified assay
     assayData <- copy(x@assays[[keepAssay]])
 
-    # optionally join to rowData and colData
+    # extract the assay index
     assayIndex <- na.omit(unique(assayIndex(x)[,
         c("rowKey", "colKey", .assayName),
         with=FALSE
@@ -552,7 +554,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 
     # handle summarized assays
     aKeys <- assayKeys(x, assayName)
-    # only compute summaries for assays that are summarized actually summarized
+    # only compute summaries for assays that are actually summarized
     summarize <- summarize && !all(idCols(x) %in% aKeys)
     if (summarize) {
         assayIndex <- assayIndex[, first(.SD), by=.assayName]
@@ -560,6 +562,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 
     setkeyv(assayIndex, .assayName)
     assayData <- assayData[assayIndex, on=.assayName]
+    # # optinally join with row and column metadata
     setkeyv(assayData, "rowKey")
     if (withDimnames && !metadata) {
         assayData <- rowIDs(x, data=TRUE, key=TRUE)[assayData, ]
@@ -618,8 +621,7 @@ setMethod('assay', signature(x='LongTable'), function(x, i, withDimnames=TRUE,
 #'
 #' @description Add or replace an assay in a LongTable by name. Currently
 #'    this function only works when the assay has all columns in row and column
-#'    data tables (i.e., when assays is retured withDimnames=TRUE). This will
-#'    be fixed in future updates.
+#'    data tables (i.e., when assays is retured withDimnames=TRUE).
 #'
 #' @examples
 #' assay(merckLongTable, 'sensitivity') <-
@@ -667,12 +669,10 @@ setReplaceMethod('assay', signature(x='LongTable'), function(x, i, value) {
     value <- copy(value)  # prevent modify by reference
     if (!is.data.table(value)) setDT(value)
 
-    # -- extract strucutral metadata form .intern slot
+    # -- extract strucutral metadata from .intern slot
     mutable_intern <- mutable(getIntern(x))
     aIndex <- mutable_intern$assayIndex
     aKeys <- mutable_intern$assayKeys
-
-
 
     # -- determine the id columns if the assay doesn't already exits
     if (!any(assayExists)) {

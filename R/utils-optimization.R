@@ -366,7 +366,6 @@ drop_fn_params <- function(fn, args) {
     return(fn)
 }
 
-
 #' Collects all function arguments other than the first into a single list
 #'   parameter.
 #'

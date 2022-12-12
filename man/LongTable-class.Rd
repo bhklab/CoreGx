@@ -209,84 +209,83 @@ metadata of an S4 objects.
 
 Add or replace an assay in a LongTable by name. Currently
 this function only works when the assay has all columns in row and column
-data tables (i.e., when assays is retured withDimnames=TRUE). This will
-be fixed in future updates.
+data tables (i.e., when assays is retured withDimnames=TRUE).
 
 Select an assay from within a LongTable object.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{rowMeta}: Get the names of the non-id columns from rowData.
+\item \code{rowMeta(LongTable)}: Get the names of the non-id columns from rowData.
 
-\item \code{colIDs}: Get the names of the columns in colData required to
+\item \code{colIDs(LongTable)}: Get the names of the columns in colData required to
 uniquely identify each row.
 
-\item \code{colMeta}: Get the names of the non-id columns in the colData
+\item \code{colMeta(LongTable)}: Get the names of the non-id columns in the colData
 \code{data.table}.
 
-\item \code{idCols}: Get the names of all id columns.
+\item \code{idCols(LongTable)}: Get the names of all id columns.
 
-\item \code{assayIndex}: Get the assayIndex item from the objects internal metadata.
+\item \code{assayIndex(LongTable)}: Get the assayIndex item from the objects internal metadata.
 
-\item \code{assayKeys}: Get the assayKeys item from the objects internal metadata.
+\item \code{assayKeys(LongTable)}: Get the assayKeys item from the objects internal metadata.
 
-\item \code{assayCols}: Get a list of column names for each assay in the object.
+\item \code{assayCols(LongTable)}: Get a list of column names for each assay in the object.
 
-\item \code{getIntern}: Access structural metadata present within a
+\item \code{getIntern(object = LongTable, x = character)}: Access structural metadata present within a
 LongTable object. This is mostly for developmer use.
 
-\item \code{getIntern}: Access all structural metadata present within a
+\item \code{getIntern(object = LongTable, x = missing)}: Access all structural metadata present within a
 LongTable object. This is primarily for developmer use.
 
-\item \code{rowData}: Get the row level annotations for a \code{LongTable} object.
+\item \code{rowData(LongTable)}: Get the row level annotations for a \code{LongTable} object.
 
-\item \code{rowData<-}: Update the row annotations for a \code{LongTable} object.
+\item \code{rowData(LongTable) <- value}: Update the row annotations for a \code{LongTable} object.
 Currently requires that all columns in rowIDs(longTable) be present in
 value.
 
-\item \code{colData}: Get the column level annotations for a LongTable
+\item \code{colData(LongTable)}: Get the column level annotations for a LongTable
 object.
 
-\item \code{colData<-}: Upadte the colData of a LongTable object. Currently
+\item \code{colData(x = LongTable) <- value}: Update the colData of a LongTable object. Currently
 requires that all of the colIDs(longTable) be in the value object.
 
-\item \code{assays}: Get a list containing all the assays in a \code{LongTable}.
+\item \code{assays(LongTable)}: Get a list containing all the assays in a \code{LongTable}.
 
-\item \code{assays<-}: Update the assays in a LongTable object. The rowIDs
+\item \code{assays(x = LongTable) <- value}: Update the assays in a LongTable object. The rowIDs
 and colIDs must be present in all assays to allow successfully remapping
 the keys. We recommend modifying the list returned by
 assays(longTable, withDimnames=TRUE) and the reassigning to the
 \code{LongTable}.
 
-\item \code{assay}: Retrieve an assay \code{data.table} object from the
+\item \code{assay(x = LongTable, i = ANY)}: Retrieve an assay \code{data.table} object from the
 \code{assays} slot of a \code{LongTable} object.
 
-\item \code{assay<-}: 
+\item \code{assay(x = LongTable, i = ANY) <- value}: 
 
-\item \code{assayNames}: Return the names of the assays contained in a
+\item \code{assayNames(LongTable)}: Return the names of the assays contained in a
 \code{LongTable}
 
-\item \code{[[}: Get an assay from a LongTable object. This method
+\item \code{x[[i}: Get an assay from a LongTable object. This method
 returns the row and column annotations by default to make assignment
 and aggregate operations easiers.
 
-\item \code{dim}: Get the number of row annotations by the number of
+\item \code{dim(LongTable)}: Get the number of row annotations by the number of
 column annotations from a LongTable object. Please note that row x columns
 does not necessarily equal the number of rows in an assay, since it is
 not required for each assay to have every row or column present.
 
-\item \code{colnames}: Retrieve the pseudo-colnames of a LongTable object,
+\item \code{colnames(LongTable)}: Retrieve the pseudo-colnames of a LongTable object,
 these are constructed by pasting together the colIDs(longTable) and
 can be used in the subset method for regex based queries.
 
-\item \code{rownames}: Retrieve the pseudo-rownames of a LongTable object,
+\item \code{rownames(LongTable)}: Retrieve the pseudo-rownames of a LongTable object,
 these are constructed by pasting together the rowIDs(longTable) and
 can be used in the subset method for regex based queries.
 
-\item \code{dimnames}: Get the pseudo-dimnames for a LongTable object. See
+\item \code{dimnames(LongTable)}: Get the pseudo-dimnames for a LongTable object. See
 colnames and rownames for more information.
-}}
 
+}}
 \section{Slots}{
 
 \describe{
