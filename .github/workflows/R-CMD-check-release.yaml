@@ -28,7 +28,7 @@ on:
     branches:
       - release
 
-name: R-CMD-check-bioc-devel
+name: R-CMD-check-bioc-release
 
 ## These environment variables control whether to run GHA code later on that is
 ## specific to testthat, covr, and pkgdown.
@@ -60,7 +60,7 @@ jobs:
             os: ubuntu-latest,
             r: '4.2',
             bioc: '3.16',
-            cont: "bioconductor/bioconductor_docker:RELEASE_3_15",
+            cont: "bioconductor/bioconductor_docker:RELEASE_3_16",
             rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
             }
 
