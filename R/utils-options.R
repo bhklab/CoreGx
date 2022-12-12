@@ -89,9 +89,9 @@ getCoreGxOptions <- function() {
 #'
 #' @describeIn CoreGx-options
 #' @export
-sampleIdentifier <- function() return(options()["CoreGx.sampleid"])
+sampleIdentifier <- function() return(.getPackageOption("sampleid"))
 
-#' Retrieve the configure treatment identifer pattern
+#' Retrieve the configured treatment identifer pattern
 #'
 #' @return
 #' `character(1)` The configured pattern for sample identifiers in CoreGx.
@@ -101,9 +101,9 @@ sampleIdentifier <- function() return(options()["CoreGx.sampleid"])
 #'
 #' @describeIn CoreGx-options
 #' @export
-treatmentIdentifier <- function() return(options()["CoreGx.sampleid"])
+treatmentIdentifier <- function() return(.getPackageOption("treatmentid"))
 
-#' Retrieve the configued tissue identifer pattern
+#' Retrieve the configured tissue identifer pattern
 #'
 #' @return
 #' `character(1)` The configured pattern for sample identifiers in CoreGx.
@@ -113,7 +113,7 @@ treatmentIdentifier <- function() return(options()["CoreGx.sampleid"])
 #'
 #' @describeIn CoreGx-options
 #' @export
-tissueIdentifer <- function() return(options()["CoreGx.sampleid"])
+tissueIdentifer <- function() return(.getPackageOption("tissueid"))
 
 #' Retrieve the configured viability assay suffix
 #'
@@ -125,7 +125,7 @@ tissueIdentifer <- function() return(options()["CoreGx.sampleid"])
 #'
 #' @describeIn CoreGx-options
 #' @export
-viabilitySuffix <- function() return(options()["CoreGx.viability_assay_suffix"])
+viabilitySuffix <- function() return(.getPackageOption("viability_assay_suffix"))
 
 #' Retrieve the configured profile assay suffix
 #'
@@ -137,7 +137,7 @@ viabilitySuffix <- function() return(options()["CoreGx.viability_assay_suffix"])
 #'
 #' @describeIn CoreGx-options
 #' @export
-profileSuffix <- function() return(options()["CoreGx.profile_assay_suffix"])
+profileSuffix <- function() return(.getPackageOption("profile_assay_suffix"))
 
 #' Retrieve the configured monotherapy prefix
 #'
@@ -149,7 +149,8 @@ profileSuffix <- function() return(options()["CoreGx.profile_assay_suffix"])
 #'
 #' @describeIn CoreGx-options
 #' @export
-monotherapyPrefix <- function() return(options()["CoreGx.monotherapy_assay_prefix"])
+monotherapyPrefix <- function()
+    return(.getPackageOption("monotherapy_assay_prefix"))
 
 #' Retrieve the configured combotherapy prefix
 #'
@@ -161,4 +162,17 @@ monotherapyPrefix <- function() return(options()["CoreGx.monotherapy_assay_prefi
 #'
 #' @describeIn CoreGx-options
 #' @export
-combotherapyPrefix <- function() return(options()["CoreGx.combotherapy_assay_prefix"])
+combotherapyPrefix <- function()
+    return(.getPackageOption("combotherapy_assay_prefix"))
+
+#' Helper method to allow direct import of options in package depending on
+#' CoreGx
+#' @noRd
+.getPackageOption <- function(name, dflt="CoreGx") {
+    # Find the package name of the calling function
+    pkg <- environmentName(environment(eval(sys.call(-1)[[1]])))
+    opt_name <- paste0(pkg, ".", name)
+    opt <- options()[[opt_name]]
+    if (is.null(opt)) { opt <- options()[[paste0(dflt, ".", name)]] }
+    return(opt)
+}

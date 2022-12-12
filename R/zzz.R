@@ -14,5 +14,6 @@
     opts <- options()
     # Allow users to override defaults in their .Rprofile
     unset_cgx_options=!(names(cgx_opts) %in% names(opts))
+    # Load options
     do.call(options, args=cgx_opts[unset_cgx_options])
 }
