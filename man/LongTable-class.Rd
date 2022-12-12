@@ -209,8 +209,7 @@ metadata of an S4 objects.
 
 Add or replace an assay in a LongTable by name. Currently
 this function only works when the assay has all columns in row and column
-data tables (i.e., when assays is retured withDimnames=TRUE). This will
-be fixed in future updates.
+data tables (i.e., when assays is retured withDimnames=TRUE).
 
 Select an assay from within a LongTable object.
 }
@@ -247,7 +246,7 @@ value.
 \item \code{colData(LongTable)}: Get the column level annotations for a LongTable
 object.
 
-\item \code{colData(x = LongTable) <- value}: Upadte the colData of a LongTable object. Currently
+\item \code{colData(x = LongTable) <- value}: Update the colData of a LongTable object. Currently
 requires that all of the colIDs(longTable) be in the value object.
 
 \item \code{assays(LongTable)}: Get a list containing all the assays in a \code{LongTable}.
