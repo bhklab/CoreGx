@@ -1,8 +1,8 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
-Version: 2.3.1
-Date: 2022-12-12
+Version: 2.3.2
+Date: 2023-02-18
 Authors@R: c(
     person(given="Petr", family="Smirnov", email = "petr.smirnov@uhnresearch.ca",
         role = c("aut")),
@@ -69,7 +69,7 @@ Suggests:
 License: GPL (>= 3)
 Config/testthat/edition: 3
 Roxygen: list(markdown=TRUE, r6=FALSE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Collate:
     'allGenerics.R'
     'immutable-class.R'

@@ -342,7 +342,8 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
 #' @export
 CoreSet2 <- function(name="emptySet", treatment=data.frame(),
     sample=data.frame(), molecularProfiles=MultiAssayExperiment(),
-    treatmentResponse=LongTable(), perturbation=list(), datasetType="sensitivity",
+    treatmentResponse=LongTable(), datasetType="sensitivity",
+    perturbation=list(n=array(dim=3), info="No perturbation data!"),
     curation=list(sample=data.frame(), treatment=data.frame())
 ) {
 

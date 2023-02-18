@@ -10,8 +10,8 @@ CoreSet2(
   sample = data.frame(),
   molecularProfiles = MultiAssayExperiment(),
   treatmentResponse = LongTable(),
-  perturbation = list(),
   datasetType = "sensitivity",
+  perturbation = list(n = array(dim = 3), info = "No perturbation data!"),
   curation = list(sample = data.frame(), treatment = data.frame())
 )
 }
@@ -30,10 +30,10 @@ of samples in \code{treatmentResponse} and \code{molecularProfiles}.}
 containing all treatment response data associated with the \code{CoreSet}
 object.}
 
-\item{perturbation}{A deprecated slot in a \code{CoreSet} object included
+\item{datasetType}{A deprecated slot in a \code{CoreSet} object included
 for backwards compatibility. This may be removed in future releases.}
 
-\item{datasetType}{A deprecated slot in a \code{CoreSet} object included
+\item{perturbation}{A deprecated slot in a \code{CoreSet} object included
 for backwards compatibility. This may be removed in future releases.}
 
 \item{curation}{A \code{list(2)} object with two items named \code{treatment} and \code{sample} with
