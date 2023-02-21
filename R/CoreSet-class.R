@@ -281,6 +281,8 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
         }
         return(df)
     }
+    return(df)
+    
 }
 
 #' @noRd
