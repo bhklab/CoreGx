@@ -176,13 +176,13 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
     treatment <- .checkForTreatmentId(treatment)
     sensitivityInfo <- .checkForSampleId(sensitivityInfo)
     sensitivityInfo <- .checkForTreatmentId(sensitivityInfo)
-    curationSample <- .checkForSampleId(curationSample)
-    curationTreatment <- .checkForTreatmentId(curationTreatment)
+    curationSample <- .checkForIdColumn(curationSample, c("sampleid", "unique.sampleid"), "cellid")
+    curationTreatment <- .checkForIdColumn(curationTreatment, c("treatmentid", "unique.treatmentid"), "drugid")
     for (nm in names(molecularProfiles)) {
         colData(molecularProfiles[[nm]]) <- .checkForSampleId(
             colData(molecularProfiles[[nm]]))
         # handle perturbation case
-        colData(molecularProfiles[[nm]]) <- .checkForIdColumns(
+        colData(molecularProfiles[[nm]]) <- .checkForIdColumn(
             colData(molecularProfiles[[nm]]), "treatmentid", "drugid",
             error=FALSE)
     }
@@ -270,17 +270,17 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
 .checkForIdColumn <- function(df, new_col, old_col, error=TRUE) {
     if (nrow(df) == 0 || ncol(df) == 0) return(df)
     name <- as.character(substitute(df))
-    if (!(new_col) %in% colnames(df)) {
+    if (!any(colnames(df) %in% new_col)) {
         if (old_col %in% colnames(df)) {
             .warning("The ", old_col, "identifier is deprecated, updating to",
                 new_col, " in ", name, "!")
-            colnames(df) <- gsub(new_col, col_col, colnames(df))
+            colnames(df) <- gsub(old_col, new_col[1], colnames(df))
         } else {
             if (error)
-                .error("The ", new_col, " identifier is mandatory in ", name, "!")
+                .error("The ", new_col[1], " identifier is mandatory in ", name, "!")
         }
-        return(df)
     }
+    return(df)
 }
 
 #' @noRd
