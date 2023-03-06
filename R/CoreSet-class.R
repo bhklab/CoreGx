@@ -279,6 +279,7 @@ CoreSet <- function(name, molecularProfiles=list(), sample=data.frame(),
             if (error)
                 .error("The ", new_col[1], " identifier is mandatory in ", name, "!")
         }
+        return(df)
     }
     return(df)
 }
