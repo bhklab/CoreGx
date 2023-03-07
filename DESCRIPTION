@@ -1,8 +1,8 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
-Version: 2.3.3
-Date: 2023-03-02
+Version: 2.3.4
+Date: 2023-03-06
 Authors@R: c(
     person(given="Petr", family="Smirnov", email = "petr.smirnov@uhnresearch.ca",
         role = c("aut")),
@@ -71,6 +71,47 @@ Config/testthat/edition: 3
 Roxygen: list(markdown=TRUE, r6=FALSE)
 RoxygenNote: 7.2.3
 RCollate:
+    'allGenerics.R'
+    'immutable-class.R'
+    'LongTable-class.R'
+    'CoreSet-class.R'
+    'CoreSet-accessors.R'
+    'CoreSet-utils.R'
+    'DataMapper-class.R'
+    'LongTable-accessors.R'
+    'LongTable-utils.R'
+    'LongTableDataMapper-class.R'
+    'LongTableDataMapper-accessors.R'
+    'TreatmentResponseExperiment-class.R'
+    'TREDataMapper-class.R'
+    'adaptiveMatthewCor.R'
+    'aggregate-methods.R'
+    'callingWaterfall.R'
+    'connectivityScore.R'
+    'cosinePerm.R'
+    'datasets.R'
+    'deprecated.R'
+    'endoaggregate-methods.R'
+    'globals.R'
+    'gwc.R'
+    'matthewCor.R'
+    'mergeAssays-method.R'
+    'methods-coerce.R'
+    'methods-dim.R'
+    'methods-dimnames.R'
+    'methods-drugSensitivitySig.R'
+    'methods-guessMapping.R'
+    'methods-metaConstruct.R'
+    'methods-subsetTo.R'
+    'optimizeCoreGx.R'
+    'updateObject-methods.R'
+    'utilities.R'
+    'utils-iteration.R'
+    'utils-messages.R'
+    'utils-optimization.R'
+    'utils-testing.R'
+    'utils-updateS4.R'
+Collate: 
     'allGenerics.R'
     'immutable-class.R'
     'LongTable-class.R'
