@@ -75,8 +75,7 @@ be skipped? Default is \code{FALSE}.}
 on the values of \code{x}.
 }
 \description{
-Curve fitting via \code{stats::optim} L-BFGS-B with fall-back grid/pattern search
-if convergence is not achieved.
+Function to fit curve via stats::optim
 }
 \details{
 TODO

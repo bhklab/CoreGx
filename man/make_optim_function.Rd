@@ -15,8 +15,7 @@ function to be optimized. Useful for reducing the number of free parameters
 in an optimization if there are insufficient degrees of freedom.}
 }
 \description{
-Takes a non-primitive R function and refactors it to be compatible with
-optimization via \code{stats::optim}.
+Takes a non-primitive R function and refactors it to be compatible with optimization via \code{stats::optim}.
 }
 \seealso{
 \code{\link{drop_fn_params}}, \code{\link{collect_fn_params}}

@@ -1,7 +1,7 @@
 #' Curve fitting via `stats::optim` L-BFGS-B with fall-back grid/pattern search
 #'   if convergence is not achieved.
 #'
-#' @description
+#' @description Function to fit curve via stats::optim
 #'
 #' @param par `numeric` Vector of intial guesses for the parameters. For each
 #'    index `i` of `par`, par\[i\] must be within the range (`lower\[i\]`,
@@ -411,7 +411,7 @@ collect_fn_params <- function(fn) {
 #' Takes a non-primitive R function and refactors it to be compatible with
 #'   optimization via `stats::optim`.
 #'
-#' @description
+#' @description Takes a non-primitive R function and refactors it to be compatible with optimization via `stats::optim`.
 #'
 #'
 #' @param fn `function` A non-primitive function

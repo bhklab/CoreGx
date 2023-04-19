@@ -7,12 +7,14 @@
 \alias{as.data.frame.long.table}
 \title{Coerce a \code{LongTable} to a \code{TreatmentResponseExperiment}}
 \usage{
-\method{as.data.table}{long.table}(from)
+\method{as.data.table}{long.table}(from, ...)
 
 \method{as.data.frame}{long.table}(x, row.names, optional = TRUE, ...)
 }
 \arguments{
 \item{from}{A \code{LongTableDataMapper} to coerce.}
+
+\item{...}{Does nothing.}
 
 \item{x}{\code{LongTable} to coerce to \code{data.frame}.}
 
@@ -23,8 +25,6 @@ with \code{as.data.frame}.}
 \item{optional}{\code{logical} Is it optional for row and column names to be
 valid R names? If FALSE will use the make.names function to ensure the
 row and column names are valid R names. Defaults to TRUE.}
-
-\item{...}{Does nothing.}
 }
 \value{
 The data in \code{object}, as the child-class
