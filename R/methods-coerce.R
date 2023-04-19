@@ -118,44 +118,46 @@ setAs('LongTable', 'data.frame', def=function(from) {
     return(DT)
 })
 
-#' @title Coerce a LongTable to a data.frame
-#' @name as
-#'
-#' @examples
-#' as(merckLongTable, 'data.frame')
-#'
-#' @description S3 version of coerce method fro convenience.
-#'
-#' @param x `LongTable` to coerce to `data.frame`.
-#' @param row.names An optional `character` vector of rownames. We do not
-#'   recommend using this parameter, it is included for S3 method consistency
-#'   with `as.data.frame`.
-#' @param optional `logical` Is it optional for row and column names to be
-#'   valid R names? If FALSE will use the make.names function to ensure the
-#'   row and column names are valid R names. Defaults to TRUE.
-#' @param ... Does nothing.
-#'
-#' @return `data.frame` containing the data from the LongTable, with the
-#'   `longTableDataMapper' attribute containg the metadata needed to reverse
-#'   the coercion operation.
-#'
-#' @importFrom data.table data.table
-#' @export
-as.data.frame.long.table <- function(x, row.names, optional=TRUE, ...) {
-    DF <- as(x, 'data.frame')
-    if (!missing(row.names)) {
-        if (!is.character(x) || length(row.names) != nrow(DF))
-            stop(.errorMsg('[CoreGx::as.data.frame.LongTable] The row.names ',
-                'argument must be a character vector with length equal to ',
-                nrow(DF)))
-        if (!optional) {
-            row.names <- make.names(row.names)
-            colnames(DF) <- make.names(colnames(DF))
-        }
-        rownames(DF) <- row.names
-    }
-    DF
-}
+# #' @title Coerce a LongTable to a data.frame
+# #' @name as
+# #'
+# #' @examples
+# #' as(merckLongTable, 'data.frame')
+# #'
+# #' @description S3 version of coerce method fro convenience.
+# #'
+# #' @param x `LongTable` to coerce to `data.frame`.
+# #' @param row.names An optional `character` vector of rownames. We do not
+# #'   recommend using this parameter, it is included for S3 method consistency
+# #'   with `as.data.frame`.
+# #' @param optional `logical` Is it optional for row and column names to be
+# #'   valid R names? If FALSE will use the make.names function to ensure the
+# #'   row and column names are valid R names. Defaults to TRUE.
+# #' @param ... Does nothing.
+# #'
+# #' @param from `LongTable` Object to coerce.
+# #' 
+# #' @return `data.frame` containing the data from the LongTable, with the
+# #'   `longTableDataMapper' attribute containg the metadata needed to reverse
+# #'   the coercion operation.
+# #'
+# #' @importFrom data.table data.table
+# #' @export
+# as.data.frame.long.table <- function(x, row.names, optional=TRUE, ...) {
+#     DF <- as(x, 'data.frame')
+#     if (!missing(row.names)) {
+#         if (!is.character(x) || length(row.names) != nrow(DF))
+#             stop(.errorMsg('[CoreGx::as.data.frame.LongTable] The row.names ',
+#                 'argument must be a character vector with length equal to ',
+#                 nrow(DF)))
+#         if (!optional) {
+#             row.names <- make.names(row.names)
+#             colnames(DF) <- make.names(colnames(DF))
+#         }
+#         rownames(DF) <- row.names
+#     }
+#     DF
+# }
 
 
 #' @title Coerce to data.table to LongTable

@@ -3,24 +3,8 @@
 %   R/methods-coerce.R
 \name{as}
 \alias{as}
-\alias{as.data.frame.long.table}
 \title{Coerce a \code{LongTable} to a \code{TreatmentResponseExperiment}}
-\usage{
-\method{as.data.frame}{long.table}(x, row.names, optional = TRUE, ...)
-}
 \arguments{
-\item{x}{\code{LongTable} to coerce to \code{data.frame}.}
-
-\item{row.names}{An optional \code{character} vector of rownames. We do not
-recommend using this parameter, it is included for S3 method consistency
-with \code{as.data.frame}.}
-
-\item{optional}{\code{logical} Is it optional for row and column names to be
-valid R names? If FALSE will use the make.names function to ensure the
-row and column names are valid R names. Defaults to TRUE.}
-
-\item{...}{Does nothing.}
-
 \item{from}{A \code{LongTableDataMapper} to coerce.}
 }
 \value{
@@ -32,10 +16,6 @@ A \code{data.table} with the data from a LongTable.
 \code{data.table} containing the data from the LongTable, with the
 `longTableDataMapper' attribute containg the metadata needed to reverse
 the coercing operation.
-
-\code{data.frame} containing the data from the LongTable, with the
-`longTableDataMapper' attribute containg the metadata needed to reverse
-the coercion operation.
 
 \code{LongTable} object configured with the longTableDataMapper
 
@@ -52,8 +32,6 @@ Coerce a LongTable into a \code{data.table}.
 
 Currently only supports coercing to data.table or data.frame
 
-S3 version of coerce method fro convenience.
-
 Coerce a data.table with the proper configuration attributes
 back to a LongTable
 }
@@ -64,8 +42,6 @@ TRE <- as(treatmentResponse(clevelandSmall_cSet),
 TRE
 
 as(merckLongTable, 'data.table')
-
-as(merckLongTable, 'data.frame')
 
 dataTable <- as(merckLongTable, 'data.table')
 print(attr(dataTable, 'longTableDataMapper')) # Method doesn't work without this
