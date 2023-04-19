@@ -96,9 +96,9 @@ setAs('LongTable', 'data.table', def=function(from) {
 #' @return A `data.table` containing the data from the LongTable, as well
 #'   as the `longTableDataMapper' attribute which contains the data needed to
 #'   reverse the coercion.
-#'
 #' @export
-as.data.table.long.table <- function(from) as(from, 'data.table')
+as.data.table.long.table <- function(from, ...) as(from, 'data.table')
+
 #' @title Coerce a LongTable into a `data.frame`
 #' @name as
 #'
