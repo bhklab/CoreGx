@@ -1,5 +1,8 @@
 # CoreGx News File
 
+# v 2.3.6
+* Updated a definition of `updateObject` method (Bioc 3.19 bugfix)
+
 # v 2.1.7
 * Fixed a bug when deleting a `TreatmentResponseExperiment` assay via `NULL` assignment
 * Added a names S4 method fo `TreatmentResponseExperiment` to enable tab autocomplete with `$` access in interative sessions
