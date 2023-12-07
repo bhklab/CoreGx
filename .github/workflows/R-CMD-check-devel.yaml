@@ -60,8 +60,8 @@ jobs:
         config:
           - {
             os: ubuntu-latest,
-            r: '4.3',
-            bioc: '3.17',
+            r: '4.4',
+            bioc: '3.19',
             cont: "bioconductor/bioconductor_docker:devel",
             rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
             }
