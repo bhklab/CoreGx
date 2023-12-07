@@ -188,12 +188,12 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     setkeyv(rowData, "rowKey")
     assayIndex <- assayIndex[
         rowData[, c(rowIDs, "rowKey"), with=FALSE], ,
-        on="rowKey"
+        on="rowKey", allow.cartesian=TRUE
     ]
     setkeyv(colData, "colKey")
     assayIndex <- assayIndex[
         colData[, c(colIDs, "colKey"), with=FALSE], ,
-        on="colKey"
+        on="colKey", allow.cartesian=TRUE
     ]
     setkeyv(assayIndex, c(rowIDs, colIDs))
     for (nm in names(assays)) {

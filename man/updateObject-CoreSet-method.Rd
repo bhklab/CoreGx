@@ -4,13 +4,16 @@
 \alias{updateObject,CoreSet-method}
 \title{Update the \code{CoreSet} class after changes in it struture or API}
 \usage{
-\S4method{updateObject}{CoreSet}(object, verify = FALSE)
+\S4method{updateObject}{CoreSet}(object, verify = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{object}{A \code{CoreSet} object to update the class structure for.}
 
 \item{verify}{A \code{logical(1)} indicating is \code{validObject} should be called
 after updating the object. Defaults to \code{TRUE}, only set \code{FALSE} for debugging.}
+
+\item{verbose}{TRUE or FALSE, indicating whether information about the update
+should be reported}
 }
 \value{
 \code{CoreSet} with update class structure.
