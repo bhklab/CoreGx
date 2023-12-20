@@ -259,10 +259,24 @@ setClassUnion('list_OR_LongTable', c('list', 'LongTable'))
 
 # ---- LongTable Class Methods
 
-#' @include allGenerics.R
-NULL
+#' Helper function to print slot information
+#' @param slotName `character` The name of the slot to print.
+#' @param slotData `data.table` The data to print.
+#' 
+#' @keywords internal
+printSlot <- function(slotName, slotData) {
+    slotCols <- ncol(slotData)
+    slotString <- paste0(slotName, '(', slotCols, '): ')
+    slotColnames <- colnames(slotData)
+    slotNamesString <-
+        if (length(slotColnames) > 6) {
+            paste0(.collapse(head(slotColnames, 3)), ' ... ', .collapse(tail(slotColnames, 3)))
+        } else {
+            .collapse(slotColnames)
+        }
+    cat("  ", yellow$bold(slotString) %+% green(slotNamesString), '\n')
+}
 
-## NOTE:: Issues printing are caused by ggplot::%+% over riding crayon::%+%
 #' Show method for the LongTable class
 #'
 #' @examples
@@ -281,7 +295,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
 
     # ---- class descriptions
     cat(yellow$bold$italic(paste0("<", class(object)[1], ">"), '\n'))
-    cat(yellow$bold('dim: ', .collapse(dim(object)), '\n'))
+    cat("  ", yellow$bold('dim: ', .collapse(dim(object)), '\n'))
 
     # --- assays slot
     assayLength <- length(assayNames(object))
@@ -291,7 +305,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
     if (nchar(assayNamesString) > options("width")) {
         assayNamesString <- paste0(strwrap(assayNamesString), collapse="\n  ")
     }
-    cat(yellow$bold(assaysString) %+% red(assayNamesString), '\n')
+    cat("  ", yellow$bold(assaysString) %+% red(assayNamesString), '\n')
 
     # --- rownames
     rows <- nrow(rowData(object))
@@ -303,19 +317,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
         } else {
             .collapse(rowNames)
         }
-    cat(yellow$bold(rowsString) %+% green(rownamesString), '\n')
+    cat("  ", yellow$bold(rowsString) %+% green(rownamesString), '\n')
 
     # ---- rowData slot
-    rowCols <- ncol(rowData(object))
-    rowDataString <- paste0('rowData(', rowCols, '): ')
-    rowColnames <- colnames(rowData(object))
-    rowDataNamesString <-
-        if (length(rowColnames) > 6) {
-            paste0(.collapse(head(rowColnames, 3)), ' ... ', .collapse(tail(rowColnames, 3)))
-        } else {
-            .collapse(rowColnames)
-        }
-    cat(yellow$bold(rowDataString) %+% green(rowDataNamesString), '\n')
+    printSlot('rowData', rowData(object))
 
     # ---- colnames
     cols <- nrow(colData(object))
@@ -327,20 +332,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
         } else {
             .collapse(colnames)
         }
-    cat(yellow$bold(colsString) %+% green(colnamesString), '\n')
+    cat("  ", yellow$bold(colsString) %+% green(colnamesString), '\n')
 
     # ---- colData slot
-    colCols <- ncol(colData(object))
-    colDataString <- paste0('colData(', colCols, '): ')
-    colColnames <- colnames(colData(object))
-    colDataNamesString <-
-        if (length(colColnames) > 6) {
-            paste0(.collapse(head(colColnames, 3)), ' ... ', .collapse(tail(colColnames, 3)))
-        } else {
-            .collapse(colColnames)
-        }
-    cat(yellow$bold(colDataString) %+% green(colDataNamesString), '\n')
-
+    printSlot('colData', colData(object))
 
     # --- metadata slot
     metadataString <- paste0('metadata(', length(metadata(object)), '): ')
@@ -353,7 +348,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
         } else {
             'none'
         }
-    cat(yellow$bold(metadataString) %+% green(metadataNamesString), '\n')
+    cat("  ", yellow$bold(metadataString) %+% green(metadataNamesString), '\n')
 })
 
 

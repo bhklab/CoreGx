@@ -414,7 +414,9 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
 #'
 #' @return Prints the CoreSet object to the output stream, and returns
 #'   invisible NULL.
-#'
+#' 
+#' @importFrom crayon %+% yellow red green blue cyan magenta
+#' 
 #' @md
 #' @export
 setMethod("show", signature=signature(object="CoreSet"), function(object) {
@@ -425,15 +427,22 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
             "the object for compatibility with the current release."),
             call.=FALSE)
 
-    cat(paste0("<", class(object)[1], ">\n"))
+    cat(yellow$bold$italic(paste0("<", class(object)[1], ">\n")))
     space <- "  "
-    cat("Name: ", name(object), "\n")
-    cat("Date Created: ", dateCreated(object), "\n")
-    cat("Number of samples: ", nrow(sampleInfo(object)), "\n")
+    cat(yellow$bold$italic("Name: ") %+% name(object), "\n")
+
+    cat(yellow$bold$italic("Date Created: ") %+% dateCreated(object), "\n")
+
+    # cat("Number of samples: ", nrow(sampleInfo(object)), "\n")
+    cat(yellow$bold$italic("Number of samples: "), nrow(sampleInfo(object)), "\n")
+
+
+
     mProfiles <- molecularProfilesSlot(object)
     mProfileNames <- names(mProfiles)
-    cat("Molecular profiles:\n")
+    cat("Molecular profiles: \n")
     if (is(mProfiles, "MultiAssayExperiment")) {
+        cat(yellow$bold$italic(paste0("<", class(mProfiles)[1], ">"), '\n'))
         showMAE <- capture.output(show(mProfiles))
         dropAfter <- which(grepl("Functionality", showMAE)) - 1
         showCompactMAE <- showMAE[1:dropAfter]
@@ -456,10 +465,11 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
             )
         }
     }
-    cat("Treatment response:\n")
+    cat("Treatment response: \n")
     if (is(treatmentResponse(object), "LongTable")) {
-        showLT <- capture.output(show(treatmentResponse(object)))
-        cat(space, paste0(showLT, collapse="\n  "), "\n")
+        show(treatmentResponse(object))
+        # showLT <- capture.output(show(treatmentResponse(object)))
+        # cat(space, paste0(showLT, collapse="\n  "), "\n")
     } else {
         cat("Drug pertubation:\n")
         cat(space,
