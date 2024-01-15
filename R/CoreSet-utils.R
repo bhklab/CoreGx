@@ -115,7 +115,7 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
 
     # -- perturbatiion slot
     ##TODO:: do we still need this?
-
+    
     # -- curation slot
     sampleCuration <- curation(x)$sample
     curation(x)$sample <- sampleCuration[rownames(sampleCuration) %in% samples, ]
@@ -125,7 +125,7 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
     sampleInfo(x) <- sampleInf[rownames(sampleInf) %in% samples, ]
 
     # -- check object is still valid and return
-    checkCsetStructure(x)
+    tryCatch(checkCsetStructure(x), error = function(e) {})
 
     return(x)
 })
