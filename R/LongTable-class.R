@@ -180,36 +180,58 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         .nm <- paste0(".", nm)
         assays[[nm]][, (.nm) := .I]
     }
-
+    
     # build the index mapping assay rows to rowKey and colKey
+    cat(.infoMsg("Building assay index...\n", time=TRUE))
     assayIndex <- expand.grid(rowKey=rowData$rowKey, colKey=colData$colKey)
     setDT(assayIndex)
-    setkeyv(assayIndex, c("rowKey", "colKey"))
+    # setkeyv(assayIndex, c("rowKey", "colKey"))
+    
+    cat(.infoMsg("Joining rowData to assayIndex...\n", time=TRUE))
     setkeyv(rowData, "rowKey")
+    setkeyv(assayIndex, "rowKey")
     assayIndex <- assayIndex[
         rowData[, c(rowIDs, "rowKey"), with=FALSE], ,
-        on="rowKey", allow.cartesian=TRUE
+        on="rowKey", allow.cartesian=FALSE
     ]
+
+    # print if rowKey in rowData is not unique
+    if(nrow(rowData) != uniqueN(rowData$rowKey)) {
+        cat(.warnMsg("rowData rowKey is not unique!"))
+        show(assayIndex)
+        show(rowData)
+    }
+
+    gc()
+    cat(.infoMsg("Joining colData to assayIndex...\n", time=TRUE))
     setkeyv(colData, "colKey")
     assayIndex <- assayIndex[
         colData[, c(colIDs, "colKey"), with=FALSE], ,
-        on="colKey", allow.cartesian=TRUE
+        on="colKey", allow.cartesian=FALSE
     ]
+    gc()
+    cat(.infoMsg("Joining assays to assayIndex...\n", time=TRUE))
     setkeyv(assayIndex, c(rowIDs, colIDs))
     for (nm in names(assays)) {
         .nm <- paste0(".", nm)
         assayIndex[assays[[nm]], (.nm) := get(.nm)]
     }
+    gc()
     assayIndex[, (c(rowIDs, colIDs)) := NULL]
     assayIndex <- assayIndex[
         which(rowAnys(!is.na(assayIndex[, paste0(".", names(assays)), with=FALSE]))),
     ]
+    gc()
+    cat(.infoMsg("Setting assayIndex key...\n", time=TRUE))
     setkeyv(assayIndex, paste0(".", names(assays)))
     internals$assayIndex <- assayIndex
+
 
     # make internals immutable to prevent users from modifying structural metadata
     internals <- immutable(internals)
 
+    gc()
+    cat(.infoMsg("Building LongTable...\n", time=TRUE))
     # Drop extra assay columns and key by the assay key in the assay index
     for (i in seq_along(assays)) {
         assays[[i]][, (assayIDs[[i]]) := NULL]

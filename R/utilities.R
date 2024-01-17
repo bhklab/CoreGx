@@ -953,33 +953,68 @@
 #' Returns a colorized error message (magenta)
 #'
 #' @examples
-#' cat(.errorMsg('This ', 'is ', 'an ', 'error ', 'message'))
+#' cat(.errorMsg('This ', 'is ', 'an ', 'error ', 'message', time = TRUE))
 #'
 #' @param ... `pairlist` One or more strings or character vectors, also
 #'   accepts any params to paste0.
+#' @param time `logical` Indicates whether to include timestamp or not. Default is FALSE.
 #'
 #' @return `character` Colorized string with results from paste0(...)
 #'
 #' @keywords internal
 #' @export
 #' @noRd
-.errorMsg <- function(..., collapse=', ') magenta$bold(paste0(..., collapse=collapse))
+.errorMsg <- function(..., time = FALSE, collapse=', ') {
+    msg <- paste0(..., collapse=collapse)
+    if (time) {
+        timestamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+        msg <- paste0(timestamp, " ", msg)
+    }
+    magenta$bold(msg)
+}
 
 #' Returns a colorized warning message (cyan)
 #'
 #' @examples
-#' cat(.warnMsg('This ', 'is ', 'a ', 'warning ', 'message'))
+#' cat(.warnMsg('This ', 'is ', 'a ', 'warning ', 'message', time = TRUE))
 #'
 #' @param ... `pairlist` One or more strings or character vectors, also
 #'   accepts any params to paste0.
+#' @param time `logical` Indicates whether to include timestamp or not. Default is FALSE.
 #'
 #' @return `character` Colorized string with results from paste0(...)
 #'
 #' @keywords internal
 #' @export
 #' @noRd
-.warnMsg <- function(..., collapse=', ') cyan$bold(paste0(..., collapse=collapse))
+.warnMsg <- function(..., time = FALSE, collapse=', ') {
+    msg <- paste0(..., collapse=collapse)
+    if (time) {
+        timestamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+        msg <- paste0(timestamp, " ", msg)
+    }
+    cyan$bold(msg)
+}
 
+#' Returns a colorized info message (green)
+#' @examples
+#' cat(.infoMsg('This ', 'is ', 'an ', 'info ', 'message', time = TRUE))
+#' @param ... `pairlist` One or more strings or character vectors, also
+#'  accepts any params to paste0.
+#' @param time `logical` Indicates whether to include timestamp or not. Default is FALSE.
+#' @return `character` Colorized string with results from paste0(...)
+#' @keywords internal
+#' @export
+#' @noRd
+#' @aliases .info
+.infoMsg <- function(..., time = FALSE, collapse=', ') {
+    msg <- paste0(..., collapse=collapse)
+    if (time) {
+        timestamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+        msg <- paste0(timestamp, " ", msg)
+    }
+    green$bold(msg)
+}
 
 #' Get the types of all items in a list
 #'
