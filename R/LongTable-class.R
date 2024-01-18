@@ -190,10 +190,15 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     cat(.infoMsg("Joining rowData to assayIndex...\n", time=TRUE))
     setkeyv(rowData, "rowKey")
     setkeyv(assayIndex, "rowKey")
-    assayIndex <- assayIndex[
-        rowData[, c(rowIDs, "rowKey"), with=FALSE], ,
-        on="rowKey", allow.cartesian=FALSE
-    ]
+    # assayIndex <- assayIndex[
+    #     rowData[, c(rowIDs, "rowKey"), with=FALSE], ,
+    #     on="rowKey", allow.cartesian=FALSE
+    # ]
+    rd <- rowData[, c(rowIDs, "rowKey"), with=FALSE]
+    assayIndex <- merge(
+        assayIndex, rd,
+        by="rowKey", all.x=TRUE, allow.cartesian=FALSE
+    )
 
     # print if rowKey in rowData is not unique
     if(nrow(rowData) != uniqueN(rowData$rowKey)) {
@@ -201,17 +206,27 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         show(assayIndex)
         show(rowData)
     }
-
+    rm(rd)
     gc()
     cat(.infoMsg("Joining colData to assayIndex...\n", time=TRUE))
     setkeyv(colData, "colKey")
-    assayIndex <- assayIndex[
-        colData[, c(colIDs, "colKey"), with=FALSE], ,
-        on="colKey", allow.cartesian=FALSE
-    ]
+    # assayIndex <- assayIndex[
+    #     colData[, c(colIDs, "colKey"), with=FALSE], ,
+    #     on="colKey", allow.cartesian=FALSE
+    # ]
+    cd <- colData[, c(colIDs, "colKey"), with=FALSE]
+    assayIndex <- merge(
+        assayIndex, cd,
+        by="colKey", all.x=TRUE, allow.cartesian=FALSE
+    )
+    rm(cd)
     gc()
     cat(.infoMsg("Joining assays to assayIndex...\n", time=TRUE))
+
+    # Set the key variables for the assayIndex using rowIDs and colIDs
     setkeyv(assayIndex, c(rowIDs, colIDs))
+
+
     for (nm in names(assays)) {
         .nm <- paste0(".", nm)
         assayIndex[assays[[nm]], (.nm) := get(.nm)]
@@ -254,6 +269,11 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     return(CoreGx:::.LongTable(rowData=rowData, colData=colData, assays=assays,
         metadata=metadata, .intern=internals))
 }
+
+#' Function to combine two LongTables into a single LongTable
+#' @param x A `LongTable` object
+#' @param y A `LongTable` object
+#' 
 
 # ---- Class unions for CoreSet slots
 #' A class union to allow multiple types in a CoreSet slot
