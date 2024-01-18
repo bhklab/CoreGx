@@ -414,7 +414,9 @@ CoreSet2 <- function(name="emptySet", treatment=data.frame(),
 #'
 #' @return Prints the CoreSet object to the output stream, and returns
 #'   invisible NULL.
-#'
+#' 
+#' @importFrom crayon %+% yellow red green blue cyan magenta
+#' 
 #' @md
 #' @export
 setMethod("show", signature=signature(object="CoreSet"), function(object) {
@@ -425,20 +427,54 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
             "the object for compatibility with the current release."),
             call.=FALSE)
 
-    cat(paste0("<", class(object)[1], ">\n"))
+    cat(yellow$bold$italic(paste0("<", class(object)[1], ">\n")))
     space <- "  "
-    cat("Name: ", name(object), "\n")
-    cat("Date Created: ", dateCreated(object), "\n")
-    cat("Number of samples: ", nrow(sampleInfo(object)), "\n")
+    cat(yellow$bold$italic("Name: ") %+% green(name(object)), "\n")
+
+    cat(yellow$bold$italic("Date Created: ") %+% green(dateCreated(object)), "\n")
+
+    # cat("Number of samples: ", nrow(sampleInfo(object)), "\n")
+    cat(yellow$bold$italic("Number of samples: "), green(nrow(sampleInfo(object))), "\n")
+
     mProfiles <- molecularProfilesSlot(object)
     mProfileNames <- names(mProfiles)
-    cat("Molecular profiles:\n")
     if (is(mProfiles, "MultiAssayExperiment")) {
-        showMAE <- capture.output(show(mProfiles))
-        dropAfter <- which(grepl("Functionality", showMAE)) - 1
-        showCompactMAE <- showMAE[1:dropAfter]
-        cat(space, paste0(showCompactMAE, collapse="\n  "), "\n")
+        cat(yellow$bold$italic("Molecular profiles: "))
+        cat(yellow$bold$italic(paste0("<", class(mProfiles)[1], ">"), '\n'))
+
+        # changing this to just experiments() as its cleaner
+        # showMAE <- capture.output(show(mProfiles))
+        # dropAfter <- which(grepl("Functionality", showMAE)) - 1
+        # showCompactMAE <- showMAE[1:dropAfter]
+        # cat(space, paste0(showCompactMAE, collapse="\n  "), "\n")
+
+        showExp <- capture.output(experiments(mProfiles))
+        cat(space, yellow$bold(showExp[1], '\n'))
+
+        # iterate through rest of experiments 
+        # split by ":" and print the first element in yellow, the rest in cyan
+        for (i in 2:length(showExp)) {
+            splitExp <- strsplit(showExp[i], ":")[[1]]
+            
+            # print the first 5 characters in splitExp[1] in yellow
+            cat(space, yellow$bold(substr(splitExp[1], 1, 5)))
+            # print after the first 5 characters in spllitExp[1] in cyan
+            cat(
+                red(substr(splitExp[1], 6, nchar(splitExp[1]))),
+                green(paste0(":", splitExp[2:length(splitExp)], collapse=":"),'\n'))
+        }
+
+        # samplenames <- sort(sampleNames(object))
+        # samplenames <- 
+        #     if (length(samplenames) > 6) {
+        #         paste0(.collapse(head(samplenames, 3)), ' ... ', .collapse(tail(samplenames, 3)))
+        #     } else {
+        #         .collapse(samplenames)
+        #     }
+        # x <- yellow$bold(paste0("colnames(", length(sampleNames(object)), "):"))
+        # cat(space, x, green(samplenames), "\n")
     } else {
+        cat(yellow$bold$italic("Molecular profiles: \n"))
         if (!length(mProfileNames)) cat(space, "None\n")
         for (item in mProfileNames) {
             title <- switch(item,
@@ -456,10 +492,11 @@ setMethod("show", signature=signature(object="CoreSet"), function(object) {
             )
         }
     }
-    cat("Treatment response:\n")
+    cat(yellow$bold$italic("Treatment response: "))
     if (is(treatmentResponse(object), "LongTable")) {
-        showLT <- capture.output(show(treatmentResponse(object)))
-        cat(space, paste0(showLT, collapse="\n  "), "\n")
+        show(treatmentResponse(object))
+        # showLT <- capture.output(show(treatmentResponse(object)))
+        # cat(space, paste0(showLT, collapse="\n  "), "\n")
     } else {
         cat("Drug pertubation:\n")
         cat(space,
@@ -1013,7 +1050,7 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
     # -- sample identifiers
     colDataL <- lapply(experiments(MAE), FUN=colData)
     colColNameL <- as(lapply(colDataL, FUN=colnames), 'List')
-    hasSampleId <- any(colColNameL %in% 'sampleid')
+    hasSampleId <- any(colColNameL %in%  'sampleid')
     if (!all(hasSampleId)) {
         nmsg <- .formatMessage('All SummarizedExperiments must have a sampleid
             column. This is not the case for ',
@@ -1037,6 +1074,8 @@ checkCsetStructure <- function(object, plotDist=FALSE, result.dir=tempdir()) {
 
     # ---- Check all samples are in the @sample slot
     samples <- sampleNames(object)
+
+    
     sampleIdL <- as(lapply(colDataL, `[[`, i='sampleid'), 'List')
     hasValidSamples <- sampleIdL %in% samples
     if (!all(all(hasValidSamples))) {

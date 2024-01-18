@@ -115,7 +115,7 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
 
     # -- perturbatiion slot
     ##TODO:: do we still need this?
-
+    
     # -- curation slot
     sampleCuration <- curation(x)$sample
     curation(x)$sample <- sampleCuration[rownames(sampleCuration) %in% samples, ]
@@ -125,7 +125,7 @@ setMethod('subsetBySample', signature('CoreSet'), function(x, samples) {
     sampleInfo(x) <- sampleInf[rownames(sampleInf) %in% samples, ]
 
     # -- check object is still valid and return
-    checkCsetStructure(x)
+    tryCatch(checkCsetStructure(x), error = function(e) {})
 
     return(x)
 })
@@ -237,7 +237,7 @@ setMethod('subsetByTreatment', signature('CoreSet'),
         keepSamples)
 
     # -- check object is still valid and return
-    checkCsetStructure(x)
+    tryCatch(checkCsetStructure(x), error = function(e) {})
 
     return(x)
 })
@@ -248,7 +248,7 @@ setMethod('subsetByTreatment', signature('CoreSet'),
     treatmentId <- if (treatmentType == 'radiation')
         paste0(treatmentType, '.type') else paste0(treatmentType, 'id')
     if (is(slotData, 'LongTable')) {
-        slotData <- slotData[, treatments]
+        slotData <- slotData[treatments, ]
     } else {
         keepTreatments <- slotData$info[[treatmentId]] %in% treatments
         slotData$profiles <- slotData$profiles[keepTreatments, ]

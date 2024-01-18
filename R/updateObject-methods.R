@@ -3,7 +3,8 @@
 #' @param object A `CoreSet` object to update the class structure for.
 #' @param verify A `logical(1)` indicating is `validObject` should be called
 #' after updating the object. Defaults to `TRUE`, only set `FALSE` for debugging.
-#'
+#' @param verbose TRUE or FALSE, indicating whether information about the update
+#' should be reported
 #' @return `CoreSet` with update class structure.
 #'
 #' @md
@@ -12,7 +13,12 @@
 #' @importMethodsFrom BiocGenerics updateObject
 #' @export
 setMethod('updateObject', signature(object="CoreSet"),
-        function(object, verify=FALSE) {
+        function(object, verify=FALSE, verbose = FALSE) {
+
+    if (verbose) {
+        message("updateObject object = 'CoreSet'")
+    }
+    
     if (!.hasSlot(object, "sample")) {
         cell <- object@cell
         sample_ <- cell
@@ -88,7 +94,8 @@ setMethod('updateObject', signature(object="CoreSet"),
 #' @param object A `LongTable` object to update the class structure for.
 #' @param verify A `logical(1)` indicating is `validObject` should be called
 #' after updating the object. Defaults to `TRUE`, only set `FALSE` for debugging.
-#'
+#' @param verbose TRUE or FALSE, indicating whether information about the update
+#' should be reported
 #' @return `LongTable` with update class structure.
 #'
 #' @md
@@ -96,7 +103,11 @@ setMethod('updateObject', signature(object="CoreSet"),
 #' @importMethodsFrom BiocGenerics updateObject
 #' @export
 setMethod("updateObject", signature(object="LongTable"),
-        function(object, verify=FALSE) {
+        function(object, verify=FALSE, verbose = FALSE) {
+
+     if (verbose) {
+        message("updateObject object = 'CoreSet'")
+    }
     if (is.environment(getIntern(object))) {
         rData <- rowData(object, key=TRUE)
         rIDs <- rowIDs(object)

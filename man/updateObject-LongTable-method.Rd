@@ -4,13 +4,16 @@
 \alias{updateObject,LongTable-method}
 \title{Update the \code{LongTable} class after changes in it struture or API}
 \usage{
-\S4method{updateObject}{LongTable}(object, verify = FALSE)
+\S4method{updateObject}{LongTable}(object, verify = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{object}{A \code{LongTable} object to update the class structure for.}
 
 \item{verify}{A \code{logical(1)} indicating is \code{validObject} should be called
 after updating the object. Defaults to \code{TRUE}, only set \code{FALSE} for debugging.}
+
+\item{verbose}{TRUE or FALSE, indicating whether information about the update
+should be reported}
 }
 \value{
 \code{LongTable} with update class structure.

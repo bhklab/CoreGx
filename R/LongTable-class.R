@@ -180,36 +180,73 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         .nm <- paste0(".", nm)
         assays[[nm]][, (.nm) := .I]
     }
-
+    
     # build the index mapping assay rows to rowKey and colKey
+    cat(.infoMsg("Building assay index...\n", time=TRUE))
     assayIndex <- expand.grid(rowKey=rowData$rowKey, colKey=colData$colKey)
     setDT(assayIndex)
-    setkeyv(assayIndex, c("rowKey", "colKey"))
+    # setkeyv(assayIndex, c("rowKey", "colKey"))
+    
+    cat(.infoMsg("Joining rowData to assayIndex...\n", time=TRUE))
     setkeyv(rowData, "rowKey")
-    assayIndex <- assayIndex[
-        rowData[, c(rowIDs, "rowKey"), with=FALSE], ,
-        on="rowKey"
-    ]
+    setkeyv(assayIndex, "rowKey")
+    # assayIndex <- assayIndex[
+    #     rowData[, c(rowIDs, "rowKey"), with=FALSE], ,
+    #     on="rowKey", allow.cartesian=FALSE
+    # ]
+    rd <- rowData[, c(rowIDs, "rowKey"), with=FALSE]
+    assayIndex <- merge(
+        assayIndex, rd,
+        by="rowKey", all.x=TRUE, allow.cartesian=FALSE
+    )
+
+    # print if rowKey in rowData is not unique
+    if(nrow(rowData) != uniqueN(rowData$rowKey)) {
+        cat(.warnMsg("rowData rowKey is not unique!"))
+        show(assayIndex)
+        show(rowData)
+    }
+    rm(rd)
+    gc()
+    cat(.infoMsg("Joining colData to assayIndex...\n", time=TRUE))
     setkeyv(colData, "colKey")
-    assayIndex <- assayIndex[
-        colData[, c(colIDs, "colKey"), with=FALSE], ,
-        on="colKey"
-    ]
+    # assayIndex <- assayIndex[
+    #     colData[, c(colIDs, "colKey"), with=FALSE], ,
+    #     on="colKey", allow.cartesian=FALSE
+    # ]
+    cd <- colData[, c(colIDs, "colKey"), with=FALSE]
+    assayIndex <- merge(
+        assayIndex, cd,
+        by="colKey", all.x=TRUE, allow.cartesian=FALSE
+    )
+    rm(cd)
+    gc()
+    cat(.infoMsg("Joining assays to assayIndex...\n", time=TRUE))
+
+    # Set the key variables for the assayIndex using rowIDs and colIDs
     setkeyv(assayIndex, c(rowIDs, colIDs))
+
+
     for (nm in names(assays)) {
         .nm <- paste0(".", nm)
         assayIndex[assays[[nm]], (.nm) := get(.nm)]
     }
+    gc()
     assayIndex[, (c(rowIDs, colIDs)) := NULL]
     assayIndex <- assayIndex[
         which(rowAnys(!is.na(assayIndex[, paste0(".", names(assays)), with=FALSE]))),
     ]
+    gc()
+    cat(.infoMsg("Setting assayIndex key...\n", time=TRUE))
     setkeyv(assayIndex, paste0(".", names(assays)))
     internals$assayIndex <- assayIndex
+
 
     # make internals immutable to prevent users from modifying structural metadata
     internals <- immutable(internals)
 
+    gc()
+    cat(.infoMsg("Building LongTable...\n", time=TRUE))
     # Drop extra assay columns and key by the assay key in the assay index
     for (i in seq_along(assays)) {
         assays[[i]][, (assayIDs[[i]]) := NULL]
@@ -232,6 +269,11 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     return(CoreGx:::.LongTable(rowData=rowData, colData=colData, assays=assays,
         metadata=metadata, .intern=internals))
 }
+
+#' Function to combine two LongTables into a single LongTable
+#' @param x A `LongTable` object
+#' @param y A `LongTable` object
+#' 
 
 # ---- Class unions for CoreSet slots
 #' A class union to allow multiple types in a CoreSet slot
@@ -259,10 +301,24 @@ setClassUnion('list_OR_LongTable', c('list', 'LongTable'))
 
 # ---- LongTable Class Methods
 
-#' @include allGenerics.R
-NULL
+#' Helper function to print slot information
+#' @param slotName `character` The name of the slot to print.
+#' @param slotData `data.table` The data to print.
+#' 
+#' @keywords internal
+printSlot <- function(slotName, slotData) {
+    slotCols <- ncol(slotData)
+    slotString <- paste0(slotName, '(', slotCols, '): ')
+    slotColnames <- colnames(slotData)
+    slotNamesString <-
+        if (length(slotColnames) > 6) {
+            paste0(.collapse(head(slotColnames, 3)), ' ... ', .collapse(tail(slotColnames, 3)))
+        } else {
+            .collapse(slotColnames)
+        }
+    cat("  ", yellow$bold(slotString) %+% green(slotNamesString), '\n')
+}
 
-## NOTE:: Issues printing are caused by ggplot::%+% over riding crayon::%+%
 #' Show method for the LongTable class
 #'
 #' @examples
@@ -281,7 +337,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
 
     # ---- class descriptions
     cat(yellow$bold$italic(paste0("<", class(object)[1], ">"), '\n'))
-    cat(yellow$bold('dim: ', .collapse(dim(object)), '\n'))
+    cat("  ", yellow$bold('dim: ', .collapse(dim(object)), '\n'))
 
     # --- assays slot
     assayLength <- length(assayNames(object))
@@ -291,7 +347,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
     if (nchar(assayNamesString) > options("width")) {
         assayNamesString <- paste0(strwrap(assayNamesString), collapse="\n  ")
     }
-    cat(yellow$bold(assaysString) %+% red(assayNamesString), '\n')
+    cat("  ", yellow$bold(assaysString) %+% red(assayNamesString), '\n')
 
     # --- rownames
     rows <- nrow(rowData(object))
@@ -303,19 +359,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
         } else {
             .collapse(rowNames)
         }
-    cat(yellow$bold(rowsString) %+% green(rownamesString), '\n')
+    cat("  ", yellow$bold(rowsString) %+% green(rownamesString), '\n')
 
     # ---- rowData slot
-    rowCols <- ncol(rowData(object))
-    rowDataString <- paste0('rowData(', rowCols, '): ')
-    rowColnames <- colnames(rowData(object))
-    rowDataNamesString <-
-        if (length(rowColnames) > 6) {
-            paste0(.collapse(head(rowColnames, 3)), ' ... ', .collapse(tail(rowColnames, 3)))
-        } else {
-            .collapse(rowColnames)
-        }
-    cat(yellow$bold(rowDataString) %+% green(rowDataNamesString), '\n')
+    printSlot('rowData', rowData(object))
 
     # ---- colnames
     cols <- nrow(colData(object))
@@ -327,20 +374,10 @@ setMethod('show', signature(object='LongTable'), function(object) {
         } else {
             .collapse(colnames)
         }
-    cat(yellow$bold(colsString) %+% green(colnamesString), '\n')
+    cat("  ", yellow$bold(colsString) %+% green(colnamesString), '\n')
 
     # ---- colData slot
-    colCols <- ncol(colData(object))
-    colDataString <- paste0('colData(', colCols, '): ')
-    colColnames <- colnames(colData(object))
-    colDataNamesString <-
-        if (length(colColnames) > 6) {
-            paste0(.collapse(head(colColnames, 3)), ' ... ', .collapse(tail(colColnames, 3)))
-        } else {
-            .collapse(colColnames)
-        }
-    cat(yellow$bold(colDataString) %+% green(colDataNamesString), '\n')
-
+    printSlot('colData', colData(object))
 
     # --- metadata slot
     metadataString <- paste0('metadata(', length(metadata(object)), '): ')
@@ -353,7 +390,7 @@ setMethod('show', signature(object='LongTable'), function(object) {
         } else {
             'none'
         }
-    cat(yellow$bold(metadataString) %+% green(metadataNamesString), '\n')
+    cat("  ", yellow$bold(metadataString) %+% green(metadataNamesString), '\n')
 })
 
 
