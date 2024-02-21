@@ -1664,17 +1664,23 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
 
     # Build the rownames
     .paste_colons <- function(...) paste(..., sep=':')
-    viability[, row_ids := Reduce(.paste_colons, mget(rowIDs(longTable)))]
-    viability[, col_ids := Reduce(.paste_colons, mget(colIDs(longTable)))]
-    viability[, rownames := paste0(row_ids, '_', col_ids)]
-    viability[, c('row_ids', 'col_ids') := NULL]
+    # viability[, row_ids := Reduce(.paste_colons, mget(rowIDs(longTable)))]
+    # viability[, col_ids := Reduce(.paste_colons, mget(colIDs(longTable)))]
+    # viability[, rownames := paste0(row_ids, '_', col_ids)]
+    # viability[, c('row_ids', 'col_ids') := NULL]
+
+    viability[, rownames := {
+        row_ids <- Reduce(.paste_colons, mget(rowIDs(longTable)))
+        col_ids <- Reduce(.paste_colons, mget(colIDs(longTable)))
+        paste0(row_ids, '_', col_ids)
+    }]
 
     # Merge the doses into vectors in a list column
     viability[, dose := Reduce(.paste_slashes, mget(colnames(.SD))),
-        .SDcols=patterns('^.*dose$')]
+        .SDcols=patterns('^.*[d|D]ose$')]
 
     # Repeat the dose values if there are more viabilities
-    numReplicates <- viability[, ncol(.SD), .SDcols=patterns('^viability.*')]
+    numReplicates <- viability[, ncol(.SD), .SDcols=patterns('^[V|v]iability.*')]
     if (numReplicates > 1) {
         viability[, paste0('dose', seq_len(numReplicates)) := dose]
         viability[, dose := NULL]
@@ -1687,7 +1693,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
     sensRaw[, , 'Dose'] <- as.matrix(viability[, .SD,
         .SDcols=patterns('^dose.*')])
     sensRaw[, , 'Viability'] <- as.matrix(viability[, .SD,
-        .SDcols=patterns('^viability.*')])
+        .SDcols=patterns('^[V|v]iability.*')])
 
     return(sensRaw)
 }
