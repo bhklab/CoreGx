@@ -434,7 +434,9 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "drug1id"   "drug2id"   "drug1dose" "drug2dose" "sampleid"  "batchid"  </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="assayIndex.html">assayIndex</a></span><span class="op">(</span><span class="va">nci_TRE_small</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;.sensitivity, .profiles, .assay_metadata&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       rowKey colKey .sensitivity .profiles .assay_metadata</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;int&gt;  &lt;int&gt;        &lt;int&gt;     &lt;int&gt;           &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:      1      1            1         1               1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:      1      2            2         2               2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:      1      3            3         3               3</span>
@@ -513,7 +515,9 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $assayIndex</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;.sensitivity, .profiles&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       rowKey colKey .sensitivity .profiles</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;int&gt;  &lt;int&gt;        &lt;int&gt;     &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:      1      1            1         1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:      1      3            2         2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:      1      5            3         3</span>
@@ -529,6 +533,7 @@ the object.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">rowData</span><span class="op">(</span><span class="va">merckLongTable</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           drug1id    drug2id drug1dose drug2dose         combination_name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            &lt;char&gt;     &lt;char&gt;     &lt;num&gt;     &lt;num&gt;                   &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1:         5-FU Bortezomib    0.3500   0.00045        5-FU &amp; Bortezomib</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   2:         5-FU Bortezomib    0.3500   0.00200        5-FU &amp; Bortezomib</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   3:         5-FU Bortezomib    0.3500   0.00900        5-FU &amp; Bortezomib</span>
@@ -545,6 +550,7 @@ the object.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">colData</span><span class="op">(</span><span class="va">merckLongTable</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     sampleid batchid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;   &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:    A2058       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2:    A2058       3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  3:    A2780       1</span>
@@ -560,7 +566,9 @@ the object.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get the keys as well, mostly for internal use</span></span></span>
 <span class="r-in"><span><span class="fu">colData</span><span class="op">(</span><span class="va">merckLongTable</span>, key<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;colKey&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     sampleid batchid colKey</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;   &lt;int&gt;  &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:    A2058       1      1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2:    A2058       3      2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  3:    A2780       1      3</span>
@@ -579,7 +587,9 @@ the object.</p></li>
 <span class="r-in"><span><span class="fu">assays</span><span class="op">(</span><span class="va">merckLongTable</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>column(s) not removed because not found: [.colnames]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $sensitivity</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;drug1id, drug2id, drug1dose, drug2dose, sampleid, batchid&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            drug1id    drug2id drug1dose drug2dose sampleid batchid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;     &lt;char&gt;     &lt;num&gt;     &lt;num&gt;   &lt;char&gt;   &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         5-FU Bortezomib    0.3500   0.00045    A2058       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         5-FU Bortezomib    0.3500   0.00045    A2780       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         5-FU Bortezomib    0.3500   0.00045     A375       1</span>
@@ -592,6 +602,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin  Topotecan    0.0223   0.07750     A427       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin  Topotecan    0.0223   0.07750    CAOV3       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               combination_name col Key .rownames row Key viability1 viability2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;   &lt;int&gt;    &lt;char&gt;   &lt;int&gt;      &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:        5-FU &amp; Bortezomib       1   A2058:1       1      0.814      0.754</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:        5-FU &amp; Bortezomib       3   A2780:1       1      0.214      0.195</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:        5-FU &amp; Bortezomib       5    A375:1       1      1.064      1.080</span>
@@ -604,6 +615,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin &amp; Topotecan       8    A427:1     744      0.142      0.166</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin &amp; Topotecan      10   CAOV3:1     744      0.091      0.084</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       viability3 viability4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:      0.765      0.849</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:      0.186      0.223</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:      1.082      1.009</span>
@@ -617,7 +629,9 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800:      0.134      0.119</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $profiles</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;drug1id, drug2id, drug1dose, drug2dose, sampleid, batchid&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            drug1id    drug2id drug1dose drug2dose sampleid batchid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;     &lt;char&gt;     &lt;num&gt;     &lt;num&gt;   &lt;char&gt;   &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         5-FU Bortezomib    0.3500   0.00045    A2058       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         5-FU Bortezomib    0.3500   0.00045    A2780       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         5-FU Bortezomib    0.3500   0.00045     A375       1</span>
@@ -630,6 +644,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin  Topotecan    0.0223   0.07750     A427       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin  Topotecan    0.0223   0.07750    CAOV3       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               combination_name col Key .rownames row Key mu/muMax_published</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;   &lt;int&gt;    &lt;char&gt;   &lt;int&gt;              &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:        5-FU &amp; Bortezomib       1   A2058:1       1              0.880</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:        5-FU &amp; Bortezomib       3   A2780:1       1              0.384</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:        5-FU &amp; Bortezomib       5    A375:1       1              1.033</span>
@@ -642,6 +657,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin &amp; Topotecan       8    A427:1     744             -0.012</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin &amp; Topotecan      10   CAOV3:1     744             -1.935</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       X/X0_published</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:          0.847</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:          0.426</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:          1.047</span>
@@ -665,7 +681,9 @@ the object.</p></li>
 <span class="r-in"><span><span class="co"># Default annotations, just the key columns</span></span></span>
 <span class="r-in"><span><span class="fu">assay</span><span class="op">(</span><span class="va">merckLongTable</span>, <span class="st">'sensitivity'</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>column(s) not removed because not found: [.colnames]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;drug1id, drug2id, drug1dose, drug2dose, sampleid, batchid&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            drug1id    drug2id drug1dose drug2dose sampleid batchid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;     &lt;char&gt;     &lt;num&gt;     &lt;num&gt;   &lt;char&gt;   &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         5-FU Bortezomib    0.3500   0.00045    A2058       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         5-FU Bortezomib    0.3500   0.00045    A2780       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         5-FU Bortezomib    0.3500   0.00045     A375       1</span>
@@ -678,6 +696,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin  Topotecan    0.0223   0.07750     A427       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin  Topotecan    0.0223   0.07750    CAOV3       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               combination_name col Key .rownames row Key i.col Key i..rownames</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;   &lt;int&gt;    &lt;char&gt;   &lt;int&gt;     &lt;int&gt;      &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:        5-FU &amp; Bortezomib       1   A2058:1       1         1     A2058:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:        5-FU &amp; Bortezomib       3   A2780:1       1         3     A2780:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:        5-FU &amp; Bortezomib       5    A375:1       1         5      A375:1</span>
@@ -690,6 +709,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin &amp; Topotecan       8    A427:1     744         8      A427:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin &amp; Topotecan      10   CAOV3:1     744        10     CAOV3:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       i.row Key viability1 viability2 viability3 viability4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;int&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         1      0.814      0.754      0.765      0.849</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         1      0.214      0.195      0.186      0.223</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         1      1.064      1.080      1.082      1.009</span>
@@ -703,7 +723,9 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800:       744      0.091      0.084      0.134      0.119</span>
 <span class="r-in"><span><span class="fu">assay</span><span class="op">(</span><span class="va">merckLongTable</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>column(s) not removed because not found: [.colnames]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;drug1id, drug2id, drug1dose, drug2dose, sampleid, batchid&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            drug1id    drug2id drug1dose drug2dose sampleid batchid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;     &lt;char&gt;     &lt;num&gt;     &lt;num&gt;   &lt;char&gt;   &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         5-FU Bortezomib    0.3500   0.00045    A2058       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         5-FU Bortezomib    0.3500   0.00045    A2780       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         5-FU Bortezomib    0.3500   0.00045     A375       1</span>
@@ -716,6 +738,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin  Topotecan    0.0223   0.07750     A427       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin  Topotecan    0.0223   0.07750    CAOV3       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               combination_name col Key .rownames row Key i.col Key i..rownames</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;   &lt;int&gt;    &lt;char&gt;   &lt;int&gt;     &lt;int&gt;      &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:        5-FU &amp; Bortezomib       1   A2058:1       1         1     A2058:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:        5-FU &amp; Bortezomib       3   A2780:1       1         3     A2780:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:        5-FU &amp; Bortezomib       5    A375:1       1         5      A375:1</span>
@@ -728,6 +751,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin &amp; Topotecan       8    A427:1     744         8      A427:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin &amp; Topotecan      10   CAOV3:1     744        10     CAOV3:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       i.row Key viability1 viability2 viability3 viability4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;int&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         1      0.814      0.754      0.765      0.849</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         1      0.214      0.195      0.186      0.223</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         1      1.064      1.080      1.082      1.009</span>
@@ -743,7 +767,9 @@ the object.</p></li>
 <span class="r-in"><span><span class="co"># With identifiers joined</span></span></span>
 <span class="r-in"><span><span class="fu">assay</span><span class="op">(</span><span class="va">merckLongTable</span>, <span class="st">'sensitivity'</span>, withDimnames<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>column(s) not removed because not found: [.colnames]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;drug1id, drug2id, drug1dose, drug2dose, sampleid, batchid&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            drug1id    drug2id drug1dose drug2dose sampleid batchid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;     &lt;char&gt;     &lt;num&gt;     &lt;num&gt;   &lt;char&gt;   &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         5-FU Bortezomib    0.3500   0.00045    A2058       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         5-FU Bortezomib    0.3500   0.00045    A2780       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         5-FU Bortezomib    0.3500   0.00045     A375       1</span>
@@ -756,6 +782,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin  Topotecan    0.0223   0.07750     A427       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin  Topotecan    0.0223   0.07750    CAOV3       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               combination_name col Key .rownames row Key i.col Key i..rownames</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;   &lt;int&gt;    &lt;char&gt;   &lt;int&gt;     &lt;int&gt;      &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:        5-FU &amp; Bortezomib       1   A2058:1       1         1     A2058:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:        5-FU &amp; Bortezomib       3   A2780:1       1         3     A2780:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:        5-FU &amp; Bortezomib       5    A375:1       1         5      A375:1</span>
@@ -768,6 +795,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin &amp; Topotecan       8    A427:1     744         8      A427:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin &amp; Topotecan      10   CAOV3:1     744        10     CAOV3:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       i.row Key viability1 viability2 viability3 viability4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;int&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         1      0.814      0.754      0.765      0.849</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         1      0.214      0.195      0.186      0.223</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         1      1.064      1.080      1.082      1.009</span>
@@ -783,7 +811,9 @@ the object.</p></li>
 <span class="r-in"><span><span class="co"># With identifiers and metadata</span></span></span>
 <span class="r-in"><span><span class="fu">assay</span><span class="op">(</span><span class="va">merckLongTable</span>, <span class="st">'profiles'</span>, withDimnames<span class="op">=</span><span class="cn">TRUE</span>, metadata<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>column(s) not removed because not found: [.colnames]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;drug1id, drug2id, drug1dose, drug2dose, sampleid, batchid&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            drug1id    drug2id drug1dose drug2dose sampleid batchid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;     &lt;char&gt;     &lt;num&gt;     &lt;num&gt;   &lt;char&gt;   &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         5-FU Bortezomib    0.3500   0.00045    A2058       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         5-FU Bortezomib    0.3500   0.00045    A2780       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         5-FU Bortezomib    0.3500   0.00045     A375       1</span>
@@ -796,6 +826,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin  Topotecan    0.0223   0.07750     A427       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin  Topotecan    0.0223   0.07750    CAOV3       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               combination_name col Key .rownames row Key i.col Key i..rownames</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;   &lt;int&gt;    &lt;char&gt;   &lt;int&gt;     &lt;int&gt;      &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:        5-FU &amp; Bortezomib       1   A2058:1       1         1     A2058:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:        5-FU &amp; Bortezomib       3   A2780:1       1         3     A2780:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:        5-FU &amp; Bortezomib       5    A375:1       1         5      A375:1</span>
@@ -808,6 +839,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin &amp; Topotecan       8    A427:1     744         8      A427:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin &amp; Topotecan      10   CAOV3:1     744        10     CAOV3:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       i.row Key mu/muMax_published X/X0_published</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;int&gt;              &lt;num&gt;          &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         1              0.880          0.847</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         1              0.384          0.426</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         1              1.033          1.047</span>
@@ -837,7 +869,9 @@ the object.</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">merckLongTable</span><span class="op">[[</span><span class="st">'sensitivity'</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>column(s) not removed because not found: [.colnames]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;drug1id, drug2id, drug1dose, drug2dose, sampleid, batchid&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            drug1id    drug2id drug1dose drug2dose sampleid batchid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;     &lt;char&gt;     &lt;num&gt;     &lt;num&gt;   &lt;char&gt;   &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         5-FU Bortezomib    0.3500   0.00045    A2058       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         5-FU Bortezomib    0.3500   0.00045    A2780       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         5-FU Bortezomib    0.3500   0.00045     A375       1</span>
@@ -850,6 +884,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin  Topotecan    0.0223   0.07750     A427       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin  Topotecan    0.0223   0.07750    CAOV3       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               combination_name col Key .rownames row Key i.col Key i..rownames</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;   &lt;int&gt;    &lt;char&gt;   &lt;int&gt;     &lt;int&gt;      &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:        5-FU &amp; Bortezomib       1   A2058:1       1         1     A2058:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:        5-FU &amp; Bortezomib       3   A2780:1       1         3     A2780:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:        5-FU &amp; Bortezomib       5    A375:1       1         5      A375:1</span>
@@ -862,6 +897,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin &amp; Topotecan       8    A427:1     744         8      A427:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin &amp; Topotecan      10   CAOV3:1     744        10     CAOV3:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       i.row Key i.col Key.2 i..rownames.2 i.row Key.2 i.col Key.1 i..rownames.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;int&gt;       &lt;int&gt;        &lt;char&gt;       &lt;int&gt;       &lt;int&gt;        &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         1           1       A2058:1           1           1       A2058:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:         1           3       A2780:1           1           3       A2780:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:         1           5        A375:1           1           5        A375:1</span>
@@ -874,6 +910,7 @@ the object.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799:       744           8        A427:1         744           8        A427:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800:       744          10       CAOV3:1         744          10       CAOV3:1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       i.row Key.1 viability1 viability2 viability3 viability4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;int&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:           1      0.814      0.754      0.765      0.849</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:           1      0.214      0.195      0.186      0.223</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:           1      1.064      1.080      1.082      1.009</span>

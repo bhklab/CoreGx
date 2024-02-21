@@ -121,6 +121,7 @@ the coercing operation.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">as</span><span class="op">(</span><span class="va">merckLongTable</span>, <span class="st">'data.table'</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               combination_name      drug1id    drug2id drug1dose drug2dose</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;       &lt;char&gt;     &lt;char&gt;     &lt;num&gt;     &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:        5-FU &amp; Bortezomib         5-FU Bortezomib    0.3500   0.00045</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:        5-FU &amp; Bortezomib         5-FU Bortezomib    0.3500   0.00045</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:        5-FU &amp; Bortezomib         5-FU Bortezomib    0.3500   0.00045</span>
@@ -133,6 +134,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799: geldanamycin &amp; Topotecan geldanamycin  Topotecan    0.0223   0.07750</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800: geldanamycin &amp; Topotecan geldanamycin  Topotecan    0.0223   0.07750</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       sampleid batchid viability1 viability2 viability3 viability4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;   &lt;int&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:    A2058       1      0.814      0.754      0.765      0.849</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:    A2780       1      0.214      0.195      0.186      0.223</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:     A375       1      1.064      1.080      1.082      1.009</span>
@@ -145,6 +147,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3799:     A427       1      0.142      0.166      0.124      0.175</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3800:    CAOV3       1      0.091      0.084      0.134      0.119</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       mu/muMax_published X/X0_published</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                    &lt;num&gt;          &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:              0.880          0.847</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:              0.384          0.426</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:              1.033          1.047</span>
@@ -176,12 +179,12 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     values: mu/muMax_published, X/X0_published</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00; font-weight: bold;">metadataMap:</span><span style="color: #00BB00;"> NA</span></span>
 <span class="r-in"><span><span class="fu">as</span><span class="op">(</span><span class="va">dataTable</span>, <span class="st">'LongTable'</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-01-18 21:36:01 Building assay index...</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-01-18 21:36:01 Joining rowData to assayIndex...</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-01-18 21:36:02 Joining colData to assayIndex...</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-01-18 21:36:03 Joining assays to assayIndex...</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-01-18 21:36:04 Setting assayIndex key...</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-01-18 21:36:04 Building LongTable...</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-02-21 15:40:46 Building assay index...</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-02-21 15:40:46 Joining rowData to assayIndex...</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-02-21 15:40:47 Joining colData to assayIndex...</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-02-21 15:40:47 Joining assays to assayIndex...</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-02-21 15:40:49 Setting assayIndex key...</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">2024-02-21 15:40:49 Building LongTable...</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00; font-weight: bold; font-style: italic;">&lt;LongTable&gt; </span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #BBBB00; font-weight: bold;">dim:  744 12 </span></span>
@@ -197,7 +200,9 @@ the coercing operation.</p>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Arguments in '...' ignored</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Arguments in '...' ignored</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #00BBBB; font-weight: bold;">Dropped S4 metadata during coercion to data.table!</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;.feature&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              .feature                                           .sample</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;                                            &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1: ENSG00000000003       BUNDS_P_NCLE_RNA5_HG-U133_PLUS_2_B11_419860</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2: ENSG00000000003       BUNDS_P_NCLE_RNA5_HG-U133_PLUS_2_F07_419790</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3: ENSG00000000003       CASED_P_NCLE_RNA4_HG-U133_PLUS_2_G02_383638</span>
@@ -210,6 +215,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999: ENSG00000068394       SILOS_P_NCLE_RNA9_HG-U133_PLUS_2_A04_523474</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000: ENSG00000068394       WATCH_P_NCLE_RNA8_HG-U133_PLUS_2_B04_474582</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           exprs se.exprs                                        samplename</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;num&gt;   &lt;lgcl&gt;                                            &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:  9.596987       NA       BUNDS_p_NCLE_RNA5_HG-U133_Plus_2_B11_419860</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:  9.924551       NA       BUNDS_p_NCLE_RNA5_HG-U133_Plus_2_F07_419790</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:  4.878338       NA       CASED_p_NCLE_RNA4_HG-U133_Plus_2_G02_383638</span>
@@ -222,6 +228,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999:  8.810289       NA       SILOS_p_NCLE_RNA9_HG-U133_Plus_2_A04_523474</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000:  9.256034       NA       WATCH_p_NCLE_RNA8_HG-U133_Plus_2_B04_474582</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                       filename       chiptype</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                         &lt;char&gt;         &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:       BUNDS_p_NCLE_RNA5_HG-U133_Plus_2_B11_419860.CEL.gz HG-U133_Plus_2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:       BUNDS_p_NCLE_RNA5_HG-U133_Plus_2_F07_419790.CEL.gz HG-U133_Plus_2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:       CASED_p_NCLE_RNA4_HG-U133_Plus_2_G02_383638.CEL.gz HG-U133_Plus_2</span>
@@ -233,19 +240,21 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8998:       NIECE_p_NCLE_RNA3_HG-U133_Plus_2_G10_296152.CEL.gz HG-U133_Plus_2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999:       SILOS_p_NCLE_RNA9_HG-U133_Plus_2_A04_523474.CEL.gz HG-U133_Plus_2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000:       WATCH_p_NCLE_RNA8_HG-U133_Plus_2_B04_474582.CEL.gz HG-U133_Plus_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       hybridization.date hybridization.hour   file.day file.hour batch</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    1:           12/19/08           11:43:19 2009-01-07  13:06:03    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2:           12/19/08           11:30:25 2009-01-07  13:05:45    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3:           10/29/08           08:04:03 2008-11-04  14:19:49    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    4:           10/29/08           07:52:47 2008-11-04  14:19:49    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    5:         2010-05-21          17:07:46Z 2010-05-26  16:35:08    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                                 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8996:         2010-05-21          17:07:46Z 2010-05-26  16:35:08    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8997:         2010-05-21          16:45:06Z 2010-05-26  16:35:21    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8998:           07/15/08           12:54:10 2008-07-24  14:23:47    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8999:         2009-12-08          20:44:59Z 2009-12-11  14:20:50    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9000:         2009-08-14          17:15:45Z 2009-08-19  16:16:45    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       hybridization.date hybridization.hour   file.day file.hour  batch</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   &lt;char&gt;             &lt;char&gt;     &lt;char&gt;    &lt;char&gt; &lt;lgcl&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    1:           12/19/08           11:43:19 2009-01-07  13:06:03     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2:           12/19/08           11:30:25 2009-01-07  13:05:45     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3:           10/29/08           08:04:03 2008-11-04  14:19:49     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    4:           10/29/08           07:52:47 2008-11-04  14:19:49     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    5:         2010-05-21          17:07:46Z 2010-05-26  16:35:08     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8996:         2010-05-21          17:07:46Z 2010-05-26  16:35:08     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8997:         2010-05-21          16:45:06Z 2010-05-26  16:35:21     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8998:           07/15/08           12:54:10 2008-07-24  14:23:47     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8999:         2009-12-08          20:44:59Z 2009-12-11  14:20:50     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9000:         2009-08-14          17:15:45Z 2009-08-19  16:16:45     NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        sampleid                 CCLE.name Cell.line.primary.name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          &lt;char&gt;                    &lt;char&gt;                 &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1: KP-N-S19s KPNSI9S_AUTONOMIC_GANGLIA              KP-N-SI9s</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:   SK-N-SH   SKNSH_AUTONOMIC_GANGLIA                SK-N-SH</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:   SK-N-FI   SKNFI_AUTONOMIC_GANGLIA                SK-N-FI</span>
@@ -258,6 +267,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999: MHH-NB-11 MHHNB11_AUTONOMIC_GANGLIA              MHH-NB-11</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000:       NB1     NB1_AUTONOMIC_GANGLIA                   NB-1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Cell.line.aliases Gender      Site.Primary     Histology Hist.Subtype1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  &lt;char&gt; &lt;char&gt;            &lt;char&gt;        &lt;char&gt;        &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:         KP-N-S19s      M autonomic_ganglia neuroblastoma            NS</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:              &lt;NA&gt;      F autonomic_ganglia neuroblastoma            NS</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:           SK-N-F1      M autonomic_ganglia neuroblastoma            NS</span>
@@ -270,6 +280,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999:              &lt;NA&gt;      M autonomic_ganglia neuroblastoma            NS</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000:              &lt;NA&gt;      M autonomic_ganglia neuroblastoma            NS</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                       Notes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                      &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:                                                                                  &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2: Identical lines: SH-SY5Y is a subclone derived from SK-N-SH and is identical to LAN-5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:                                                                                  &lt;NA&gt;</span>
@@ -282,6 +293,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999:                                                                                  &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000:                                                                                  &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Source                                 Expression.arrays</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;                                            &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:  HSRRB       BUNDS_p_NCLE_RNA5_HG-U133_Plus_2_B11_419860</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:   ATCC       BUNDS_p_NCLE_RNA5_HG-U133_Plus_2_F07_419790</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:   ATCC       CASED_p_NCLE_RNA4_HG-U133_Plus_2_G02_383638</span>
@@ -294,6 +306,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999:   DSMZ       SILOS_p_NCLE_RNA9_HG-U133_Plus_2_A04_523474</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000:  HSRRB       WATCH_p_NCLE_RNA8_HG-U133_Plus_2_B04_474582</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                               SNP.arrays Oncomap</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                   &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:  FIEFS_p_NCLE_DNA_Affy5_GenomeWideSNP_6_H05_410924     yes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:   BOWER_p_NCLE_DNAAffy8_GenomeWideSNP_6_B02_464602     yes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:  FIEFS_p_NCLE_DNA_Affy5_GenomeWideSNP_6_F10_410970     yes</span>
@@ -306,6 +319,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999:  AWASH_p_NCLE_DNAAffy10_GenomeWideSNP_6_H08_542886     yes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000:  AWASH_p_NCLE_DNAAffy10_GenomeWideSNP_6_F10_542910     yes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Hybrid.Capture.Sequencing batchid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          &lt;char&gt;  &lt;lgcl&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:                       yes      NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:                       yes      NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:                       yes      NA</span>
@@ -318,6 +332,7 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999:                       yes      NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000:                       yes      NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                              rownames.x              Probe</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                  &lt;char&gt;             &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1:       BUNDS_P_NCLE_RNA5_HG-U133_PLUS_2_B11_419860 ENSG00000000003_at</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2:       BUNDS_P_NCLE_RNA5_HG-U133_PLUS_2_F07_419790 ENSG00000000003_at</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3:       CASED_P_NCLE_RNA4_HG-U133_PLUS_2_G02_383638 ENSG00000000003_at</span>
@@ -329,19 +344,21 @@ the coercing operation.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8998:       NIECE_P_NCLE_RNA3_HG-U133_PLUS_2_G10_296152 ENSG00000068394_at</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8999:       SILOS_P_NCLE_RNA9_HG-U133_PLUS_2_A04_523474 ENSG00000068394_at</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9000:       WATCH_P_NCLE_RNA8_HG-U133_PLUS_2_B04_474582 ENSG00000068394_at</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         EnsemblGeneId EntrezGeneId Symbol    GeneBioType BEST      rownames.y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    1: ENSG00000000003         7105 TSPAN6 protein_coding TRUE ENSG00000000003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2: ENSG00000000003         7105 TSPAN6 protein_coding TRUE ENSG00000000003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3: ENSG00000000003         7105 TSPAN6 protein_coding TRUE ENSG00000000003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    4: ENSG00000000003         7105 TSPAN6 protein_coding TRUE ENSG00000000003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    5: ENSG00000000003         7105 TSPAN6 protein_coding TRUE ENSG00000000003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                                        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8996: ENSG00000068394        27238  GPKOW protein_coding TRUE ENSG00000068394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8997: ENSG00000068394        27238  GPKOW protein_coding TRUE ENSG00000068394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8998: ENSG00000068394        27238  GPKOW protein_coding TRUE ENSG00000068394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8999: ENSG00000068394        27238  GPKOW protein_coding TRUE ENSG00000068394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9000: ENSG00000068394        27238  GPKOW protein_coding TRUE ENSG00000068394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         EnsemblGeneId EntrezGeneId Symbol    GeneBioType   BEST      rownames.y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;        &lt;int&gt; &lt;char&gt;         &lt;char&gt; &lt;lgcl&gt;          &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    1: ENSG00000000003         7105 TSPAN6 protein_coding   TRUE ENSG00000000003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2: ENSG00000000003         7105 TSPAN6 protein_coding   TRUE ENSG00000000003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3: ENSG00000000003         7105 TSPAN6 protein_coding   TRUE ENSG00000000003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    4: ENSG00000000003         7105 TSPAN6 protein_coding   TRUE ENSG00000000003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    5: ENSG00000000003         7105 TSPAN6 protein_coding   TRUE ENSG00000000003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8996: ENSG00000068394        27238  GPKOW protein_coding   TRUE ENSG00000068394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8997: ENSG00000068394        27238  GPKOW protein_coding   TRUE ENSG00000068394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8998: ENSG00000068394        27238  GPKOW protein_coding   TRUE ENSG00000068394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8999: ENSG00000068394        27238  GPKOW protein_coding   TRUE ENSG00000068394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9000: ENSG00000068394        27238  GPKOW protein_coding   TRUE ENSG00000068394</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            rownames.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1: ENSG00000000003</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    2: ENSG00000000003</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    3: ENSG00000000003</span>
