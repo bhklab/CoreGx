@@ -509,7 +509,10 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     aList <- copy(assays(object, raw=TRUE))
 
     # -- sort metadata tables by their id columns and update the index
+    # Add row key to rData
     rData[, .rowKey := .I, by=c(rowIDs(object))]
+
+    # Add column key to cData
     cData[, .colKey := .I, by=c(colIDs(object))]
 
     # -- update rowKey and colKey in the assayIndex, if they have changed
@@ -529,7 +532,38 @@ setMethod('reindex', signature(object='LongTable'), function(object) {
     # -- add new indices for assayKeys to index
     setkeyv(index, c("rowKey", "colKey"))
     assays_ <- setdiff(colnames(index), c("rowKey", "colKey"))
+    lapply(assays_, function(nm){
+        # drop the first "." from nm
+        name <- gsub("^\\.", "", nm)
+
+        # if there are any more "." in the name, then raise an erro
+        if (grepl("\\.", name))
+            stop("Assay names cannot contain '.' characters!")
+
+    })
+
     assayEqualKeys <- setNames(vector("logical", length(assays_)), assays_)
+    # This loop iterates over each element in the 'assays_' vector.
+    # For each element, it performs the following operations:
+    # 1. It checks if the element is not missing in the current data.table.
+    # 2. If the element is not missing, it creates a new column with the name
+    #    ".<element>" and assigns a unique group identifier (.GRP) to each row
+    #    that has a non-missing value for that element. The grouping is done by
+    #    the element itself.
+    # 3. It updates the 'assayEqualKeys' list with a logical value indicating
+    #    whether all the values in the newly created column are equal to the
+    #    corresponding values in the original column.
+    #    This is done to ensure that summary assays, with repeated keys, have
+    #    consistent values across all rows.
+    #
+    # The data.table syntax used in this code is as follows:
+    # - The 'get' function is used to retrieve the value of a variable by name.
+    # - The 'is.na' function is used to check if a value is missing.
+    # - The ':=' operator is used to create or update columns by reference.
+    # - The '.GRP' variable represents a unique group identifier.
+    # - The 'by' parameter is used to specify the grouping variable(s).
+    #
+    # Note: The line width of the code has been limited to 80 characters for better readability.
     for (nm in assays_) {
         ## Added by to maintain cardinality of the each assayKey
         ## Required to fix #147 and ensure summary assays, with repeated keys
