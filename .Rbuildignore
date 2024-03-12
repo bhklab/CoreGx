@@ -18,7 +18,6 @@ appveyor.yml
 ^.git/.*
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
-^\.github$
 scripts
 combos
 local_data
