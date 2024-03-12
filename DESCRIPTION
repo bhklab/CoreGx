@@ -1,9 +1,11 @@
 Package: CoreGx
 Type: Package
 Title: Classes and Functions to Serve as the Basis for Other 'Gx' Packages
-Version: 2.7.2
-Date: 2023-12-07
+Version: 2.7.3
+Date: 2024-03-11
 Authors@R: c(
+    person(given="Jermiah", family="Joseph", email="jermiah.joseph@uhn.ca",
+        role=c("aut")),
     person(given="Petr", family="Smirnov", email = "petr.smirnov@uhnresearch.ca",
         role = c("aut")),
     person(given="Ian", family="Smith", email = "ianc.smith@mail.utoronto.ca",
@@ -11,8 +13,6 @@ Authors@R: c(
     person(given="Christopher", family="Eeles", email = "christopher.eeles@uhnresearch.ca",
         role = c("aut")),
     person(given="Feifei", family="Li", email="ff.li@mail.utoronto.ca",
-        role=c("aut")),
-    person(given="Jermiah", family="Joseph", email="jermiah.joseph@uhn.ca",
         role=c("aut")),
     person("Benjamin", "Haibe-Kains",
         email = "benjamin.haibe.kains@utoronto.ca", role = c("aut", "cre"))
@@ -71,7 +71,7 @@ Suggests:
 License: GPL (>= 3)
 Config/testthat/edition: 3
 Roxygen: list(markdown=TRUE, r6=FALSE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 RCollate:
     'allGenerics.R'
     'immutable-class.R'
