@@ -1,5 +1,8 @@
 # CoreGx News File
 
+* v 2.7.4
+* Added logging and attribute returns to `callingWaterful` method.
+
 * v 2.3.6
 * Updated a definition of `updateObject` method (Bioc 3.19 bugfix)
 
