@@ -3,7 +3,14 @@
 \docType{class}
 \name{list_OR_LongTable-class}
 \alias{list_OR_LongTable-class}
-\title{A class union to allow multiple types in a CoreSet slot}
+\title{Function to combine two LongTables into a single LongTable}
+\arguments{
+\item{x}{A \code{LongTable} object}
+
+\item{y}{A \code{LongTable} object
+
+A class union to allow multiple types in a CoreSet slot}
+}
 \description{
-A class union to allow multiple types in a CoreSet slot
+Function to combine two LongTables into a single LongTable
 }
