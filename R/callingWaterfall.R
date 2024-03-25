@@ -51,15 +51,30 @@
 #'
 #' @export
 #' @keywords internal
-callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fold = c(4, 1.2, 1.2), cor.min.linear = 0.95, name = "Drug",
-    plot = FALSE) {
+callingWaterfall <- function(
+    x, 
+    type = c("IC50", "AUC", "AMAX"), 
+    intermediate.fold = c(4, 1.2, 1.2), 
+    cor.min.linear = 0.95, 
+    name = "Drug",
+    plot = FALSE
+) {
+    funContext <- .funContext("::callingWaterfall")
 
-    type <- match.arg(type)
+    # Set the 'type' variable to one of the allowed values
+    # type <- match.arg(type)
+    type <- "IC50"
+    .message(funContext, "Calling waterfall for ", type, " with ", name)
+
+    # If there are any negative values in 'intermediate.fold', replace them with 0
     if (any(!is.na(intermediate.fold) & intermediate.fold < 0)) {
         intermediate.fold <- intermediate.fold[!is.na(intermediate.fold) & intermediate.fold < 0] <- 0
     }
+
+    # If the 'names' of 'x' are not defined, assign them as "X.1", "X.2", etc.
     if (is.null(names(x))) {
         names(x) <- paste("X", seq_along(x), sep = ".")
+        .message(funContext, "No names in input data, using ", length(x), " default names")
     }
 
     xx <- x[complete.cases(x)]
@@ -91,15 +106,25 @@ callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fo
         interfold <- intermediate.fold
     })
 
+    # Check if the length of 'xx' is less than 3
     if (length(xx) < 3) {
         tt <- array(NA, dim = length(x), dimnames = list(names(x)))
+        # Create an array 'tt' with NA values, having the same length as 'x'
+        # The dimensions of 'tt' are set using the length of 'x' and the names of 'x'
+        
         if (interfold == 0) {
+            # Check if 'interfold' is equal to 0
             tt <- factor(tt, levels = c("resistant", "sensitive"))
+            # Convert 'tt' into a factor with levels "resistant" and "sensitive"
         } else {
             tt <- factor(tt, levels = c("resistant", "intermediate", "sensitive"))
+            # Convert 'tt' into a factor with levels "resistant", "intermediate", and "sensitive"
         }
+        
         return(tt)
+        # Return the 'tt' array
     }
+
 
     oo <- order(xx, decreasing = TRUE)
     ## test linearity with Pearson correlation
@@ -113,13 +138,27 @@ callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fo
     }, slope = rr$coefficients[2], intercept = rr$coefficients[1])
     if (cc$estimate > cor.min.linear) {
         ## approximately linear waterfall
+        msg <- sprintf("Linear waterfall with R=%.3g", cc$estimate)
+        .message(funContext, msg)
+        msg2 <- sprintf("Using median as cutoff")
+        .message(funContext, msg2)
+        
+        cutoff_attribute <- "median"
         cutoff <- which.min(abs(xx[oo] - median(xx[oo])))
         cutoffn <- names(cutoff)[1]
     } else {
         ## non linear waterfall identify cutoff as the maximum distance
+        msg <- sprintf("Non-linear waterfall with R=%.3g", cc$estimate)
+        .message(funContext, msg)
+        msg2 <- sprintf("Using maximal distance as cutoff")
+        .message(funContext, msg2)
+        
+        cutoff_attribute <- "maximal distance"
         cutoff <- which.max(abs(ddi))
         cutoffn <- names(ddi)[cutoff]
     }
+
+
     ## identify intermediate sensitivities
     switch(type, IC50 = {
         if (interfold == 0) {
@@ -197,6 +236,20 @@ callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fo
     } else {
         tt <- factor(tt, levels = c("resistant", "intermediate", "sensitive"))
     }
+
+    # Add attributes to the output
+    attr(tt, "parameters") <- list(
+        type = type,
+        intermediate.fold = interfold,
+        cor.min.linear = cor.min.linear
+    )
+
+    attr(tt, "cutoff") <- list(
+        method = cutoff_attribute,
+        value = xx[oo][cutoff],
+        distance = ddi[cutoffn]
+    )
+
     return(tt)
 }
 
@@ -205,7 +258,6 @@ callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fo
 
 #' Calculate shortest distance between point and line
 #'
-#' @examples .distancePointLine(0, 0, 1, -1, 1)
 #'
 #' @description This function calculates the shortest distance between a point
 #'   and a line in 2D space.
@@ -221,6 +273,9 @@ callingWaterfall <- function(x, type = c("IC50", "AUC", "AMAX"), intermediate.fo
 #'
 #' @return `numeric` The shortest distance between a point and a line.
 #'
+#' @examples 
+#' .distancePointLine(0, 0, 1, -1, 1)
+#' 
 #' @export
 #' @keywords internal
 .distancePointLine <- function(x, y, a=1, b=1, c=0) {
