@@ -666,3 +666,7 @@ is_optim_compatible <- function(fn) formalArgs(fn)[1] == "par"
         }
     }
 }
+
+jermiah <- function(msg){
+  print(msg)
+}
