@@ -1,8 +1,8 @@
 pandoc: 3.1.1
-pkgdown: 2.0.7
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
-  TreatmentResponseExperiment: TreatmentResponseExperiment.html
   coreGx: coreGx.html
-last_built: 2024-03-25T15:57Z
+  TreatmentResponseExperiment: TreatmentResponseExperiment.html
+last_built: 2025-08-25T16:09Z
 
