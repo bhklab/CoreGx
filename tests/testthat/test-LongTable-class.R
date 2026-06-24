@@ -84,6 +84,100 @@ testthat::test_that("`LongTable` constructor method works with valid inputs", {
     )
 })
 
+testthat::test_that("`LongTable` constructor builds sparse assay index", {
+    row_data <- data.table(
+        treatmentid = paste0("D", seq_len(100)),
+        row_meta = seq_len(100)
+    )
+    col_data <- data.table(
+        sampleid = paste0("S", seq_len(100)),
+        col_meta = seq_len(100)
+    )
+    sensitivity <- data.table(
+        treatmentid = c("D1", "D20", "D100"),
+        sampleid = c("S2", "S2", "S99"),
+        viability = c(0.9, 0.5, 0.1)
+    )
+
+    lt <- LongTable(
+        rowData = row_data,
+        rowIDs = "treatmentid",
+        colData = col_data,
+        colIDs = "sampleid",
+        assays = list(sensitivity = sensitivity),
+        assayIDs = list(sensitivity = c("treatmentid", "sampleid"))
+    )
+
+    testthat::expect_equal(nrow(assayIndex(lt)), nrow(sensitivity))
+    testthat::expect_equal(
+        nrow(assay(lt, "sensitivity", withDimnames = TRUE)),
+        nrow(sensitivity)
+    )
+})
+
+testthat::test_that("`LongTable` constructor preserves assay-specific keys", {
+    row_data <- data.table(
+        experiment_id = "E1",
+        treatmentid = "D1"
+    )
+    col_data <- data.table(sampleid = "S1")
+    raw <- data.table(
+        experiment_id = c("E1", "E1"),
+        sampleid = c("S1", "S1"),
+        dose_index = c(1L, 2L),
+        dose = c(-7, -6),
+        viability = c(95, 70)
+    )
+
+    lt <- LongTable(
+        rowData = row_data,
+        rowIDs = "experiment_id",
+        colData = col_data,
+        colIDs = "sampleid",
+        assays = list(raw = raw),
+        assayIDs = list(raw = c("experiment_id", "sampleid", "dose_index"))
+    )
+
+    raw_assay <- assay(lt, "raw", withDimnames = TRUE, summarize = FALSE)
+    testthat::expect_equal(
+        assayKeys(lt, "raw"),
+        c("experiment_id", "sampleid", "dose_index")
+    )
+    testthat::expect_equal(nrow(raw_assay), 2L)
+    testthat::expect_equal(raw_assay$dose_index, c(1L, 2L))
+    testthat::expect_true("dose_index" %in% colnames(assays(lt, raw = TRUE)$raw))
+    testthat::expect_false("experiment_id" %in% colnames(assays(lt, raw = TRUE)$raw))
+    testthat::expect_false("sampleid" %in% colnames(assays(lt, raw = TRUE)$raw))
+})
+
+testthat::test_that("`LongTable` constructor expands summary assays by observed keys", {
+    row_data <- data.table(
+        treatmentid = c("D1", "D1"),
+        dose = c(-7, -6)
+    )
+    col_data <- data.table(sampleid = "S1")
+    profiles <- data.table(
+        treatmentid = "D1",
+        sampleid = "S1",
+        ic50 = -6.5
+    )
+
+    lt <- LongTable(
+        rowData = row_data,
+        rowIDs = c("treatmentid", "dose"),
+        colData = col_data,
+        colIDs = "sampleid",
+        assays = list(profiles = profiles),
+        assayIDs = list(profiles = c("treatmentid", "sampleid"))
+    )
+
+    testthat::expect_equal(
+        nrow(assay(lt, "profiles", summarize = FALSE)),
+        nrow(row_data)
+    )
+    testthat::expect_equal(nrow(assay(lt, "profiles")), nrow(profiles))
+})
+
 # == assayCols
 
 testthat::test_that("`assayCols,LongTable-method` retrieves specified assay's column names",{
