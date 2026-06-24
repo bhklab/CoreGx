@@ -178,6 +178,47 @@ testthat::test_that("`LongTable` constructor expands summary assays by observed 
     testthat::expect_equal(nrow(assay(lt, "profiles")), nrow(profiles))
 })
 
+testthat::test_that("`.rebuildRaw` supports paired numbered wide raw assays", {
+    row_data <- data.table(
+        experiment_id = c("E1", "E2"),
+        treatmentid = c("D1", "D2")
+    )
+    col_data <- data.table(sampleid = c("S1", "S2"))
+    sensitivity <- data.table(
+        experiment_id = c("E1", "E2"),
+        sampleid = c("S1", "S2"),
+        dose_1 = c(1e-8, 2e-8),
+        dose_2 = c(1e-7, 2e-7),
+        dose_10 = c(1e-6, 2e-6),
+        viability_1 = c(95, 90),
+        viability_2 = c(75, 70),
+        viability_10 = c(20, 10)
+    )
+
+    tre <- TreatmentResponseExperiment(
+        rowData = row_data,
+        rowIDs = "experiment_id",
+        colData = col_data,
+        colIDs = "sampleid",
+        assays = list(sensitivity = sensitivity),
+        assayIDs = list(sensitivity = c("experiment_id", "sampleid"))
+    )
+
+    raw <- CoreGx:::.rebuildRaw(tre)
+
+    testthat::expect_equal(dim(raw), c(2L, 3L, 2L))
+    testthat::expect_equal(dimnames(raw)[[1]], c("E1_S1", "E2_S2"))
+    testthat::expect_equal(dimnames(raw)[[2]], c("dose1", "dose2", "dose10"))
+    testthat::expect_equal(
+        unname(raw[, , "Dose"]),
+        matrix(c(1e-8, 2e-8, 1e-7, 2e-7, 1e-6, 2e-6), nrow = 2)
+    )
+    testthat::expect_equal(
+        unname(raw[, , "Viability"]),
+        matrix(c(95, 90, 75, 70, 20, 10), nrow = 2)
+    )
+})
+
 # == assayCols
 
 testthat::test_that("`assayCols,LongTable-method` retrieves specified assay's column names",{
