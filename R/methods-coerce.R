@@ -234,9 +234,11 @@ as.long.table <- function(x) as(x, 'LongTable')
 #' @export
 setAs(from='SummarizedExperiment', to='data.table', function(from) {
     # -- extract sample metadata
-    colDT <- as.data.table(colData(from), keep.rownames='.sample')
+    colDT <- as.data.table(as.data.frame(colData(from), optional=TRUE),
+        keep.rownames='.sample')
     # -- extract feature metadata
-    rowDT <- as.data.table(rowData(from), keep.rownames='.feature')
+    rowDT <- as.data.table(as.data.frame(rowData(from), optional=TRUE),
+        keep.rownames='.feature')
     # -- extract and process assays
     assayL <- assays(from)
     assayDtL <- lapply(assayL, as.data.table, keep.rownames='.feature')
