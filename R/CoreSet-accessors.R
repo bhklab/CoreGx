@@ -1634,7 +1634,7 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
             renaming your assays in the @treatmentResponse LongTable object?')
 
     # Extract the information needed to reconstruct the sensitivityRaw array
-    viability <- longTable$sensitivity
+    viability <- copy(longTable$sensitivity)
 
     # Early return for single treatment sensitivity experimentss
     ## TODO:: refactor this into a helper?
@@ -1662,18 +1662,43 @@ setMethod("sensitivityRaw", signature("CoreSet"), function(object) {
         return(sensRaw)
     }
 
-    # Build the rownames
     .paste_colons <- function(...) paste(..., sep=':')
-    # viability[, row_ids := Reduce(.paste_colons, mget(rowIDs(longTable)))]
-    # viability[, col_ids := Reduce(.paste_colons, mget(colIDs(longTable)))]
-    # viability[, rownames := paste0(row_ids, '_', col_ids)]
-    # viability[, c('row_ids', 'col_ids') := NULL]
+    .addRawRownames <- function(rawDT) {
+        rawDT[, rownames := {
+            row_ids <- Reduce(.paste_colons, mget(rowIDs(longTable)))
+            col_ids <- Reduce(.paste_colons, mget(colIDs(longTable)))
+            paste0(row_ids, '_', col_ids)
+        }]
+        rawDT
+    }
 
-    viability[, rownames := {
-        row_ids <- Reduce(.paste_colons, mget(rowIDs(longTable)))
-        col_ids <- Reduce(.paste_colons, mget(colIDs(longTable)))
-        paste0(row_ids, '_', col_ids)
-    }]
+    doseCols <- grep('^[dD]ose_?[0-9]+$', colnames(viability), value=TRUE)
+    viabCols <- grep('^[Vv]iability_?[0-9]+$', colnames(viability),
+        value=TRUE)
+    doseIndex <- sub('^[dD]ose_?', '', doseCols)
+    viabIndex <- sub('^[Vv]iability_?', '', viabCols)
+    sharedIndex <- intersect(doseIndex, viabIndex)
+
+    if (length(sharedIndex)) {
+        sharedIndex <- sharedIndex[order(as.integer(sharedIndex))]
+        doseCols <- doseCols[match(sharedIndex, doseIndex)]
+        viabCols <- viabCols[match(sharedIndex, viabIndex)]
+        viability <- .addRawRownames(viability)
+
+        sensRaw <- array(dim=list(nrow(viability), length(sharedIndex), 2),
+            dimnames=list(viability$rownames, paste0('dose', sharedIndex),
+                c('Dose', 'Viability')))
+        sensRaw[, , 'Dose'] <- as.matrix(viability[, .SD,
+            .SDcols=doseCols])
+        sensRaw[, , 'Viability'] <- as.matrix(viability[, .SD,
+            .SDcols=viabCols])
+
+        return(sensRaw)
+    }
+
+    # Build the rownames
+    viability <- .addRawRownames(viability)
+
 
     # Merge the doses into vectors in a list column
     viability[, dose := Reduce(.paste_slashes, mget(colnames(.SD))),

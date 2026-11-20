@@ -159,12 +159,14 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
     internals$colMeta <- setdiff(colnames(colData[, -'colKey']), colIDs)
 
     # -- capture assays internal metadata
-    # sort such that rowIDs are first, then colIDs; ensures reindex returns
-    # the same order as construtor
+    # Sort such that rowIDs are first, then colIDs, followed by any
+    # assay-specific keys. The extra keys are required for assays with repeated
+    # observations per row/column pair, such as dose-response measurements.
     for (i in seq_along(assayIDs)) {
         rids <- intersect(rowIDs, assayIDs[[i]])
         cids <- intersect(colIDs, assayIDs[[i]])
-        assayIDs[[i]] <- c(rids, cids)
+        extraIDs <- setdiff(assayIDs[[i]], c(rids, cids))
+        assayIDs[[i]] <- c(rids, cids, extraIDs)
     }
     internals$assayKeys <- assayIDs
 
@@ -181,61 +183,42 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
         assays[[nm]][, (.nm) := .I]
     }
     
-    # build the index mapping assay rows to rowKey and colKey
+    # Build the index mapping observed assay rows to rowKey and colKey. This
+    # avoids constructing a dense rowData x colData Cartesian product for sparse
+    # datasets.
     cat(.infoMsg("Building assay index...\n", time=TRUE))
-    assayIndex <- expand.grid(rowKey=rowData$rowKey, colKey=colData$colKey)
-    setDT(assayIndex)
-    # setkeyv(assayIndex, c("rowKey", "colKey"))
-    
-    cat(.infoMsg("Joining rowData to assayIndex...\n", time=TRUE))
-    setkeyv(rowData, "rowKey")
-    setkeyv(assayIndex, "rowKey")
-    # assayIndex <- assayIndex[
-    #     rowData[, c(rowIDs, "rowKey"), with=FALSE], ,
-    #     on="rowKey", allow.cartesian=FALSE
-    # ]
-    rd <- rowData[, c(rowIDs, "rowKey"), with=FALSE]
-    assayIndex <- merge(
-        assayIndex, rd,
-        by="rowKey", all.x=TRUE, allow.cartesian=FALSE
-    )
-
-    # print if rowKey in rowData is not unique
-    if(nrow(rowData) != uniqueN(rowData$rowKey)) {
-        cat(.warnMsg("rowData rowKey is not unique!"))
-        show(assayIndex)
-        show(rowData)
-    }
-    rm(rd)
-    gc()
-    cat(.infoMsg("Joining colData to assayIndex...\n", time=TRUE))
-    setkeyv(colData, "colKey")
-    # assayIndex <- assayIndex[
-    #     colData[, c(colIDs, "colKey"), with=FALSE], ,
-    #     on="colKey", allow.cartesian=FALSE
-    # ]
-    cd <- colData[, c(colIDs, "colKey"), with=FALSE]
-    assayIndex <- merge(
-        assayIndex, cd,
-        by="colKey", all.x=TRUE, allow.cartesian=FALSE
-    )
-    rm(cd)
-    gc()
-    cat(.infoMsg("Joining assays to assayIndex...\n", time=TRUE))
-
-    # Set the key variables for the assayIndex using rowIDs and colIDs
-    setkeyv(assayIndex, c(rowIDs, colIDs))
-
-
+    assayIndexList <- vector("list", length(assays))
+    names(assayIndexList) <- names(assays)
     for (nm in names(assays)) {
         .nm <- paste0(".", nm)
-        assayIndex[assays[[nm]], (.nm) := get(.nm)]
+        rids <- intersect(rowIDs, assayIDs[[nm]])
+        cids <- intersect(colIDs, assayIDs[[nm]])
+
+        if (!length(rids)) {
+            stop(.errorMsg("No rowIDs found in assayIDs for assay: ", nm),
+                call.=FALSE)
+        }
+        if (!length(cids)) {
+            stop(.errorMsg("No colIDs found in assayIDs for assay: ", nm),
+                call.=FALSE)
+        }
+
+        idx <- unique(assays[[nm]][, c(assayIDs[[nm]], .nm), with=FALSE])
+
+        rd <- unique(rowData[, c(rids, "rowKey"), with=FALSE])
+        setkeyv(rd, rids)
+        setkeyv(idx, rids)
+        idx <- merge(idx, rd, by=rids, all.x=TRUE, allow.cartesian=TRUE)
+
+        cd <- unique(colData[, c(cids, "colKey"), with=FALSE])
+        setkeyv(cd, cids)
+        setkeyv(idx, cids)
+        idx <- merge(idx, cd, by=cids, all.x=TRUE, allow.cartesian=TRUE)
+
+        assayIndexList[[nm]] <- idx[, c("rowKey", "colKey", .nm), with=FALSE]
     }
-    gc()
-    assayIndex[, (c(rowIDs, colIDs)) := NULL]
-    assayIndex <- assayIndex[
-        which(rowAnys(!is.na(assayIndex[, paste0(".", names(assays)), with=FALSE]))),
-    ]
+    assayIndex <- rbindlist(assayIndexList, use.names=TRUE, fill=TRUE)
+    assayIndex <- unique(assayIndex)
     gc()
     cat(.infoMsg("Setting assayIndex key...\n", time=TRUE))
     setkeyv(assayIndex, paste0(".", names(assays)))
@@ -247,9 +230,12 @@ LongTable <- function(rowData, rowIDs, colData, colIDs, assays, assayIDs,
 
     gc()
     cat(.infoMsg("Building LongTable...\n", time=TRUE))
-    # Drop extra assay columns and key by the assay key in the assay index
+    # Drop row/column ID columns and key by the assay key in the assay index.
+    # Assay-specific keys remain in the assay so repeated observations can be
+    # recovered by accessors.
     for (i in seq_along(assays)) {
-        assays[[i]][, (assayIDs[[i]]) := NULL]
+        dimIDs <- intersect(assayIDs[[i]], c(rowIDs, colIDs))
+        assays[[i]][, (dimIDs) := NULL]
         setkeyv(assays[[i]], paste0(".", names(assays)[i]))
     }
 
@@ -593,6 +579,8 @@ setMethod('assayCols', signature(object='LongTable'),
         x=lapply(assays(object, raw=TRUE), FUN=colnames),
         y=as.list(paste0(".", assayNames(object)))
     )
-    assayCols <- Map(c, keys, assayColnames)
+    assayCols <- Map(function(keyCols, assayCols) {
+        unique(c(keyCols, assayCols))
+    }, keys, assayColnames)
     if (!missing(i)) assayCols[[i]] else assayCols
 })
